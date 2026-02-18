@@ -27,9 +27,9 @@ def check_password():
         st.session_state.authenticated = False
     if not st.session_state.authenticated:
         st.title("\U0001f512 Harris Farm Hub")
-        password = st.text_input("Enter password to access The Hub:", type="password")
+        pw = st.text_input("Password:", type="password")
         if st.button("Login"):
-            if password == st.secrets.get("password", "HFM2026!1"):
+            if pw == "HFM2026!1":
                 st.session_state.authenticated = True
                 st.rerun()
             else:
