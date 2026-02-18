@@ -3,9 +3,4 @@ pandas
 plotly
 numpy
 pyarrow
-gdown
-requests
-openai
-anthropic
-python-dotenv
 Pillow
