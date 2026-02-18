@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: harris-farm-hub
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash render_start.sh
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.6

@@ -27,7 +27,8 @@ def check_password():
         st.session_state.authenticated = False
     if not st.session_state.authenticated:
         st.title("\U0001f512 Harris Farm Hub")
-        pw = st.text_input("Password:", type="password")
+        st.markdown("**AI Centre of Excellence**")
+        pw = st.text_input("Enter password:", type="password")
         if st.button("Login"):
             if pw == "HFM2026!1":
                 st.session_state.authenticated = True

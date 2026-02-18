@@ -4,3 +4,14 @@ plotly
 numpy
 pyarrow
 Pillow
+requests
+httpx
+uvicorn[standard]
+fastapi
+pydantic<2
+python-dotenv
+anthropic
+openai
+sqlalchemy
+aiofiles
+gdown
