@@ -1,9 +1,8 @@
-# Dashboards
-streamlit>=1.28,<2.0
-pandas>=2.1,<3.0
-plotly>=5.18,<6.0
-numpy>=1.26,<2.0
-requests>=2.31,<3.0
-
-# Transaction data engine (pre-built wheels, no C compile)
-duckdb>=1.0.0
+streamlit
+pandas
+plotly
+numpy
+requests
+duckdb
+pyarrow
+gdown

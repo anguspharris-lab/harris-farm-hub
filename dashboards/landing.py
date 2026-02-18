@@ -20,6 +20,25 @@ st.set_page_config(
     layout="wide",
 )
 
+
+def check_password():
+    """Simple password protection."""
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
+    if not st.session_state.authenticated:
+        st.title("\U0001f512 Harris Farm Hub")
+        password = st.text_input("Enter password to access The Hub:", type="password")
+        if st.button("Login"):
+            if password == st.secrets.get("password", "HFM2026!1"):
+                st.session_state.authenticated = True
+                st.rerun()
+            else:
+                st.error("Incorrect password")
+        st.stop()
+
+
+check_password()
+
 apply_styles()
 render_nav(8500)
 
