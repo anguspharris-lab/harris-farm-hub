@@ -1,0 +1,53 @@
+{
+  "name": "Arena Competition UI",
+  "description": "Build out the Arena competition UI so agent performance is visible and competitive. Tables and API endpoints exist (12 proposals, 5 team stats) but the UI is minimal. Make it prominent and engaging.",
+  "abort_on_safety_fail": true,
+  "max_retries_per_task": 1,
+  "timeout_seconds_per_task": 600,
+  "phases": [
+    {
+      "name": "Build Arena dashboard section",
+      "success_criteria": "Arena competition visible in Hub Portal with rankings, head-to-head, and competition history. Tests pass.",
+      "tasks": [
+        {
+          "name": "Build Arena competition UI in Hub Portal",
+          "description": "In dashboards/hub_portal.py, find the Arena-related section (if any) and build it out into a full competition view. If no dedicated section exists, add an 'Arena' tab.\n\n1. **Standings Table**: Query GET /api/arena/leaderboard (or equivalent). Display:\n   - Rank, Agent Name, Win/Loss/Draw record, Avg Score, Best Score, Current Streak\n   - Use st.dataframe with conditional formatting (green for top 3, red for bottom)\n\n2. **Head-to-Head Comparison**: Allow user to select 2 agents from dropdowns\n   - Show side-by-side metrics: avg score, task count, best grade, improvement delta\n   - Radar chart (Plotly) comparing the 7 scoring criteria (H/R/S/C/D/U/X)\n\n3. **Competition History**: Show past competitions:\n   - Timeline of competitions with winners\n   - Score progression chart (line chart, each agent a line)\n\n4. **Active Competition Banner**: If a competition is active:\n   - Days remaining countdown\n   - Current leader\n   - 'Join Competition' or 'View Details' button\n\n5. **Team Stats**: Display team-level aggregates from arena API:\n   - Total tasks completed across all agents\n   - Average quality score\n   - Improvement trend (up/down arrow)\n\nUse Plotly for all charts. Keep consistent with Hub Portal styling.\nIf API returns empty data, show placeholder message with instructions.\n\nRun tests after: python3 -m pytest tests/ -v",
+          "agent_role": "frontend_engineer",
+          "files_to_touch": [
+            "dashboards/hub_portal.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arena backend endpoints",
+      "success_criteria": "All Arena PARTIAL endpoints return real data. Tests pass.",
+      "tasks": [
+        {
+          "name": "Activate Arena API endpoints with real data",
+          "description": "In backend/app.py, find the Arena-related endpoints (there should be ~10 marked as PARTIAL in FEATURE_STATUS.md).\n\nFor each Arena endpoint:\n1. Verify it queries real data from the arena tables (arena_competitions, arena_entries, arena_results, team_stats or similar)\n2. If any endpoint returns mock/empty data, wire it to real database queries\n3. Ensure these endpoints work:\n   - GET /api/arena/leaderboard — returns ranked agents by score\n   - GET /api/arena/competitions — lists all competitions (active and past)\n   - POST /api/arena/competitions — creates a new competition (30-day window, baseline scores)\n   - GET /api/arena/competitions/{id} — returns competition details with standings\n   - POST /api/arena/competitions/{id}/enter — enters an agent into a competition\n   - GET /api/arena/head-to-head?agent1=X&agent2=Y — returns comparison data\n   - GET /api/arena/team-stats — returns team-level aggregates\n\nIf arena tables don't have data, add a seed function (like seed_arena_data) that:\n- Creates 1 completed competition with results from existing agent_scores\n- Creates 1 active competition\n- Populates team_stats from agent_proposals aggregates\n\nRun tests after: python3 -m pytest tests/ -v",
+          "agent_role": "backend_engineer",
+          "files_to_touch": [
+            "backend/app.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tests and docs",
+      "success_criteria": "Arena tests and docs complete.",
+      "tasks": [
+        {
+          "name": "Write Arena tests and update docs",
+          "description": "1. Create tests/test_arena.py:\n   - Test GET /api/arena/leaderboard returns list\n   - Test GET /api/arena/competitions returns list\n   - Test GET /api/arena/team-stats returns dict with expected keys\n   - Test competition creation and entry\n   - Test head-to-head comparison returns data for both agents\n   - Min 8 tests\n\n2. Update docs/FEATURE_STATUS.md:\n   - Arena Competition: PARTIAL → LIVE\n\n3. Update docs/CHANGELOG.md with Arena UI entry\n\nRun: python3 -m pytest tests/ -v",
+          "agent_role": "test_engineer",
+          "files_to_touch": [
+            "tests/test_arena.py",
+            "docs/FEATURE_STATUS.md",
+            "docs/CHANGELOG.md"
+          ]
+        }
+      ]
+    }
+  ]
+}

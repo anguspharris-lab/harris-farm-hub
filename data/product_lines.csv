@@ -1,0 +1,492 @@
+department_code,department_name,major_group_code,major_group_name,minor_group_code,minor_group_name,item_family_code,item_family_name,source
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,105,Beans French,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,107,Beans Broad,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,108,Beans Butter,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,109,Beans Flat,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,110,Beans Italian,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,111,Beans Red,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,115,Broccoli Tender Stem,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,116,Broccoli,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,122,Cabbage,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,125,Cabbage Savoy,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,128,Cabbage Red,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,131,Cabbage Tuscan,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,133,Capsicums Red,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,134,Capsicums Green,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,135,Capsicums Butter,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,136,Capsicums Orange,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,147,Celery,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,151,Chilli Hot,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,152,Chilli Bullhorn,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,154,Chilli Bullhorn Yellow,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,168,Sin Qua,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,175,Cucumber Apple,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,176,Cucumber Telegraph,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,177,Cucumber Green,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,180,Eggplant,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,181,Eggplant Small,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,182,Eggplant Thai,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,187,Gherkins,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,194,Eggplant European,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,222,Leeks Bunch,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,224,Baby Cos Living,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,225,Lettuce,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,226,Baby Cos Twin Packs,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,227,Lettuce Cos,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,230,Lettuce Rapa,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,232,Malahia,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,248,Peas,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,249,Peas Snow,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,253,Mushrooms Jumbo,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,259,Peas Honey Snap,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,280,Soup Pack,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,290,Squash Spaghetti,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,294,Turmeric,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,304,Turnip White,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,305,Witloff,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,306,Zucchini Black,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,307,Zucchini Grey,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,308,Stir Fry,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,320,Alfalfa,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,383,Yams,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,704,Flower Edible,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,705,Pandan Leaves,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,707,Beanettes,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,710,Chilli Long Hot,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,712,Jalapeno,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,1335,Capsicums Mini,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,1511,Habanero,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,1751,Chilli Thai,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,2801,Roast Pack,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,1,Vegetables,9980,For Budget Only,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,292,Tomatoes Egg Sensation,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,295,Tomatoes Amorosa,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,296,Tomatoes Grape Kumato,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,297,Tomatoes Ox Heart,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,298,Tomatoes Truss,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,300,Tomatoes,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,301,Tomatoes Cherry,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,302,Tomatoes Mini Roma,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,303,Tomatoes Egg,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,311,Tomatoes Vine Ripened,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,312,Tomatoes Grape Golden,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,313,Tomatoes Egg Vine Ripe,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,316,Tomatoes Sampari,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,317,Tomatoes Medley Mix,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,2298,Tomatoes Rosso Bruno,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,2981,Tomatoes Truss Otello,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,3974,Tomatoes Heirloom,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,7288,Tomatoes Cherry Sweet Pearl,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,7295,Tomatoes Johny Lovebits,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,7298,Tomatoes Grape,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,2,Tomatoes,72987,Tomatoes Sweet Delights,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,137,Carrots Med,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,138,Carrots Small,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,170,Chokoes,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,185,Garlic,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,186,Ginger,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,189,Galangal,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,241,Onion Brown,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,242,Onion White,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,243,Onion Pickling,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,244,Onion Spanish,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,247,Parsnips,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,250,Potatoes Chats,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,251,Potatoes Washed,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,252,Potatoes Brushed,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,254,Potatoes Pontiacs,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,257,Potatoes Kumera,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,258,Potatoes Sweet,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,262,Pumpkin Qld Blue,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,264,Pumpkin Gramma,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,266,Pumpkin Butternut,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,268,Pumpkin Gold Nugget,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,287,Swedes,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,288,Taroroot,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,293,Pumpkin Kent,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,334,Eschallots French,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,382,Potatoes Desiree,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,391,Potatoes Peeled,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,392,Pumpkin Peeled,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,397,Onion Salad,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,748,Potatoes Kestrel,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,749,Potato Hawian Sweet,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,752,Potatoes Kipfler,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,753,Potatoes Dutch Cream,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,754,Potatoes Bintje,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,756,Potatoes Purple Congo,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,758,Potatoes King Edward,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,759,Potatoes Charlotte,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,762,Potatoes Kestrel,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,772,Potato Red Ruby Lou,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,1381,Snackable Carrots,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,1851,Garlic Fresh Bunch,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,1861,Ginger Ea,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,2662,Pumpkin Coventry,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,2664,Pumpkin Orange Glow,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,7137,Crisp & Fresh Carrots,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,3,Hard Vegetables,8380,Carrot Juice,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,104,Asparagus,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,112,Beans Snake,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,114,Beetroot,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,117,Brussels Sprouts,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,119,Cauliflower Purple,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,120,Cabbage Chinese,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,139,Carrots (dutch) Bunch,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,141,Cauliflower,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,142,Orange Cauliflower,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,144,Celeriac Bunch,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,145,Celeriac Loose,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,150,Chickory,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,161,Chick Qua,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,172,Corn,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,173,Corn Baby,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,178,Cucumber Lebanese,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,184,Endive,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,190,Aniseed Bunch,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,191,Fennel Loose,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,193,Artichoke Each Local,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,199,Artichoke Victorian,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,211,Baby Beetroot,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,220,Kohlrabi,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,221,Kale,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,228,Lettuce Mignionette,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,231,Lettuce Radichia,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,235,Mushroom Pine,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,237,Mushrooms Cups,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,239,Mushrooms Oyster,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,240,Okra,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,245,Onion Spring,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,246,Mushroom King Brown,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,270,Radish Red,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,271,Radish White,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,274,Rhubarb,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,275,Scallopini,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,277,Shallots,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,281,Spinach,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,282,Spinach English,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,283,Spinach Rainbow,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,284,Squash Button,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,286,Squash Gold,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,314,Lettuce Living,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,319,Bean Shoot Pkt,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,321,Basil Purple/Green,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,322,Basil Thai,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,326,Bay Leaves,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,328,Bean Shoot Loose,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,330,Chives Green,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,332,Coriander,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,333,Dill,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,335,Horseradish,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,336,Marjoram,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,337,Mint,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,338,Sprouts,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,340,Oregano,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,341,Parsley,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,343,Parsley Continental,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,345,Rosemary,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,346,Sage,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,347,Vietnamese Mint,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,348,Sorrel,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,349,Tarragon,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,350,Thyme,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,352,Thyme Lemon,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,353,Broccoli Sprouts,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,356,Chervill,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,359,Lemon Grass,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,360,Zucchini Flower,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,361,Arugula,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,362,Mushrooms Flat,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,365,Exotic Mushrooms,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,374,Mushroom Swiss Brown,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,390,Curry Leaves,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,393,Lime Leaves,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,395,Sprouts Herbs,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,701,Salad,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,708,Herbs Mixed Punnets,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,711,Prepack Baby Veg,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,717,Sea Asparagus,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,720,Salads Pre-Pack,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,729,Black Garlic,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,730,Peeled Garlic,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,742,Micro Herbs Tubs,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,746,Betel Leave,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,747,Wheatgrass,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,760,Garlic Single Clove,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,1141,Love Beets,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,1142,Golden Beetroot,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,1202,Purple Chinese Cabbage,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,1373,Baby Vegetables,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,1392,Carrots Purple Bunch,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,1722,Popcorn,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,2531,Love Baby Potatoes,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,2711,French Radish,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,3611,Prepack Salad Eco Leaf,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,6334,Mung Beans,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,4,Highly Perishable Vegies,7115,Crisp & Fresh Beetroot,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,5,PRE-CUT VEGETABLES,2412,HFM Cut Vegetables,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,5,PRE-CUT VEGETABLES,2413,Peeled & Sliced Veggies Kg,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,5,PRE-CUT VEGETABLES,2480,Cut Veg Packs,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,5,PRE-CUT VEGETABLES,2515,Cut Veg,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,146,Gow Gee,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,155,Gai Lan,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,156,Green Shanghai Buk Choy,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,157,Buk Choy,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,158,Choy Sum,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,159,Choy Sum Baby,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,160,Tong Ho,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,163,Moon Buk,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,165,Gai Choy,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,166,Gay Choy Baby,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,167,Hung Choy,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,169,Hong Kong Choy Sum,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,196,Hong Kong Melon,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,331,Chives Garlic,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,354,Watercress,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,386,Garlic Shoots,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,473,Melon Bitter,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,771,Long Melon,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,8,Asian Vegetables,1602,Yau Mak Choy,F&V Shrinkage Retail
+10,Fruit & Vegetables,1,Vegetables,9,MICROWAVABLE,780,Microwavable Vegetables,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,400,Apples Envy,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,402,Apples Delicious,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,403,Apples Pink Lady,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,405,Apples Golden Delicious,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,407,Apples Granny Smith,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,408,Apples Jonathon,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,409,Apples Sundowner,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,410,Apples Royal Gala,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,411,Apples Fuji,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,418,Apples Jazz,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,530,Apples Star,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,4012,Apples Rockit,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,4013,Apples Papple,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,4021,Apples Crimson Snow,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,4033,Apples Gippsland,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,4041,APPLES COSMIC CRISP,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,4400,Apples Kanzi,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,4402,Apples Rubi Gold,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,4443,Apples Bravo,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,1,Apples,6784,Apples Toffee,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,2,Pears,496,Pears Josephine,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,2,Pears,497,Pears William,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,2,Pears,498,Pears Beurre Bosc,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,2,Pears,499,Pears Packham,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,2,Pears,509,Pears Corella,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,2,Pears,521,Quinces,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,2,Pears,539,Pears Nashi,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,2,Pears,541,Pears Ya,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,2,Pears,559,Pears Winter Cole,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,2,Pears,580,Pears Paradise,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,2,Pears,723,Pears Yali,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,436,Cumquats,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,456,Grapefruit,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,458,Grapefruit Ruby Red,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,462,Lemons,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,464,Limes,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,468,Mandarins Imperial,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,476,Mandarins Afourer,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,486,Pomellos,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,488,Oranges Blood,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,491,Oranges Navel,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,492,Oranges Valencia,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,493,Mandarins Murcott,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,525,Tangelos,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,573,Mandarins Daisy,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,574,Limes Blood,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,592,Mandarins Empress,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,593,Mandarins Hickson,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,4492,Oranges Navel Ruby Red,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,3,CITRUS,4641,Limes Finger,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,4,Bananas,419,Plantain Bananas,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,4,Bananas,420,Bananas Hand,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,4,Bananas,421,Bananas Loose,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,4,Bananas,422,Bananas Lady Fingers,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,4,Bananas,524,Banana Senyorita,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,4,Bananas,7420,Bananas Eco,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,5,Berries,423,Blueberries,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,5,Berries,424,Blackberries,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,5,Berries,427,Gooseberries,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,5,Berries,430,Raspberries,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,5,Berries,431,Mulberries,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,5,Berries,432,Strawberries,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,5,Berries,459,Mix Berries,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,414,Apricots,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,435,Cherries,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,437,Cherries White,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,442,Figs Fresh,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,443,Figs Fresh Punnet,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,446,Grapes Red Seedless,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,447,Grapes Black Muscatels,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,449,Grapes White Seedless,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,451,Grapes Sultana,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,484,Nectarines,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,485,Nectarine White,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,502,Persimmons,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,504,Pomegranates,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,508,Peaches Yellow,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,510,Peaches White,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,511,Peaches Golden,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,512,Plums Blood,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,515,Plums Crimson Glow,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,516,Plums Early Queen,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,519,Plums Red Beaut,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,567,Plums October Sun,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,585,Plums Angelino,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,587,Plums September Candy,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,596,Grapes Currant,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,597,Grapes Black Seedless,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,598,Grapes Black,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,5111,Peaches Donut,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,5517,Plums Aussie Bell,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,5518,Plums Dapple Dandy,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,5520,Plums Queen Garnett,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,5671,Plums Sunset,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,7516,Plums Amber Jewel,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,7517,Plums Tegan Blue,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,7518,Plums Flavour Fall,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,7520,Plums Black Kat,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,6,Stone Fruit,7620,Plums Black Diamond,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,415,Avocados,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,438,Coconuts,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,440,Custard Apple,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,444,Kiwi Gold,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,445,Feijoas,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,455,Guavas,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,460,Jack Fruit,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,461,Kiwi Fruit Green,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,466,Rambutan,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,467,Lychees,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,470,Mango,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,482,Achacha,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,494,Passionfruit,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,495,Paw Paw,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,501,Dragon Fruit,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,505,Pineapple Large,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,506,Paw Paw Fijian,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,507,Pineapples Small,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,520,Prickly Pear,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,523,Tamarillo,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,526,Durian,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,529,Star Fruit,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,538,Mangoes Cooking,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,540,Paw Paw Cooking,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,562,Bread Fruit,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,563,Fuyu Fruit,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,564,Longans,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,565,Dates Jujube,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,566,Mangosteen,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,570,Passionfruit Panama,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,576,Black Sapote,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,579,Soursop,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,590,Sugar Cane,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,591,Kiwi Berry,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,595,Pineapple Sweet Topless,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,731,Banana Leaves,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,4551,Jujube Fruit,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,7,TROPICAL,4611,Kiwi Fruit Red,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,8,Melon,463,Melon Champagne,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,8,Melon,471,Melon Casaba,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,8,Melon,472,Melon Honey Dew Large,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,8,Melon,475,Melon Rock Large,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,8,Melon,477,Melon Rock Small,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,8,Melon,478,Melon Jam,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,8,Melon,480,Watermelon Whole,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,8,Melon,555,Melon Honey Dew Yellow,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,8,Melon,556,Watermelon Seedless,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,8,Melon,577,Spanish Melon,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,9,Sundry Fruit,441,Dates,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,9,Sundry Fruit,487,Olives Large,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,9,Sundry Fruit,490,Olives Black,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,9,Sundry Fruit,522,Rosellas,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,9,Sundry Fruit,533,Plums Sugar (prunes),F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,9,Sundry Fruit,722,Dates Barhee,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,9,Sundry Fruit,6801,Chestnuts,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,9,Sundry Fruit,7170,Pistachio Fresh,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,9,Sundry Fruit,44112,Dates Medjool,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,11,CUT FRUIT,60215,HFM Cut Fruit,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,11,CUT FRUIT,60216,Cutfruit- warehouse,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,11,CUT FRUIT,60219,Cutfruit Store Production,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,12,HFM JUICE,8080,HFM Fresh Juices,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,12,HFM JUICE,60213,HFM Cold Pressed Juice,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,99,MISCELLANEOUS FRUIT SALES,548,Fruit Basket Economy,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,99,MISCELLANEOUS FRUIT SALES,549,Fruit Basket Medium,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,99,MISCELLANEOUS FRUIT SALES,550,Fruit Basket Prestige,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,99,MISCELLANEOUS FRUIT SALES,777,Pallets,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,99,MISCELLANEOUS FRUIT SALES,7780,Fruit Boxes,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,99,MISCELLANEOUS FRUIT SALES,7793,Juice It Up,F&V Shrinkage Retail
+10,Fruit & Vegetables,2,Fruit,99,MISCELLANEOUS FRUIT SALES,9965,Children Cancer Institute,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7104,Organic Asparagus,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7105,Organic Beans,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7114,Organic Beetroot,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7116,Organic Broccoli,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7117,Organic Brussels Sprouts,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7118,Organic Broccolini,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7122,Organic Cabbage,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7128,Organic Cabbage Red,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7133,Organic Capsicums Red,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7134,Organic Capsicums Green,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7138,Organic Carrots,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7139,Organic Carrots Bunch,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7141,Organic Cauliflower,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7147,Organic Celery,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7157,Organic Buk Choy,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7172,Organic Corn,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7178,Organic Lebanese Cucumbers,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7180,Organic Eggplant,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7185,Organic Garlic P/P,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7186,Organic Ginger,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7221,Organic Kale,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7223,Organic Leeks,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7225,Organic Lettuce,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7227,Organic Cos Lettuce,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7237,Organic Mushrooms,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7241,Organic Onions,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7244,Organic Onions Spanish,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7247,Organic Parsnips,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7257,Organic Kumera,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7266,Organic Pumpkin Butternut,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7277,Organic Shallots,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7281,Organic Spinach,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7282,Organic English Spinach,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7293,Organic Pumpkin Jap,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7294,Organic Turmeric,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7300,Organic Tomatoes,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7306,Organic Zucchini Black,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7314,Organic Living Lettuce,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7315,Organic Sprouts,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7321,Organic Basil,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7330,Organic Chives,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7332,Organic Coriander,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7333,Organic Dill,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7337,Organic Mint,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7343,Organic Parsley Continental,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7361,Organic Rocket P/P,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7701,Organic Salad Mesclun P/P,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7703,Organic Baby Spinach P/P,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7752,Organic Kipfler Potatoes,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,7753,Organic Dutch Cream,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,10105,For Budget Only-Do Not Use,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,71141,Organic Love Beets,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,17,Organic Vegetable,71151,Organic Broccolini,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7403,Organic Apples Pink Lady,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7407,Organic Apples Granny Smith,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7410,Organic Apple Gala,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7411,Organic Apple Fuji,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7414,Organic Apricot,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7416,Organic Avocadoes,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7421,Organic Banana,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7441,Organic Dates,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7449,Grapes White Seedless,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7458,Organic Grapefruit Ruby,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7461,Organic Kiwi Fruit,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7462,Organic Lemon,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7464,Organic Limes,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7468,Organic Mandarines,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7470,Organic Mangoes,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7491,Organic Oranges Navel,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7492,Organic Oranges Valencia,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7499,Organic Pears Packham,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,7510,Organic Peaches White,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,74150,Organic Avocadoes,F&V Shrinkage Retail
+10,Fruit & Vegetables,7,Organic Fruit & Veg,27,ORGANIC FRUIT,74462,Organic Grapes Red Seedless,F&V Shrinkage Retail

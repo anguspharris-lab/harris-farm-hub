@@ -1,0 +1,89 @@
+{
+  "name": "Real Data Dashboard Rewiring",
+  "description": "Replace mock data in all dashboards with real Harris Farm data from data/harris_farm.db SQLite database. Add hierarchy reporting. Validate all calculations against source data.",
+  "abort_on_safety_fail": true,
+  "max_retries_per_task": 1,
+  "timeout_seconds_per_task": 300,
+  "phases": [
+    {
+      "name": "Create data access module",
+      "success_criteria": "dashboards/shared/data_access.py connects to data/harris_farm.db and provides query functions. All existing tests pass.",
+      "tasks": [
+        {
+          "name": "Create shared data access module for SQLite",
+          "description": "Create dashboards/shared/data_access.py that provides these functions for all dashboards:\n\n1. get_db_path() — returns path to data/harris_farm.db relative to project root\n2. get_stores() — returns list of store names from stores table (store_type='Retail' only, sorted by store_name)\n3. get_departments() — returns list of dicts with department_code, department_name, major_group_code, major_group_name from departments table\n4. get_sales_data(stores=None, departments=None, major_groups=None, date_from=None, date_to=None, measure='Sales - Val', channel='Retail', promo='N') — queries sales table, returns list of dicts with store, department, major_group, week_ending, value. Filters are optional.\n5. get_customer_data(stores=None, date_from=None, date_to=None) — queries customers table\n6. get_fiscal_calendar() — returns fiscal_calendar table as list of dicts\n7. get_market_share(region_code=None, channel='Total', period_from=None, period_to=None) — queries market_share table\n\nUse sqlite3 module. Use context managers for connections. Cache the db path. All functions return lists of dicts for easy use with pandas/streamlit.\n\nAlso update dashboards/shared/__init__.py to export the new module.\n\nThe database is at PROJECT_ROOT/data/harris_farm.db where PROJECT_ROOT is 2 levels up from the shared/ directory.\n\nDatabase schema:\n- stores: store_number, store_name, store_company, state, store_type, fv_store, like_for_like\n- departments: department_code, department_name, major_group_code, major_group_name\n- fiscal_calendar: sequence, week_ending_date, financial_year, fin_week_of_year, etc.\n- sales: store, channel, department, major_group, is_promotion, measure, week_ending, value, fy_lol, rolling_13wk_lol, fv_store\n- customers: store, channel, measure, week_ending, value\n- market_share: period, region_code, region_name, industry_name, channel, market_size_dollars, market_share_pct, customer_penetration_pct, spend_per_customer, spend_per_transaction, transactions_per_customer\n\nMeasures in sales: 'Sales - Val', 'Initial Gross Profit - Val', 'Final Gross Prod - Val', 'Bgt Sales - Val', 'Bgt Final GP - Val', 'Total Shrinkage \\u2013 Val'\nStore format: '10 - HFM Pennant Hills', '28 - HFM Mosman', etc.\nDepartment format: '10 - Fruit & Vegetables', '20 - Grocery', etc.\n\nRun tests after: python3 -m pytest tests/ -v",
+          "agent_role": "data_engineer",
+          "files_to_touch": [
+            "dashboards/shared/data_access.py",
+            "dashboards/shared/__init__.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rewire sales dashboard",
+      "success_criteria": "sales_dashboard.py shows real data from SQLite. All existing tests pass.",
+      "tasks": [
+        {
+          "name": "Rewrite sales dashboard to use real data",
+          "description": "Rewrite dashboards/sales_dashboard.py to use REAL data from data/harris_farm.db via the shared data_access module.\n\nCURRENT STATE: The dashboard generates MOCK data using seeded RNG. Replace ALL mock data generation with real SQLite queries.\n\nKEY CHANGES:\n1. Import from shared.data_access (get_stores, get_sales_data, get_departments, get_fiscal_calendar)\n2. Replace the STORES list with get_stores() from database (real 27 retail stores, not mock 21)\n3. Replace generate_mock_data() with actual queries to sales table\n4. Store filter: use real store names from DB\n5. Department filter: ADD department and major group filters from departments table\n6. Period filter: keep 454 calendar logic but use real fiscal_calendar table for period boundaries\n7. KPIs from real data: Revenue = SUM(Sales - Val), GP = SUM(Initial Gross Profit - Val), Shrinkage = SUM(Total Shrinkage - Val), Budget = SUM(Bgt Sales - Val)\n8. Period comparisons: query previous period from real data (not mock deltas)\n9. Charts: real weekly trends from sales table\n\nKEEP: nav header, Streamlit layout, chart styling, 454 calendar sidebar display\nKEEP: from nav import render_nav\n\nThe dashboard runs from dashboards/ directory: cd dashboards && streamlit run sales_dashboard.py\nSo data_access imports work as: from shared.data_access import ...\nDB path needs to go up one level: ../data/harris_farm.db\n\nStore names in DB: '10 - HFM Pennant Hills', '28 - HFM Mosman', etc. Display just the name part after the ' - '.\n\nDo NOT break any existing tests. Run python3 -m pytest tests/ -v after changes.",
+          "agent_role": "architect",
+          "files_to_touch": [
+            "dashboards/sales_dashboard.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Add hierarchy reporting and rewire profitability",
+      "success_criteria": "Hierarchy drill-down works in sales dashboard. Profitability uses real data. Tests pass.",
+      "tasks": [
+        {
+          "name": "Add hierarchy drill-down to sales dashboard",
+          "description": "Add hierarchy reporting to sales_dashboard.py:\n\n1. Add Department filter (multiselect from departments table: F&V, Grocery, Perishable, Flowers, Proteins, Bakery, Liquor, Service/Counter)\n2. Add Major Group filter (updates based on selected department)\n3. Add a 'Hierarchy View' tab/section that shows:\n   - Department-level summary: Sales, GP$, GP%, Budget, Variance for each department\n   - Click/select department to see Major Group breakdown\n   - Sortable table with conditional formatting (red for negative variance)\n4. Add a treemap or sunburst chart showing sales by Department > Major Group\n5. Period-over-period comparison at each hierarchy level\n\nQuery the sales table grouped by department (or major_group) with appropriate filters.\n\nKeep existing KPI cards and trend charts. Add the hierarchy view as a new section below.\n\nDo NOT break existing functionality. Run tests after.",
+          "agent_role": "architect",
+          "files_to_touch": [
+            "dashboards/sales_dashboard.py"
+          ]
+        },
+        {
+          "name": "Rewrite profitability dashboard to use real data",
+          "description": "Rewrite dashboards/profitability_dashboard.py to use REAL data from data/harris_farm.db.\n\nReplace all mock data with real SQLite queries via shared.data_access.\n\nKEY DATA:\n- Revenue: measure='Sales - Val'\n- Initial GP: measure='Initial Gross Profit - Val'\n- Final GP: measure='Final Gross Prod - Val'\n- Shrinkage: measure='Total Shrinkage \\u2013 Val' (note the em-dash)\n- Budget Sales: measure='Bgt Sales - Val'\n- Budget GP: measure='Bgt Final GP - Val'\n\nCALCULATIONS:\n- GP% = Initial GP / Sales × 100\n- Final Margin% = Final GP / Sales × 100\n- Shrinkage% = Shrinkage / Sales × 100\n- Budget Variance = Actual Sales - Budget Sales\n\nKEEP: nav header, layout structure, chart styling\nKEEP: from nav import render_nav\n\nThe dashboard runs from dashboards/ directory.\n\nDo NOT break existing tests. Run python3 -m pytest tests/ -v after.",
+          "agent_role": "architect",
+          "files_to_touch": [
+            "dashboards/profitability_dashboard.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Validation and testing",
+      "success_criteria": "New tests validate real data integrity. All tests pass. Cross-dashboard consistency verified.",
+      "tasks": [
+        {
+          "name": "Write validation tests for real data dashboards",
+          "description": "Create tests/test_real_data.py to validate the real data integration:\n\n1. Test data_access module:\n   - get_stores() returns 27+ retail stores\n   - get_departments() returns 8 departments with 28 major groups\n   - get_sales_data() returns data with correct columns\n   - get_sales_data() with store filter returns only that store\n   - get_sales_data() with date filter returns data in range\n   - get_fiscal_calendar() returns 626 weeks\n\n2. Test data integrity:\n   - No negative Sales values (returns are separate)\n   - GP% is between -100% and 100% for most records\n   - Budget data exists for FY2024\n   - All stores in sales table exist in stores table\n   - All departments in sales table exist in departments table\n   - Date range covers at least 2 full fiscal years\n\n3. Test calculation accuracy:\n   - GP$ = Sales$ × GP% (spot check 5 random store-weeks)\n   - Budget variance = Actual - Budget\n   - Sum of major group sales = department total\n   - Sum of department sales = store total\n\n4. Test cross-dashboard consistency:\n   - Sales total from sales_dashboard query matches profitability_dashboard query for same filters\n\nMin 1 success + 1 failure test per function. Follow existing test patterns.\n\nDatabase: data/harris_farm.db (path relative to project root)\nRun: python3 -m pytest tests/ -v",
+          "agent_role": "test_engineer",
+          "files_to_touch": [
+            "tests/test_real_data.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Documentation",
+      "success_criteria": "Docs reflect real data architecture.",
+      "tasks": [
+        {
+          "name": "Update docs for real data integration",
+          "description": "Update documentation to reflect the real data integration:\n\n1. docs/ARCHITECTURE.md — Add:\n   - data/ directory: harris_farm.db SQLite database, source CSV files\n   - Database schema (7 tables, 1.49M sales rows)\n   - Data flow: Excel → CSV extraction → SQLite → dashboards/shared/data_access.py → dashboards\n   - Real store list (27 retail stores) replaces mock 21\n   - 8 departments with 28 major groups\n   - Hierarchy: Department → Major Group → (future: Minor Group → Item)\n\n2. docs/CHANGELOG.md — Add entry:\n   - v2.0.0: Real data integration from Weekly Fresh Report Excel files\n   - Replaced mock data with 1.49M rows of actual sales transactions\n   - Added hierarchy reporting (Dept → Major Group drill-down)\n   - 41 real stores, 8 departments, 28 major groups\n   - Market share data: 76K rows by postcode\n\nKeep existing doc style. Do NOT modify CLAUDE.md or watchdog/ files.",
+          "agent_role": "architect",
+          "files_to_touch": [
+            "docs/ARCHITECTURE.md",
+            "docs/CHANGELOG.md"
+          ]
+        }
+      ]
+    }
+  ]
+}

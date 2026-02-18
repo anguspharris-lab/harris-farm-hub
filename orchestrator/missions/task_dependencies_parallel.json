@@ -1,0 +1,55 @@
+{
+  "name": "Agent Task Dependencies & Parallel Execution",
+  "description": "Add dependency tracking between agent proposals (PLANNED) and enable parallel execution of independent proposals (PLANNED). Currently the executor processes proposals sequentially with no dependency awareness.",
+  "abort_on_safety_fail": true,
+  "max_retries_per_task": 1,
+  "timeout_seconds_per_task": 600,
+  "phases": [
+    {
+      "name": "Add dependency tracking schema and logic",
+      "success_criteria": "agent_proposals table has depends_on field. Executor respects dependencies. Tests pass.",
+      "tasks": [
+        {
+          "name": "Add proposal dependency tracking",
+          "description": "In backend/app.py:\n\n1. Add column to agent_proposals table (in init_hub_database):\n   ALTER TABLE agent_proposals ADD COLUMN depends_on TEXT DEFAULT '[]';\n   (JSON array of proposal IDs that must complete before this one can execute)\n   Handle the case where column already exists gracefully (try/except).\n\n2. Update POST /api/agent-tasks to accept optional depends_on field:\n   - Validate that referenced proposal IDs exist\n   - Store as JSON array string\n\n3. In backend/agent_executor.py, update run_approved_proposals():\n   - Before executing a proposal, check its depends_on list\n   - All referenced proposals must have status='COMPLETED'\n   - If dependencies not met, skip this proposal (leave it APPROVED for next run)\n   - Log skipped proposals: 'Skipping proposal {id}: waiting on dependencies {deps}'\n\n4. Add endpoint GET /api/agent-tasks/{id}/dependencies:\n   - Returns list of dependency proposals with their current status\n   - Indicates which are blocking (not COMPLETED)\n\nRun tests after: python3 -m pytest tests/ -v",
+          "agent_role": "backend_engineer",
+          "files_to_touch": [
+            "backend/app.py",
+            "backend/agent_executor.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Add parallel execution",
+      "success_criteria": "Executor can run multiple independent proposals concurrently. Tests pass.",
+      "tasks": [
+        {
+          "name": "Enable parallel proposal execution",
+          "description": "In backend/agent_executor.py:\n\n1. Add a parallel execution mode to run_approved_proposals():\n   - Identify all APPROVED proposals with met dependencies\n   - Group them: proposals that share no dependencies can run in parallel\n   - Use concurrent.futures.ThreadPoolExecutor(max_workers=3)\n   - Execute independent proposals concurrently\n   - Wait for all to complete before starting next batch\n\n2. Add configuration:\n   EXECUTOR_MAX_PARALLEL = int(os.getenv('EXECUTOR_MAX_PARALLEL', '1'))\n   When set to 1, behaves exactly as before (sequential, backward compatible)\n   When set to 2+, enables parallel execution\n\n3. Ensure thread safety:\n   - Each proposal gets its own SQLite connection (don't share across threads)\n   - DuckDB TransactionStore should be thread-safe (create per-thread instances if needed)\n   - Wrap status updates in proper locking\n\n4. Update POST /api/admin/executor/run to accept optional max_parallel param\n5. Update GET /api/admin/executor/status to show parallel execution info\n\nRun tests after: python3 -m pytest tests/ -v",
+          "agent_role": "backend_engineer",
+          "files_to_touch": [
+            "backend/agent_executor.py",
+            "backend/app.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tests and docs",
+      "success_criteria": "Dependency and parallel execution tests pass. Docs updated.",
+      "tasks": [
+        {
+          "name": "Write tests and update docs",
+          "description": "1. Create tests/test_dependencies_parallel.py:\n   - Test proposal with no dependencies executes normally\n   - Test proposal with unmet dependencies is skipped\n   - Test proposal executes after dependencies complete\n   - Test circular dependency doesn't deadlock (timeout after 5s)\n   - Test parallel mode=1 is sequential (backward compatible)\n   - Test parallel mode=2 runs 2 proposals concurrently\n   - Test dependency validation rejects nonexistent IDs\n   - Min 8 tests\n\n2. Update docs/FEATURE_STATUS.md:\n   - Task Dependencies: PLANNED → LIVE\n   - Parallel Execution: PLANNED → LIVE\n\n3. Update docs/CHANGELOG.md\n\nRun: python3 -m pytest tests/ -v",
+          "agent_role": "test_engineer",
+          "files_to_touch": [
+            "tests/test_dependencies_parallel.py",
+            "docs/FEATURE_STATUS.md",
+            "docs/CHANGELOG.md"
+          ]
+        }
+      ]
+    }
+  ]
+}

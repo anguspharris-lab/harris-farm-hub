@@ -1,0 +1,62 @@
+============================================================
+HFM Job Roles Import Report
+Generated: 2026-02-15 08:50:00
+============================================================
+
+SUMMARY
+  Rows processed:     211
+  Successful imports: 211
+  Duplicates found:   0
+  Validation errors:  0
+
+BREAKDOWN BY FUNCTION
+  Support Office: 152
+  Retail: 53
+  Wholesale-Sydney: 6
+
+BREAKDOWN BY DEPARTMENT
+  Finance: 24
+  IT: 23
+  Online: 10
+  Store Management: 10
+  Logistics Fresh: 9
+  People and Culture: 9
+  Executive: 9
+  Retail Operations: 9
+  Buying Team Fresh: 8
+  Safety Risk & Compliance: 7
+  Property: 7
+  Butcher Proteins: 6
+  Logistics Grocery: 6
+  Marketing: 6
+  Wholesale Business: 6
+  Proteins: 5
+  Logistics Admin: 5
+  Service: 4
+  Fruit and Vegetables: 4
+  Buying Team Gourmet: 4
+  Buying Team Proteins: 4
+  Perishable: 3
+  Grocery: 3
+  Flowers: 3
+  Bakery: 3
+  Back of House: 3
+  Cheese Cutting: 3
+  Logistics Perishables: 3
+  Yoghurt Production: 3
+  Orange Juice: 3
+  Service/Counter: 2
+  Liquor: 2
+  Logistics Freezer: 2
+  Back of House - Refrigerated: 1
+  In Store Trolley Collection: 1
+  Training: 1
+
+SAMPLE DATA (first 5 rows)
+  Function                  Department                Job
+  ------------------------- ------------------------- ------------------------------
+  Retail                    Service                   Supervisor
+  Retail                    Perishable                Section Lead
+  Retail                    Service/Counter           Shop Assistant
+  Retail                    Perishable                Shop Assistant
+  Retail                    Service                   Shop Assistant

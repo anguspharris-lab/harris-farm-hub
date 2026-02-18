@@ -1,0 +1,8 @@
+[2026-02-15T08:50:00.523842] Starting import from HFM Job Roles.xlsx (mode=replace)
+[2026-02-15T08:50:00.533879] Read 211 rows from HFM Job Roles.xlsx
+[2026-02-15T08:50:00.534270] Validated 211 rows, 0 warnings
+[2026-02-15T08:50:00.534339] No duplicates found
+[2026-02-15T08:50:00.537337] Cleared existing employee_roles data (replace mode)
+[2026-02-15T08:50:00.539245] Inserted 211 rows into employee_roles
+[2026-02-15T08:50:00.539551] Wrote /Users/angusharris/Downloads/harris-farm-hub/data/roles/role_metadata.json
+[2026-02-15T08:50:00.539745] Wrote /Users/angusharris/Downloads/harris-farm-hub/data/roles/import_report.txt

@@ -1,0 +1,29 @@
+department_code,department_name,major_group_code,major_group_name
+10,Fruit & Vegetables,1,Vegetables
+10,Fruit & Vegetables,2,Fruit
+10,Fruit & Vegetables,7,Organic Fruit & Veg
+20,Grocery,3,Nuts & Fruits Dried
+20,Grocery,4,Groceries General
+20,Grocery,6,Drinks
+20,Grocery,9,MISCELLANEOUS SALES
+20,Grocery,17,Confection
+20,Grocery,25,Eggs
+20,Grocery,44,Non Food Grocery
+20,Grocery,80,Cooking Essential
+30,Perishable,15,Dairy
+30,Perishable,30,Yoghurt
+30,Perishable,37,Frozen
+30,Perishable,38,Refrigerated
+30,Perishable,90,Cheese
+40,Flowers,5,Flowers/Plants
+50,Proteins,10,BUTCHER MEAT
+50,Proteins,35,Seafood
+50,Proteins,40,PREPACKED FRESH MEAT
+50,Proteins,91,DELI SMALLGOODS
+60,Bakery,20,Packaged Bakery
+60,Bakery,21,Instore Bakery
+70,Liquor,71,Wine
+70,Liquor,75,Beer & Cider
+80,Service/Counter,8,Instore Foodservice
+80,Service/Counter,36,Wholesale Food Service
+80,Service/Counter,50,Fresh Deli

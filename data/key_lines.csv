@@ -1,0 +1,16 @@
+department_code,major_group_code,minor_group_code,item_family_code,item_number,key_line_name,source
+10,02,07,470,4708,4708 Mango Tray Sale,Key Lines
+10,02,07,470,All,470 - Mangoes,Key Lines
+10,02,05,423,All,423 - Blueberries,Key Lines
+10,02,05,430,All,430 - Raspberries,Key Lines
+10,02,05,432,All,432 - Strawberries,Key Lines
+10,02,05,All,All,Total 05 - Berries,Key Lines
+10,02,07,415,All,415 - Avocadoes,Key Lines
+10,02,06,414,All,414 - Apricots,Key Lines
+10,02,06,435,All,435 - Cherries,Key Lines
+10,02,06,449,All,449 - Grapes White Seedless,Key Lines
+10,02,06,484,All,484 - Nectarines,Key Lines
+10,02,06,508,All,508 - Peaches Yellow,Key Lines
+10,02,06,510,All,510 - Peaches White,Key Lines
+10,02,06,All,All,Total 06 - Stone Fruit,Key Lines
+10,02,All,All,All,Total Fruit,Key Lines

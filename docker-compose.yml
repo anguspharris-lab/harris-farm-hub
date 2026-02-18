@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  # Backend API
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GROK_API_KEY=${GROK_API_KEY}
+      - DB_TYPE=${DB_TYPE}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - ./backend:/app
+      - hub-data:/app/data
+    networks:
+      - hub-network
+    restart: unless-stopped
+
+  # Sales Dashboard
+  dashboard-sales:
+    build:
+      context: ./dashboards
+      dockerfile: Dockerfile
+    command: streamlit run sales_dashboard.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000
+    networks:
+      - hub-network
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # Profitability Dashboard
+  dashboard-profit:
+    build:
+      context: ./dashboards
+      dockerfile: Dockerfile
+    command: streamlit run profitability_dashboard.py --server.port 8502 --server.address 0.0.0.0
+    ports:
+      - "8502:8502"
+    environment:
+      - API_URL=http://api:8000
+    networks:
+      - hub-network
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # Transport Dashboard
+  dashboard-transport:
+    build:
+      context: ./dashboards
+      dockerfile: Dockerfile
+    command: streamlit run transport_dashboard.py --server.port 8503 --server.address 0.0.0.0
+    ports:
+      - "8503:8503"
+    environment:
+      - API_URL=http://api:8000
+    networks:
+      - hub-network
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # Prompt Builder
+  prompt-builder:
+    build:
+      context: ./dashboards
+      dockerfile: Dockerfile
+    command: streamlit run prompt_builder.py --server.port 8504 --server.address 0.0.0.0
+    ports:
+      - "8504:8504"
+    environment:
+      - API_URL=http://api:8000
+    networks:
+      - hub-network
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # Frontend (Optional - React app)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    networks:
+      - hub-network
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  hub-data:
+
+networks:
+  hub-network:
+    driver: bridge

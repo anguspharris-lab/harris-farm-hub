@@ -1,0 +1,76 @@
+{
+  "name": "Phase 3 — WATCHDOG Approval Integration",
+  "description": "Wire the existing WatchdogService (dashboards/shared/watchdog_safety.py) into the agent proposal approval flow. Auto-populate risk_level on proposals. Display WATCHDOG badge in Agent Control UI. Block HIGH/BLOCKED proposals from approval without operator override.",
+  "abort_on_safety_fail": true,
+  "max_retries_per_task": 1,
+  "timeout_seconds_per_task": 600,
+  "phases": [
+    {
+      "name": "Wire WATCHDOG into proposal creation",
+      "success_criteria": "Every new agent_proposal gets a WATCHDOG analysis. watchdog_status and watchdog_report_json fields populated. Tests pass.",
+      "tasks": [
+        {
+          "name": "Integrate WATCHDOG into POST /api/agent-tasks",
+          "description": "In backend/app.py, find the POST /api/agent-tasks endpoint (creates new agent proposals). After the proposal is inserted into the agent_proposals table:\n\n1. Import WatchdogService from the shared module. The file is at dashboards/shared/watchdog_safety.py. You may need to add the path: sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'dashboards'))\n2. Instantiate WatchdogService(db_path=config.HUB_DB)\n3. Call analyze_proposal() with the proposal data (agent_id, title, description from the request)\n4. Store the result: UPDATE agent_proposals SET watchdog_status=result['risk_level'], watchdog_report_json=json.dumps(result) WHERE id=new_proposal_id\n5. If risk_level is 'BLOCKED', set the proposal status to 'REJECTED' immediately with reviewer_notes='WATCHDOG: Blocked — critical safety violation'\n\nThe agent_proposals table already has watchdog_status (TEXT) and watchdog_report_json (TEXT) columns. The WatchdogService already has analyze_proposal() and all scanning methods built.\n\nAlso wire it into the existing agent_executor.py — when agent_executor processes APPROVED proposals via run_approved_proposals(), add a pre-check: if the proposal has no watchdog_status, run the analysis before executing.\n\nRun tests after: python3 -m pytest tests/ -v",
+          "agent_role": "backend_engineer",
+          "files_to_touch": [
+            "backend/app.py",
+            "backend/agent_executor.py"
+          ]
+        },
+        {
+          "name": "Add WATCHDOG risk auto-assessment to all proposal sources",
+          "description": "Find all code paths that create agent_proposals (INSERT INTO agent_proposals) in backend/app.py. There are multiple: POST /api/agent-tasks, the self-improvement trigger, the scheduled analysis trigger, and any manual proposal creation endpoints.\n\nFor EACH insertion point, add a call to WatchdogService.analyze_proposal() immediately after insertion, and UPDATE the row with watchdog_status and watchdog_report_json.\n\nCreate a helper function to avoid duplication:\n\ndef run_watchdog_on_proposal(proposal_id: int, agent_id: str, title: str, description: str):\n    from shared.watchdog_safety import WatchdogService\n    wd = WatchdogService(db_path=config.HUB_DB)\n    result = wd.analyze_proposal({'agent_id': agent_id, 'title': title, 'description': description})\n    conn = sqlite3.connect(config.HUB_DB)\n    conn.execute('UPDATE agent_proposals SET watchdog_status=?, watchdog_report_json=? WHERE id=?',\n                 (result['risk_level'], json.dumps(result), proposal_id))\n    conn.commit()\n    conn.close()\n    return result\n\nCall this from every insertion point.\n\nRun tests after: python3 -m pytest tests/ -v",
+          "agent_role": "backend_engineer",
+          "files_to_touch": [
+            "backend/app.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Display WATCHDOG badge in Agent Control UI",
+      "success_criteria": "Agent Control tab in hub_portal.py shows WATCHDOG risk badge for each proposal. HIGH/BLOCKED proposals show warning. Tests pass.",
+      "tasks": [
+        {
+          "name": "Add WATCHDOG risk badge to Agent Control panel",
+          "description": "In dashboards/hub_portal.py, find the Agent Control tab (tab11). This tab shows agent proposals in a table with approve/reject buttons.\n\n1. When loading proposals from the API, include watchdog_status and watchdog_report_json\n2. For each proposal row, display a coloured badge next to the title:\n   - SAFE: green badge '✅ SAFE'\n   - LOW: yellow badge '⚠️ LOW'\n   - MEDIUM: orange badge '🟠 MEDIUM'\n   - HIGH: red badge '🔴 HIGH' with warning text 'Requires senior approval'\n   - BLOCKED: black badge '⛔ BLOCKED' with 'Cannot approve — safety violation'\n   - None/empty: grey badge '⏳ Pending analysis'\n3. Add an expander for each proposal that shows the full WATCHDOG report (from watchdog_report_json)\n4. For BLOCKED proposals, disable/hide the Approve button\n5. For HIGH proposals, add a confirmation checkbox 'I acknowledge the HIGH risk assessment' before allowing approval\n\nUse st.columns for layout. Use st.markdown with HTML for coloured badges. Keep existing approve/reject functionality intact.\n\nRun tests after: python3 -m pytest tests/ -v",
+          "agent_role": "frontend_engineer",
+          "files_to_touch": [
+            "dashboards/hub_portal.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Write WATCHDOG integration tests",
+      "success_criteria": "test_watchdog_integration.py with 12+ tests covering all risk levels and blocking behaviour.",
+      "tasks": [
+        {
+          "name": "Create WATCHDOG integration tests",
+          "description": "Create tests/test_watchdog_integration.py to test the full WATCHDOG integration:\n\n1. Test WatchdogService.analyze_proposal() returns correct structure (tracking_id, risk_level, findings, report, recommendation)\n2. Test SAFE proposal: title='Analyse demand at Mosman for 14 days' → risk_level=SAFE\n3. Test LOW proposal: title='Run analysis across all stores for 90 days' → risk_level >= LOW\n4. Test MEDIUM proposal with code_changes containing 'eval()' → risk_level >= MEDIUM\n5. Test HIGH proposal with multiple unsafe patterns → risk_level >= HIGH\n6. Test BLOCKED proposal with blocked action keyword 'delete_database' → risk_level=BLOCKED\n7. Test BLOCKED proposal with SQL injection pattern → risk_level=BLOCKED\n8. Test credential detection: proposal with 'password=\"secret123\"' → finds credential finding\n9. Test PII detection: proposal containing phone number pattern → finds privacy finding\n10. Test report generation: report contains 'WATCHDOG Safety Report' header\n11. Test recommendation for BLOCKED: decision starts with 'REJECT'\n12. Test recommendation for SAFE: decision starts with 'APPROVE'\n\nImport from: sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'dashboards'))\nfrom shared.watchdog_safety import WatchdogService\n\nRun: python3 -m pytest tests/test_watchdog_integration.py -v",
+          "agent_role": "test_engineer",
+          "files_to_touch": [
+            "tests/test_watchdog_integration.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Documentation",
+      "success_criteria": "FEATURE_STATUS.md and CHANGELOG.md updated.",
+      "tasks": [
+        {
+          "name": "Update docs for WATCHDOG integration",
+          "description": "Update docs:\n\n1. docs/FEATURE_STATUS.md:\n   - Change 'WATCHDOG Safety Analysis (LLM)' from PARTIAL to LIVE with new evidence\n   - Change 'Risk Level Auto-Assessment' from PARTIAL to LIVE\n   - Update details to reflect integration into approval flow\n\n2. docs/CHANGELOG.md — add entry:\n   ## [2.6.0] - 2026-02-19\n   ### Added\n   - WATCHDOG safety analysis integrated into agent proposal approval flow\n   - Auto risk assessment on all new proposals (SAFE/LOW/MEDIUM/HIGH/BLOCKED)\n   - BLOCKED proposals auto-rejected, HIGH proposals require acknowledgement\n   - WATCHDOG risk badge in Agent Control UI\n   - 12 integration tests for safety analysis\n\n3. docs/ACTIVATION_ROADMAP.md — mark Phase 3 as COMPLETED with date 2026-02-19\n\nKeep existing doc style.",
+          "agent_role": "architect",
+          "files_to_touch": [
+            "docs/FEATURE_STATUS.md",
+            "docs/CHANGELOG.md",
+            "docs/ACTIVATION_ROADMAP.md"
+          ]
+        }
+      ]
+    }
+  ]
+}

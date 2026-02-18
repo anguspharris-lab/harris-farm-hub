@@ -1,0 +1,89 @@
+{
+  "name": "Fabric Migration Prep",
+  "description": "Prepare Harris Farm Hub codebase for migration from mock data to Microsoft Fabric. Extract shared modules, add data abstraction layer, expand test coverage.",
+  "abort_on_safety_fail": true,
+  "max_retries_per_task": 1,
+  "timeout_seconds_per_task": 300,
+  "phases": [
+    {
+      "name": "Extract shared modules",
+      "success_criteria": "Shared store/calendar code extracted into dashboards/shared/. All 52 tests still pass.",
+      "tasks": [
+        {
+          "name": "Extract store network into shared module",
+          "description": "The 21-store network (names, regions, distances) is duplicated across sales_dashboard.py, profitability_dashboard.py, transport_dashboard.py, and prompt_builder.py. Extract into dashboards/shared/stores.py with a STORES list and a REGIONS dict. Create dashboards/shared/__init__.py. Update all 4 dashboards to import from shared.stores. Do NOT change any dashboard behaviour — only the import source. Run tests after.",
+          "agent_role": "architect",
+          "files_to_touch": [
+            "dashboards/shared/__init__.py",
+            "dashboards/shared/stores.py",
+            "dashboards/sales_dashboard.py",
+            "dashboards/profitability_dashboard.py",
+            "dashboards/transport_dashboard.py",
+            "dashboards/prompt_builder.py"
+          ]
+        },
+        {
+          "name": "Extract 454 calendar into shared module",
+          "description": "The 5/4/4 retail fiscal calendar logic (build_454_calendar, get_454_period, get_454_quarter, _fy_anchor) is in sales_dashboard.py. Extract into dashboards/shared/calendar.py. Update sales_dashboard.py to import from shared.calendar. Do NOT change any behaviour. Run tests after.",
+          "agent_role": "architect",
+          "files_to_touch": [
+            "dashboards/shared/calendar.py",
+            "dashboards/sales_dashboard.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Test shared modules",
+      "success_criteria": "New tests/test_shared.py with 10+ tests. All tests pass.",
+      "tasks": [
+        {
+          "name": "Write tests for shared store and calendar modules",
+          "description": "Create tests/test_shared.py. Test stores: count is 21, all have name field, no duplicates, all in REGIONS. Test calendar: FY start is Monday, FY start near Jul 1, quarters are 13 weeks each (5+4+4), period dates don't overlap, WTD returns correct range. Min 1 success + 1 failure test per function. Follow existing test patterns in tests/ directory.",
+          "agent_role": "test_engineer",
+          "files_to_touch": [
+            "tests/test_shared.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Data access layer",
+      "success_criteria": "backend/data_layer.py with DataSource interface. Mock mode preserved. Tests pass.",
+      "tasks": [
+        {
+          "name": "Create data access abstraction",
+          "description": "Create backend/data_layer.py with: (1) DataSource ABC with methods get_sales_data(stores, categories, date_from, date_to) and get_store_list(). (2) MockDataSource that implements these using current seeded-RNG patterns from sales_dashboard.py. (3) FabricDataSource that raises NotImplementedError for all methods. (4) get_data_source() factory function that returns MockDataSource when DB_TYPE=mock (default) or FabricDataSource when DB_TYPE=fabric. Keep it simple — this is the interface, not the full implementation.",
+          "agent_role": "data_engineer",
+          "files_to_touch": [
+            "backend/data_layer.py"
+          ]
+        },
+        {
+          "name": "Write tests for data layer",
+          "description": "Create tests/test_data_layer.py. Test: MockDataSource returns deterministic data (seed 42), data has correct columns, no negative revenue, valid margin range, FabricDataSource raises NotImplementedError, factory returns correct type based on DB_TYPE env var. Min 1 success + 1 failure per function.",
+          "agent_role": "test_engineer",
+          "files_to_touch": [
+            "tests/test_data_layer.py"
+          ],
+          "depends_on": ["phase3_task1"]
+        }
+      ]
+    },
+    {
+      "name": "Documentation",
+      "success_criteria": "All docs reflect new architecture.",
+      "tasks": [
+        {
+          "name": "Update architecture docs",
+          "description": "Update docs/ARCHITECTURE.md to show: dashboards/shared/ module, backend/data_layer.py DataSource pattern, orchestrator/ system. Update docs/CHANGELOG.md with entries. Keep existing style.",
+          "agent_role": "architect",
+          "files_to_touch": [
+            "docs/ARCHITECTURE.md",
+            "docs/CHANGELOG.md"
+          ]
+        }
+      ]
+    }
+  ]
+}

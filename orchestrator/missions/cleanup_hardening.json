@@ -1,0 +1,39 @@
+{
+  "name": "Codebase Cleanup & Hardening",
+  "description": "Remove dead code, consolidate duplicate files, update base prompt to reflect current system state (16 dashboards, not 6), and fix known limitations.",
+  "abort_on_safety_fail": true,
+  "max_retries_per_task": 1,
+  "timeout_seconds_per_task": 300,
+  "phases": [
+    {
+      "name": "Remove dead code and consolidate",
+      "success_criteria": "Dead code removed. No duplicate DB files. Tests pass.",
+      "tasks": [
+        {
+          "name": "Remove dead code and duplicate files",
+          "description": "Clean up the codebase:\n\n1. Delete backend/main.py — it is acknowledged dead code (see watchdog/handover.md: 'backend/main.py is dead code (not used)'). The real entry point is backend/app.py.\n\n2. Delete dashboards/sales_dashboard.py.bak — backup file, not needed.\n\n3. Consolidate hub_data.db files — there are copies at:\n   - backend/hub_data.db (canonical — used by app.py)\n   - hub_data.db (root level — older copy)\n   - data/hub_data.db (another copy)\n   Remove the root-level and data/ copies. They are not referenced by any code (app.py uses backend/hub_data.db via Config.HUB_DB).\n   Verify by grepping for hub_data.db in all .py files to confirm only backend/ copy is used.\n\n4. Verify no imports reference the deleted files. Search for 'from main import' or 'import main' in all Python files.\n\n5. Run tests to confirm nothing breaks: python3 -m pytest tests/ -v",
+          "agent_role": "architect",
+          "files_to_touch": [
+            "backend/main.py",
+            "dashboards/sales_dashboard.py.bak"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Update orchestrator base prompt",
+      "success_criteria": "Base prompt reflects current 16-dashboard, 93-endpoint system. Tests pass.",
+      "tasks": [
+        {
+          "name": "Update orchestrator prompts to reflect current system",
+          "description": "Update orchestrator/prompts/base.md:\n\nCurrent content says '6 Streamlit dashboards (8501-8506)'. The system now has 16 dashboards (8500-8515) and 93+ API endpoints.\n\nRewrite base.md to reflect:\n- 16 Streamlit dashboards (ports 8500-8515) across 5 hub categories\n- FastAPI backend with 93+ endpoints on port 8000\n- 35 SQLite tables in hub_data.db\n- 383.6M POS transactions via DuckDB\n- 72,911 products in product hierarchy\n- 5-4-4 fiscal calendar\n- 11 analysis types\n- Agent executor and self-improvement loop\n- WATCHDOG governance (7 laws)\n- 1,003+ tests across 25+ files\n\nKeep it concise — agents need context, not a novel.\n\nAlso update orchestrator/prompts/architect.md to mention the full system scope.\n\nRun tests after: python3 -m pytest tests/ -v",
+          "agent_role": "architect",
+          "files_to_touch": [
+            "orchestrator/prompts/base.md",
+            "orchestrator/prompts/architect.md"
+          ]
+        }
+      ]
+    }
+  ]
+}

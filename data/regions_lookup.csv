@@ -1,0 +1,1070 @@
+Region Code,Region Name
+ACT,ACT
+AUS,AUS
+NSW,NSW
+QLD,QLD
+2000,Sydney
+2006,Camperdown (NSW)
+2007,Ultimo
+2008,Chippendale
+2009,Pyrmont
+2010,Surry Hills
+2011,Potts Point
+2015,Alexandria
+2016,Redfern
+2017,Waterloo (NSW)
+2018,Rosebery (NSW)
+2019,Botany
+2020,Mascot
+2021,Paddington (NSW)
+2022,Bondi Junction
+2023,Bellevue Hill
+2024,Bronte
+2025,Woollahra
+2026,Bondi Beach
+2027,Darling Point
+2028,Double Bay
+2029,Rose Bay (NSW)
+2030,Vaucluse
+2031,Randwick
+2032,Kingsford (NSW)
+2033,Kensington (NSW)
+2034,Coogee (NSW)
+2035,Maroubra
+2036,Matraville
+2037,Glebe (NSW)
+2038,Annandale (NSW)
+2039,Rozelle
+2040,Leichhardt (NSW)
+2041,Balmain
+2042,Newtown (NSW)
+2043,Erskineville
+2044,St Peters (NSW)
+2045,Haberfield
+2046,Five Dock
+2047,Drummoyne
+2048,Stanmore (NSW)
+2049,Petersham
+2050,Camperdown (NSW)
+2052,Kensington (NSW)
+2060,North Sydney
+2061,Kirribilli
+2062,Cammeray
+2063,Northbridge (NSW)
+2064,Artarmon
+2065,St Leonards (NSW)
+2066,Lane Cove North
+2067,Chatswood
+2068,Willoughby (NSW)
+2069,Roseville
+2070,Lindfield
+2071,Killara (NSW)
+2072,Gordon (NSW)
+2073,Pymble
+2074,Turramurra
+2075,St Ives (NSW)
+2076,Wahroonga
+2077,Hornsby
+2079,Mount Colah
+2080,Mount Kuring-Gai
+2081,Berowra
+2082,Berowra Heights
+2083,Brooklyn (NSW)
+2084,Terrey Hills
+2085,Belrose
+2086,Frenchs Forest
+2087,Forestville (NSW)
+2088,Mosman
+2089,Neutral Bay
+2090,Cremorne (NSW)
+2092,Seaforth (NSW)
+2093,Balgowlah
+2094,Fairlight
+2095,Manly (NSW)
+2096,Freshwater (NSW)
+2097,Collaroy (NSW)
+2099,Dee Why
+2100,Beacon Hill
+2101,Narrabeen
+2102,Warriewood
+2103,Mona Vale
+2104,Bayview (NSW)
+2105,Scotland Island
+2106,Newport (NSW)
+2107,Avalon Beach
+2108,Palm Beach (NSW)
+2109,Macquarie Park
+2110,Hunters Hill
+2111,Gladesville
+2112,Ryde
+2113,North Ryde
+2114,West Ryde
+2115,Ermington
+2116,Rydalmere
+2117,Telopea
+2118,Carlingford
+2119,Beecroft
+2120,Pennant Hills
+2121,Epping (NSW)
+2122,Eastwood (NSW)
+2125,West Pennant Hills
+2126,Cherrybrook
+2127,Sydney Olympic Park
+2128,Silverwater (Parramatta - NSW)
+2129,Homebush (NSW)
+2130,Summer Hill (Inner West - NSW)
+2131,Ashfield (NSW)
+2132,Croydon (NSW)
+2133,Croydon Park (NSW)
+2134,Burwood (NSW)
+2135,Strathfield (NSW)
+2136,Strathfield South
+2137,Concord
+2138,Rhodes
+2140,Homebush (NSW)
+2141,Lidcombe
+2142,Granville (NSW)
+2143,Regents Park (NSW)
+2144,Auburn (NSW)
+2145,Greystanes
+2146,Toongabbie (NSW)
+2147,Seven Hills (NSW)
+2148,Blacktown
+2150,Parramatta
+2151,North Parramatta
+2152,Northmead
+2153,Baulkham Hills
+2154,Castle Hill (NSW)
+2155,Kellyville
+2156,Glenhaven
+2157,Glenorie
+2158,Dural (Hornsby - NSW)
+2159,Galston
+2160,Merrylands
+2161,Guildford (NSW)
+2162,Chester Hill
+2163,Villawood
+2164,Smithfield (NSW)
+2165,Fairfield (NSW)
+2166,Cabramatta
+2167,Glenfield (NSW)
+2168,Green Valley (NSW)
+2170,Liverpool
+2171,West Hoxton
+2172,Voyager Point
+2173,Wattle Grove (NSW)
+2174,Edmondson Park
+2175,Horsley Park
+2176,Bossley Park
+2177,Bonnyrigg
+2178,Kemps Creek
+2179,Leppington
+2190,Greenacre
+2191,Belfield
+2192,Belmore
+2193,Canterbury (NSW)
+2194,Campsie
+2195,Lakemba
+2196,Punchbowl (Canterbury-Bankstown - NSW)
+2197,Bass Hill
+2198,Georges Hall
+2199,Yagoona
+2200,Bankstown
+2203,Dulwich Hill
+2204,Marrickville
+2205,Wolli Creek
+2206,Earlwood
+2207,Bexley
+2208,Kingsgrove
+2209,Beverly Hills
+2210,Riverwood
+2211,Padstow
+2212,Revesby
+2213,Panania
+2214,Milperra
+2216,Rockdale
+2217,Kogarah
+2218,Carlton (NSW)
+2219,Sans Souci
+2220,Hurstville
+2221,Blakehurst
+2222,Penshurst (NSW)
+2223,Mortdale
+2224,Sylvania
+2225,Oyster Bay
+2226,Jannali
+2227,Gymea
+2228,Miranda (NSW)
+2229,Caringbah
+2230,Cronulla
+2231,Kurnell
+2232,Sutherland (NSW)
+2233,Engadine
+2234,Menai
+2250,Wyoming
+2251,Kincumber
+2256,Woy Woy
+2257,Umina Beach
+2258,Ourimbah
+2259,Hamlyn Terrace
+2260,Terrigal
+2261,Bateau Bay
+2262,Blue Haven
+2263,Gorokan
+2264,Bonnells Bay
+2265,Cooranbong
+2267,Wangi Wangi
+2278,Barnsley
+2280,Belmont (NSW)
+2281,Swansea (NSW)
+2282,Warners Bay
+2283,Toronto
+2284,Speers Point
+2285,Cameron Park
+2286,West Wallsend
+2287,Wallsend
+2289,Adamstown
+2290,Charlestown (NSW)
+2291,Merewether
+2292,Broadmeadow
+2293,Wickham (NSW)
+2294,Carrington (Newcastle - NSW)
+2295,Stockton (NSW)
+2296,Islington
+2297,Tighes Hill
+2298,Waratah (NSW)
+2299,Lambton
+2300,Newcastle
+2302,Newcastle West
+2303,Hamilton (NSW)
+2304,Mayfield (Newcastle - NSW)
+2305,New Lambton
+2306,Windale
+2307,Shortland
+2308,Callaghan
+2311,Gresford
+2312,Nabiac
+2315,Nelson Bay (NSW)
+2316,Anna Bay
+2317,Salamander Bay
+2318,Medowie
+2319,Tanilba Bay
+2320,Rutherford
+2321,Gillieston Heights
+2322,Thornton (NSW)
+2323,East Maitland
+2324,Raymond Terrace
+2325,Cessnock
+2326,Weston (NSW)
+2327,Kurri Kurri
+2328,Denman
+2329,Merriwa (NSW)
+2330,Singleton (NSW)
+2333,Muswellbrook
+2334,Greta (NSW)
+2335,North Rothbury
+2336,Aberdeen (NSW)
+2337,Scone
+2338,Murrurundi
+2339,Willow Tree
+2340,South Tamworth
+2341,Werris Creek
+2342,Currabubula
+2343,Quirindi
+2344,Duri
+2345,Attunga
+2346,Manilla
+2347,Barraba
+2350,Armidale
+2351,Armidale
+2352,Kootingal
+2353,Moonbi
+2354,Walcha
+2355,Bendemeer
+2357,Coonabarabran
+2358,Uralla (NSW)
+2359,Bundarra
+2360,Inverell
+2361,Ashford (NSW)
+2365,Guyra
+2369,Tingha
+2370,Glen Innes
+2371,Emmaville
+2372,Tenterfield
+2379,Goolhi
+2380,Gunnedah
+2381,Curlewis (NSW)
+2382,Boggabri
+2386,Burren Junction
+2388,Wee Waa
+2390,Narrabri
+2395,Binnaway
+2396,Baradine
+2397,Bellata
+2398,Gurley
+2399,Pallamallawa
+2400,Moree
+2401,Gravesend
+2402,Warialda
+2403,Delungra
+2404,Bingara
+2405,Garah
+2406,Mungindi (NSW)
+2408,North Star
+2409,Boggabilla
+2410,Yetman
+2415,Upper Karuah River
+2420,Dungog
+2421,Vacy
+2422,Gloucester
+2423,Bulahdelah
+2424,Mount George (NSW)
+2425,Stroud
+2426,Coopernook
+2427,Harrington
+2428,Forster (NSW)
+2429,Wingham
+2430,Taree
+2431,South West Rocks
+2439,Kew (NSW)
+2440,West Kempsey
+2441,Upper Rollands Plains
+2443,Laurieton
+2444,Port Macquarie
+2445,Lake Cathie
+2446,Wauchope
+2447,Macksville
+2448,Nambucca Heads
+2449,Buckra Bendinni
+2450,Coffs Harbour
+2452,Toormina
+2453,Dorrigo
+2454,Bellingen
+2455,Urunga
+2456,Woolgoolga
+2460,Grafton
+2462,Ulmarra
+2463,Maclean
+2464,Yamba (NSW)
+2465,Harwood
+2466,Iluka (NSW)
+2469,Woombah
+2470,Casino
+2471,West Coraki
+2472,Woodburn (Richmond Valley - NSW)
+2473,Evans Head
+2474,Kyogle
+2475,Urbenville
+2476,Woodenbong
+2477,Alstonville
+2478,Ballina
+2479,Bangalow
+2480,Goonellabah
+2481,Byron Bay
+2482,Mullumbimby
+2483,Ocean Shores
+2484,Murwillumbah
+2485,Tweed Heads
+2486,Banora Point
+2487,Kingscliff
+2488,Bogangar
+2489,Pottsville
+2490,Tumbulgum
+2500,Wollongong
+2502,Warrawong
+2505,Port Kembla
+2506,Berkeley
+2508,Helensburgh
+2515,Thirroul
+2516,Bulli
+2517,Woonona
+2518,Corrimal
+2519,Fairy Meadow
+2525,Figtree
+2526,Unanderra
+2527,Albion Park
+2528,Warilla
+2529,Shell Cove
+2530,Dapto
+2533,Kiama
+2534,Gerringong
+2535,Shoalhaven Heads
+2536,Catalina
+2537,Moruya
+2538,Milton (NSW)
+2539,Ulladulla
+2540,Sanctuary Point
+2541,Nowra
+2545,Bodalla
+2546,Narooma
+2548,Merimbula
+2549,South Pambula
+2550,Bega
+2551,Eden
+2555,Badgerys Creek
+2556,Bringelly
+2557,Gledswood Hills
+2558,Eagle Vale
+2559,Claymore
+2560,Campbelltown (NSW)
+2563,Menangle Park
+2564,Macquarie Fields
+2565,Ingleburn
+2566,Minto
+2567,Harrington Park
+2568,Menangle
+2569,Douglas Park
+2570,Oran Park
+2571,Picton (NSW)
+2572,Thirlmere
+2573,Tahmoor
+2574,Bargo
+2575,Mittagong
+2576,Bowral
+2577,Moss Vale
+2578,Bundanoon (NSW)
+2579,Marulan
+2580,Goulburn
+2581,Bellmount Forest
+2582,Yass
+2583,Crookwell
+2584,Binalong
+2585,Galong
+2586,Boorowa
+2587,Harden
+2588,Wallendbeen
+2590,Cootamundra
+2594,Young
+2600,Yarralumla
+2601,City
+2602,O'Connor (ACT)
+2603,Griffith (ACT)
+2604,Kingston (ACT)
+2605,Curtin
+2606,Phillip
+2607,Mawson
+2609,Symonston
+2611,Coombs
+2612,Braddon
+2614,Page
+2615,Macgregor (ACT)
+2617,Belconnen
+2618,Wallaroo (NSW)
+2619,Jerrabomberra
+2620,Karabar
+2621,Bungendore
+2622,Braidwood
+2623,Captains Flat
+2625,Kosciuszko National Park
+2626,Bredbo
+2627,Jindabyne
+2628,Berridale
+2629,Adaminaby
+2630,Cooma (NSW)
+2631,Nimmitabel
+2632,Bombala
+2633,Delegate
+2640,Thurgoona
+2641,Lavington
+2642,Jindera
+2643,Howlong
+2644,Holbrook
+2645,Urana
+2646,Corowa
+2647,Mulwala
+2648,Wentworth (NSW)
+2650,Wagga Wagga
+2651,Forest Hill (NSW)
+2652,Uranquinty
+2653,Tumbarumba
+2655,The Rock
+2656,Lockhart
+2658,Henty (NSW)
+2659,Walla Walla
+2660,Culcairn
+2661,Kapooka
+2663,Junee
+2665,Ariah Park
+2666,Temora
+2668,Barmedman
+2669,Weethalle
+2671,West Wyalong
+2672,Lake Cargelligo
+2675,Hillston
+2678,Charles Sturt University
+2680,Griffith (NSW)
+2681,Yenda (NSW)
+2700,Narrandera
+2701,Coolamon
+2702,Ganmain
+2703,Yanco
+2705,Leeton
+2706,Darlington Point
+2707,Coleambally
+2710,Deniliquin
+2711,Hay (NSW)
+2712,Berrigan
+2713,Finley
+2714,Tocumwal
+2715,Balranald
+2716,Jerilderie
+2717,Coomealla
+2720,Tumut
+2722,South Gundagai
+2725,Stockinbingal
+2727,Coolac
+2729,Adelong
+2730,Batlow
+2731,Moama
+2732,Barham
+2733,Moulamein
+2734,Mellool
+2735,Koraleigh
+2736,Tooleybuc
+2737,Euston
+2738,Gol Gol
+2739,Buronga
+2745,Glenmore Park
+2747,Llandilo
+2748,Orchard Hills
+2749,Cranebrook
+2750,Penrith
+2752,Silverdale (NSW)
+2753,Richmond (NSW)
+2754,North Richmond
+2755,Richmond (NSW)
+2756,South Windsor
+2757,Kurmond
+2758,Kurrajong
+2759,St Clair (Penrith - NSW)
+2760,St Marys (NSW)
+2761,Plumpton (NSW)
+2762,Schofields
+2763,Quakers Hill
+2765,Riverstone
+2766,Rooty Hill
+2767,Doonside
+2768,Glenwood (NSW)
+2769,The Ponds
+2770,Mount Druitt
+2773,Glenbrook
+2774,Blaxland (NSW)
+2775,Gunderman
+2776,Faulconbridge
+2777,Springwood (NSW)
+2778,Woodford (NSW)
+2779,Hazelbrook
+2780,Katoomba
+2782,Wentworth Falls
+2783,Lawson (NSW)
+2784,Bullaburra
+2785,Blackheath
+2786,Mount Victoria
+2787,Oberon
+2790,Lithgow
+2791,Panuara
+2792,Mandurama
+2793,Woodstock (Cowra - NSW)
+2794,Cowra
+2795,Kelso (NSW)
+2797,Lyndhurst (Blayney - NSW)
+2798,Millthorpe
+2799,Blayney
+2800,Orange
+2803,Crowther
+2804,Canowindra
+2805,Gooloogong
+2806,Eugowra
+2807,Koorawatha
+2809,Greenethorpe
+2810,Grenfell
+2817,Tooraweenah
+2818,Geurie
+2820,Wellington (NSW)
+2821,Narromine
+2822,Eumungerie
+2823,Trangie
+2824,Warren
+2825,Nyngan
+2826,Nevertire
+2827,Gilgandra
+2828,Gulargambone
+2829,Coonamble
+2830,Dubbo
+2831,Wongarbon
+2832,Walgett
+2833,Collarenebri
+2834,Lightning Ridge
+2835,Cobar
+2836,Wilcannia
+2838,Goodooga
+2839,Brewarrina
+2840,Bourke
+2842,Mendooran
+2843,Coolah
+2844,Dunedoo
+2845,Wallerawang
+2847,Portland (NSW)
+2848,Kandos
+2849,Rylstone
+2850,Mudgee
+2852,Gulgong
+2864,Cudal
+2865,Manildra
+2866,Molong
+2867,Cumnock
+2868,Yeoval
+2869,Peak Hill (NSW)
+2870,Parkes (NSW)
+2871,Forbes (NSW)
+2873,Tottenham (NSW)
+2874,Tullamore
+2875,Trundle
+2876,Bogan Gate
+2877,Condobolin
+2878,Ivanhoe (NSW)
+2879,Menindee
+2880,Broken Hill
+2898,Lord Howe Island
+2899,Norfolk Island
+2900,Greenway
+2902,Kambah
+2903,Wanniassa
+2904,Monash (ACT)
+2905,Calwell
+2906,Gordon (ACT)
+2911,Crace
+2912,Gungahlin
+2913,Franklin (ACT)
+2914,Harrison
+3682,Springhurst
+3683,Chiltern
+3685,Rutherglen
+3687,Wahgunyah
+3688,Barnawartha
+3690,Wodonga
+3691,Baranduda
+3695,Sandy Creek (Vic.)
+3700,Tallangatta
+3701,Eskdale (Vic.)
+3747,Beechworth
+3749,Yackandandah
+4000,Brisbane City
+4005,New Farm
+4006,Fortitude Valley
+4007,Hamilton (Qld)
+4008,Pinkenba
+4009,Eagle Farm
+4010,Albion (Brisbane - Qld)
+4011,Clayfield
+4012,Nundah
+4013,Northgate (Qld)
+4014,Banyo
+4017,Bracken Ridge
+4018,Taigum
+4019,Clontarf (Moreton Bay - Qld)
+4020,Redcliffe (Qld)
+4021,Kippa-Ring
+4022,Rothwell
+4025,Moreton Island
+4030,Windsor (Qld)
+4031,Kedron
+4032,Chermside
+4034,Aspley
+4035,Albany Creek
+4036,Bald Hills (Qld)
+4037,Eatons Hill
+4051,Alderley
+4053,Everton Park
+4054,Keperra
+4055,Ferny Hills
+4059,Kelvin Grove
+4060,Ashgrove
+4061,The Gap (Brisbane - Qld)
+4064,Paddington (Qld)
+4065,Bardon
+4066,Toowong
+4067,St Lucia
+4068,Indooroopilly
+4069,Chapel Hill (Qld)
+4070,Bellbowrie
+4072,St Lucia
+4073,Sinnamon Park
+4074,Jindalee (Qld)
+4075,Oxley (Qld)
+4076,Darra
+4077,Inala
+4078,Forest Lake
+4101,South Brisbane
+4102,Woolloongabba
+4103,Annerley
+4104,Yeronga
+4105,Moorooka
+4106,Rocklea (Qld)
+4107,Salisbury (Qld)
+4108,Coopers Plains
+4109,Sunnybank Hills
+4110,Acacia Ridge
+4111,Nathan
+4112,Kuraby
+4113,Eight Mile Plains
+4114,Woodridge (Qld)
+4115,Parkinson
+4116,Calamvale
+4117,Berrinba
+4118,Regents Park (Qld)
+4119,Underwood (Qld)
+4120,Greenslopes
+4121,Tarragindi
+4122,Upper Mount Gravatt
+4123,Rochedale South
+4124,Greenbank
+4125,Park Ridge
+4127,Slacks Creek
+4128,Shailer Park
+4129,Loganholme
+4130,Cornubia
+4131,Loganlea
+4132,Marsden
+4133,Logan Reserve
+4151,Coorparoo
+4152,Carindale
+4153,Belmont (Qld)
+4154,Wakerley
+4155,Chandler (Qld)
+4156,Mackenzie (Brisbane - Qld)
+4157,Capalaba
+4158,Thorneside
+4159,Birkdale
+4160,Wellington Point
+4161,Alexandra Hills
+4163,Cleveland (Qld)
+4164,Thornlands
+4165,Redland Bay
+4169,Kangaroo Point (Qld)
+4170,Morningside
+4171,Bulimba
+4172,Murarrie
+4173,Tingalpa
+4174,Hemmant
+4178,Wynnum
+4179,Manly West
+4183,Dunwich
+4184,Russell Island
+4205,Bethania
+4207,Eagleby
+4208,Ormeau
+4209,Upper Coomera
+4210,Oxenford
+4211,Nerang
+4212,Helensvale
+4213,Mudgeeraba
+4214,Ashmore
+4215,Southport (Qld)
+4216,Biggera Waters
+4217,Surfers Paradise
+4218,Mermaid Waters
+4220,Burleigh Waters
+4221,Palm Beach (Qld)
+4223,Currumbin Waters
+4224,Tugun
+4225,Coolangatta (Qld)
+4226,Robina
+4227,Varsity Lakes
+4228,Tallebudgera
+4229,Robina
+4230,Robina
+4270,Tamborine
+4271,Tamborine Mountain
+4272,Tamborine Mountain
+4275,Canungra
+4280,Jimboomba
+4285,Beaudesert
+4287,Knapp Creek
+4300,Springfield Lakes
+4301,Redbank Plains
+4303,Riverview (Qld)
+4304,Bundamba
+4305,Brassall
+4306,South Ripley
+4307,Harrisville
+4309,Kalbar
+4310,Boonah (Qld)
+4311,Lowood
+4312,Moombra
+4313,Toogoolawah
+4340,Rosewood (Qld)
+4341,Laidley
+4342,Forest Hill (Qld)
+4343,Gatton
+4344,Helidon
+4345,Lawes
+4346,Marburg
+4347,Grantham
+4350,Kearneys Spring
+4352,Highfields (Qld)
+4353,Djuan
+4354,Goombungee
+4355,Crows Nest (Qld)
+4356,Pittsworth
+4357,Millmerran
+4358,Cambooya
+4359,Greenmount (Toowoomba - Qld)
+4360,Nobby
+4361,Clifton (Qld)
+4362,Goomburra
+4363,Southbrook
+4364,Brookstead
+4365,Leyburn
+4370,Warwick (Qld)
+4371,Yangan
+4372,Tannymorel
+4373,Killarney (Qld)
+4374,Dalveen
+4375,Cottonvale (Qld)
+4376,Thulimbah
+4377,The Summit
+4378,Applethorpe
+4380,Stanthorpe
+4381,Glen Aplin
+4382,Ballandean
+4383,Wallangarra
+4385,Brush Creek
+4387,Inglewood (Qld)
+4388,Yelarbon
+4390,Goondiwindi
+4400,Kingsthorpe
+4401,Oakey
+4402,Cooyar
+4403,Jondaryan
+4404,Bowenville
+4405,Dalby
+4406,Kogan
+4407,Cecil Plains
+4408,Bell (Qld)
+4410,Jandowae
+4411,Tuckerang
+4413,Chinchilla
+4415,Miles
+4416,Condamine
+4417,Surat
+4419,Wandoan
+4420,Taroom
+4421,Tara (Qld)
+4422,Southwood
+4423,Glenmorgan
+4424,Drillham
+4427,Yuleba
+4428,Wallumbilla
+4454,Injune
+4455,Roma
+4465,Mitchell (Qld)
+4467,Mungallala South
+4468,Morven (Qld)
+4470,Charleville
+4472,Blackall
+4477,Augathella
+4478,Tambo
+4480,Quilpie
+4481,Stonehenge (Barcoo - Qld)
+4486,Dirranbandi
+4487,St George (Qld)
+4488,Bollon
+4490,Wyandra
+4492,Thargomindah
+4494,North Bungunya
+4496,North Talwood
+4497,Thallon
+4498,Toobeah
+4500,Warner
+4501,Lawnton
+4502,Petrie
+4503,Kallangur
+4504,Narangba
+4505,Burpengary
+4506,Morayfield
+4507,Banksia Beach
+4508,Deception Bay
+4509,North Lakes
+4510,Caboolture
+4511,Ningi
+4512,Wamuran
+4514,Woodford (Qld)
+4515,Kilcoy
+4516,Elimbah
+4517,Beerburrum
+4518,Glass House Mountains
+4519,Beerwah
+4520,Samford Valley
+4521,Dayboro
+4550,Landsborough (Qld)
+4551,Little Mountain
+4552,Maleny
+4553,Palmview
+4554,Eudlo
+4555,Palmwoods (Qld)
+4556,Buderim
+4557,Mountain Creek (Qld)
+4558,Maroochydore
+4559,Woombye
+4560,Nambour
+4561,Yandina
+4562,Doonan
+4563,Cooroy
+4564,Marcoola
+4565,Tewantin
+4566,Noosaville
+4567,Noosa Heads
+4568,Pomona (Qld)
+4569,Cooran
+4570,Gympie
+4571,Como (Qld)
+4572,Alexandra Headland
+4573,Coolum Beach
+4574,Obi Obi
+4575,Wurtulla
+4580,Cooloola Cove
+4581,Rainbow Beach
+4600,Kilkivan
+4601,Goomeri
+4605,Murgon
+4606,Wondai
+4608,Charlestown (Qld)
+4610,Kingaroy
+4612,Stonelands
+4613,Melrose (Qld)
+4614,Yarraman (Qld)
+4615,Nanango
+4620,Boompa
+4621,Biggenden
+4625,Gayndah
+4626,Mundubbera
+4627,Eidsvold
+4630,Monto
+4650,Maryborough (Qld)
+4655,Urangan
+4659,Burrum Heads
+4660,Childers (Qld)
+4662,Torbanlea
+4670,Bargara
+4671,Nearum
+4673,Yandaran
+4674,Deepwater (Qld)
+4676,Lowmead
+4677,Agnes Water
+4678,Foreshores
+4680,Clinton (Qld)
+4695,East End
+4697,Raglan (Qld)
+4699,Bajool
+4700,The Range (Qld)
+4701,Norman Gardens
+4702,Gracemere
+4703,Yeppoon
+4705,Ogmore
+4707,St Lawrence
+4709,Tieri
+4710,Zilzie
+4711,Glenlee (Qld)
+4712,Duaringa
+4713,Woorabinda
+4714,Mount Morgan
+4715,Biloela
+4716,Thangool
+4717,Blackwater
+4718,Moura
+4719,Theodore (Qld)
+4720,Emerald (Qld)
+4721,Clermont
+4722,Arcturus
+4723,Capella
+4724,Alpha
+4725,Barcaldine
+4726,Aramac
+4727,Ilfracombe
+4728,Mexico
+4730,Longreach (Qld)
+4731,Isisford
+4733,Corfield
+4735,Winton (Qld)
+4737,Sarina
+4738,Koumala
+4739,Carmila
+4740,Andergrove
+4741,Kuttabul
+4742,Nebo
+4743,Glenden
+4744,Moranbah
+4745,Dysart (Qld)
+4746,Middlemount
+4750,Bucasia
+4751,Walkerston
+4753,Marian
+4754,Mirani
+4756,Finch Hatton
+4757,Dalrymple Heights
+4798,Calen
+4799,Bloomsbury
+4800,Proserpine
+4802,Cannonvale
+4803,Whitsundays
+4804,Collinsville (Qld)
+4805,Bowen
+4806,Home Hill
+4807,Ayr
+4808,Alva
+4809,Giru
+4810,North Ward
+4811,Idalia
+4812,Hermit Park
+4814,Mount Louisa
+4815,Kelso (Qld)
+4816,Palm Island
+4817,Kirwan
+4818,Burdell
+4819,Nelly Bay
+4820,Charters Towers City
+4821,Hughenden
+4822,Richmond (Richmond - Qld)
+4823,Julia Creek
+4824,Cloncurry
+4825,Barkly (Qld)
+4828,Camooweal
+4829,Bedourie
+4830,Doomadgee
+4849,Cardwell
+4850,Ingham
+4852,Mission Beach
+4854,Tully
+4855,Granadilla
+4856,No 4 Branch
+4858,Mourilyan
+4859,South Johnstone
+4860,Innisfail
+4861,East Russell
+4865,Gordonvale
+4868,Mount Sheridan (Qld)
+4869,Edmonton
+4870,Redlynch
+4871,Yarrabah
+4872,Silver Valley
+4873,Mossman
+4874,Trunding
+4875,Thursday Island
+4876,Bamaga
+4877,Port Douglas
+4878,Smithfield (Qld)
+4879,Trinity Beach
+4880,Mareeba
+4881,Kuranda
+4882,Tolga
+4883,Atherton
+4884,Yungaburra
+4885,Peeramon
+4886,Millaa Millaa
+4887,Herberton
+4888,Millstream (Qld)
+4890,Normanton
+4891,Karumba
+4892,Kowanyama
+4895,Cooktown

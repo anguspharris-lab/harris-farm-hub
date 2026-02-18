@@ -1,0 +1,14 @@
+{
+  "name": "code_quality_v7",
+  "criteria": {
+    "honest": {"weight": 0.2, "min": 5, "target": 9, "desc": "Behaviour matches names/docs exactly"},
+    "reliable": {"weight": 0.15, "min": 5, "target": 9, "desc": "Error handling, timeouts, retries, graceful degradation"},
+    "safe": {"weight": 0.15, "min": 5, "target": 9, "desc": "No secrets, no destructive ops, permissions correct"},
+    "clean": {"weight": 0.1, "min": 5, "target": 8, "desc": "Readable, typed, linted, maintainable"},
+    "data_correct": {"weight": 0.2, "min": 5, "target": 9, "desc": "Output verified to source ±0.01, checksums, ranges, nulls"},
+    "usable": {"weight": 0.1, "min": 5, "target": 8, "desc": "Intuitive, accessible, responsive, consistent, error messages helpful"},
+    "documented": {"weight": 0.1, "min": 5, "target": 8, "desc": "User guide, API docs, architecture decisions, changelog all current"}
+  },
+  "pass_threshold": 7.0,
+  "halt_threshold": 5.0
+}

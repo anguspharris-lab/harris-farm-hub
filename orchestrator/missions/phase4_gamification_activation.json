@@ -1,0 +1,70 @@
+{
+  "name": "Phase 4 — Gamification & Competition Activation",
+  "description": "Activate the portal gamification system: populate portal_scores on task completion, define and award achievements, build a prominent leaderboard UI, and populate user progress tracking. All tables and API endpoints already exist — this mission wires them into the live flow.",
+  "abort_on_safety_fail": true,
+  "max_retries_per_task": 1,
+  "timeout_seconds_per_task": 600,
+  "phases": [
+    {
+      "name": "Wire scoring into task completion",
+      "success_criteria": "Every completed agent task creates a portal_score entry. Tests pass.",
+      "tasks": [
+        {
+          "name": "Auto-post portal scores on task completion",
+          "description": "In backend/agent_executor.py, after a proposal is marked COMPLETED and scored by the presentation rubric:\n\n1. Find where proposals are marked COMPLETED (UPDATE agent_proposals SET status='COMPLETED')\n2. After the status update, POST a score to the portal_scores table:\n   INSERT INTO portal_scores (user_id, score_type, score_value, context, timestamp)\n   VALUES (agent_name, 'task_completion', rubric_avg_score, json.dumps({'proposal_id': id, 'analysis_type': type, 'grade': grade}), datetime_now)\n3. Also check achievement criteria and award achievements:\n   - 'first_analysis': agent has 1+ completed proposals → INSERT INTO achievements (user_id, achievement_name, achievement_type, awarded_at)\n   - 'consistent_performer': agent has 5+ consecutive scores > 9.0 → award achievement\n   - 'board_ready_streak': agent has 10+ Board-ready grades → award achievement\n   - 'self_improver': agent's avg score increased by 1.0+ from first 5 to last 5 → award achievement\n4. Use INSERT OR IGNORE for achievements to avoid duplicates (UNIQUE constraint on user_id + achievement_name)\n\nThe portal_scores and achievements tables already exist in hub_data.db. Check the schema in backend/app.py init_hub_database().\n\nRun tests after: python3 -m pytest tests/ -v",
+          "agent_role": "backend_engineer",
+          "files_to_touch": [
+            "backend/agent_executor.py",
+            "backend/app.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Build leaderboard and achievements UI",
+      "success_criteria": "Hub Portal shows a prominent leaderboard tab and achievements display. Tests pass.",
+      "tasks": [
+        {
+          "name": "Build agent leaderboard in Hub Portal",
+          "description": "In dashboards/hub_portal.py, enhance the existing portal/gamification section:\n\n1. Find an appropriate tab (or create a sub-section in an existing tab) for the leaderboard\n2. Query the API: GET /api/portal/leaderboard to get agent rankings\n3. Display a formatted leaderboard table:\n   Rank | Agent | Avg Score | Tasks Completed | Best Grade | Trend (arrow up/down/steady)\n4. Use st.metric for top 3 agents with delta showing score change\n5. Add a 'Recent Achievements' section below:\n   - Query achievements from the API or directly from hub_data.db\n   - Display achievement badges with icons:\n     🏆 First Analysis, ⭐ Consistent Performer, 👑 Board-Ready Streak, 📈 Self-Improver\n   - Show when each was awarded\n6. Add a 'Competition Mode' section:\n   - Show current 30-day competition window (if active)\n   - Rankings by improvement (delta from baseline, not absolute score)\n   - Use st.progress bars for visual comparison\n\nIf the leaderboard API returns empty, show a message: 'No scores recorded yet. Run agent tasks to populate the leaderboard.'\n\nKeep existing hub_portal.py tabs intact. Add this as enhancement to existing content.\n\nRun tests after: python3 -m pytest tests/ -v",
+          "agent_role": "frontend_engineer",
+          "files_to_touch": [
+            "dashboards/hub_portal.py"
+          ]
+        },
+        {
+          "name": "Populate user progress tracking",
+          "description": "In backend/app.py, find the user_progress table (or equivalent). Wire it so that:\n\n1. When a user (or agent) completes a learning module → INSERT into user_progress\n2. When a user submits a prompt via the chatbot or prompt builder → INSERT activity record\n3. When a user makes a Rubric 'Chairman Decision' → INSERT activity record\n4. Create a new endpoint GET /api/portal/progress/{user_id} that returns:\n   - Total activities count\n   - Learning modules completed\n   - Prompts submitted\n   - Rubric decisions made\n   - Current level (Apprentice/Specialist/Master based on thresholds)\n   - Points total\n\nLevel thresholds:\n- Apprentice: 0-49 points\n- Specialist: 50-199 points\n- Master: 200+ points\n\nPoints: learning module = 20pts, prompt submitted = 5pts, rubric decision = 10pts, task completed = 15pts\n\nRun tests after: python3 -m pytest tests/ -v",
+          "agent_role": "backend_engineer",
+          "files_to_touch": [
+            "backend/app.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tests and documentation",
+      "success_criteria": "Gamification tests pass. Docs updated.",
+      "tasks": [
+        {
+          "name": "Write gamification tests",
+          "description": "Create tests/test_gamification.py:\n\n1. Test portal_scores table exists and has correct schema\n2. Test achievements table exists and has correct schema\n3. Test POST /api/portal/score creates a score entry (mock or direct DB)\n4. Test GET /api/portal/leaderboard returns list (even if empty)\n5. Test achievement criteria: 'first_analysis' awarded after 1 completion\n6. Test achievement uniqueness: same achievement not awarded twice\n7. Test user progress levels: 0 points = Apprentice, 50 = Specialist, 200 = Master\n8. Test score aggregation: leaderboard ranks by average score descending\n\nRun: python3 -m pytest tests/test_gamification.py -v",
+          "agent_role": "test_engineer",
+          "files_to_touch": [
+            "tests/test_gamification.py"
+          ]
+        },
+        {
+          "name": "Update docs for gamification activation",
+          "description": "Update docs:\n\n1. docs/FEATURE_STATUS.md:\n   - Portal Scores: PARTIAL → LIVE\n   - Achievements: PARTIAL → LIVE\n   - User Progress Tracking: PARTIAL → LIVE\n   - Leaderboard UI: PARTIAL → LIVE\n\n2. docs/CHANGELOG.md — add entry for gamification activation\n\n3. docs/ACTIVATION_ROADMAP.md — mark Phase 4 as COMPLETED\n\nKeep existing style.",
+          "agent_role": "architect",
+          "files_to_touch": [
+            "docs/FEATURE_STATUS.md",
+            "docs/CHANGELOG.md",
+            "docs/ACTIVATION_ROADMAP.md"
+          ]
+        }
+      ]
+    }
+  ]
+}

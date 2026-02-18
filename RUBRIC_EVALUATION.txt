@@ -1,0 +1,357 @@
+================================================================================
+THE RUBRIC - MULTI-LLM EVALUATION
+Harris Farm Markets AI Centre of Excellence Hub - Architecture Decision
+================================================================================
+
+QUESTION FOR EVALUATION:
+Design the optimal architecture for "The Hub" - Harris Farm's AI Centre of Excellence.
+
+CONTEXT:
+- Harris Farm Markets: 30+ premium grocery stores across Australia
+- Co-CEO Gus wants weekend build (launch Monday)
+- Custom web app foundation required
+- Day 1 priority: Sales data queries + dashboards for finance team
+- Future: Multi-LLM evaluation, prompt training, self-improvement
+- Finance team already using Claude Excel add-in
+- Need natural language → database queries → visualizations
+
+REQUIREMENTS:
+1. Custom web app (React frontend + Python backend)
+2. Natural language queries to sales database → dashboards  
+3. Multi-LLM evaluation system ("The Rubric")
+4. Prompt engineering training academy
+5. Self-improvement from user feedback
+6. MVP buildable in 2 days
+
+================================================================================
+RUBRIC EVALUATION RESULTS
+================================================================================
+
+I'm going to evaluate this using my capabilities to represent what each LLM would recommend, then you make the chairman's decision.
+
+Let me query this systematically...
+
+================================================================================
+APPROACH 1: "RAPID MVP WITH SMART SHORTCUTS"
+================================================================================
+
+TECH STACK:
+- Frontend: React + Vite + Tailwind CSS (fastest setup)
+- Backend: FastAPI + SQLAlchemy (Python, async-first)
+- Database: PostgreSQL (flexible, good for analytics)
+- LLM Integration: Direct API calls (Anthropic, OpenAI, xAI SDKs)
+- Deployment: Docker containers on AWS/Azure
+- Analytics: Plotly Dash embedded in React
+
+WEEKEND BUILD STRATEGY:
+Saturday:
+- Hours 1-4: FastAPI backend with database ORM
+- Hours 5-8: React shell + routing + basic UI
+- Hours 9-12: Natural language query endpoint (use LLM to write SQL)
+
+Sunday:  
+- Hours 1-4: Dashboard components with mock data
+- Hours 5-8: The Rubric multi-LLM system
+- Hours 9-12: Deploy to staging, test with real data connection
+
+NATURAL LANGUAGE → SQL APPROACH:
+```python
+def nl_to_query(user_question: str, schema_info: dict):
+    """Use Claude to convert English to SQL"""
+    prompt = f"""Convert this to SQL for our database:
+    Question: {user_question}
+    Schema: {schema_info}
+    
+    Return only valid SQL, no explanation."""
+    
+    sql = call_claude(prompt)
+    results = execute_query(sql)
+    return results
+```
+
+SELF-IMPROVEMENT MECHANISM:
+- Every query stores: question, generated SQL, results, user rating (1-5)
+- Weekly: Analyze low-rated queries, improve prompt templates
+- Success patterns → saved as templates in prompt library
+
+SECURITY:
+- Read-only database credentials for Day 1
+- Role-based access control (finance team only initially)
+- SQL injection protection via parameterized queries
+- API rate limiting
+
+MVP SCOPE (MONDAY LAUNCH):
+✅ Natural language database queries
+✅ 3 dashboard templates: Sales Overview, Store Profitability, Transport Costs
+✅ The Rubric (query 2-3 LLMs, present side-by-side)
+✅ Basic prompt library (10 templates)
+⏳ Full training academy (Phase 2)
+⏳ Advanced analytics (Phase 2)
+
+STRENGTHS:
+- Realistic 2-day timeline
+- Proven tech stack
+- Clear upgrade path
+- Focuses on finance team needs first
+
+RISKS:
+- NL→SQL can be unpredictable with complex queries
+- Need database schema documentation
+- May need query validation layer
+
+================================================================================
+APPROACH 2: "ENTERPRISE-GRADE FROM DAY 1"
+================================================================================
+
+TECH STACK:
+- Frontend: Next.js 14 (React + server components)
+- Backend: NestJS (TypeScript, enterprise patterns)
+- Database: Dual: PostgreSQL (main) + ClickHouse (analytics)
+- BI Layer: Embedded Metabase or Superset
+- LLM Orchestration: LangChain with custom chains
+- Deployment: Kubernetes cluster
+- Observability: DataDog + Sentry
+
+ARCHITECTURE:
+```
+User Request → Next.js
+    ↓
+API Gateway (rate limiting, auth)
+    ↓
+Query Orchestrator
+    ├→ Cache Check (Redis)
+    ├→ LLM Query Planner (determines best approach)
+    ├→ SQL Generator (multiple validation layers)
+    └→ Multi-LLM Evaluator (The Rubric)
+    ↓
+Database Layer (read replicas)
+    ↓
+Result Processor
+    ↓
+Dashboard Renderer
+```
+
+NATURAL LANGUAGE PROCESSING:
+- Phase 1: Intent classification (what type of query?)
+- Phase 2: Entity extraction (stores, dates, products)
+- Phase 3: Query generation with validation
+- Phase 4: Results explanation in plain English
+
+SELF-IMPROVEMENT:
+- ML model tracking query success
+- A/B testing different prompt strategies
+- Automated prompt optimization via reinforcement learning
+- User feedback → retraining pipeline
+
+TRAINING ACADEMY:
+- Interactive Jupyter notebooks
+- Gamified progression system
+- Real Harris Farm scenarios
+- Certification with assessments
+
+WEEKEND BUILD:
+Not realistic - this is a 4-6 week project
+
+STRENGTHS:
+- Production-ready scalability
+- Enterprise security
+- Comprehensive monitoring
+- Long-term maintainability
+
+WEAKNESSES:
+- Cannot build in 2 days
+- Over-engineered for MVP
+- High complexity = higher failure risk initially
+
+================================================================================
+APPROACH 3: "HYBRID - SMART START, SCALE LATER"
+================================================================================
+
+TECH STACK:
+- Frontend: React + Vite (fast development)
+- Backend: Python FastAPI (easy LLM integration)
+- Database Connector: Use existing BI tool API if available, else direct SQL
+- Quick Dashboards: Streamlit embedded iframes (fast to build)
+- LLM: Start Claude-only, add others next week
+- Deploy: Vercel (frontend) + Railway (backend) - zero DevOps
+
+WEEKEND STRATEGY:
+
+SATURDAY - "DATA LAYER":
+Morning:
+- Set up FastAPI with database connection
+- Build 5 key endpoints:
+  * /api/query (natural language → results)
+  * /api/dashboards (pre-built viz)
+  * /api/rubric (multi-LLM evaluation)
+  * /api/templates (prompt library)
+  * /api/feedback (user ratings)
+
+Afternoon:
+- Create Streamlit dashboards (3 key ones):
+  * Sales Performance (daily/weekly/monthly)
+  * Store Profitability Matrix
+  * Transport Cost Analysis
+- These are FAST to build (2-3 hours for all three)
+
+SUNDAY - "AI LAYER":
+Morning:
+- Build The Rubric system (Claude + ChatGPT initially)
+- Create evaluation UI (side-by-side comparison)
+- Chairman's decision recording
+
+Afternoon:
+- React frontend shell
+- Prompt template library (15 starter templates)
+- Basic training module (interactive examples)
+- Deploy everything
+
+NATURAL LANGUAGE APPROACH:
+```python
+# Phase 1: Simple but effective
+async def handle_query(question: str):
+    # Step 1: Use Claude to understand intent
+    intent = await classify_intent(question)
+    
+    # Step 2: Generate SQL with schema awareness
+    sql = await generate_sql(question, get_schema())
+    
+    # Step 3: Execute with safety checks
+    if validate_sql(sql):
+        results = await db.execute(sql)
+        
+        # Step 4: Claude explains results
+        explanation = await explain_results(question, results)
+        
+        return {
+            "data": results,
+            "sql": sql,
+            "explanation": explanation
+        }
+```
+
+THE RUBRIC IMPLEMENTATION:
+```python
+async def run_rubric(prompt: str):
+    # Query multiple LLMs in parallel
+    responses = await asyncio.gather(
+        query_claude(prompt),
+        query_chatgpt(prompt),
+        # Add Grok later
+    )
+    
+    # Store for chairman review
+    save_evaluation(prompt, responses)
+    
+    return {
+        "prompt": prompt,
+        "responses": responses,
+        "awaiting_decision": True
+    }
+```
+
+SELF-IMPROVEMENT:
+- Simple feedback loop: thumbs up/down on every response
+- Weekly report: "This week users loved X, struggled with Y"
+- Automatic prompt library updates based on successful queries
+- Phase 2: More sophisticated ML
+
+MVP FEATURES (MONDAY):
+✅ 3 live dashboards with real data
+✅ Natural language queries (Claude-powered)
+✅ The Rubric (Claude + ChatGPT)
+✅ 15 prompt templates by role
+✅ Simple training guide
+✅ Feedback collection
+⏳ Full multi-LLM (add Grok Week 2)
+⏳ Advanced training academy (Week 2-3)
+⏳ Predictive analytics (Phase 2)
+
+DEPLOYMENT:
+- Frontend: Vercel (free tier, instant deploy)
+- Backend: Railway or Render (free/cheap tier)
+- Database: Existing Harris Farm DB (read-only connection)
+- Total setup time: 30 minutes
+- Total cost: $0-50/month initially
+
+STRENGTHS:
+- Realistic 2-day delivery
+- Uses best-in-class tools for speed
+- Streamlit dashboards are surprisingly powerful
+- Clear evolution path (can migrate to enterprise later)
+- Lowest risk approach
+
+WEAKNESSES:
+- Streamlit embedded = not as polished UI
+- Initial scale limited (but fine for finance team)
+- Will need refactoring for company-wide rollout
+
+================================================================================
+CHAIRMAN'S DECISION FRAMEWORK
+================================================================================
+
+EVALUATION CRITERIA:
+
+1. CAN IT BE BUILT THIS WEEKEND?
+   - Approach 1: Yes (tight but doable)
+   - Approach 2: No (4-6 weeks minimum)
+   - Approach 3: Yes (most confident)
+
+2. WILL FINANCE TEAM USE IT MONDAY?
+   - Approach 1: Yes (if data connection works)
+   - Approach 2: N/A (not ready)
+   - Approach 3: Yes (high confidence)
+
+3. CAN IT SCALE TO COMPANY-WIDE?
+   - Approach 1: Yes (needs refactoring)
+   - Approach 2: Yes (built for scale)
+   - Approach 3: Partially (frontend rebuild needed)
+
+4. DOES IT ENABLE "PROMPT SUPERSTARS"?
+   - Approach 1: Basic (library only)
+   - Approach 2: Comprehensive (full academy)
+   - Approach 3: Good (library + guide)
+
+5. INCLUDES THE RUBRIC (MULTI-LLM)?
+   - Approach 1: Yes
+   - Approach 2: Yes (complex)
+   - Approach 3: Yes (simple)
+
+6. SELF-IMPROVING SYSTEM?
+   - Approach 1: Basic feedback loop
+   - Approach 2: Advanced ML
+   - Approach 3: Smart feedback with weekly learning
+
+================================================================================
+RECOMMENDATION MATRIX
+================================================================================
+
+IF YOUR PRIORITY IS:
+
+→ LAUNCH MONDAY (Must have): Choose Approach 3
+→ ENTERPRISE SCALE (Future-proof): Choose Approach 2 (but delay launch)
+→ BALANCE (Working MVP that grows): Choose Approach 1
+
+CLAUDE'S RECOMMENDATION: **APPROACH 3** (Hybrid)
+
+REASONING:
+- You said "I want this built this weekend" - that's the constraint
+- Finance team is your pilot - they need something Monday
+- Streamlit dashboards are actually excellent for analytics (used by data teams everywhere)
+- FastAPI + React gives you flexibility to evolve
+- The Rubric works from Day 1
+- You can refine UI in Week 2-3 while people are actually using it
+- Better to have 80% solution Monday than 100% solution in March
+
+================================================================================
+CHAIRMAN: YOUR DECISION?
+================================================================================
+
+Which approach do you want to proceed with?
+
+1️⃣ APPROACH 1: Rapid MVP (Pure React/FastAPI)
+2️⃣ APPROACH 2: Enterprise-Grade (4-6 weeks, production-ready)
+3️⃣ APPROACH 3: Hybrid Smart Start (Recommended - Streamlit dashboards + React)
+4️⃣ CUSTOM: Take elements from multiple approaches
+
+Once you decide, I'll begin building immediately.

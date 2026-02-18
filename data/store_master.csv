@@ -1,0 +1,42 @@
+store_number,store_name,store_company,state,store_type,fv_store,like_for_like
+10,HFM Pennant Hills,10 - HFM Pennant Hills,NSW,Retail,1,1
+11,HFM Meats Pennant Hills,11 - HFM Meats Pennant Hills,NSW,Meats,0,1
+13,HFM Meats Willoughby,13 - HFM Meats Willoughby,NSW,Meats,0,1
+19,HFM Meats Mosman,19 - HFM Meats Mosman,NSW,Meats,0,1
+22,HFM Merrylands,22 - HFM Merrylands,NSW,Retail,1,1
+24,HFM St Ives,24 - HFM St Ives,NSW,Retail,1,1
+28,HFM Mosman,28 - HFM Mosman,NSW,Retail,1,1
+29,HFM Bondi Junction,29 - HFM Bondi Junction,NSW,Retail,1,1
+32,HFM Willoughby,32 - HFM Willoughby,NSW,Retail,1,1
+37,HFM Broadway,37 - HFM Broadway,NSW,Retail,1,1
+38,HFM Glendale,38 - HFM Glendale,NSW,Retail,1,1
+40,HFM Erina,40 - HFM Erina,NSW,Retail,1,1
+44,HFM Orange,44 - HFM Orange,NSW,Retail,1,1
+47,HFM Penrith,47 - HFM Penrith,NSW,Retail,1,1
+48,HFM Manly,48 - HFM Manly,NSW,Retail,1,1
+49,HFM Mona Vale,49 - HFM Mona Vale,NSW,Retail,1,1
+50,HFM Baulkham Hills,50 - HFM Baulkham Hills,NSW,Retail,1,1
+51,HFM Bowral,51 - HFM Bowral,NSW,Retail,1,1
+52,HFM Cammeray,52 - HFM Cammeray,NSW,Retail,1,1
+54,HFM Potts Point,54 - HFM Potts Point,NSW,Retail,1,1
+55,HFM Dee Why,55 - HFM Dee Why,NSW,Retail,1,1
+56,HFM Boronia Park,56 - HFM Boronia Park,NSW,Retail,1,1
+57,HFM Bondi Beach,57 - HFM Bondi Beach,NSW,Retail,1,1
+58,HFM Drummoyne,58 - HFM Drummoyne,NSW,Retail,1,1
+59,HFM Bathurst Concession,59 - HFM Bathurst Concession,NSW,Concession,1,1
+61,HFM Moruya Concession,61 - HFM Moruya Concession,NSW,Concession,1,1
+63,HFM Randwick,63 - HFM Randwick,NSW,Retail,1,1
+64,HFM Leichhardt,64 - HFM Leichhardt,NSW,Retail,1,1
+65,HFM Bondi Westfield,65 - HFM Bondi Westfield,NSW,Retail,1,1
+66,HFM Newcastle,66 - HFM Newcastle,NSW,Retail,1,1
+67,HFM Lindfield,67 - HFM Lindfield,NSW,Retail,1,1
+68,HFM Albury,68 - HFM Albury,NSW,Retail,1,1
+69,HFM Rose Bay,69 - HFM Rose Bay,NSW,Retail,1,1
+70,HFM West End,70 - HFM West End,QLD,Retail,1,1
+71,HFM Potts Point Kitchen,71 - HFM Potts Point Kitchen,NSW,Kitchen,,
+72,HFM Wagga Concession,72 - HFM Wagga Concession,NSW,Concession,1,1
+73,HFM Online,73 - HFM Online,NSW,Online,0,1
+74,HFM Isle of Capri,74 - HFM Isle of Capri,QLD,Retail,1,1
+75,HFM Clayfield,75 - HFM Clayfield,QLD,Retail,1,1
+76,HFM Lane Cove,76 - HFM Lane Cove,NSW,Retail,1,1
+99,Online Unallocated,99 - Online Unallocated,NSW,Online,1,1

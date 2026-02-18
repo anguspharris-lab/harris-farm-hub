@@ -1,0 +1,53 @@
+# Data files (large / sensitive — not for git)
+*.db
+*.db-shm
+*.db-wal
+*.parquet
+data/transactions/
+
+# Secrets
+.env
+.env.*
+*.key
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+dist/
+build/
+venv/
+.venv/
+env/
+
+# Logs (keep directory structure via .gitkeep, not contents)
+logs/*.log
+logs/*.pid
+nohup.out
+
+# Watchdog runtime artifacts
+watchdog/audit.log
+watchdog/audit.log.bak
+watchdog/data_checksums/
+
+# Backups
+*.bak
+
+# Archives
+*.zip
+*.tar.gz
+
+# Node
+node_modules/
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db

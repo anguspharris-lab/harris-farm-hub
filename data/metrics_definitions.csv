@@ -1,0 +1,15 @@
+Category,Metric,Definition
+Overall Definitions,Market,"Harris Farm Markets + competitor group made up of:
+- Coles
+- Woolworths
+- Aldi
+- IGA"
+Overall Definitions,Reporting Period,Monthly based on HFM retail calendar
+Overall Definitions,Region,Based on residential location of customer at the end of the reporting period.
+Overall Definitions,Refunds,Refunds are included at the point in time the refunds are returned
+Market Share Metrics,Market Size ($),Monthly $ size of market
+Market Share Metrics,Market Share (%),HFM spend / HFM + competitor group spend
+Performance Driver Metrics,Customer penetration (%),Number of customers that spent with HFM (or the competitor group) in the defined market during the reporting period.
+Performance Driver Metrics,Average spend per customer ($),Total spend / Total number of customers
+Performance Driver Metrics,Average transaction size ($),Total spend / Total number of transactions
+Performance Driver Metrics,Avg. frequency per customer / Avg. transactions per customer (#),Total number of transactions / Total number of customers

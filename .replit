@@ -1,0 +1,77 @@
+run = "bash start.sh"
+entrypoint = "start.sh"
+
+[nix]
+channel = "stable-24_05"
+
+[env]
+PYTHONPATH = "${REPL_HOME}/backend:${REPL_HOME}/dashboards"
+HUB_BASE_URL = "https://${REPL_SLUG}.${REPL_OWNER}.repl.co"
+AUTH_ENABLED = "false"
+
+[[ports]]
+localPort = 8500
+externalPort = 80
+
+[[ports]]
+localPort = 8000
+externalPort = 8000
+
+[[ports]]
+localPort = 8501
+externalPort = 8501
+
+[[ports]]
+localPort = 8502
+externalPort = 8502
+
+[[ports]]
+localPort = 8503
+externalPort = 8503
+
+[[ports]]
+localPort = 8504
+externalPort = 8504
+
+[[ports]]
+localPort = 8505
+externalPort = 8505
+
+[[ports]]
+localPort = 8506
+externalPort = 8506
+
+[[ports]]
+localPort = 8507
+externalPort = 8507
+
+[[ports]]
+localPort = 8508
+externalPort = 8508
+
+[[ports]]
+localPort = 8509
+externalPort = 8509
+
+[[ports]]
+localPort = 8510
+externalPort = 8510
+
+[[ports]]
+localPort = 8511
+externalPort = 8511
+
+[[ports]]
+localPort = 8512
+externalPort = 8512
+
+[[ports]]
+localPort = 8513
+externalPort = 8513
+
+[[ports]]
+localPort = 8514
+externalPort = 8514
+
+[deployment]
+run = ["bash", "start.sh"]

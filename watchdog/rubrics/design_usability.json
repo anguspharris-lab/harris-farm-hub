@@ -1,0 +1,49 @@
+{
+  "name": "design_usability_v7",
+  "description": "Scored after every UI-facing task. Benchmarked against Uber-level usability.",
+  "criteria": {
+    "first_use_clarity": {
+      "weight": 0.15, "min": 5, "target": 9,
+      "desc": "Can a new user accomplish the primary task within 60 seconds without instructions?",
+      "benchmark": "Uber: open app → book ride in 3 taps"
+    },
+    "navigation": {
+      "weight": 0.15, "min": 5, "target": 9,
+      "desc": "Max 2 clicks to any feature. Clear back/home. No dead ends.",
+      "benchmark": "Bottom nav or sidebar always visible. Current location always clear."
+    },
+    "visual_hierarchy": {
+      "weight": 0.1, "min": 5, "target": 8,
+      "desc": "Most important info largest/boldest. Actions clearly distinguished from content.",
+      "benchmark": "KPIs big and bold at top. Charts below. Details on drill-down."
+    },
+    "consistency": {
+      "weight": 0.1, "min": 5, "target": 8,
+      "desc": "Same patterns across all dashboards. Same colours mean same things.",
+      "benchmark": "Revenue always green. Costs always red. Same layout grid everywhere."
+    },
+    "error_communication": {
+      "weight": 0.15, "min": 5, "target": 9,
+      "desc": "Errors explain what happened AND what to do next. Never technical jargon.",
+      "benchmark": "Not 'Error 500'. Instead: 'Could not load sales data. Check database connection in Settings.'"
+    },
+    "responsiveness": {
+      "weight": 0.1, "min": 5, "target": 8,
+      "desc": "Works on desktop, tablet, phone. No horizontal scroll. Touch targets ≥44px.",
+      "benchmark": "Streamlit handles basic responsive. Custom CSS for touch targets."
+    },
+    "loading_feedback": {
+      "weight": 0.1, "min": 5, "target": 8,
+      "desc": "User always knows something is happening. Spinners, progress bars, skeleton screens.",
+      "benchmark": "Never a blank screen. Show loading state within 200ms."
+    },
+    "accessibility": {
+      "weight": 0.15, "min": 5, "target": 8,
+      "desc": "Colour contrast ≥4.5:1. Labels on all inputs. Keyboard navigable.",
+      "benchmark": "WCAG 2.1 AA minimum. Alt text on charts."
+    }
+  },
+  "pass_threshold": 7.0,
+  "halt_threshold": 5.0,
+  "when_to_score": "After every task that creates or modifies UI elements (dashboards, forms, reports, error messages)"
+}

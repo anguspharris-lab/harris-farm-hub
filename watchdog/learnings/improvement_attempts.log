@@ -1,0 +1,25 @@
+# Improvement attempts log
+
+## 2026-02-13 Session Learnings
+
+### Bug Found: KeyError in /api/rubric
+- When LLM API call fails, error response dict may lack "timestamp" key
+- Fix: Use .get() with fallback for all response dict access
+- Lesson: Always use .get() when accessing dict values from external API responses
+
+### Pattern: Deterministic Mock Data
+- np.random without seed = different data every session = confusing for users
+- Fix: np.random.RandomState(42) gives same data every time
+- Lesson: Always seed random generators in mock data for testability
+
+### Pattern: Security Scan False Positives
+- Word "tokens" in UI display strings triggers scan
+- Fix: Add exclusion patterns for display contexts (f"{tokens}", etc.)
+- Lesson: Test scan against your own code after adding new files
+
+### Pattern: Streamlit PATH issues
+- `streamlit` command not found when run via subprocess
+- Full path needed: /Users/angusharris/Library/Python/3.9/bin/streamlit
+- Lesson: Use full paths in startup scripts or ensure PATH is set
+
+[IMPROVE] 2026-02-17 00:43 | S | attempt 1/3 | 8.4->8.4 | SUCCESS | Test cycle recording (no actual improvement)

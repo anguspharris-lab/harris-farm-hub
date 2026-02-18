@@ -1,0 +1,41 @@
+{
+  "name": "Report Export — HTML, Markdown & PDF",
+  "description": "Add HTML, Markdown, and PDF export formats for intelligence reports. Currently only JSON and CSV are implemented. GET /api/intelligence/export/{id}/{fmt} needs html, md, and pdf format support.",
+  "abort_on_safety_fail": true,
+  "max_retries_per_task": 1,
+  "timeout_seconds_per_task": 600,
+  "phases": [
+    {
+      "name": "Implement export formats",
+      "success_criteria": "GET /api/intelligence/export/{id}/html, /md, and /pdf all return correctly formatted reports. Tests pass.",
+      "tasks": [
+        {
+          "name": "Add HTML and Markdown export to intelligence reports",
+          "description": "In backend/app.py (or create backend/report_export.py if cleaner), find the GET /api/intelligence/export/{id}/{fmt} endpoint.\n\nAdd support for fmt='html' and fmt='md':\n\n1. Load the intelligence report from intelligence_reports table (it has: id, agent_type, analysis_type, store_id, date_range, result_json, rubric_score_json, grade, created_at)\n\n2. For Markdown (fmt='md'):\n   - Title: '# {analysis_type} Report — {store_name}'\n   - Metadata: Date, Grade, Score\n   - Executive Summary from result_json\n   - Data tables rendered as Markdown tables\n   - Rubric scores as a table\n   - Generated timestamp footer\n   - Return with Content-Type: text/markdown\n\n3. For HTML (fmt='html'):\n   - Convert the Markdown to styled HTML\n   - Use a simple inline CSS stylesheet (professional, print-friendly)\n   - Harris Farm branding (green #2d7d2e header)\n   - Tables with borders and alternating row colours\n   - Return with Content-Type: text/html\n\n4. For PDF (fmt='pdf'):\n   - Use the HTML output and convert to PDF\n   - Try to import weasyprint or fpdf2. If neither available, return the HTML with a header suggesting print-to-PDF\n   - Add to requirements.txt if needed: fpdf2>=2.7.0\n   - Return with Content-Type: application/pdf\n   - If PDF library not available, return 501 with message 'PDF generation requires fpdf2. Install with: pip install fpdf2'\n\nRun tests after: python3 -m pytest tests/ -v",
+          "agent_role": "backend_engineer",
+          "files_to_touch": [
+            "backend/app.py",
+            "requirements.txt"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tests and docs",
+      "success_criteria": "Export tests pass. Docs updated.",
+      "tasks": [
+        {
+          "name": "Write export format tests and update docs",
+          "description": "1. Create tests/test_report_export.py:\n   - Test MD export returns valid Markdown with title header\n   - Test HTML export returns valid HTML with <html> tag\n   - Test HTML export includes CSS styling\n   - Test MD export includes data tables\n   - Test export of nonexistent report returns 404\n   - Test unsupported format returns 400\n   - Test JSON and CSV still work (regression)\n   - Min 8 tests\n\n2. Update docs/FEATURE_STATUS.md:\n   - Report Export (HTML/MD/PDF): PLANNED → LIVE\n\n3. Update docs/CHANGELOG.md\n4. Update docs/API_REFERENCE.md — document new export formats\n\nRun: python3 -m pytest tests/ -v",
+          "agent_role": "test_engineer",
+          "files_to_touch": [
+            "tests/test_report_export.py",
+            "docs/FEATURE_STATUS.md",
+            "docs/CHANGELOG.md",
+            "docs/API_REFERENCE.md"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "name": "Phase 5 — A/B Testing Framework",
+  "description": "Build the A/B testing framework for deploying agent improvements scientifically. Store version history, route traffic between test and production configs, evaluate with statistical significance, and promote winners.",
+  "abort_on_safety_fail": true,
+  "max_retries_per_task": 1,
+  "timeout_seconds_per_task": 600,
+  "phases": [
+    {
+      "name": "Create version manager and schema",
+      "success_criteria": "agent_versions table created. AgentVersionManager class with deploy_test, evaluate, promote methods. Tests pass.",
+      "tasks": [
+        {
+          "name": "Build AgentVersionManager",
+          "description": "Create backend/ab_testing.py with:\n\n1. Database schema (add to init_hub_database in app.py):\n   CREATE TABLE IF NOT EXISTS agent_versions (\n     id INTEGER PRIMARY KEY AUTOINCREMENT,\n     agent_name TEXT NOT NULL,\n     version TEXT NOT NULL,\n     config_json TEXT NOT NULL,\n     is_production BOOLEAN DEFAULT 0,\n     is_test BOOLEAN DEFAULT 0,\n     test_ratio REAL DEFAULT 0.2,\n     deployed_at TEXT DEFAULT (datetime('now')),\n     retired_at TEXT,\n     avg_score REAL DEFAULT 0,\n     task_count INTEGER DEFAULT 0,\n     UNIQUE(agent_name, version)\n   );\n\n   CREATE TABLE IF NOT EXISTS ab_test_results (\n     id INTEGER PRIMARY KEY AUTOINCREMENT,\n     agent_name TEXT NOT NULL,\n     test_version TEXT NOT NULL,\n     prod_version TEXT NOT NULL,\n     test_avg_score REAL,\n     prod_avg_score REAL,\n     test_count INTEGER,\n     prod_count INTEGER,\n     p_value REAL,\n     significant BOOLEAN,\n     winner TEXT,\n     evaluated_at TEXT DEFAULT (datetime('now'))\n   );\n\n2. AgentVersionManager class:\n   - __init__(self, db_path): store db_path\n   - deploy_test(self, agent_name, new_config, test_ratio=0.2):\n     * Create new version entry with is_test=True\n     * Keep existing production version\n     * Return version ID\n   - get_config_for_task(self, agent_name):\n     * If agent has active test: route test_ratio% to test config, rest to production\n     * Use random.random() < test_ratio for routing\n     * Return (config, version_id, is_test)\n   - record_result(self, agent_name, version_id, score):\n     * Update avg_score and task_count for the version\n   - evaluate(self, agent_name, min_samples=20):\n     * Get test and prod version scores\n     * If both have min_samples: run scipy.stats.ttest_ind (or manual t-test)\n     * Return {test_avg, prod_avg, p_value, significant (p<0.05), winner}\n   - promote(self, agent_name):\n     * Set test version as production\n     * Retire old production version\n     * Store result in ab_test_results\n   - rollback(self, agent_name):\n     * Retire test version, keep production\n   - get_active_tests(self):\n     * Return all agents with active A/B tests\n\n3. Keep it simple — no external dependencies beyond scipy (already available via numpy).\n   If scipy not available, use a simple effect size calculation instead.\n\nRun tests after: python3 -m pytest tests/ -v",
+          "agent_role": "backend_engineer",
+          "files_to_touch": [
+            "backend/ab_testing.py",
+            "backend/app.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wire A/B testing into executor and add API",
+      "success_criteria": "Agent executor uses A/B routing. API endpoints for managing tests. Tests pass.",
+      "tasks": [
+        {
+          "name": "Wire A/B testing into agent executor",
+          "description": "In backend/agent_executor.py:\n\n1. Import AgentVersionManager from backend/ab_testing.py\n2. In the proposal execution flow (where analysis functions are called):\n   - Before running analysis, call version_manager.get_config_for_task(agent_name)\n   - Pass any config overrides to the analysis function (e.g., different prompt, parameters)\n   - After getting results and rubric score, call version_manager.record_result(agent_name, version_id, avg_score)\n3. Add auto-evaluate: after recording result, if both versions have 20+ samples, auto-evaluate and log result\n\nIn backend/app.py, add API endpoints:\n\n1. GET /api/ab-tests — list all active A/B tests\n2. POST /api/ab-tests — create new test: {agent_name, new_config, test_ratio}\n3. GET /api/ab-tests/{agent_name} — get test status and results\n4. POST /api/ab-tests/{agent_name}/evaluate — manually trigger evaluation\n5. POST /api/ab-tests/{agent_name}/promote — promote test version\n6. POST /api/ab-tests/{agent_name}/rollback — rollback test version\n7. GET /api/ab-tests/results — list all completed A/B test results\n\nRun tests after: python3 -m pytest tests/ -v",
+          "agent_role": "backend_engineer",
+          "files_to_touch": [
+            "backend/agent_executor.py",
+            "backend/app.py"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tests and documentation",
+      "success_criteria": "A/B testing tests pass. Docs updated.",
+      "tasks": [
+        {
+          "name": "Write A/B testing tests",
+          "description": "Create tests/test_ab_testing.py:\n\n1. Test AgentVersionManager initialization creates tables\n2. Test deploy_test creates version entry with is_test=True\n3. Test get_config_for_task returns production config when no test active\n4. Test get_config_for_task routes some traffic to test version\n5. Test record_result updates avg_score and task_count\n6. Test evaluate returns comparison with p_value\n7. Test evaluate requires min_samples (returns None if insufficient data)\n8. Test promote switches test to production, retires old\n9. Test rollback retires test version\n10. Test get_active_tests returns correct list\n11. Test duplicate version creation is handled gracefully\n12. Test AB test results stored after evaluation\n\nRun: python3 -m pytest tests/test_ab_testing.py -v",
+          "agent_role": "test_engineer",
+          "files_to_touch": [
+            "tests/test_ab_testing.py"
+          ]
+        },
+        {
+          "name": "Update docs for A/B testing",
+          "description": "1. docs/FEATURE_STATUS.md:\n   - A/B Testing Framework: PLANNED → LIVE\n   - Automated Prompt Optimisation: PLANNED → PARTIAL (framework ready, needs prompts)\n\n2. docs/CHANGELOG.md — add A/B testing entry\n3. docs/ACTIVATION_ROADMAP.md — mark Phase 5 as COMPLETED\n4. docs/API_REFERENCE.md — document 7 new A/B testing endpoints\n\nKeep existing style.",
+          "agent_role": "architect",
+          "files_to_touch": [
+            "docs/FEATURE_STATUS.md",
+            "docs/CHANGELOG.md",
+            "docs/ACTIVATION_ROADMAP.md",
+            "docs/API_REFERENCE.md"
+          ]
+        }
+      ]
+    }
+  ]
+}
