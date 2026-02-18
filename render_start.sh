@@ -1,10 +1,9 @@
 #!/bin/bash
-# Start FastAPI backend in background
-cd /opt/render/project/src
-python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 &
+# Start FastAPI backend on internal port 8000
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 &
 
-# Wait for backend to start
+# Wait for backend
 sleep 3
 
-# Start Streamlit frontend
-streamlit run dashboards/landing.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
+# Start Streamlit on Render's PORT (this is the public-facing port)
+streamlit run dashboards/landing.py --server.port ${PORT:-10000} --server.address 0.0.0.0 --server.headless true --server.enableCORS false --server.enableXsrfProtection false
