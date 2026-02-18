@@ -117,4 +117,7 @@ def init_db():
                   template TEXT,
                   category TEXT,
                   difficulty TEXT,
-                  uses
+                  uses INTEGER DEFAULT 0,
+                  avg_rating REAL DEFAULT 0,
+                  created_at TEXT,
+                  updated_at TEXT)''')
