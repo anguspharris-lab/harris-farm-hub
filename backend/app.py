@@ -19,7 +19,14 @@ import logging
 import re
 from pathlib import Path
 from contextlib import asynccontextmanager
+import sys
 from dotenv import load_dotenv
+
+# Ensure backend/ is on sys.path so `import auth`, `import transaction_layer` etc. work
+# regardless of working directory (required when run as `python -m uvicorn backend.app:app`)
+_backend_dir = os.path.dirname(os.path.abspath(__file__))
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
 
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
