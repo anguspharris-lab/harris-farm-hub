@@ -5,6 +5,10 @@
 *.parquet
 data/transactions/
 
+# Allow small reference parquets (needed for deployment)
+!data/fiscal_calendar_daily.parquet
+!data/product_hierarchy.parquet
+
 # Secrets
 .env
 .env.*

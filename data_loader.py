@@ -15,24 +15,34 @@ import urllib.request
 # After uploading to Drive, replace REPLACE_WITH_FILE_ID with the real ID.
 # ---------------------------------------------------------------------------
 
+# ENV VAR OVERRIDES — set these on Render to enable auto-download:
+#   GDRIVE_ID_HARRIS_FARM_DB  → Google Drive file ID for harris_farm.db
+#   GDRIVE_ID_FY24_PARQUET    → Google Drive file ID for FY24.parquet
+#   GDRIVE_ID_FY25_PARQUET    → Google Drive file ID for FY25.parquet
+#   GDRIVE_ID_FY26_PARQUET    → Google Drive file ID for FY26.parquet
+
+def _gdrive_url(env_key, fallback_id="REPLACE_WITH_FILE_ID"):
+    file_id = os.getenv(env_key, fallback_id)
+    return f"https://drive.google.com/uc?export=download&id={file_id}"
+
 DATA_FILES = {
     "data/harris_farm.db": {
-        "url": "https://drive.google.com/uc?export=download&id=REPLACE_WITH_FILE_ID",
+        "url": _gdrive_url("GDRIVE_ID_HARRIS_FARM_DB"),
         "size_mb": 399,
         "description": "Weekly aggregated sales, customer & market share data",
     },
     "data/transactions/FY24.parquet": {
-        "url": "https://drive.google.com/uc?export=download&id=REPLACE_WITH_FILE_ID",
+        "url": _gdrive_url("GDRIVE_ID_FY24_PARQUET"),
         "size_mb": 2355,
         "description": "POS transactions FY24 (Jul 2023 - Jun 2024, 134M rows)",
     },
     "data/transactions/FY25.parquet": {
-        "url": "https://drive.google.com/uc?export=download&id=REPLACE_WITH_FILE_ID",
+        "url": _gdrive_url("GDRIVE_ID_FY25_PARQUET"),
         "size_mb": 2663,
         "description": "POS transactions FY25 (Jul 2024 - Jun 2025, 149M rows)",
     },
     "data/transactions/FY26.parquet": {
-        "url": "https://drive.google.com/uc?export=download&id=REPLACE_WITH_FILE_ID",
+        "url": _gdrive_url("GDRIVE_ID_FY26_PARQUET"),
         "size_mb": 1741,
         "description": "POS transactions FY26 YTD (Jul 2025 - Feb 2026, 99M rows)",
     },

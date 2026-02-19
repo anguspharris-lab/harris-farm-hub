@@ -2,7 +2,7 @@ services:
   - type: web
     name: harris-farm-hub
     runtime: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && python data_loader.py
     startCommand: bash render_start.sh
     envVars:
       - key: PYTHON_VERSION
