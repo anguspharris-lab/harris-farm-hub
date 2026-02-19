@@ -30,8 +30,15 @@ fi
 # Start FastAPI backend on internal port 8000
 python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000 &
 
-# Wait for backend
-sleep 3
+# Wait for backend to be ready (up to 30 seconds)
+echo "Waiting for backend API..."
+for i in $(seq 1 30); do
+    if curl -s http://127.0.0.1:8000/ > /dev/null 2>&1; then
+        echo "Backend ready after ${i}s"
+        break
+    fi
+    sleep 1
+done
 
 # Start single multi-page Streamlit app on Render's PORT
 streamlit run dashboards/app.py --server.port ${PORT:-10000} --server.address 0.0.0.0 --server.headless true --server.enableCORS false --server.enableXsrfProtection false --server.fileWatcherType none

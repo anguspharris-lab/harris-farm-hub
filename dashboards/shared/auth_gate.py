@@ -22,101 +22,120 @@ except ImportError:
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 # ---------------------------------------------------------------------------
-# Login page CSS
+# Login page CSS — targets Streamlit's actual DOM elements directly
+# (NOT wrapper divs, which don't work across st.markdown blocks)
 # ---------------------------------------------------------------------------
 
 _LOGIN_CSS = """
 <style>
     /* Hide Streamlit chrome on login page */
-    #MainMenu, footer, header {visibility: hidden;}
-    .block-container {padding-top: 0 !important; max-width: 100% !important;}
-
-    .auth-wrapper {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
-        margin: -6rem -4rem;
-        padding: 2rem;
-    }
-    .auth-card {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        padding: 48px 40px;
-        width: 100%;
-        max-width: 420px;
-    }
-    .auth-logo {
-        text-align: center;
-        margin-bottom: 8px;
-    }
-    .auth-logo span {
-        font-size: 2.8em;
-    }
-    .auth-title {
-        text-align: center;
-        font-size: 1.6em;
-        font-weight: 700;
-        color: #1e3a8a;
-        margin: 0 0 4px 0;
-        letter-spacing: -0.5px;
-    }
-    .auth-subtitle {
-        text-align: center;
-        color: #6b7280;
-        font-size: 0.95em;
-        margin: 0 0 32px 0;
-    }
-    .auth-divider {
-        border: none;
-        border-top: 1px solid #e5e7eb;
-        margin: 24px 0;
-    }
-    .auth-footer {
-        text-align: center;
-        color: #9ca3af;
-        font-size: 0.8em;
-        margin-top: 24px;
-    }
-    .auth-toggle {
-        text-align: center;
-        margin-top: 16px;
-    }
-    .auth-toggle a {
-        color: #1e3a8a;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.9em;
+    #MainMenu, footer, header, [data-testid="stSidebar"],
+    [data-testid="stSidebarNav"] {
+        display: none !important;
+        visibility: hidden !important;
     }
 
-    /* Style Streamlit form elements inside auth card */
-    .auth-card .stTextInput > div > div > input {
-        border-radius: 8px;
-        border: 1.5px solid #d1d5db;
-        padding: 10px 14px;
-        font-size: 0.95em;
+    /* Dark gradient background on the entire app */
+    .stApp {
+        background: linear-gradient(135deg, #0a1628 0%, #1a2744 50%, #0d1f3c 100%) !important;
     }
-    .auth-card .stTextInput > div > div > input:focus {
-        border-color: #1e3a8a;
-        box-shadow: 0 0 0 3px rgba(30,58,138,0.1);
+
+    /* Center content vertically and constrain width */
+    .stApp > .main > .block-container {
+        max-width: 440px !important;
+        padding: 2rem 1.5rem !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        min-height: 100vh !important;
     }
-    .auth-card .stButton > button {
-        background: linear-gradient(135deg, #1e3a8a, #2563eb);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 12px 24px;
-        font-size: 1em;
-        font-weight: 600;
-        letter-spacing: 0.3px;
-        transition: all 0.2s;
+
+    /* Style text input labels */
+    .stTextInput > label,
+    [data-testid="stWidgetLabel"] {
+        color: rgba(255, 255, 255, 0.7) !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        letter-spacing: 0.3px !important;
     }
-    .auth-card .stButton > button:hover {
-        background: linear-gradient(135deg, #1e40af, #3b82f6);
-        box-shadow: 0 4px 12px rgba(30,58,138,0.3);
-        transform: translateY(-1px);
+
+    /* Style text input fields */
+    .stTextInput > div > div > input {
+        background: rgba(255, 255, 255, 0.06) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 12px !important;
+        color: #fff !important;
+        padding: 14px 16px !important;
+        font-size: 15px !important;
+    }
+
+    .stTextInput > div > div > input:focus {
+        border-color: rgba(255, 255, 255, 0.4) !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .stTextInput > div > div > input::placeholder {
+        color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    /* Style the Sign In / Create Account button */
+    .stFormSubmitButton > button,
+    [data-testid="stFormSubmitButton"] > button {
+        background: linear-gradient(135deg, #2d7d3a, #3a9d4a) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 14px !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.3px !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .stFormSubmitButton > button:hover,
+    [data-testid="stFormSubmitButton"] > button:hover {
+        background: linear-gradient(135deg, #3a9d4a, #4aad5a) !important;
+        box-shadow: 0 4px 15px rgba(45, 125, 58, 0.4) !important;
+    }
+
+    /* Toggle buttons (Create Account / Sign In) */
+    .stButton > button {
+        color: rgba(255, 255, 255, 0.7) !important;
+        background: rgba(255, 255, 255, 0.06) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 10px !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .stButton > button:hover {
+        background: rgba(255, 255, 255, 0.12) !important;
+        border-color: rgba(255, 255, 255, 0.3) !important;
+        color: #fff !important;
+    }
+
+    /* Caption / helper text */
+    .stCaption, [data-testid="stCaptionContainer"] {
+        color: rgba(255, 255, 255, 0.45) !important;
+    }
+
+    /* Error messages */
+    .stAlert [data-testid="stNotificationContentError"] {
+        background: rgba(220, 53, 69, 0.15) !important;
+        border: 1px solid rgba(220, 53, 69, 0.3) !important;
+        color: #ff6b7a !important;
+    }
+
+    /* Divider line */
+    hr {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 480px) {
+        .stApp > .main > .block-container {
+            padding: 1.5rem 1rem !important;
+        }
     }
 </style>
 """
@@ -194,19 +213,21 @@ def _render_auth_page(api_url):
     if "auth_mode" not in st.session_state:
         st.session_state["auth_mode"] = "login"
 
-    st.markdown('<div class="auth-wrapper"><div class="auth-card">', unsafe_allow_html=True)
-
-    # Logo and title
+    # Logo and title — self-contained HTML block (no wrapping divs)
     st.markdown(
-        '<div class="auth-logo"><span>&#127822;</span></div>'
-        '<div class="auth-title">Harris Farm Hub</div>'
-        '<div class="auth-subtitle">AI Centre of Excellence</div>',
+        '<div style="text-align:center;padding-top:2rem;margin-bottom:2rem;">'
+        '<div style="font-size:3rem;margin-bottom:0.5rem;">&#127822;</div>'
+        '<div style="font-size:1.75rem;font-weight:700;color:#fff;'
+        'letter-spacing:-0.5px;margin-bottom:0.25rem;">Harris Farm Hub</div>'
+        '<div style="font-size:0.8rem;color:rgba(255,255,255,0.45);'
+        'letter-spacing:2px;text-transform:uppercase;font-weight:400;">'
+        'AI Centre of Excellence</div>'
+        '</div>',
         unsafe_allow_html=True,
     )
 
     if not api_ok:
-        st.error("Cannot connect to the Hub API. Please ensure the backend is running on port 8000.")
-        st.markdown('</div></div>', unsafe_allow_html=True)
+        st.error("Cannot connect to the Hub API. The backend may still be starting — please refresh in 30 seconds.")
         return
 
     if st.session_state.get("auth_mode", "login") == "login":
@@ -214,11 +235,12 @@ def _render_auth_page(api_url):
     else:
         _render_register(api_url, site_pw_required)
 
+    # Footer
     st.markdown(
-        '<div class="auth-footer">Harris Farm Markets &bull; AI Centre of Excellence</div>',
+        '<div style="text-align:center;margin-top:2rem;color:rgba(255,255,255,0.25);'
+        'font-size:0.75rem;">Harris Farm Markets &middot; Powered by AI</div>',
         unsafe_allow_html=True,
     )
-    st.markdown('</div></div>', unsafe_allow_html=True)
 
 
 def _render_login(api_url, site_pw_required):
@@ -230,17 +252,17 @@ def _render_login(api_url, site_pw_required):
         else:
             site_password = None
 
-        email = st.text_input("Email Address", placeholder="you@harrisfarm.com.au")
-        password = st.text_input("Password", type="password", placeholder="Enter your password")
+        email = st.text_input("Email", placeholder="you@harrisfarm.com.au")
+        password = st.text_input("Password", type="password", placeholder="Enter password")
 
         st.markdown("")  # spacing
-        submitted = st.form_submit_button("Sign In", use_container_width=True)
+        submitted = st.form_submit_button("Enter The Hub", use_container_width=True)
 
         if submitted:
             _handle_login(api_url, site_pw_required, site_password, email, password)
 
     # Toggle to register
-    st.markdown('<hr class="auth-divider">', unsafe_allow_html=True)
+    st.markdown("---")
     col1, col2 = st.columns(2)
     with col1:
         st.caption("Don't have an account?")
@@ -303,7 +325,7 @@ def _render_register(api_url, site_pw_required):
             site_password = None
 
         name = st.text_input("Full Name", placeholder="Your full name")
-        email = st.text_input("Email Address", placeholder="you@harrisfarm.com.au")
+        email = st.text_input("Email", placeholder="you@harrisfarm.com.au")
         password = st.text_input("Choose Password", type="password",
                                  placeholder="Minimum 8 characters")
         confirm = st.text_input("Confirm Password", type="password",
@@ -317,7 +339,7 @@ def _render_register(api_url, site_pw_required):
                              name, email, password, confirm)
 
     # Toggle to login
-    st.markdown('<hr class="auth-divider">', unsafe_allow_html=True)
+    st.markdown("---")
     col1, col2 = st.columns(2)
     with col1:
         st.caption("Already have an account?")
