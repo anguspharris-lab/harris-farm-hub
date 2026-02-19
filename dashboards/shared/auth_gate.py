@@ -35,24 +35,49 @@ _LOGIN_CSS = """
         visibility: hidden !important;
     }
 
-    /* Dark gradient background on the entire app */
+    /* Dark gradient background — override EVERY Streamlit container */
+    html, body,
+    .stApp,
+    [data-testid="stAppViewContainer"],
+    [data-testid="stAppViewBlockContainer"],
+    .main,
+    .main > div,
+    .block-container,
+    [data-testid="stVerticalBlock"],
+    section[data-testid="stSidebar"],
+    .stApp > header {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
     .stApp {
         background: linear-gradient(135deg, #0a1628 0%, #1a2744 50%, #0d1f3c 100%) !important;
     }
 
     /* Center content vertically and constrain width */
-    .stApp > .main > .block-container {
+    .stApp > .main > .block-container,
+    .block-container {
         max-width: 440px !important;
         padding: 2rem 1.5rem !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
         min-height: 100vh !important;
+        margin: 0 auto !important;
+    }
+
+    /* ALL text on login page must be light */
+    .stApp p, .stApp span, .stApp div, .stApp label,
+    .stApp h1, .stApp h2, .stApp h3,
+    .stMarkdown, .stMarkdown p, .stMarkdown span, .stMarkdown div {
+        color: rgba(255, 255, 255, 0.85) !important;
     }
 
     /* Style text input labels */
     .stTextInput > label,
-    [data-testid="stWidgetLabel"] {
+    .stTextInput label,
+    [data-testid="stWidgetLabel"],
+    [data-testid="stWidgetLabel"] p {
         color: rgba(255, 255, 255, 0.7) !important;
         font-size: 13px !important;
         font-weight: 500 !important;
