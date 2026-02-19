@@ -5,7 +5,6 @@ Real item-level POS transactions (383M rows, FY24-FY26 via DuckDB/parquet).
 Data source: Microsoft Fabric retail fact_pos_sales.
 """
 
-import sys
 from pathlib import Path
 
 import streamlit as st
@@ -14,25 +13,11 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import date
 
-# Ensure backend is importable
-_BACKEND = str(Path(__file__).resolve().parent.parent / "backend")
-if _BACKEND not in sys.path:
-    sys.path.insert(0, _BACKEND)
-
 from transaction_layer import TransactionStore, STORE_NAMES
 from transaction_queries import run_query
 from product_hierarchy import get_departments, get_major_groups, get_minor_groups
 
-# Page configuration
-st.set_page_config(
-    page_title="Revenue Bridge | Harris Farm Hub",
-    page_icon="\U0001f4c9",
-    layout="wide",
-)
-
-from nav import render_nav
-from shared.styles import apply_styles, render_header, render_footer
-from shared.auth_gate import require_login
+from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
 from shared.fiscal_selector import render_fiscal_selector
 from shared.hierarchy_filter import render_hierarchy_filter, hierarchy_filter_summary
@@ -41,9 +26,7 @@ from shared.time_filter import (
     render_time_filter, time_filter_summary, render_quick_period,
 )
 
-apply_styles()
-user = require_login()
-render_nav(8513, auth_token=st.session_state.get("auth_token"))
+user = st.session_state.get("auth_user")
 render_header(
     "Revenue Bridge",
     "**Revenue decomposition & financial trends** | Network and store-level analysis",

@@ -5,14 +5,9 @@ Hour of Day, Season, Fiscal Quarter, Fiscal Month.
 Used by all transaction dashboards (Store Ops, Product Intel, Revenue Bridge, Buying Hub).
 """
 
-import sys
-from pathlib import Path
 from datetime import date, timedelta
 
 import streamlit as st
-
-# Ensure backend is importable
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "backend"))
 
 from fiscal_calendar import (
     get_current_fiscal_period,

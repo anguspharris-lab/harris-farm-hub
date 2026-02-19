@@ -2,7 +2,6 @@
 Harris Farm Hub — Landing Page
 Centre of Excellence — "For The Greater Goodness"
 Aligned with Harris Farm's 5 Strategic Pillars.
-Port 8500.
 """
 
 import sqlite3
@@ -11,37 +10,10 @@ from pathlib import Path
 
 import streamlit as st
 
-from nav import render_nav, HUBS, BASE_URL
-from shared.styles import apply_styles, render_footer, HFM_GREEN, HFM_DARK
+from nav import HUBS, port_to_url
+from shared.styles import render_footer, HFM_GREEN, HFM_DARK
 
-st.set_page_config(
-    page_title="Harris Farm Hub — Centre of Excellence",
-    page_icon="\U0001f34e",
-    layout="wide",
-)
-
-
-def check_password():
-    """Simple password protection."""
-    if "authenticated" not in st.session_state:
-        st.session_state.authenticated = False
-    if not st.session_state.authenticated:
-        st.title("\U0001f512 Harris Farm Hub")
-        st.markdown("**AI Centre of Excellence**")
-        pw = st.text_input("Enter password:", type="password")
-        if st.button("Login"):
-            if pw == "HFM2026!1":
-                st.session_state.authenticated = True
-                st.rerun()
-            else:
-                st.error("Incorrect password")
-        st.stop()
-
-
-check_password()
-
-apply_styles()
-render_nav(8500)
+user = st.session_state.get("auth_user")
 
 # --- Hero ---
 st.markdown(
@@ -151,8 +123,6 @@ PILLAR_CONTEXT = {
     },
 }
 
-_token_qs = ""
-
 # Render hub cards — 3 top, 2 bottom (or adapt to count)
 _n_hubs = len(HUBS)
 if _n_hubs <= 3:
@@ -185,9 +155,10 @@ for i, hub in enumerate(HUBS):
         # Dashboard links
         dash_list = ""
         for label, port, d_icon, desc in hub["dashboards"]:
+            page_url = port_to_url(port)
             dash_list += (
                 f"<div style='margin:5px 0;'>"
-                f"<a href='{BASE_URL}:{port}{_token_qs}' target='_top' "
+                f"<a href='{page_url}' "
                 f"style='color:{color};text-decoration:none;font-weight:600;'>"
                 f"{d_icon} {label}</a>"
                 f" <span style='color:#9ca3af;font-size:0.8em;'>— {desc}</span>"
@@ -215,7 +186,7 @@ for i, hub in enumerate(HUBS):
             f"{dash_list}"
             f"<div style='margin-top:10px;'>{status_html}</div>"
             f"<div style='margin-top:14px;'>"
-            f"<a href='{BASE_URL}:{first_port}{_token_qs}' target='_top' "
+            f"<a href='{port_to_url(first_port)}' "
             f"style='display:inline-block;padding:8px 20px;background:{color};"
             f"color:white;border-radius:6px;text-decoration:none;font-size:0.9em;'>"
             f"Open {name} &rarr;</a>"
@@ -236,7 +207,7 @@ st.markdown(
     "The Hub is about <strong>enablement, not replacement</strong>. "
     "AI takes care of the repetitive stuff so you can focus on what matters — "
     "serving customers, building relationships, and doing your best work. "
-    "Start with the <a href='" + BASE_URL + ":8510' target='_top' "
+    "Start with the <a href='/learning-centre' "
     "style='color:#4ba021;font-weight:600;'>Learning Centre</a> "
     "to build your skills.</div>"
     "</div>",
@@ -274,7 +245,7 @@ st.markdown(
     "Dashboards marked <strong>LIVE</strong> are fully functional. "
     "Features marked <strong>Future Development</strong> are planned "
     "and being built through our autonomous development pipeline. "
-    "<a href='" + BASE_URL + ":8515' target='_top' "
+    "<a href='/hub-portal' "
     "style='color:#d97706;'>View full feature status in Hub Portal &rarr;</a>"
     "</div></div>",
     unsafe_allow_html=True,

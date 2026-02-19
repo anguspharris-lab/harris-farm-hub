@@ -14,17 +14,13 @@ Role-based personalisation and progress tracking.
 
 import json
 import os
-import sys
 from datetime import datetime
 from pathlib import Path
 
 import requests
 import streamlit as st
 
-sys.path.insert(0, str(Path(__file__).parent))
-from nav import render_nav
-from shared.styles import apply_styles, render_header, render_footer
-from shared.auth_gate import require_login
+from shared.styles import render_header, render_footer
 from shared.learning_content import (
     MODULES,
     LESSONS,
@@ -44,10 +40,7 @@ from shared.training_content import (
 # CONFIG
 # ---------------------------------------------------------------------------
 
-st.set_page_config(page_title="Learning Centre | Harris Farm Hub", layout="wide")
-apply_styles()
-user = require_login()
-render_nav(current_port=8510, auth_token=st.session_state.get("auth_token"))
+user = st.session_state.get("auth_user")
 render_header(
     "Learning Centre",
     "**Prompt Academy** — AI & Data Skills for Every Harris Farmer"
@@ -377,11 +370,11 @@ with tab_dashboard:
     st.markdown("### Quick Links")
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown(f"[The Rubric — Compare AI Models]({os.getenv('HUB_BASE_URL', 'http://localhost')}:8505)")
+        st.markdown("[The Rubric — Compare AI Models](/the-rubric)")
     with col2:
-        st.markdown(f"[Prompt Builder — Design Prompts]({os.getenv('HUB_BASE_URL', 'http://localhost')}:8504)")
+        st.markdown("[Prompt Builder — Design Prompts](/prompt-builder)")
     with col3:
-        st.markdown(f"[Hub Assistant — Ask Questions]({os.getenv('HUB_BASE_URL', 'http://localhost')}:8509)")
+        st.markdown("[Hub Assistant — Ask Questions](/hub-assistant)")
 
 
 # ===== TAB 2: AI PROMPTING SKILLS =====
@@ -439,9 +432,9 @@ with tab_kb:
     # Link to Hub Assistant
     st.markdown("---")
     st.info(
-        f"**Can't find what you need?** "
-        f"[Ask the Hub Assistant]({os.getenv('HUB_BASE_URL', 'http://localhost')}:8509) "
-        f"— it searches the full Knowledge Base and gives you answers with source references."
+        "**Can't find what you need?** "
+        "[Ask the Hub Assistant](/hub-assistant) "
+        "— it searches the full Knowledge Base and gives you answers with source references."
     )
 
 

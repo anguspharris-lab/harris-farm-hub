@@ -5,7 +5,6 @@ Top items, PLU deep dive, basket analysis, slow movers.
 Data source: Microsoft Fabric retail fact_pos_sales.
 """
 
-import sys
 from pathlib import Path
 
 import streamlit as st
@@ -14,24 +13,12 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import date
 
-# Ensure backend is importable
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backend"))
-
 from transaction_layer import TransactionStore, STORE_NAMES
 from transaction_queries import run_query
 from plu_lookup import resolve_plu, enrich_items, load_plu_names, load_plu_details, plu_coverage_stats
 from product_hierarchy import get_departments, get_major_groups, get_minor_groups
 
-# Page configuration
-st.set_page_config(
-    page_title="Product Intelligence | Harris Farm Hub",
-    page_icon="\U0001f50d",
-    layout="wide",
-)
-
-from nav import render_nav
-from shared.styles import apply_styles, render_header, render_footer
-from shared.auth_gate import require_login
+from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
 from shared.fiscal_selector import render_fiscal_selector
 from shared.hierarchy_filter import render_hierarchy_filter, hierarchy_filter_summary
@@ -40,9 +27,7 @@ from shared.time_filter import (
     render_time_filter, time_filter_summary, render_quick_period,
 )
 
-apply_styles()
-user = require_login()
-render_nav(8512, auth_token=st.session_state.get("auth_token"))
+user = st.session_state.get("auth_user")
 render_header(
     "Product Intelligence",
     "**Item-level performance analytics** | Top items, basket analysis, PLU deep dive",

@@ -5,7 +5,6 @@ and gamified scoreboard. Port 8515.
 """
 
 import json
-import sys
 from pathlib import Path
 
 import streamlit as st
@@ -14,17 +13,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import requests
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backend"))
-
-st.set_page_config(
-    page_title="Hub Portal | Harris Farm Hub",
-    page_icon="\U0001f310",
-    layout="wide",
-)
-
-from nav import render_nav
-from shared.styles import apply_styles, render_header, render_footer
-from shared.auth_gate import require_login
+from shared.styles import render_header, render_footer
 from shared.portal_content import (
     load_doc, load_procedure, load_learning, load_rubric,
     get_doc_index, get_procedure_index, get_learning_index,
@@ -348,9 +337,7 @@ def _fetch_game_achievements():
         return []
 
 
-apply_styles()
-user = require_login()
-render_nav(8515, auth_token=st.session_state.get("auth_token"))
+user = st.session_state.get("auth_user")
 render_header(
     "Hub Documentation Portal",
     "**Procedures, data catalog, AI showcase, prompt intelligence "

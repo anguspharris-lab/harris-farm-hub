@@ -13,24 +13,15 @@ from datetime import datetime, timedelta
 import sqlite3
 from pathlib import Path
 
-st.set_page_config(
-    page_title="Store Profitability | Harris Farm Hub",
-    page_icon="💰",
-    layout="wide"
-)
-
 # ============================================================================
 # STYLING
 # ============================================================================
 
-from nav import render_nav
-from shared.styles import apply_styles, render_header, render_footer
-from shared.auth_gate import require_login
+from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
 
-apply_styles(extra_css=".profit-positive { color: #10b981; font-weight: bold; }\n    .profit-negative { color: #ef4444; font-weight: bold; }")
-user = require_login()
-render_nav(8502, auth_token=st.session_state.get("auth_token"))
+st.markdown("<style>.profit-positive { color: #10b981; font-weight: bold; }\n    .profit-negative { color: #ef4444; font-weight: bold; }</style>", unsafe_allow_html=True)
+user = st.session_state.get("auth_user")
 
 
 # ============================================================================

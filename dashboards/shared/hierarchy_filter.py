@@ -4,13 +4,7 @@ Reusable cascading sidebar filter: Department → Category → Sub-Category → 
 Used by all transaction dashboards (Store Ops, Product Intel, Revenue Bridge, Buying Hub).
 """
 
-import sys
-from pathlib import Path
-
 import streamlit as st
-
-# Ensure backend is importable
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "backend"))
 
 from product_hierarchy import (
     get_departments, get_major_groups, get_minor_groups,

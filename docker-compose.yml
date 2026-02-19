@@ -25,62 +25,14 @@ services:
       - hub-network
     restart: unless-stopped
 
-  # Sales Dashboard
-  dashboard-sales:
+  # Single multi-page Streamlit Hub
+  hub:
     build:
-      context: ./dashboards
-      dockerfile: Dockerfile
-    command: streamlit run sales_dashboard.py --server.port 8501 --server.address 0.0.0.0
+      context: .
+      dockerfile: dashboards/Dockerfile
+    command: streamlit run dashboards/app.py --server.port 8500 --server.address 0.0.0.0 --server.headless true
     ports:
-      - "8501:8501"
-    environment:
-      - API_URL=http://api:8000
-    networks:
-      - hub-network
-    depends_on:
-      - api
-    restart: unless-stopped
-
-  # Profitability Dashboard
-  dashboard-profit:
-    build:
-      context: ./dashboards
-      dockerfile: Dockerfile
-    command: streamlit run profitability_dashboard.py --server.port 8502 --server.address 0.0.0.0
-    ports:
-      - "8502:8502"
-    environment:
-      - API_URL=http://api:8000
-    networks:
-      - hub-network
-    depends_on:
-      - api
-    restart: unless-stopped
-
-  # Transport Dashboard
-  dashboard-transport:
-    build:
-      context: ./dashboards
-      dockerfile: Dockerfile
-    command: streamlit run transport_dashboard.py --server.port 8503 --server.address 0.0.0.0
-    ports:
-      - "8503:8503"
-    environment:
-      - API_URL=http://api:8000
-    networks:
-      - hub-network
-    depends_on:
-      - api
-    restart: unless-stopped
-
-  # Prompt Builder
-  prompt-builder:
-    build:
-      context: ./dashboards
-      dockerfile: Dockerfile
-    command: streamlit run prompt_builder.py --server.port 8504 --server.address 0.0.0.0
-    ports:
-      - "8504:8504"
+      - "8500:8500"
     environment:
       - API_URL=http://api:8000
     networks:

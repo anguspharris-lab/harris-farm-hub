@@ -9,7 +9,6 @@ Data sources:
   - DuckDB transactions: 383M POS rows, ~12% with loyalty CustomerCode
 """
 
-import sys
 import sqlite3
 from pathlib import Path
 
@@ -20,27 +19,15 @@ import plotly.graph_objects as go
 import streamlit as st
 from datetime import datetime, date
 
-# Backend imports for transaction layer
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backend"))
 from transaction_layer import TransactionStore, STORE_NAMES
 from transaction_queries import run_query
 
-from nav import render_nav
-from shared.styles import apply_styles, render_header, render_footer
-from shared.auth_gate import require_login
+from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
 from shared.fiscal_selector import render_fiscal_selector
 from shared.time_filter import render_time_filter, time_filter_summary, render_quick_period
 
-st.set_page_config(
-    page_title="Customer Analytics | Harris Farm Hub",
-    page_icon="\U0001f465",
-    layout="wide",
-)
-
-apply_styles()
-user = require_login()
-render_nav(8507, auth_token=st.session_state.get("auth_token"))
+user = st.session_state.get("auth_user")
 
 render_header(
     "Customer Analytics",

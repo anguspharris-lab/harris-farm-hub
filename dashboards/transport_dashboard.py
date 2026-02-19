@@ -11,16 +11,8 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import numpy as np
 
-st.set_page_config(
-    page_title="Transport Costs | Harris Farm Hub",
-    page_icon="🚚",
-    layout="wide"
-)
-
-from nav import render_nav
 from shared.stores import STORES, REGIONS
-from shared.styles import apply_styles, render_header, render_footer
-from shared.auth_gate import require_login
+from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
 
 # Approximate km from Sydney Markets (Flemington) to each store
@@ -186,9 +178,7 @@ def generate_transport_data():
 # HEADER
 # ============================================================================
 
-apply_styles()
-user = require_login()
-render_nav(8503, auth_token=st.session_state.get("auth_token"))
+user = st.session_state.get("auth_user")
 
 render_header("🚚 Transport & Logistics", "**Operations Team** | Delivery costs, route efficiency & fleet analysis")
 

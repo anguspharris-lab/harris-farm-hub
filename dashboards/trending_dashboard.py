@@ -10,22 +10,12 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 
-st.set_page_config(
-    page_title="Trending | Harris Farm Hub",
-    page_icon="📈",
-    layout="wide"
-)
-
 API_URL = "http://localhost:8000"
 
-from nav import render_nav
-from shared.styles import apply_styles, render_header, render_footer
-from shared.auth_gate import require_login
+from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
 
-apply_styles()
-user = require_login()
-render_nav(8506, auth_token=st.session_state.get("auth_token"))
+user = st.session_state.get("auth_user")
 
 # ============================================================================
 # HEADER
@@ -194,46 +184,25 @@ st.subheader("🏥 System Health")
 
 col1, col2, col3 = st.columns(3)
 
-services = {
-    "API": 8000,
-    "Hub Home": 8500,
-    "Sales": 8501,
-    "Profitability": 8502,
-    "Transport": 8503,
-    "Prompt Builder": 8504,
-    "The Rubric": 8505,
-    "Trending": 8506,
-    "Customers": 8507,
-    "Market Share": 8508,
-    "Hub Assistant": 8509,
-    "Learning Centre": 8510,
-}
-
-healthy = 0
-total = len(services)
-
-for name, port in services.items():
-    try:
-        r = requests.get(f"http://localhost:{port}", timeout=3)
-        if r.status_code in (200, 302):
-            healthy += 1
-    except Exception:
-        pass
+api_healthy = False
+try:
+    r = requests.get(f"{API_URL}/", timeout=3)
+    if r.status_code in (200, 302):
+        api_healthy = True
+except Exception:
+    pass
 
 with col1:
-    st.metric("Services Up", f"{healthy}/{total}")
+    st.metric("API Backend", "Up" if api_healthy else "Down")
 
 with col2:
-    pct = (healthy / total * 100) if total > 0 else 0
-    st.metric("Uptime", f"{pct:.0f}%")
+    st.metric("Dashboard Pages", "17")
 
 with col3:
-    if healthy == total:
+    if api_healthy:
         st.success("ALL HEALTHY")
-    elif healthy > 0:
-        st.warning(f"{total - healthy} service(s) down")
     else:
-        st.error("ALL SERVICES DOWN")
+        st.error("API Backend Down")
 
 # ============================================================================
 # INSIGHTS

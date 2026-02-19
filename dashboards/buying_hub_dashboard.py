@@ -6,7 +6,6 @@ Hierarchy: Department (9) → Major Group (30) → Minor Group (405) → HFM Ite
 Data source: Microsoft Fabric retail fact_pos_sales + Product Hierarchy 20260215.xlsx.
 """
 
-import sys
 from pathlib import Path
 
 import streamlit as st
@@ -15,9 +14,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import date
 
-# Ensure backend is importable
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backend"))
-
 from transaction_layer import TransactionStore, STORE_NAMES
 from transaction_queries import run_query
 from product_hierarchy import (
@@ -25,16 +21,7 @@ from product_hierarchy import (
     hierarchy_stats, load_hierarchy,
 )
 
-# Page configuration
-st.set_page_config(
-    page_title="Buying Hub | Harris Farm Hub",
-    page_icon="\U0001f6d2",
-    layout="wide",
-)
-
-from nav import render_nav
-from shared.styles import apply_styles, render_header, render_footer
-from shared.auth_gate import require_login
+from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
 from shared.fiscal_selector import render_fiscal_selector
 from shared.hierarchy_filter import render_hierarchy_filter, hierarchy_filter_summary
@@ -43,9 +30,7 @@ from shared.time_filter import (
     render_time_filter, time_filter_summary, render_quick_period,
 )
 
-apply_styles()
-user = require_login()
-render_nav(8514, auth_token=st.session_state.get("auth_token"))
+user = st.session_state.get("auth_user")
 render_header(
     "Buying Hub",
     "**Category & buyer intelligence** | 72,911 products across 9 departments",

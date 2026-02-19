@@ -12,19 +12,9 @@ from shared.stores import STORES
 
 API_URL = "http://localhost:8000"
 
-st.set_page_config(
-    page_title="Prompt Builder | Harris Farm Hub",
-    page_icon="🔧",
-    layout="wide"
-)
+from shared.styles import render_header, render_footer
 
-from nav import render_nav
-from shared.styles import apply_styles, render_header, render_footer
-from shared.auth_gate import require_login
-
-apply_styles()
-user = require_login()
-render_nav(8504, auth_token=st.session_state.get("auth_token"))
+user = st.session_state.get("auth_user")
 
 render_header("🔧 Prompt Builder", "**Super User Tool** | Design, test, and save custom analytical prompts")
 

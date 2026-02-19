@@ -6,7 +6,6 @@ Enhanced: product hierarchy filters, period comparison, like-for-like stores.
 Data source: Microsoft Fabric retail fact_pos_sales.
 """
 
-import sys
 from pathlib import Path
 
 import streamlit as st
@@ -14,9 +13,6 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import date
-
-# Ensure backend is importable
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backend"))
 
 from transaction_layer import TransactionStore, STORE_NAMES
 from transaction_queries import run_query
@@ -33,23 +29,11 @@ from shared.time_filter import (
     render_time_filter, time_filter_summary,
     render_quick_period, resolve_quick_period,
 )
-
-# Page configuration
-st.set_page_config(
-    page_title="Store Operations | Harris Farm Hub",
-    page_icon="\U0001f3ea",
-    layout="wide",
-)
-
-from nav import render_nav
-from shared.styles import apply_styles, render_header, render_footer
-from shared.auth_gate import require_login
+from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
 from shared.fiscal_selector import render_fiscal_selector
 
-apply_styles()
-user = require_login()
-render_nav(8511, auth_token=st.session_state.get("auth_token"))
+user = st.session_state.get("auth_user")
 render_header(
     "Store Operations Intelligence",
     "**Item-level POS transaction analysis** | 383M transactions across 34 stores (FY24-FY26)",

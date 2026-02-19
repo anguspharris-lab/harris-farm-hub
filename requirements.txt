@@ -1,4 +1,4 @@
-streamlit
+streamlit>=1.36
 pandas
 plotly
 numpy
@@ -15,3 +15,6 @@ openai
 sqlalchemy
 aiofiles
 gdown
+bcrypt
+duckdb
+openpyxl

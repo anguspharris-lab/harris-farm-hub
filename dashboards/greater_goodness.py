@@ -9,23 +9,9 @@ things we do every day. This is the heart of who we are.
  We've believed in nature itself." — Harris Farm Markets
 """
 
-import sys
-from pathlib import Path
-
 import streamlit as st
 
-sys.path.insert(0, str(Path(__file__).parent))
-from nav import render_nav, BASE_URL
-from shared.styles import apply_styles, render_footer
-
-st.set_page_config(
-    page_title="Greater Goodness | Harris Farm Hub",
-    page_icon="\U0001f331",
-    layout="wide",
-)
-
-apply_styles()
-render_nav(8516)
+from shared.styles import render_footer
 
 # ---------------------------------------------------------------------------
 # HERO

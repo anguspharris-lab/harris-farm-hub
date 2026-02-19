@@ -10,26 +10,17 @@ import json
 import plotly.graph_objects as go
 from datetime import datetime
 
-st.set_page_config(
-    page_title="The Rubric | Harris Farm Hub",
-    page_icon="⚖️",
-    layout="wide"
-)
-
 API_URL = "http://localhost:8000"
 
-from nav import render_nav
-from shared.styles import apply_styles, render_header, render_footer
-from shared.auth_gate import require_login
+from shared.styles import render_header, render_footer
 from shared.training_content import (
     BUILDING_BLOCKS, PROMPT_EXAMPLES, CHALLENGES,
     RUBRIC_CRITERIA, BADGES, COACH_SYSTEM_PROMPT,
     check_prompt_quality,
 )
 
-apply_styles(extra_css=".winner-card { border: 3px solid #10b981; border-radius: 10px; padding: 10px; }")
-user = require_login()
-render_nav(8505, auth_token=st.session_state.get("auth_token"))
+st.markdown("<style>.winner-card { border: 3px solid #10b981; border-radius: 10px; padding: 10px; }</style>", unsafe_allow_html=True)
+user = st.session_state.get("auth_user")
 
 render_header("⚖️ The Rubric", "**AI Training & Prompt Skills** | Learn to write great prompts and evaluate AI responses")
 

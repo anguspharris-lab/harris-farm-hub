@@ -15,25 +15,14 @@ import requests
 import sqlite3
 from pathlib import Path
 
-# Page configuration
-st.set_page_config(
-    page_title="Sales Performance | Harris Farm Hub",
-    page_icon="📊",
-    layout="wide"
-)
-
 # ============================================================================
 # STYLING
 # ============================================================================
 
-from nav import render_nav
-from shared.styles import apply_styles, render_header, render_footer
-from shared.auth_gate import require_login
+from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
 
-apply_styles()
-user = require_login()
-render_nav(8501, auth_token=st.session_state.get("auth_token"))
+user = st.session_state.get("auth_user")
 
 
 # ============================================================================

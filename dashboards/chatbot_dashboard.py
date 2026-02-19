@@ -8,21 +8,11 @@ import streamlit as st
 import requests
 from datetime import datetime
 
-st.set_page_config(
-    page_title="Hub Assistant | Harris Farm Hub",
-    page_icon="💬",
-    layout="wide"
-)
-
 API_URL = "http://localhost:8000"
 
-from nav import render_nav
-from shared.styles import apply_styles, render_header, render_footer
-from shared.auth_gate import require_login
+from shared.styles import render_header, render_footer
 
-apply_styles()
-user = require_login()
-render_nav(8509, auth_token=st.session_state.get("auth_token"))
+user = st.session_state.get("auth_user")
 
 # ============================================================================
 # HEADER
