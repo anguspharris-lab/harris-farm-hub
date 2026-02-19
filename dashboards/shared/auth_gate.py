@@ -59,24 +59,37 @@ _LOGIN_CSS = """
         letter-spacing: 0.3px !important;
     }
 
-    /* Style text input fields */
-    .stTextInput > div > div > input {
-        background: rgba(255, 255, 255, 0.06) !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    /* Style text input fields — multiple selectors for Streamlit version compat */
+    .stTextInput input,
+    .stTextInput > div > div > input,
+    [data-testid="stTextInput"] input,
+    .stTextInput input[type="text"],
+    .stTextInput input[type="password"],
+    .stTextInput input[type="email"] {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 12px !important;
-        color: #fff !important;
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
         padding: 14px 16px !important;
         font-size: 15px !important;
+        caret-color: #ffffff !important;
     }
 
-    .stTextInput > div > div > input:focus {
-        border-color: rgba(255, 255, 255, 0.4) !important;
-        background: rgba(255, 255, 255, 0.1) !important;
-        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05) !important;
+    .stTextInput input:focus,
+    .stTextInput > div > div > input:focus,
+    [data-testid="stTextInput"] input:focus {
+        border-color: rgba(255, 255, 255, 0.45) !important;
+        background: rgba(255, 255, 255, 0.12) !important;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08) !important;
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
     }
 
+    .stTextInput input::placeholder,
     .stTextInput > div > div > input::placeholder {
-        color: rgba(255, 255, 255, 0.3) !important;
+        color: rgba(255, 255, 255, 0.35) !important;
+        -webkit-text-fill-color: rgba(255, 255, 255, 0.35) !important;
     }
 
     /* Style the Sign In / Create Account button */
