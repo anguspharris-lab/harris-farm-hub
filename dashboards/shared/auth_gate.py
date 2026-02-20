@@ -219,8 +219,8 @@ def _handle_login(api_url, site_pw_required, site_password, email, password):
             if resp.status_code != 200 or not resp.json().get("valid"):
                 st.error("Invalid site access code.")
                 return
-        except requests.RequestException:
-            st.error("Cannot connect to the Hub API.")
+        except requests.RequestException as e:
+            st.error(f"Cannot connect to the Hub API at {api_url}: {e}")
             return
 
     # Authenticate user
@@ -237,9 +237,10 @@ def _handle_login(api_url, site_pw_required, site_password, email, password):
             st.session_state.pop("auth_mode", None)
             st.rerun()
         else:
-            st.error("Invalid email or password. Please check your credentials.")
-    except requests.RequestException:
-        st.error("Cannot connect to the Hub API.")
+            detail = resp.json().get("detail", "Unknown error")
+            st.error(f"Login failed: {detail}")
+    except requests.RequestException as e:
+        st.error(f"Cannot connect to the Hub API at {api_url}: {e}")
 
 
 def _render_reset_password(api_url, site_pw_required):
