@@ -82,18 +82,12 @@ def require_login(api_url=None):
     if os.getenv("AUTH_ENABLED", "true").lower() in ("false", "0", "no"):
         return {"id": 0, "email": "dev@local", "name": "Developer", "role": "admin"}
 
-    # Check session_state first (fast path for reruns on same port)
-    token = st.session_state.get("auth_token")
-    source = "session_state"
+    # Fast path: already logged in this session — no API call needed
+    if st.session_state.get("auth_token") and st.session_state.get("auth_user"):
+        return st.session_state["auth_user"]
 
-    # Fall back to URL query params (cross-port navigation)
-    if not token:
-        token_val = st.query_params.get("token", None)
-        if token_val:
-            token = token_val
-            source = "query_params"
-
-    # Validate token if found
+    # Check URL query params (cross-port navigation, legacy)
+    token = st.query_params.get("token", None)
     if token:
         try:
             resp = requests.get(
@@ -106,22 +100,10 @@ def require_login(api_url=None):
                 if data.get("valid"):
                     st.session_state["auth_token"] = token
                     st.session_state["auth_user"] = data["user"]
-                    if source == "query_params":
-                        st.query_params.clear()
+                    st.query_params.clear()
                     return data["user"]
-                else:
-                    # API explicitly said token is invalid — clear it
-                    st.session_state.pop("auth_token", None)
-                    st.session_state.pop("auth_user", None)
-            else:
-                # Non-200 response — clear token
-                st.session_state.pop("auth_token", None)
-                st.session_state.pop("auth_user", None)
         except requests.RequestException:
-            # API unreachable — trust cached session if we have one
-            cached_user = st.session_state.get("auth_user")
-            if cached_user:
-                return cached_user
+            pass
 
     # No valid token -- show login/register page
     _render_auth_page(api_url)
