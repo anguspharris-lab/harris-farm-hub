@@ -5,15 +5,15 @@ Aligned with Harris Farm's 5 Strategic Pillars.
 """
 
 import sqlite3
-from datetime import datetime
 from pathlib import Path
 
 import streamlit as st
 
-from nav import HUBS, port_to_url
+from nav import HUBS, _PORT_TO_SLUG
 from shared.styles import render_footer, HFM_GREEN, HFM_DARK
 
 user = st.session_state.get("auth_user")
+_pages = st.session_state.get("_pages", {})
 
 # --- Hero ---
 st.markdown(
@@ -83,8 +83,7 @@ if DB_PATH.exists():
 
 st.markdown("")
 
-# --- Pillar Cards ---
-# Map pillar numbers to additional context for the cards
+# --- Pillar Context ---
 PILLAR_CONTEXT = {
     "Pillar 1": {
         "tagline": "We'll do things right, from end-to-end",
@@ -123,7 +122,16 @@ PILLAR_CONTEXT = {
     },
 }
 
-# Render hub cards — 3 top, 2 bottom (or adapt to count)
+
+def _port_to_page(port):
+    """Convert a legacy port number to a page object for st.page_link()."""
+    slug = _PORT_TO_SLUG.get(port)
+    if slug and slug in _pages:
+        return _pages[slug]
+    return None
+
+
+# --- Pillar Cards ---
 _n_hubs = len(HUBS)
 if _n_hubs <= 3:
     all_cols = st.columns(_n_hubs)
@@ -135,12 +143,10 @@ else:
     all_cols = st.columns(_n_hubs)
 
 for i, hub in enumerate(HUBS):
-    # Wrap to second row after 3 cards
     if i == 3 and _n_hubs > 3:
         row2 = st.columns(min(3, _n_hubs - 3))
-        # Re-reference the second row columns
         all_cols = all_cols[:3] + row2
-    col_idx = i if i < 3 else i  # index into all_cols
+    col_idx = i if i < 3 else i
     with all_cols[col_idx]:
         color = hub["color"]
         icon = hub["icon"]
@@ -152,20 +158,7 @@ for i, hub in enumerate(HUBS):
         tagline = ctx.get("tagline", "")
         status_items = ctx.get("status_items", [])
 
-        # Dashboard links
-        dash_list = ""
-        for label, port, d_icon, desc in hub["dashboards"]:
-            page_url = port_to_url(port)
-            dash_list += (
-                f"<div style='margin:5px 0;'>"
-                f"<a href='{page_url}' "
-                f"style='color:{color};text-decoration:none;font-weight:600;'>"
-                f"{d_icon} {label}</a>"
-                f" <span style='color:#9ca3af;font-size:0.8em;'>— {desc}</span>"
-                f"</div>"
-            )
-
-        # Status badges
+        # Status badges HTML
         status_html = ""
         for item in status_items:
             status_html += (
@@ -173,9 +166,10 @@ for i, hub in enumerate(HUBS):
                 f"&bull; {item}</div>"
             )
 
+        # Card header (HTML for styling, no links)
         st.markdown(
             f"<div style='border:2px solid {color};border-radius:12px;padding:20px;"
-            f"min-height:320px;background:white;'>"
+            f"min-height:200px;background:white;'>"
             f"<div style='font-size:0.75em;color:{color};font-weight:600;"
             f"text-transform:uppercase;letter-spacing:1px;'>{pillar}</div>"
             f"<div style='font-size:1.3em;font-weight:bold;color:{HFM_DARK};"
@@ -183,17 +177,16 @@ for i, hub in enumerate(HUBS):
             f"<div style='font-size:0.85em;color:#6b7280;font-style:italic;"
             f"margin-bottom:10px;'>{tagline}</div>"
             f"<hr style='margin:10px 0;border-color:#e5e7eb;'>"
-            f"{dash_list}"
             f"<div style='margin-top:10px;'>{status_html}</div>"
-            f"<div style='margin-top:14px;'>"
-            f"<a href='{port_to_url(first_port)}' "
-            f"style='display:inline-block;padding:8px 20px;background:{color};"
-            f"color:white;border-radius:6px;text-decoration:none;font-size:0.9em;'>"
-            f"Open {name} &rarr;</a>"
-            f"</div>"
             f"</div>",
             unsafe_allow_html=True,
         )
+
+        # Dashboard links — using st.page_link (session-safe, no reload)
+        for label, port, d_icon, desc in hub["dashboards"]:
+            page = _port_to_page(port)
+            if page:
+                st.page_link(page, label=f"{d_icon} {label}", use_container_width=True)
 
 st.markdown("")
 
@@ -206,13 +199,11 @@ st.markdown(
     "<div style='color:#6b7280;font-size:0.9em;margin-top:4px;'>"
     "The Hub is about <strong>enablement, not replacement</strong>. "
     "AI takes care of the repetitive stuff so you can focus on what matters — "
-    "serving customers, building relationships, and doing your best work. "
-    "Start with the <a href='/learning-centre' "
-    "style='color:#4ba021;font-weight:600;'>Learning Centre</a> "
-    "to build your skills.</div>"
+    "serving customers, building relationships, and doing your best work.</div>"
     "</div>",
     unsafe_allow_html=True,
 )
+st.page_link(_pages.get("learning-centre", "/"), label="Start with the Learning Centre", use_container_width=False)
 
 # --- Harris Farm Story ---
 with st.expander("About Harris Farm Markets"):
@@ -244,12 +235,11 @@ st.markdown(
     "<strong>Note:</strong> The Hub is actively evolving. "
     "Dashboards marked <strong>LIVE</strong> are fully functional. "
     "Features marked <strong>Future Development</strong> are planned "
-    "and being built through our autonomous development pipeline. "
-    "<a href='/hub-portal' "
-    "style='color:#d97706;'>View full feature status in Hub Portal &rarr;</a>"
-    "</div></div>",
+    "and being built through our autonomous development pipeline.</div>"
+    "</div>",
     unsafe_allow_html=True,
 )
+st.page_link(_pages.get("hub-portal", "/"), label="View full feature status in Hub Portal", use_container_width=False)
 
 st.markdown("")
 

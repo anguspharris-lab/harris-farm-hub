@@ -2889,31 +2889,6 @@ async def auth_reset_password(req: ResetPasswordRequest, request: Request):
     return {"ok": True, "message": "Password has been reset. You can now sign in."}
 
 
-@app.get("/api/auth/debug")
-async def auth_debug():
-    """Temporary diagnostic endpoint — check auth DB state."""
-    import auth as auth_module
-    conn = auth_module._get_conn()
-    users = conn.execute("SELECT id, email, name, role, active FROM users").fetchall()
-    site_pw = conn.execute(
-        "SELECT value FROM auth_config WHERE key = 'site_password_hash'"
-    ).fetchone()
-    require_site = conn.execute(
-        "SELECT value FROM auth_config WHERE key = 'require_site_password'"
-    ).fetchone()
-    conn.close()
-    return {
-        "auth_db_path": auth_module.AUTH_DB,
-        "auth_db_exists": os.path.exists(auth_module.AUTH_DB),
-        "users": [dict(u) for u in users],
-        "site_password_hash_set": site_pw is not None,
-        "site_password_hash_preview": site_pw["value"][:20] + "..." if site_pw else None,
-        "require_site_password": require_site["value"] if require_site else None,
-        "env_admin_email": os.getenv("AUTH_ADMIN_EMAIL", ""),
-        "env_site_pw_set": bool(os.getenv("AUTH_SITE_PASSWORD", "")),
-        "env_admin_pw_set": bool(os.getenv("AUTH_ADMIN_PASSWORD", "")),
-    }
-
 
 @app.get("/api/auth/me")
 async def auth_me(request: Request):

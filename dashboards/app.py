@@ -76,6 +76,10 @@ _PILLARS = [
      "slugs": ["prompt-builder", "the-rubric", "trending", "revenue-bridge", "hub-portal"]},
 ]
 
+# Store page objects in session_state so landing.py can use st.page_link()
+st.session_state["_pages"] = _pages
+st.session_state["_home"] = _home
+
 nav = st.navigation(
     {
         "": [_home],
