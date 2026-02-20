@@ -30,178 +30,38 @@ _LOGIN_CSS = """
 <style>
     /* Hide Streamlit chrome on login page */
     #MainMenu, footer, header, [data-testid="stSidebar"],
-    [data-testid="stSidebarNav"] {
+    [data-testid="stSidebarNav"], .stDeployButton {
         display: none !important;
         visibility: hidden !important;
     }
 
-    /* Dark gradient background — override EVERY Streamlit container */
-    html, body,
-    .stApp,
-    [data-testid="stAppViewContainer"],
-    [data-testid="stAppViewBlockContainer"],
-    .main,
-    .main > div,
-    .block-container,
-    [data-testid="stVerticalBlock"],
-    section[data-testid="stSidebar"],
-    .stApp > header {
-        background: transparent !important;
-        background-color: transparent !important;
-    }
-
-    .stApp {
-        background: linear-gradient(135deg, #0a1628 0%, #1a2744 50%, #0d1f3c 100%) !important;
-    }
-
-    /* Center content vertically and constrain width */
-    .stApp > .main > .block-container,
+    /* Center content and constrain width */
     .block-container {
         max-width: 440px !important;
-        padding: 2rem 1.5rem !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        min-height: 100vh !important;
         margin: 0 auto !important;
+        padding-top: 4rem !important;
     }
 
-    /* ALL text on login page must be light */
-    .stApp p, .stApp span, .stApp div, .stApp label,
-    .stApp h1, .stApp h2, .stApp h3,
-    .stMarkdown, .stMarkdown p, .stMarkdown span, .stMarkdown div {
-        color: rgba(255, 255, 255, 0.85) !important;
-    }
-
-    /* Style text input labels */
-    .stTextInput > label,
-    .stTextInput label,
-    [data-testid="stWidgetLabel"],
-    [data-testid="stWidgetLabel"] p {
-        color: rgba(255, 255, 255, 0.7) !important;
-        font-size: 13px !important;
-        font-weight: 500 !important;
-        letter-spacing: 0.3px !important;
-    }
-
-    /* Pulsing glow animation for password fields */
-    @keyframes pulse-glow {
-        0%, 100% { text-shadow: 0 0 8px rgba(74, 222, 128, 0.8); opacity: 1; }
-        50% { text-shadow: 0 0 16px rgba(74, 222, 128, 1); opacity: 0.7; }
-    }
-
-    /* Style ALL text input fields */
-    .stTextInput input,
-    .stTextInput > div > div > input,
-    [data-testid="stTextInput"] input {
-        background: rgba(255, 255, 255, 0.08) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 12px !important;
-        color: #ffffff !important;
-        -webkit-text-fill-color: #ffffff !important;
-        padding: 14px 16px !important;
-        font-size: 16px !important;
-        caret-color: #4ade80 !important;
-    }
-
-    /* Password fields — bright green pulsing dots */
-    .stTextInput input[type="password"] {
-        color: #4ade80 !important;
-        -webkit-text-fill-color: #4ade80 !important;
-        font-size: 22px !important;
-        letter-spacing: 6px !important;
-        animation: pulse-glow 1.2s ease-in-out infinite !important;
-    }
-
-    .stTextInput input:focus,
-    .stTextInput > div > div > input:focus {
-        border-color: rgba(74, 222, 128, 0.5) !important;
-        background: rgba(255, 255, 255, 0.12) !important;
-        box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.15) !important;
-        color: #ffffff !important;
-        -webkit-text-fill-color: #ffffff !important;
-    }
-
-    /* Focused password fields keep green glow */
-    .stTextInput input[type="password"]:focus {
-        color: #4ade80 !important;
-        -webkit-text-fill-color: #4ade80 !important;
-        box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2) !important;
-    }
-
-    .stTextInput input::placeholder,
-    .stTextInput > div > div > input::placeholder {
-        color: rgba(255, 255, 255, 0.35) !important;
-        -webkit-text-fill-color: rgba(255, 255, 255, 0.35) !important;
-        animation: none !important;
-        letter-spacing: normal !important;
-        font-size: 15px !important;
-    }
-
-    /* Checkbox styling for reveal toggle */
-    .stCheckbox label span,
-    .stCheckbox label p {
-        color: rgba(255, 255, 255, 0.6) !important;
-        font-size: 13px !important;
-    }
-
-    /* Style the Sign In / Create Account button */
+    /* Green submit button */
     .stFormSubmitButton > button,
     [data-testid="stFormSubmitButton"] > button {
-        background: linear-gradient(135deg, #2d7d3a, #3a9d4a) !important;
+        background-color: #4ba021 !important;
         color: white !important;
         border: none !important;
-        border-radius: 12px !important;
-        padding: 14px !important;
+        border-radius: 8px !important;
+        padding: 12px !important;
         font-size: 16px !important;
         font-weight: 600 !important;
-        letter-spacing: 0.3px !important;
-        transition: all 0.2s ease !important;
     }
 
     .stFormSubmitButton > button:hover,
     [data-testid="stFormSubmitButton"] > button:hover {
-        background: linear-gradient(135deg, #3a9d4a, #4aad5a) !important;
-        box-shadow: 0 4px 15px rgba(45, 125, 58, 0.4) !important;
+        background-color: #3d8a1b !important;
     }
 
-    /* Toggle buttons (Create Account / Sign In) */
+    /* Toggle button (Create Account / Sign In) */
     .stButton > button {
-        color: rgba(255, 255, 255, 0.7) !important;
-        background: rgba(255, 255, 255, 0.06) !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-radius: 10px !important;
-        transition: all 0.2s ease !important;
-    }
-
-    .stButton > button:hover {
-        background: rgba(255, 255, 255, 0.12) !important;
-        border-color: rgba(255, 255, 255, 0.3) !important;
-        color: #fff !important;
-    }
-
-    /* Caption / helper text */
-    .stCaption, [data-testid="stCaptionContainer"] {
-        color: rgba(255, 255, 255, 0.45) !important;
-    }
-
-    /* Error messages */
-    .stAlert [data-testid="stNotificationContentError"] {
-        background: rgba(220, 53, 69, 0.15) !important;
-        border: 1px solid rgba(220, 53, 69, 0.3) !important;
-        color: #ff6b7a !important;
-    }
-
-    /* Divider line */
-    hr {
-        border-color: rgba(255, 255, 255, 0.1) !important;
-    }
-
-    /* Mobile responsive */
-    @media (max-width: 480px) {
-        .stApp > .main > .block-container {
-            padding: 1.5rem 1rem !important;
-        }
+        border-radius: 8px !important;
     }
 </style>
 """
@@ -286,13 +146,13 @@ def _render_auth_page(api_url):
     if "auth_mode" not in st.session_state:
         st.session_state["auth_mode"] = "login"
 
-    # Logo and title — self-contained HTML block (no wrapping divs)
+    # Logo and title
     st.markdown(
-        '<div style="text-align:center;padding-top:2rem;margin-bottom:2rem;">'
+        '<div style="text-align:center;margin-bottom:2rem;">'
         '<div style="font-size:3rem;margin-bottom:0.5rem;">&#127822;</div>'
-        '<div style="font-size:1.75rem;font-weight:700;color:#fff;'
+        '<div style="font-size:1.75rem;font-weight:700;color:#171819;'
         'letter-spacing:-0.5px;margin-bottom:0.25rem;">Harris Farm Hub</div>'
-        '<div style="font-size:0.8rem;color:rgba(255,255,255,0.45);'
+        '<div style="font-size:0.8rem;color:#888;'
         'letter-spacing:2px;text-transform:uppercase;font-weight:400;">'
         'AI Centre of Excellence</div>'
         '</div>',
@@ -310,7 +170,7 @@ def _render_auth_page(api_url):
 
     # Footer
     st.markdown(
-        '<div style="text-align:center;margin-top:2rem;color:rgba(255,255,255,0.25);'
+        '<div style="text-align:center;margin-top:2rem;color:#aaa;'
         'font-size:0.75rem;">Harris Farm Markets &middot; Powered by AI</div>',
         unsafe_allow_html=True,
     )
