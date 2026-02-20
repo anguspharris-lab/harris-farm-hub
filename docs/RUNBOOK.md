@@ -1,202 +1,232 @@
 # Harris Farm Hub — Runbook
 
-> Operations guide for starting, stopping, monitoring, and troubleshooting the Hub.
+> Operations guide for the Hub. Covers local dev, Render deployment, monitoring, and troubleshooting.
 
 ---
 
-## Quick Commands
+## Service Map
+
+| Service | Port | Process | What it does |
+|---------|------|---------|-------------|
+| Hub (Streamlit) | 8500 (local) / $PORT (Render) | `streamlit run dashboards/app.py` | All 17 dashboards, single process |
+| API (FastAPI) | 8000 | `uvicorn backend.app:app` | 80+ endpoints, auth, NL queries, LLM |
+
+---
+
+## Local Operations
+
+### Start
 
 ```bash
-# Start everything
 cd /Users/angusharris/Downloads/harris-farm-hub
 bash start.sh
-
-# Stop everything
-bash stop.sh
-
-# Setup/change API keys (interactive)
-bash setup_keys.sh
-
-# Check if services are running
-curl -s http://localhost:8000 && echo " API OK"
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8501  # Sales
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8502  # Profitability
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8503  # Transport
-curl -s -o /dev/null -w "%{http_code}" http://localhost:8504  # Prompt Builder
+# Hub: http://localhost:8500
+# API: http://localhost:8000
 ```
 
----
-
-## Service Details
-
-| Service | Process | Port | Log File |
-|---------|---------|------|----------|
-| Backend API | `python3 app.py` | 8000 | `logs/api.log` |
-| Sales Dashboard | `streamlit run sales_dashboard.py` | 8501 | `logs/sales.log` |
-| Profitability | `streamlit run profitability_dashboard.py` | 8502 | `logs/profit.log` |
-| Transport | `streamlit run transport_dashboard.py` | 8503 | `logs/transport.log` |
-| Prompt Builder | `streamlit run prompt_builder.py` | 8504 | `logs/builder.log` |
-
----
-
-## Starting Services Manually
-
-If `start.sh` fails, start each service individually:
+### Stop
 
 ```bash
-export PATH="/Users/angusharris/Library/Python/3.9/bin:$PATH"
-cd /Users/angusharris/Downloads/harris-farm-hub
-
-# API
-cd backend && python3 app.py &
-cd ..
-
-# Dashboards (each in background)
-cd dashboards
-streamlit run sales_dashboard.py --server.port 8501 --server.headless true &
-streamlit run profitability_dashboard.py --server.port 8502 --server.headless true &
-streamlit run transport_dashboard.py --server.port 8503 --server.headless true &
-streamlit run prompt_builder.py --server.port 8504 --server.headless true &
-cd ..
-```
-
----
-
-## Stopping Services Manually
-
-```bash
-# Graceful
 pkill -f "streamlit run"
-pkill -f "app.py"
-
-# Nuclear (if above doesn't work)
-lsof -i :8000 -i :8501 -i :8502 -i :8503 -i :8504 | grep LISTEN | awk '{print $2}' | xargs kill -9
+pkill -f "uvicorn"
 ```
 
----
-
-## Checking Logs
+### Restart just the Hub (keep API running)
 
 ```bash
-# Live tail all logs
-tail -f logs/*.log
-
-# Check specific service
-tail -50 logs/api.log
-tail -50 logs/sales.log
-
-# Search for errors
-grep -i error logs/*.log
-grep -i traceback logs/*.log
+pkill -f "streamlit run"
+streamlit run dashboards/app.py --server.port 8500 --server.headless true --server.fileWatcherType none &
 ```
 
----
-
-## Port Conflicts
-
-If a port is already in use:
+### Check health
 
 ```bash
-# Find what's using the port
-lsof -i :8501
+bash watchdog/health.sh
+```
 
-# Kill it
-kill <PID>
+### View logs
 
-# Or use a different port
-streamlit run sales_dashboard.py --server.port 8511 --server.headless true
+```bash
+tail -f logs/api.log    # Backend
+tail -f logs/hub.log    # Streamlit
+```
+
+### Change API keys
+
+```bash
+bash setup_keys.sh
 ```
 
 ---
 
-## Environment Variables
+## Render Operations
 
-Located in `.env` at the project root. Services read these on startup — restart required after changes.
+### Deployment
 
-| Variable | Purpose | Required? |
-|----------|---------|-----------|
-| ANTHROPIC_API_KEY | Claude API (NL queries, Rubric) | Optional for MVP |
-| OPENAI_API_KEY | ChatGPT (Rubric) | Optional for MVP |
-| GROK_API_KEY | Grok (Rubric) | Optional |
-| DB_TYPE | Database type | No (default: postgresql) |
-| DB_HOST | Database host | No (not connected in MVP) |
-| DB_PORT | Database port | No |
-| DB_NAME | Database name | No |
-| DB_USER | Database user | No |
-| DB_PASSWORD | Database password | No |
-| API_URL | Backend URL | No (default: http://localhost:8000) |
+Deploys trigger automatically on push to `main`. To manually deploy:
+
+```bash
+# Via Render API
+curl -X POST -H "Authorization: Bearer $RENDER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"clearCache": "do_not_clear"}' \
+  https://api.render.com/v1/services/srv-d6b3lqur433s73aq0u2g/deploys
+```
+
+Or use the dashboard: https://dashboard.render.com/web/srv-d6b3lqur433s73aq0u2g
+
+### View logs
+
+Dashboard -> harris-farm-hub -> Logs
+
+### SSH into the service
+
+```bash
+ssh srv-d6b3lqur433s73aq0u2g@ssh.oregon.render.com
+```
+
+### Check data on disk
+
+```bash
+# Via SSH
+ls -lh /data/
+ls -lh /data/transactions/
+du -sh /data/*
+```
+
+### Force re-download data
+
+```bash
+# Via SSH — delete the file, then redeploy
+rm /data/harris_farm.db
+rm /data/transactions/FY26.parquet
+# Then trigger a deploy (data_loader.py runs on start)
+```
+
+### Environment variables
+
+Set via dashboard: https://dashboard.render.com/web/srv-d6b3lqur433s73aq0u2g/env
+
+| Variable | Purpose | Required |
+|----------|---------|----------|
+| `PYTHON_VERSION` | Python runtime | Yes |
+| `ANTHROPIC_API_KEY` | Claude API | Yes |
+| `OPENAI_API_KEY` | GPT API | Yes |
+| `AUTH_ENABLED` | Enable login (`true`/`false`) | Yes |
+| `AUTH_SECRET_KEY` | Token signing key | Yes |
+| `AUTH_SITE_PASSWORD` | Shared team access code | Yes |
+| `AUTH_ADMIN_EMAIL` | Admin account email | Yes (first deploy) |
+| `AUTH_ADMIN_PASSWORD` | Admin account password | Yes (first deploy) |
+
+### Render API key
+
+Stored locally: used for CLI operations. Generate at:
+https://dashboard.render.com/u/settings#api-keys
+
+Service ID: `srv-d6b3lqur433s73aq0u2g`
 
 ---
 
-## Database
+## Data Management
 
-### Hub Metadata (SQLite)
-- Location: `backend/hub_data.db`
-- Auto-created on API startup
-- Contains: queries, llm_responses, evaluations, feedback, prompt_templates, generated_queries
+### Data sources
+
+| File | Location | Size | Updates |
+|------|----------|------|---------|
+| `harris_farm.db` | `/data/harris_farm.db` | 399MB | Weekly (manual upload) |
+| `FY24.parquet` | `/data/transactions/FY24.parquet` | 2.3GB | Static (closed FY) |
+| `FY25.parquet` | `/data/transactions/FY25.parquet` | 2.7GB | Static (closed FY) |
+| `FY26.parquet` | `/data/transactions/FY26.parquet` | 1.7GB | Periodic (current FY) |
+| `hub_data.db` | `/data/hub_data.db` | <1MB | Auto (app state) |
+
+### Updating harris_farm.db
+
+1. Get the updated `.db` file
+2. Upload to GitHub Release:
+   ```bash
+   gh release upload data-v1 harris_farm.db --clobber
+   ```
+3. SSH into Render and delete the old file:
+   ```bash
+   ssh srv-d6b3lqur433s73aq0u2g@ssh.oregon.render.com
+   rm /data/harris_farm.db
+   ```
+4. Trigger a redeploy — `data_loader.py` will download the new file
+
+### Updating transaction parquets
+
+Same process. For files >2GB, split first:
+```bash
+split -b 1900m path/to/FY26.parquet /tmp/FY26.parquet.part_
+gh release upload data-v1 /tmp/FY26.parquet.part_* --clobber
+```
 
 ### Backup
-```bash
-cp backend/hub_data.db backend/hub_data_backup_$(date +%Y%m%d).db
-```
 
-### Reset (delete all Hub data)
 ```bash
-rm backend/hub_data.db
-# Restart API — it will recreate the database
+# Via SSH
+cp /data/harris_farm.db /data/harris_farm.db.bak
+cp /data/hub_data.db /data/hub_data.db.bak
 ```
 
 ---
 
-## Common Issues
+## Troubleshooting
 
-### "streamlit: command not found"
+### Login page appears but fields are invisible / white-on-white
+
+The login page uses Streamlit's default light theme. If custom CSS from `shared/styles.py` is loading before the auth gate, check that `app.py` calls `require_login()` BEFORE `apply_styles()`.
+
+### "Cannot connect to the Hub API" on login
+
+The backend hasn't started yet. On Render, it takes ~10s to boot. Refresh after 30 seconds.
+
+### Login doesn't persist between pages
+
+Ensure `dashboards/app.py` uses `st.page_link()` for navigation (not HTML `<a href>` links). HTML links cause full page reloads which destroy `st.session_state`.
+
+### Data dashboards show empty / errors
+
+Data files aren't on disk. Check via SSH:
 ```bash
-export PATH="/Users/angusharris/Library/Python/3.9/bin:$PATH"
+ls -lh /data/harris_farm.db
+ls -lh /data/transactions/
 ```
-Or use the full path: `/Users/angusharris/Library/Python/3.9/bin/streamlit`
+If missing, trigger a redeploy — `data_loader.py` will download them.
 
-### "ModuleNotFoundError"
+### Deploy fails at build step
+
+Check `requirements.txt` — all packages must be installable on Python 3.11. Common issues:
+- `pydantic<2` constraint (needed for FastAPI compatibility)
+- Missing system packages (shouldn't happen on Render Python runtime)
+
+### "ModuleNotFoundError: No module named 'auth'"
+
+The backend needs `backend/` on `sys.path`. This is handled by `backend/app.py` line 25-29. If running manually, use:
 ```bash
-pip3 install -r requirements.txt
+python3 -m uvicorn backend.app:app --host 0.0.0.0 --port 8000
 ```
+NOT `cd backend && python3 app.py`.
 
-### Dashboard shows but charts are empty
-Mock data generates on first load. Try refreshing (Cmd+R). If persistent, check `logs/sales.log` for errors.
+### Streamlit "watchdog" error
 
-### API returns "API key not configured"
-The AI features need keys in `.env`. Run `bash setup_keys.sh` and restart.
-
-### "Address already in use"
-Another process is on that port. Find and kill it:
+The project has a `watchdog/` directory that shadows the pip `watchdog` package. Always run with:
 ```bash
-lsof -i :8501 | grep LISTEN
-kill <PID>
+--server.fileWatcherType none
 ```
 
 ---
 
-## Health Check Script
+## Key Files
 
-Save this as `healthcheck.sh`:
-
-```bash
-#!/bin/bash
-echo "Harris Farm Hub Health Check"
-echo "============================"
-for port in 8000 8501 8502 8503 8504; do
-    code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:$port)
-    case $port in
-        8000) name="API" ;;
-        8501) name="Sales" ;;
-        8502) name="Profit" ;;
-        8503) name="Transport" ;;
-        8504) name="Prompt Builder" ;;
-    esac
-    if [ "$code" = "200" ]; then
-        echo "  OK   $name (:$port)"
-    else
-        echo "  FAIL $name (:$port) - HTTP $code"
-    fi
-done
-```
+| File | What it does | When to edit |
+|------|-------------|-------------|
+| `dashboards/app.py` | Entry point, navigation, auth gate | Adding/removing pages |
+| `dashboards/shared/auth_gate.py` | Login UI + session management | Changing login flow |
+| `dashboards/shared/styles.py` | Shared CSS, header, footer | Changing look and feel |
+| `backend/app.py` | All API endpoints | Adding backend features |
+| `backend/auth.py` | Auth logic, token management | Changing auth rules |
+| `data_loader.py` | Data download from GitHub | Adding new data files |
+| `render_start.sh` | Render startup sequence | Changing deploy behavior |
+| `render.yaml` | Render service config | Changing infra settings |
+| `requirements.txt` | Python dependencies | Adding packages |

@@ -1,482 +1,276 @@
-# 🍎 Harris Farm Hub - AI Centre of Excellence
+# Harris Farm Hub — AI Centre of Excellence
 
-> **Built this weekend. Launched Monday. Transforming forever.**
+> **17 dashboards. One platform. Zero complexity.**
 
-The Hub is Harris Farm Markets' centralized AI platform for data analysis, intelligent decision-making, and continuous learning. Built to democratize data access and turn every team member into a data-driven decision maker.
+The Hub is Harris Farm Markets' centralized AI platform — Sales, Profitability, Customer Analytics, Market Share, Transport, Store Ops, Product Intel, and more — all powered by 383M POS transactions, wrapped in a single Streamlit app with shared authentication.
 
----
-
-## 🎯 What Is The Hub?
-
-The Hub is your **AI-powered command centre** that connects:
-- Natural language queries → Your database
-- Multiple AI models → Smarter decisions
-- Product-level data → Actionable insights
-- Your team → Best practices and templates
-
-### Core Capabilities
-
-1. **📊 Interactive Dashboards**
-   - Sales Performance (revenue, trends, out-of-stocks)
-   - Store Profitability (P&L, margins, optimization)
-   - Transport Costs (route efficiency, cost reduction)
-   - Product-Level Analytics (wastage, miss-picks, over-ordering)
-
-2. **⚖️ The Rubric (Multi-LLM Evaluation)**
-   - Query Claude, ChatGPT, and Grok simultaneously
-   - Compare responses side-by-side
-   - Make "Chairman's Decision" on best answer
-   - System learns from your choices
-
-3. **💬 Natural Language Queries**
-   - Ask questions in plain English
-   - Automatic SQL generation
-   - AI-powered insights and explanations
-   - Self-improving from feedback
-
-4. **🔧 Super User Prompt Builder**
-   - Design custom analytical queries
-   - Product-level issue detection
-   - Save and share with teams
-   - Schedule automated reports
-
-5. **📚 Prompt Template Library**
-   - Pre-built queries by role
-   - Retail ops, buying, merchandising, finance
-   - Beginner → Advanced levels
-   - Community-contributed
-
-6. **🎓 Training Academy** (Coming Week 2)
-   - Become a "Prompt Superstar"
-   - Interactive lessons
-   - Certification pathway
-   - Real Harris Farm scenarios
+**Live:** https://harris-farm-hub.onrender.com
 
 ---
 
-## 🚀 Quick Start
-
-### Option 1: Automated Script (Recommended)
-
-```bash
-# Make scripts executable
-chmod +x start.sh stop.sh
-
-# Start all services
-./start.sh
-
-# Access dashboards:
-# - Sales: http://localhost:8501
-# - Profitability: http://localhost:8502
-# - Transport: http://localhost:8503
-# - Prompt Builder: http://localhost:8504
-# - API: http://localhost:8000
-
-# When done
-./stop.sh
-```
-
-### Option 2: Docker
-
-```bash
-# Create .env file first (see DEPLOYMENT_GUIDE.md)
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
-```
-
-### Option 3: Manual
+## Quick Start (Local)
 
 ```bash
 # Install dependencies
-pip install -r requirements.txt --break-system-packages
+pip install -r requirements.txt
 
-# Start API
-cd backend && python app.py &
+# Start everything (API + Hub)
+bash start.sh
 
-# Start dashboards (in separate terminals)
-cd dashboards
-streamlit run sales_dashboard.py --server.port 8501 &
-streamlit run profitability_dashboard.py --server.port 8502 &
-streamlit run transport_dashboard.py --server.port 8503 &
-streamlit run prompt_builder.py --server.port 8504 &
+# Open in browser
+open http://localhost:8500
 ```
+
+That's it. The Hub runs on port 8500, the API on port 8000.
 
 ---
 
-## 📁 Project Structure
+## Architecture
+
+```
+Browser (any device)
+    |
+    v
+Streamlit Multi-Page App (port 8500)
+    dashboards/app.py
+    |-- Auth gate (shared login)
+    |-- 17 page modules (sales, profitability, customers, etc.)
+    |-- Shared styles, filters, components
+    |
+    v
+FastAPI Backend (port 8000)
+    backend/app.py
+    |-- 80+ API endpoints
+    |-- Auth (bcrypt, session tokens)
+    |-- Natural language query engine
+    |-- Multi-LLM orchestration (Claude, GPT, Grok)
+    |
+    v
+Data Layer
+    |-- harris_farm.db (SQLite, 399MB) — weekly sales, customers, market share
+    |-- FY24/25/26.parquet (DuckDB) — 383M POS transactions
+    |-- hub_data.db (SQLite) — app state, knowledge base, chat history
+```
+
+### Dashboards (17 pages, 5 pillars)
+
+| Pillar | Pages |
+|--------|-------|
+| For The Greater Goodness | Greater Goodness |
+| Smashing It for the Customer | Customers, Market Share |
+| Growing Legendary Leadership | Learning Centre, Hub Assistant |
+| Today's Business, Done Better | Sales, Profitability, Transport, Store Ops, Buying Hub, Product Intel |
+| Tomorrow's Business, Built Better | Prompt Builder, The Rubric, Trending, Revenue Bridge, Hub Portal |
+
+---
+
+## Deployment (Render)
+
+The Hub is deployed to Render at https://harris-farm-hub.onrender.com. Everything is automated — push to `main` triggers a deploy.
+
+### How it works
+
+1. **Build step:** `pip install -r requirements.txt`
+2. **Start step:** `bash render_start.sh` which:
+   - Links persistent disk at `/data`
+   - Downloads data files from GitHub Releases (first deploy only, ~7.2GB)
+   - Starts FastAPI backend on port 8000
+   - Starts Streamlit on Render's PORT
+
+### Render service config
+
+| Setting | Value |
+|---------|-------|
+| Service | Web Service (Python) |
+| Plan | Starter ($7/mo) |
+| Region | Oregon |
+| Branch | main |
+| Build Command | `pip install -r requirements.txt` |
+| Start Command | `bash render_start.sh` |
+| Disk | 10GB at `/data` |
+
+### Environment variables (set on Render dashboard)
+
+| Variable | Purpose |
+|----------|---------|
+| `PYTHON_VERSION` | `3.11.6` |
+| `ANTHROPIC_API_KEY` | Claude API key for NL queries and Rubric |
+| `OPENAI_API_KEY` | ChatGPT API key for Rubric |
+| `AUTH_ENABLED` | `true` |
+| `AUTH_SECRET_KEY` | Random hex string for token signing |
+| `AUTH_SITE_PASSWORD` | Shared access code for the team |
+| `AUTH_ADMIN_EMAIL` | Admin user email |
+| `AUTH_ADMIN_PASSWORD` | Admin user password |
+
+### Data files
+
+Data is stored in a GitHub Release (`data-v1`) and auto-downloaded on first deploy:
+
+| File | Size | Contents |
+|------|------|----------|
+| `harris_farm.db` | 399MB | Weekly sales, customers, market share |
+| `FY24.parquet` | 2.3GB | POS transactions Jul 2023 - Jun 2024 (134M rows) |
+| `FY25.parquet` | 2.7GB | POS transactions Jul 2024 - Jun 2025 (149M rows) |
+| `FY26.parquet` | 1.7GB | POS transactions Jul 2025 - Feb 2026 (99M rows) |
+
+Files >2GB are split into parts for GitHub (2GB upload limit) and reassembled automatically by `data_loader.py`.
+
+### Updating data files
+
+To update data files (e.g., new FY26 data):
+
+```bash
+# Install gh CLI if needed
+brew install gh
+
+# Upload new file (splits automatically if >2GB)
+gh release upload data-v1 path/to/new_file.parquet --clobber
+
+# For files >2GB, split first:
+split -b 1900m path/to/big_file.parquet /tmp/FY26.parquet.part_
+gh release upload data-v1 /tmp/FY26.parquet.part_* --clobber
+
+# Delete old data on Render to force re-download:
+# Render Dashboard -> harris-farm-hub -> Shell -> rm /data/transactions/FY26.parquet
+# Then trigger a manual deploy
+```
+
+### Fresh deploy from scratch
+
+If deploying to a new Render service:
+
+1. Create a Web Service pointing to this repo
+2. Set all environment variables listed above
+3. Add a 10GB disk mounted at `/data`
+4. Deploy — data downloads automatically on first start
+
+---
+
+## Local Development
+
+### Prerequisites
+
+- Python 3.9+
+- pip
+
+### Running locally
+
+```bash
+# Install deps
+pip install -r requirements.txt
+
+# Option A: Use start.sh (starts API + Hub)
+bash start.sh
+
+# Option B: Manual
+python3 -m uvicorn backend.app:app --host 0.0.0.0 --port 8000 &
+streamlit run dashboards/app.py --server.port 8500 --server.fileWatcherType none
+```
+
+### Environment
+
+Copy `.env.template` to `.env` or create one:
+
+```bash
+ANTHROPIC_API_KEY=sk-ant-...
+OPENAI_API_KEY=sk-proj-...
+AUTH_ENABLED=false          # Set to true to require login locally
+```
+
+With `AUTH_ENABLED=false`, the auth gate is bypassed and you go straight to the Hub.
+
+### Data files
+
+The following must be in `data/` for data-dependent dashboards:
+
+- `harris_farm.db` — required for Sales, Profitability, Market Share, Landing
+- `data/transactions/FY*.parquet` — required for Customer, Store Ops, Product Intel, Buying Hub, Revenue Bridge
+
+AI dashboards (Prompt Builder, Rubric, Hub Assistant, Learning Centre) work without data files.
+
+---
+
+## Project Structure
 
 ```
 harris-farm-hub/
-│
-├── backend/
-│   ├── app.py                 # FastAPI server with all endpoints
-│   └── hub_data.db           # SQLite for Hub metadata
-│
-├── dashboards/
-│   ├── sales_dashboard.py        # Sales + product-level analytics
-│   ├── profitability_dashboard.py # Store P&L analysis
-│   ├── transport_dashboard.py     # Logistics optimization
-│   └── prompt_builder.py          # Super user custom query tool
-│
-├── frontend/                  # React app (optional)
-│   ├── src/
-│   └── package.json
-│
-├── docs/
-│   ├── DEPLOYMENT_GUIDE.md   # Complete deployment instructions
-│   └── USER_GUIDE.md         # End-user documentation
-│
-├── config/
-│   └── .env.template         # Environment variables template
-│
-├── requirements.txt          # Python dependencies
-├── docker-compose.yml        # Container orchestration
-├── start.sh                  # Quick start script
-├── stop.sh                   # Stop all services
-└── README.md                 # This file
+  dashboards/
+    app.py                      # Single entry point (st.navigation)
+    landing.py                  # Home page with pillar cards
+    sales_dashboard.py          # Sales performance
+    profitability_dashboard.py  # Store P&L
+    customer_dashboard.py       # Customer analytics
+    market_share_dashboard.py   # Market share by postcode
+    transport_dashboard.py      # Transport costs
+    store_ops_dashboard.py      # Store operations
+    product_intel_dashboard.py  # Product-level analytics
+    buying_hub_dashboard.py     # Buying analysis
+    revenue_bridge_dashboard.py # Revenue bridge
+    chatbot_dashboard.py        # Hub Assistant (RAG chatbot)
+    learning_centre.py          # Training content
+    prompt_builder.py           # Custom prompt designer
+    rubric_dashboard.py         # Multi-LLM evaluation
+    trending_dashboard.py       # Usage analytics
+    hub_portal.py               # Documentation portal
+    greater_goodness.py         # Sustainability
+    nav.py                      # Legacy nav data (used by landing)
+    shared/
+      auth_gate.py              # Login/register UI + session management
+      styles.py                 # Shared CSS + header/footer
+      fiscal_selector.py        # 5-4-4 fiscal calendar picker
+      hierarchy_filter.py       # Product hierarchy drill-down
+      time_filter.py            # Time/hour range filter
+      ask_question.py           # NL query component
+      stores.py                 # Store list constants
+      data_access.py            # SQLite helpers
+  backend/
+    app.py                      # FastAPI server (80+ endpoints)
+    auth.py                     # Authentication (bcrypt, sessions)
+    fiscal_calendar.py          # 5-4-4 fiscal calendar logic
+    transaction_layer.py        # DuckDB parquet query engine
+    transaction_queries.py      # Pre-built transaction queries
+    product_hierarchy.py        # Product hierarchy lookups
+    hub_data.db                 # App state database
+  data/
+    harris_farm.db              # Main analytics database
+    transactions/               # POS transaction parquets
+    *.csv                       # Reference data files
+  data_loader.py                # Downloads data from GitHub Releases
+  render_start.sh               # Render startup script
+  render.yaml                   # Render service config
+  start.sh                      # Local startup script
+  requirements.txt              # Python dependencies
 ```
 
 ---
 
-## 🔧 Configuration
+## Authentication
 
-### Required: API Keys
+The Hub uses a two-layer auth system:
 
-Get API keys from:
-- **Anthropic (Claude)**: https://console.anthropic.com/
-- **OpenAI (ChatGPT)**: https://platform.openai.com/
-- **xAI (Grok)**: https://x.ai/api (optional)
+1. **Site access code** — shared password you give the team (set via `AUTH_SITE_PASSWORD`)
+2. **Individual accounts** — email + password per user
 
-### Required: Database Connection
+On first deploy, an admin account is created from `AUTH_ADMIN_EMAIL` / `AUTH_ADMIN_PASSWORD` env vars.
 
-Configure Harris Farm's database in `.env`:
+Users can create their own accounts (requires the site access code).
+
+Set `AUTH_ENABLED=false` to bypass all auth (local dev).
+
+---
+
+## Health Check
 
 ```bash
-DB_TYPE=postgresql  # or sqlserver
-DB_HOST=your-database-host
-DB_PORT=5432
-DB_NAME=harris_farm
-DB_USER=readonly_user  # Use read-only for safety
-DB_PASSWORD=your_secure_password
-```
+# Local
+bash watchdog/health.sh
 
-### Environment Variables
-
-Copy `.env.template` to `.env` and fill in:
-
-```bash
-# API Keys
-ANTHROPIC_API_KEY=sk-ant-xxxxx
-OPENAI_API_KEY=sk-xxxxx
-GROK_API_KEY=xai-xxxxx
-
-# Database
-DB_TYPE=postgresql
-DB_HOST=db.harrisfarm.internal
-DB_PORT=5432
-DB_NAME=harris_farm_prod
-DB_USER=hub_readonly
-DB_PASSWORD=xxxxx
-
-# App Settings
-API_URL=http://localhost:8000
-FRONTEND_URL=http://localhost:3000
+# Render — check via logs
+# Dashboard -> harris-farm-hub -> Logs
 ```
 
 ---
 
-## 💡 Use Cases
+## License
 
-### For Finance Team (Primary Users)
-
-**Daily Tasks:**
-- Check store profitability trends
-- Analyze transport cost patterns
-- Query sales data with natural language
-- Identify cost reduction opportunities
-
-**Key Queries:**
-```
-"Which stores had margin below 5% last month?"
-"Show me transport costs for Eastern Suburbs routes"
-"Compare this week's revenue to last week by category"
-"What's our total wastage cost across all fresh produce?"
-```
-
-### For Buyers
-
-**Product-Level Analytics:**
-- Out-of-stock tracking and lost sales
-- Over-ordering detection
-- Wastage patterns by product/store
-- Supplier performance
-
-**Custom Prompts:**
-- "Show products consistently ordered 15% above sales"
-- "Which items had wastage above 20% at any store?"
-- "Alert me to products out of stock for 4+ hours"
-
-### For Operations
-
-**Store Performance:**
-- Online miss-pick analysis
-- Inventory velocity tracking
-- Store comparison benchmarks
-- Best practice identification
-
-**Automated Reports:**
-- Daily out-of-stock summary
-- Weekend wastage report
-- Weekly performance scorecard
-
-### For Leadership (Gus, Angela)
-
-**Strategic Decisions:**
-- Use The Rubric for major decisions
-- Compare AI model recommendations
-- Track KPIs across all functions
-- Identify systemic issues
-
----
-
-## 🎓 Becoming a Prompt Superstar
-
-### Level 1: Prompt Apprentice
-- Learn basic query structure
-- Use template library
-- Ask clear questions
-- Understand results
-
-### Level 2: Prompt Specialist
-- Design custom prompts
-- Use Super User Prompt Builder
-- Apply filters and thresholds
-- Share prompts with team
-
-### Level 3: Prompt Master
-- Create complex multi-step queries
-- Optimize for performance
-- Train others
-- Contribute to library
-
----
-
-## 🔐 Security & Access
-
-### Day 1 (MVP)
-- ✅ Read-only database access
-- ✅ Internal network only
-- ✅ Basic authentication
-- ✅ Environment variable secrets
-
-### Production (Week 2+)
-- [ ] Azure AD / SSO integration
-- [ ] Role-based access control
-- [ ] Audit logging
-- [ ] HTTPS/TLS everywhere
-- [ ] API rate limiting
-- [ ] Data masking for sensitive fields
-
----
-
-## 📊 Success Metrics
-
-Track Hub effectiveness:
-
-### Usage Metrics
-- Queries per day
-- Active users
-- Dashboard views
-- Rubric evaluations
-
-### Quality Metrics
-- Query success rate
-- Average user rating (1-5 stars)
-- Response accuracy
-- Time saved vs manual
-
-### Business Impact
-- Cost savings identified
-- Issues caught early
-- Decisions informed by data
-- Process improvements
-
-### Learning Metrics
-- Chairman decisions logged
-- Popular templates
-- Self-improvement rate
-- User progression (Apprentice→Master)
-
----
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**API won't start**
-```bash
-# Check if port 8000 is in use
-lsof -i :8000
-
-# Try different port
-uvicorn app:app --port 8001
-```
-
-**Dashboard shows "Connection Error"**
-```bash
-# Verify API is running
-curl http://localhost:8000
-
-# Check API_URL in dashboard
-# Should match backend port
-```
-
-**Database connection failed**
-```bash
-# Test connection manually
-psql -h $DB_HOST -U $DB_USER -d $DB_NAME
-
-# Verify credentials in .env
-# Try read-only user first
-```
-
-**Slow performance**
-```bash
-# Add database indexes
-# Implement result caching
-# Limit query result sizes
-```
-
-### Getting Help
-
-- **Email**: hub-support@harrisfarm.com
-- **Slack**: #harris-farm-hub
-- **Documentation**: See `/docs` folder
-- **GitHub Issues**: Report bugs and request features
-
----
-
-## 🛣️ Roadmap
-
-### ✅ Phase 1: Weekend MVP (Completed)
-- Natural language queries
-- Three core dashboards
-- The Rubric (multi-LLM)
-- Prompt library basics
-- Super User Prompt Builder
-- Product-level analytics
-
-### 📅 Phase 2: Week 2-3
-- Full training academy
-- Scheduled reports
-- Email/Slack notifications
-- Advanced visualizations
-- Mobile optimization
-- Prompt sharing workflow
-
-### 📅 Phase 3: Month 2
-- Predictive analytics
-- Real-time alerts
-- Voice interface (buyers at markets)
-- Supplier portal
-- Advanced ML models
-- Multi-user collaboration
-
-### 📅 Phase 4: Month 3+
-- Autonomous AI agents
-- Dynamic pricing engine
-- Demand forecasting
-- Supply chain optimization
-- Customer sentiment analysis
-- Competitive intelligence
-
----
-
-## 🤝 Contributing
-
-### For Harris Farm Team
-
-**Adding Prompt Templates:**
-1. Design prompt in Prompt Builder
-2. Test with real data
-3. Save with clear name and description
-4. Share with relevant teams
-
-**Improving The Hub:**
-1. Submit feedback via star ratings
-2. Report issues in Slack
-3. Suggest features
-4. Share success stories
-
-**Becoming a Super User:**
-1. Complete training modules
-2. Build 5+ custom prompts
-3. Help train colleagues
-4. Get certified
-
----
-
-## 📜 License
-
-Proprietary - Harris Farm Markets Internal Use Only
-
----
-
-## 🙏 Acknowledgments
-
-Built with:
-- **FastAPI** - Modern Python web framework
-- **Streamlit** - Rapid dashboard development
-- **Claude (Anthropic)** - Advanced AI capabilities
-- **Plotly** - Interactive visualizations
-- **React** - Modern frontend framework
-
-Special thanks to:
-- **Finance Team** - Pilot users and feedback
-- **Gus** - Vision and leadership
-- **The Hub Team** - Weekend warriors
-
----
-
-## 📞 Contact
-
-**Project Lead**: Gus (Co-CEO)
-**Technical Support**: hub-support@harrisfarm.com
-**Slack Channel**: #harris-farm-hub
-
----
-
-**Built with ❤️ for Harris Farm Markets**
-
-*Transforming data into decisions, one query at a time.*
-
----
-
-## Quick Reference
-
-```bash
-# Start The Hub
-./start.sh
-
-# Check status
-curl http://localhost:8000
-
-# View logs
-tail -f logs/*.log
-
-# Stop The Hub
-./stop.sh
-
-# Access dashboards
-open http://localhost:8501  # Sales
-open http://localhost:8502  # Profitability
-open http://localhost:8503  # Transport
-open http://localhost:8504  # Prompt Builder
-```
-
-**Ready to launch? Run `./start.sh` and open your browser! 🚀**
+Proprietary — Harris Farm Markets Internal Use Only
