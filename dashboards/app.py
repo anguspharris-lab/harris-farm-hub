@@ -23,16 +23,16 @@ st.set_page_config(
     layout="wide",
 )
 
-# Shared styling — applied once, inherited by all pages
-from shared.styles import apply_styles
-
-apply_styles()
-
-# Auth gate — runs before any page renders
+# Auth gate — runs before any page renders (login page has its own dark styling)
 from shared.auth_gate import require_login
 
 user = require_login()
 st.session_state["auth_user"] = user
+
+# Shared styling — applied AFTER login so it doesn't conflict with login page CSS
+from shared.styles import apply_styles
+
+apply_styles()
 
 # ---------------------------------------------------------------------------
 # Page definitions — grouped by strategic pillar
