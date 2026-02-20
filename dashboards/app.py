@@ -55,6 +55,7 @@ _pages = {
     "store-ops": st.Page(str(_DIR / "store_ops_dashboard.py"), title="Store Ops", icon="\U0001f3ea", url_path="store-ops"),
     "buying-hub": st.Page(str(_DIR / "buying_hub_dashboard.py"), title="Buying Hub", icon="\U0001f6d2", url_path="buying-hub"),
     "product-intel": st.Page(str(_DIR / "product_intel_dashboard.py"), title="Product Intel", icon="\U0001f50d", url_path="product-intel"),
+    "plu-intel": st.Page(str(_DIR / "plu_intel_dashboard.py"), title="PLU Intelligence", icon="\U0001f4ca", url_path="plu-intel"),
     "prompt-builder": st.Page(str(_DIR / "prompt_builder.py"), title="Prompt Builder", icon="\U0001f527", url_path="prompt-builder"),
     "the-rubric": st.Page(str(_DIR / "rubric_dashboard.py"), title="The Rubric", icon="\u2696\ufe0f", url_path="the-rubric"),
     "trending": st.Page(str(_DIR / "trending_dashboard.py"), title="Trending", icon="\U0001f4c8", url_path="trending"),
@@ -71,7 +72,7 @@ _PILLARS = [
     {"name": "People", "icon": "\U0001f393", "color": "#059669",
      "slugs": ["learning-centre", "hub-assistant"]},
     {"name": "Operations", "icon": "\U0001f4ca", "color": "#d97706",
-     "slugs": ["sales", "profitability", "transport", "store-ops", "buying-hub", "product-intel"]},
+     "slugs": ["sales", "profitability", "transport", "store-ops", "buying-hub", "product-intel", "plu-intel"]},
     {"name": "Digital & AI", "icon": "\U0001f680", "color": "#4ba021",
      "slugs": ["prompt-builder", "the-rubric", "trending", "revenue-bridge", "hub-portal"]},
 ]
@@ -86,7 +87,7 @@ nav = st.navigation(
         "For The Greater Goodness": [_pages["greater-goodness"]],
         "Smashing It for the Customer": [_pages["customers"], _pages["market-share"]],
         "Growing Legendary Leadership": [_pages["learning-centre"], _pages["hub-assistant"]],
-        "Today's Business, Done Better": [_pages["sales"], _pages["profitability"], _pages["transport"], _pages["store-ops"], _pages["buying-hub"], _pages["product-intel"]],
+        "Today's Business, Done Better": [_pages["sales"], _pages["profitability"], _pages["transport"], _pages["store-ops"], _pages["buying-hub"], _pages["product-intel"], _pages["plu-intel"]],
         "Tomorrow's Business, Built Better": [_pages["prompt-builder"], _pages["the-rubric"], _pages["trending"], _pages["revenue-bridge"], _pages["hub-portal"]],
     }
 )

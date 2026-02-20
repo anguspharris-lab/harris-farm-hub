@@ -60,6 +60,7 @@ HUBS = [
             ("Store Ops", 8511, "\U0001f3ea", "Store-level transaction intelligence"),
             ("Buying Hub", 8514, "\U0001f6d2", "Category buying, demand & weather"),
             ("Product Intel", 8512, "\U0001f50d", "Item & category performance"),
+            ("PLU Intelligence", 8517, "\U0001f4ca", "PLU-level wastage, shrinkage & margins"),
         ],
     },
     {
@@ -110,6 +111,7 @@ _PORT_TO_SLUG = {
     8506: "trending",
     8513: "revenue-bridge",
     8515: "hub-portal",
+    8517: "plu-intel",
 }
 
 
