@@ -116,23 +116,29 @@ def init_auth_db(db_path=None):
 
     conn.commit()
 
-    # Seed site password if not set
-    site_pw = c.execute(
-        "SELECT value FROM auth_config WHERE key = 'site_password_hash'"
-    ).fetchone()
-    if not site_pw:
-        env_site_pw = os.getenv("AUTH_SITE_PASSWORD", "")
-        if env_site_pw:
-            c.execute(
-                "INSERT INTO auth_config (key, value) VALUES (?, ?)",
-                ("site_password_hash", hash_password(env_site_pw)),
-            )
+    # Sync site password from env var on every startup
+    env_site_pw = os.getenv("AUTH_SITE_PASSWORD", "")
+    if env_site_pw:
         c.execute(
-            "INSERT OR IGNORE INTO auth_config (key, value) VALUES (?, ?)",
-            ("require_site_password", "true" if env_site_pw else "false"),
+            "INSERT OR REPLACE INTO auth_config (key, value) VALUES (?, ?)",
+            ("site_password_hash", hash_password(env_site_pw)),
         )
+        c.execute(
+            "INSERT OR REPLACE INTO auth_config (key, value) VALUES (?, ?)",
+            ("require_site_password", "true"),
+        )
+    else:
+        # No env var — only seed defaults if no config exists
+        existing = c.execute(
+            "SELECT value FROM auth_config WHERE key = 'require_site_password'"
+        ).fetchone()
+        if not existing:
+            c.execute(
+                "INSERT OR IGNORE INTO auth_config (key, value) VALUES (?, ?)",
+                ("require_site_password", "false"),
+            )
 
-    # Seed session timeout
+    # Seed session timeout if not set
     timeout_row = c.execute(
         "SELECT value FROM auth_config WHERE key = 'session_timeout_hours'"
     ).fetchone()
@@ -142,17 +148,26 @@ def init_auth_db(db_path=None):
             ("session_timeout_hours", os.getenv("AUTH_SESSION_TIMEOUT", "24")),
         )
 
-    # Seed admin user if no users exist
-    user_count = c.execute("SELECT COUNT(*) FROM users").fetchone()[0]
-    if user_count == 0:
-        admin_email = os.getenv("AUTH_ADMIN_EMAIL", "")
-        admin_pw = os.getenv("AUTH_ADMIN_PASSWORD", "")
-        if admin_email and admin_pw:
+    # Sync admin user from env vars on every startup
+    admin_email = os.getenv("AUTH_ADMIN_EMAIL", "")
+    admin_pw = os.getenv("AUTH_ADMIN_PASSWORD", "")
+    if admin_email and admin_pw:
+        existing_admin = c.execute(
+            "SELECT id FROM users WHERE email = ?", (admin_email,)
+        ).fetchone()
+        if existing_admin:
+            # Update password to match env var (handles password resets via env)
+            c.execute(
+                "UPDATE users SET password_hash = ?, role = 'admin', active = 1, "
+                "updated_at = datetime('now') WHERE email = ?",
+                (hash_password(admin_pw), admin_email),
+            )
+        else:
             c.execute(
                 "INSERT INTO users (email, name, password_hash, role) VALUES (?, ?, ?, ?)",
                 (admin_email, "Admin", hash_password(admin_pw), "admin"),
             )
-            log_auth_event("admin_seeded", admin_email, "", "Initial admin created from env", conn=conn)
+            log_auth_event("admin_seeded", admin_email, "", "Admin created from env", conn=conn)
 
     conn.commit()
     conn.close()
@@ -232,6 +247,22 @@ def authenticate_user(email, password):
         "name": row["name"],
         "role": row["role"],
     }
+
+
+def reset_password(email, new_password):
+    """Reset a user's password. Returns True if user found and updated."""
+    conn = _get_conn()
+    row = conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
+    if not row:
+        conn.close()
+        return False
+    conn.execute(
+        "UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE email = ?",
+        (hash_password(new_password), email),
+    )
+    conn.commit()
+    conn.close()
+    return True
 
 
 def list_users():

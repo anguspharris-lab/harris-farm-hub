@@ -2770,6 +2770,11 @@ class RegisterRequest(BaseModel):
     email: str
     password: str
 
+class ResetPasswordRequest(BaseModel):
+    email: str
+    new_password: str
+    site_password: str
+
 class UpdateSettingsRequest(BaseModel):
     site_password: Optional[str] = None
     session_timeout: Optional[int] = None
@@ -2862,6 +2867,26 @@ async def auth_register(req: RegisterRequest, request: Request):
         return {"token": token, "user": user}
     except ValueError:
         raise HTTPException(status_code=409, detail="An account with this email already exists")
+
+
+@app.post("/api/auth/reset-password")
+async def auth_reset_password(req: ResetPasswordRequest, request: Request):
+    """Reset password using the site access code as verification."""
+    import auth as auth_module
+    ip = _get_client_ip(request)
+
+    if not auth_module.check_site_password(req.site_password):
+        auth_module.log_auth_event("reset_failed", req.email, ip, "Invalid site password")
+        raise HTTPException(status_code=403, detail="Invalid site access code")
+
+    if len(req.new_password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+
+    if not auth_module.reset_password(req.email, req.new_password):
+        raise HTTPException(status_code=404, detail="No account found with that email")
+
+    auth_module.log_auth_event("password_reset", req.email, ip, "Password reset via site code")
+    return {"ok": True, "message": "Password has been reset. You can now sign in."}
 
 
 @app.get("/api/auth/me")

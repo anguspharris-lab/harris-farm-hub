@@ -145,8 +145,11 @@ def _render_auth_page(api_url):
         st.error("Cannot connect to the Hub API. The backend may still be starting — please refresh in 30 seconds.")
         return
 
-    if st.session_state.get("auth_mode", "login") == "login":
+    mode = st.session_state.get("auth_mode", "login")
+    if mode == "login":
         _render_login(api_url, site_pw_required)
+    elif mode == "reset":
+        _render_reset_password(api_url, site_pw_required)
     else:
         _render_register(api_url, site_pw_required)
 
@@ -179,6 +182,11 @@ def _render_login(api_url, site_pw_required):
 
         if submitted:
             _handle_login(api_url, site_pw_required, site_password, email, password)
+
+    # Forgot password link
+    if st.button("Forgot Password?", key="switch_reset", type="tertiary"):
+        st.session_state["auth_mode"] = "reset"
+        st.rerun()
 
     # Toggle to register
     st.markdown("---")
@@ -232,6 +240,59 @@ def _handle_login(api_url, site_pw_required, site_password, email, password):
             st.error("Invalid email or password. Please check your credentials.")
     except requests.RequestException:
         st.error("Cannot connect to the Hub API.")
+
+
+def _render_reset_password(api_url, site_pw_required):
+    """Render the password reset form."""
+    show_pw = st.checkbox("Reveal passwords", key="reset_show_pw", value=False)
+    pw_type = "default" if show_pw else "password"
+
+    with st.form("reset_form", clear_on_submit=False):
+        st.markdown("**Reset your password**")
+        st.caption("Enter the site access code, your email, and a new password.")
+
+        site_password = st.text_input("Site Access Code", type=pw_type,
+                                       placeholder="Required to verify identity")
+        email = st.text_input("Email", placeholder="you@harrisfarm.com.au")
+        new_password = st.text_input("New Password", type=pw_type,
+                                      placeholder="Minimum 8 characters")
+        confirm = st.text_input("Confirm New Password", type=pw_type,
+                                 placeholder="Re-enter your new password")
+
+        st.markdown("")
+        submitted = st.form_submit_button("Reset Password", use_container_width=True)
+
+        if submitted:
+            if not site_password or not email or not new_password or not confirm:
+                st.error("Please fill in all fields.")
+            elif len(new_password) < 8:
+                st.error("Password must be at least 8 characters.")
+            elif new_password != confirm:
+                st.error("Passwords do not match.")
+            else:
+                try:
+                    resp = requests.post(
+                        f"{api_url}/api/auth/reset-password",
+                        json={
+                            "email": email,
+                            "new_password": new_password,
+                            "site_password": site_password,
+                        },
+                        timeout=5,
+                    )
+                    if resp.status_code == 200:
+                        st.success("Password reset! You can now sign in.")
+                    else:
+                        detail = resp.json().get("detail", "Reset failed.")
+                        st.error(detail)
+                except requests.RequestException:
+                    st.error("Cannot connect to the Hub API.")
+
+    # Back to login
+    st.markdown("---")
+    if st.button("Back to Sign In", key="switch_back_login", use_container_width=True):
+        st.session_state["auth_mode"] = "login"
+        st.rerun()
 
 
 def _render_register(api_url, site_pw_required):
