@@ -145,6 +145,14 @@ def _render_auth_page(api_url):
         st.error("Cannot connect to the Hub API. The backend may still be starting — please refresh in 30 seconds.")
         return
 
+    # Temporary debug panel (remove after troubleshooting)
+    if st.query_params.get("debug") == "1":
+        try:
+            dbg = requests.get(f"{api_url}/api/auth/debug", timeout=5).json()
+            st.code(str(dbg), language="json")
+        except Exception as e:
+            st.warning(f"Debug fetch failed: {e}")
+
     mode = st.session_state.get("auth_mode", "login")
     if mode == "login":
         _render_login(api_url, site_pw_required)
