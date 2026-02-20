@@ -2,7 +2,7 @@ services:
   - type: web
     name: harris-farm-hub
     runtime: python
-    buildCommand: pip install -r requirements.txt && python data_loader.py
+    buildCommand: pip install -r requirements.txt
     startCommand: bash render_start.sh
     envVars:
       - key: PYTHON_VERSION
@@ -10,4 +10,4 @@ services:
     disk:
       name: hub-data
       mountPath: /data
-      sizeGB: 1
+      sizeGB: 10

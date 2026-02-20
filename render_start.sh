@@ -7,6 +7,9 @@
 if [ -d /data ]; then
     echo "Persistent disk found at /data"
 
+    # Ensure transactions subdirectory exists on disk
+    mkdir -p /data/transactions
+
     # Copy git-tracked reference files to disk (first deploy only)
     cp -n data/*.csv /data/ 2>/dev/null || true
     cp -n data/*.parquet /data/ 2>/dev/null || true
@@ -17,6 +20,10 @@ if [ -d /data ]; then
     ln -s /data data
 
     echo "Data directory linked to persistent disk"
+
+    # Download large data files if missing (first deploy only)
+    echo "Checking data files..."
+    python data_loader.py
 fi
 
 # Also link backend/hub_data.db to persistent disk
