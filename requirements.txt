@@ -12,9 +12,6 @@ pydantic<2
 python-dotenv
 anthropic
 openai
-sqlalchemy
-aiofiles
-gdown
 bcrypt
 duckdb
 openpyxl
