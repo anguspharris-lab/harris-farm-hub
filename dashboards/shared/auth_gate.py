@@ -84,37 +84,65 @@ _LOGIN_CSS = """
         letter-spacing: 0.3px !important;
     }
 
-    /* Style text input fields — multiple selectors for Streamlit version compat */
+    /* Pulsing glow animation for password fields */
+    @keyframes pulse-glow {
+        0%, 100% { text-shadow: 0 0 8px rgba(74, 222, 128, 0.8); opacity: 1; }
+        50% { text-shadow: 0 0 16px rgba(74, 222, 128, 1); opacity: 0.7; }
+    }
+
+    /* Style ALL text input fields */
     .stTextInput input,
     .stTextInput > div > div > input,
-    [data-testid="stTextInput"] input,
-    .stTextInput input[type="text"],
-    .stTextInput input[type="password"],
-    .stTextInput input[type="email"] {
+    [data-testid="stTextInput"] input {
         background: rgba(255, 255, 255, 0.08) !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 12px !important;
         color: #ffffff !important;
         -webkit-text-fill-color: #ffffff !important;
         padding: 14px 16px !important;
-        font-size: 15px !important;
-        caret-color: #ffffff !important;
+        font-size: 16px !important;
+        caret-color: #4ade80 !important;
+    }
+
+    /* Password fields — bright green pulsing dots */
+    .stTextInput input[type="password"] {
+        color: #4ade80 !important;
+        -webkit-text-fill-color: #4ade80 !important;
+        font-size: 22px !important;
+        letter-spacing: 6px !important;
+        animation: pulse-glow 1.2s ease-in-out infinite !important;
     }
 
     .stTextInput input:focus,
-    .stTextInput > div > div > input:focus,
-    [data-testid="stTextInput"] input:focus {
-        border-color: rgba(255, 255, 255, 0.45) !important;
+    .stTextInput > div > div > input:focus {
+        border-color: rgba(74, 222, 128, 0.5) !important;
         background: rgba(255, 255, 255, 0.12) !important;
-        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08) !important;
+        box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.15) !important;
         color: #ffffff !important;
         -webkit-text-fill-color: #ffffff !important;
+    }
+
+    /* Focused password fields keep green glow */
+    .stTextInput input[type="password"]:focus {
+        color: #4ade80 !important;
+        -webkit-text-fill-color: #4ade80 !important;
+        box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2) !important;
     }
 
     .stTextInput input::placeholder,
     .stTextInput > div > div > input::placeholder {
         color: rgba(255, 255, 255, 0.35) !important;
         -webkit-text-fill-color: rgba(255, 255, 255, 0.35) !important;
+        animation: none !important;
+        letter-spacing: normal !important;
+        font-size: 15px !important;
+    }
+
+    /* Checkbox styling for reveal toggle */
+    .stCheckbox label span,
+    .stCheckbox label p {
+        color: rgba(255, 255, 255, 0.6) !important;
+        font-size: 13px !important;
     }
 
     /* Style the Sign In / Create Account button */
@@ -290,15 +318,19 @@ def _render_auth_page(api_url):
 
 def _render_login(api_url, site_pw_required):
     """Render the login form."""
+    # Reveal toggle (outside form so it updates instantly)
+    show_pw = st.checkbox("Reveal passwords", key="login_show_pw", value=False)
+    pw_type = "default" if show_pw else "password"
+
     with st.form("login_form", clear_on_submit=False):
         if site_pw_required:
-            site_password = st.text_input("Site Access Code", type="password",
+            site_password = st.text_input("Site Access Code", type=pw_type,
                                           placeholder="Enter site access code")
         else:
             site_password = None
 
         email = st.text_input("Email", placeholder="you@harrisfarm.com.au")
-        password = st.text_input("Password", type="password", placeholder="Enter password")
+        password = st.text_input("Password", type=pw_type, placeholder="Enter password")
 
         st.markdown("")  # spacing
         submitted = st.form_submit_button("Enter The Hub", use_container_width=True)
@@ -362,18 +394,22 @@ def _handle_login(api_url, site_pw_required, site_password, email, password):
 
 def _render_register(api_url, site_pw_required):
     """Render the registration form."""
+    # Reveal toggle (outside form so it updates instantly)
+    show_pw = st.checkbox("Reveal passwords", key="register_show_pw", value=False)
+    pw_type = "default" if show_pw else "password"
+
     with st.form("register_form", clear_on_submit=False):
         if site_pw_required:
-            site_password = st.text_input("Site Access Code", type="password",
+            site_password = st.text_input("Site Access Code", type=pw_type,
                                           placeholder="Required to create an account")
         else:
             site_password = None
 
         name = st.text_input("Full Name", placeholder="Your full name")
         email = st.text_input("Email", placeholder="you@harrisfarm.com.au")
-        password = st.text_input("Choose Password", type="password",
+        password = st.text_input("Choose Password", type=pw_type,
                                  placeholder="Minimum 8 characters")
-        confirm = st.text_input("Confirm Password", type="password",
+        confirm = st.text_input("Confirm Password", type=pw_type,
                                 placeholder="Re-enter your password")
 
         st.markdown("")
