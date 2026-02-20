@@ -44,6 +44,14 @@ DATA_FILES = {
         "size_mb": 1773,
         "description": "POS transactions FY26 YTD (Jul 2025 - Feb 2026, 99M rows)",
     },
+    "data/harris_farm_plu.db": {
+        "urls": [
+            f"{_BASE_URL}/harris_farm_plu.db.part_aa",
+            f"{_BASE_URL}/harris_farm_plu.db.part_ab",
+        ],
+        "size_mb": 3072,
+        "description": "PLU weekly results (27.3M rows, 3 fiscal years, 43 stores)",
+    },
 }
 
 

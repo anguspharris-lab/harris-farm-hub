@@ -3,6 +3,7 @@
 *.db-shm
 *.db-wal
 *.parquet
+*.part_*
 data/transactions/
 
 # Allow small reference parquets (needed for deployment)
