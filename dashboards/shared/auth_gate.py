@@ -221,12 +221,19 @@ def require_login(api_url=None):
                     if source == "query_params":
                         st.query_params.clear()
                     return data["user"]
+                else:
+                    # API explicitly said token is invalid — clear it
+                    st.session_state.pop("auth_token", None)
+                    st.session_state.pop("auth_user", None)
+            else:
+                # Non-200 response — clear token
+                st.session_state.pop("auth_token", None)
+                st.session_state.pop("auth_user", None)
         except requests.RequestException:
-            pass
-
-        # Token invalid -- clear state
-        st.session_state.pop("auth_token", None)
-        st.session_state.pop("auth_user", None)
+            # API unreachable — trust cached session if we have one
+            cached_user = st.session_state.get("auth_user")
+            if cached_user:
+                return cached_user
 
     # No valid token -- show login/register page
     _render_auth_page(api_url)
