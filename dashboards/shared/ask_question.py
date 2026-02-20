@@ -7,6 +7,7 @@ Usage:
     render_ask_question("sales")   # at the bottom of the dashboard
 """
 
+import os
 import re
 from datetime import datetime
 
@@ -17,7 +18,7 @@ import streamlit.components.v1 as components
 
 from shared.schema_context import SUGGESTED_QUESTIONS
 
-API_URL = "http://localhost:8000"
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 # ---------------------------------------------------------------------------
 # MAIN PUBLIC FUNCTION

@@ -250,8 +250,8 @@ DATA_SOURCES = [
             ("EstimatedCOGS", "FLOAT", "Estimated cost of goods"),
             ("CustomerCode", "TEXT", "Customer ID (88% null)"),
         ],
-        "used_by": ["Store Ops (8511)", "Product Intel (8512)",
-                     "Revenue Bridge (8513)", "Buying Hub (8514)"],
+        "used_by": ["Store Ops", "Product Intel",
+                     "Revenue Bridge", "Buying Hub"],
         "join_key": "PLUItem_ID = ProductNumber",
     },
     {
@@ -273,8 +273,8 @@ DATA_SOURCES = [
             ("BuyerId", "TEXT", "Buyer code (no name mapping)"),
             ("ProductLifecycleStateId", "TEXT", "Active/Deleted/New/Derange"),
         ],
-        "used_by": ["Store Ops (8511)", "Product Intel (8512)",
-                     "Revenue Bridge (8513)", "Buying Hub (8514)"],
+        "used_by": ["Store Ops", "Product Intel",
+                     "Revenue Bridge", "Buying Hub"],
         "join_key": "ProductNumber = PLUItem_ID (98.3% match)",
     },
     {
@@ -295,8 +295,8 @@ DATA_SOURCES = [
             ("COGS", "FLOAT", "Cost of goods sold"),
             ("GP", "FLOAT", "Gross profit"),
         ],
-        "used_by": ["Sales (8501)", "Profitability (8502)",
-                     "Customers (8507)", "Market Share (8508)"],
+        "used_by": ["Sales", "Profitability",
+                     "Customers", "Market Share"],
         "join_key": "Store + Week + Department",
     },
     {
@@ -319,8 +319,8 @@ DATA_SOURCES = [
             ("SeasonName", "TEXT", "Summer/Autumn/Winter/Spring"),
             ("DayOfWeekName", "TEXT", "Monday-Sunday"),
         ],
-        "used_by": ["Store Ops (8511)", "Product Intel (8512)",
-                     "Revenue Bridge (8513)", "Buying Hub (8514)"],
+        "used_by": ["Store Ops", "Product Intel",
+                     "Revenue Bridge", "Buying Hub"],
         "join_key": "CAST(SaleDate AS DATE) = TheDate",
     },
     {
@@ -341,8 +341,8 @@ DATA_SOURCES = [
             ("knowledge_base", "TABLE", "Extracted policy documents (FTS5)"),
             ("chat_messages", "TABLE", "Hub Assistant conversation history"),
         ],
-        "used_by": ["Learning Centre (8510)", "Hub Assistant (8509)",
-                     "Prompt Builder (8504)", "The Rubric (8505)"],
+        "used_by": ["Learning Centre", "Hub Assistant",
+                     "Prompt Builder", "The Rubric"],
         "join_key": "Various internal keys",
     },
 ]
@@ -405,7 +405,7 @@ SHOWCASE_IMPLEMENTATIONS = [
                 "dynamic filter placeholders for hierarchy, time, and fiscal "
                 "dimensions.",
         "stats": "41 queries | 383M rows | <2s response",
-        "dashboard": "Store Ops (8511)",
+        "dashboard": "Store Ops",
     },
     {
         "name": "Product Hierarchy",
@@ -413,7 +413,7 @@ SHOWCASE_IMPLEMENTATIONS = [
                 "transactions with 98.3% PLU match rate. Searchable filter "
                 "with priority-ranked results.",
         "stats": "72,911 products | 5 levels | 98.3% match",
-        "dashboard": "Store Ops (8511)",
+        "dashboard": "Store Ops",
     },
     {
         "name": "Fiscal Calendar",
@@ -429,7 +429,7 @@ SHOWCASE_IMPLEMENTATIONS = [
                 "responses with latency tracking, token counting, and "
                 "Chairman's Decision voting.",
         "stats": "3 providers | async parallel | scored rubric",
-        "dashboard": "The Rubric (8505)",
+        "dashboard": "The Rubric",
     },
     {
         "name": "Weather Demand Forecasting",
@@ -453,7 +453,7 @@ SHOWCASE_IMPLEMENTATIONS = [
                 "Data Skills, Company Knowledge) with role-based priorities, "
                 "practice challenges, and progress tracking.",
         "stats": "12 modules | 14 lessons | 9 challenges",
-        "dashboard": "Learning Centre (8510)",
+        "dashboard": "Learning Centre",
     },
     {
         "name": "Knowledge Base",
@@ -461,6 +461,6 @@ SHOWCASE_IMPLEMENTATIONS = [
                 "policy documents. Powers the Hub Assistant chatbot with "
                 "BM25-ranked context retrieval.",
         "stats": "FTS5 search | BM25 ranking | multi-LLM",
-        "dashboard": "Hub Assistant (8509)",
+        "dashboard": "Hub Assistant",
     },
 ]

@@ -1,4 +1,4 @@
-"""Harris Farm Hub — Learning Centre Dashboard (Port 8510)
+"""Harris Farm Hub — Learning Centre Dashboard
 
 Pillar 3: Growing Legendary Leadership | Pillar 5: AI Centre of Excellence
 Structured around the Prosci ADKAR change management framework:
@@ -46,7 +46,7 @@ render_header(
     "**Prompt Academy** — AI & Data Skills for Every Harris Farmer"
 )
 
-API_BASE = os.getenv("HUB_API_BASE", "http://localhost:8000")
+API_BASE = os.getenv("API_URL", "http://localhost:8000")
 
 
 # ---------------------------------------------------------------------------

@@ -65,7 +65,7 @@ def range_check(values, field, min_val=None, max_val=None, allow_null=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--port", type=int, default=8501)
+    parser.add_argument("--port", type=int, default=8500)
     parser.add_argument("--tolerance", type=float, default=0.01)
     args = parser.parse_args()
     sys.exit(0 if validate_response(args.port, args.tolerance) else 1)

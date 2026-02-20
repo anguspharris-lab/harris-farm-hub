@@ -1025,18 +1025,20 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+_cors_origins = [
+    "http://localhost:8000",
+    "http://localhost:8500",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:8500",
+]
+# Allow Render domain (set RENDER_EXTERNAL_URL automatically by Render)
+_render_url = os.getenv("RENDER_EXTERNAL_URL")
+if _render_url:
+    _cors_origins.append(_render_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:8000",
-        "http://localhost:8500", "http://localhost:8501", "http://localhost:8502",
-        "http://localhost:8503", "http://localhost:8504", "http://localhost:8505",
-        "http://localhost:8506", "http://localhost:8507", "http://localhost:8508",
-        "http://localhost:8509",
-        "http://localhost:8510",
-        "http://localhost:8511", "http://localhost:8512", "http://localhost:8513",
-        "http://localhost:8514", "http://localhost:8515",
-    ],
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Content-Type", "X-Auth-Token"],

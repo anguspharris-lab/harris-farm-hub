@@ -2,7 +2,6 @@
 Harris Farm Hub — Customer Analytics Dashboard
 Analyses customer counts, channel mix, RFM segmentation, cohort retention,
 lifetime value, and basket composition.
-Port 8507.
 
 Data sources:
   - SQLite customers table: store x channel x measure x week (17K rows)

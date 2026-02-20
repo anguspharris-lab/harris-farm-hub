@@ -49,10 +49,8 @@ mkdir -p logs
 # ---- Start Backend API ----
 echo ""
 echo "Starting Backend API (port 8000)..."
-cd backend
-python3 app.py > ../logs/api.log 2>&1 &
+python3 -m uvicorn backend.app:app --host 0.0.0.0 --port 8000 > logs/api.log 2>&1 &
 API_PID=$!
-cd ..
 sleep 2
 
 if ps -p $API_PID > /dev/null 2>&1; then

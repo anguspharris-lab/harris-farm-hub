@@ -4,11 +4,13 @@ Ask questions about Harris Farm procedures, golden rules, and operations.
 Answers are grounded in the NUTS document knowledge base.
 """
 
+import os
+
 import streamlit as st
 import requests
 from datetime import datetime
 
-API_URL = "http://localhost:8000"
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 from shared.styles import render_header, render_footer
 

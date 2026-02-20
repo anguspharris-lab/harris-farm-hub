@@ -3,6 +3,8 @@ Harris Farm Hub - Trending & Self-Improvement Dashboard
 Shows usage analytics, LLM performance, feedback trends, and system health.
 """
 
+import os
+
 import streamlit as st
 import requests
 import pandas as pd
@@ -10,7 +12,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 
-API_URL = "http://localhost:8000"
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question

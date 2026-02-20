@@ -1,10 +1,11 @@
 """
 Harris Farm Hub — Documentation Portal
 Centralized documentation, data catalog, AI showcase, prompt library,
-and gamified scoreboard. Port 8515.
+and gamified scoreboard.
 """
 
 import json
+import os
 from pathlib import Path
 
 import streamlit as st
@@ -33,7 +34,7 @@ from shared.watchdog_safety import (
     RISK_LEVELS, RISK_COLORS, RISK_ICONS, SYSTEM_STATUS,
 )
 
-API_URL = "http://localhost:8000"
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 
 # ---------------------------------------------------------------------------

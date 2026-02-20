@@ -3,6 +3,8 @@ Harris Farm Hub - Super User Prompt Builder
 Advanced interface for designing custom analytical prompts
 """
 
+import os
+
 import streamlit as st
 import pandas as pd
 import json
@@ -10,7 +12,7 @@ import requests
 from datetime import datetime
 from shared.stores import STORES
 
-API_URL = "http://localhost:8000"
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 from shared.styles import render_header, render_footer
 

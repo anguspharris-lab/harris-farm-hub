@@ -1,5 +1,5 @@
 """
-Harris Farm Hub — Greater Goodness Dashboard (Port 8516)
+Harris Farm Hub — Greater Goodness Dashboard
 
 Pillar 1: For The Greater Goodness
 Our purpose, sustainability achievements, community impact, and the good

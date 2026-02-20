@@ -1,7 +1,6 @@
 """
 Harris Farm Hub — Market Share Dashboard
 Analyses market share by postcode/region, customer penetration, and spend metrics.
-Port 8508.
 
 Data source: market_share table in harris_farm.db
   - Channels: Instore, Online, Total

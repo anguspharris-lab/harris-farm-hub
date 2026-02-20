@@ -4,13 +4,15 @@ Learn to write effective prompts, practice with challenges, compare AI
 responses, and evaluate them using a structured rubric.
 """
 
+import os
+
 import streamlit as st
 import requests
 import json
 import plotly.graph_objects as go
 from datetime import datetime
 
-API_URL = "http://localhost:8000"
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 from shared.styles import render_header, render_footer
 from shared.training_content import (

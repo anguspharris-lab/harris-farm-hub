@@ -1,5 +1,5 @@
 #!/bin/bash
-P=0;F=0;SERVICES=("api:8000" "home:8500" "sales:8501" "profit:8502" "transport:8503" "prompts:8504" "rubric:8505" "trending:8506" "customers:8507" "market:8508" "assistant:8509" "learning:8510" "store_ops:8511" "product:8512" "revenue:8513" "buying_hub:8514")
+P=0;F=0;SERVICES=("api:8000" "hub:8500")
 for S in "${SERVICES[@]}"; do
   NAME="${S%%:*}"; PORT="${S##*:}"
   CODE=$(curl -so/dev/null -w"%{http_code}" --max-time 3 http://localhost:$PORT 2>/dev/null)

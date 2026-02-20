@@ -56,7 +56,7 @@ echo ""
 
 # Stop everything
 pkill -f "streamlit run" 2>/dev/null
-pkill -f "app.py" 2>/dev/null
+pkill -f "uvicorn" 2>/dev/null
 sleep 2
 
 export PATH="/Users/angusharris/Library/Python/3.9/bin:$PATH"
@@ -64,50 +64,41 @@ cd "$HUB_DIR"
 mkdir -p logs
 
 # Start API
-cd backend
-python3 app.py > ../logs/api.log 2>&1 &
-cd ..
+python3 -m uvicorn backend.app:app --host 0.0.0.0 --port 8000 > logs/api.log 2>&1 &
 sleep 3
 
-# Start dashboards
-cd dashboards
-streamlit run sales_dashboard.py --server.port 8501 --server.headless true > ../logs/sales.log 2>&1 &
-sleep 2
-streamlit run profitability_dashboard.py --server.port 8502 --server.headless true > ../logs/profit.log 2>&1 &
-sleep 2
-streamlit run transport_dashboard.py --server.port 8503 --server.headless true > ../logs/transport.log 2>&1 &
-sleep 2
-streamlit run prompt_builder.py --server.port 8504 --server.headless true > ../logs/builder.log 2>&1 &
-cd ..
-
-sleep 8
+# Start single Hub app
+streamlit run dashboards/app.py \
+    --server.port 8500 \
+    --server.headless true \
+    --server.address 0.0.0.0 \
+    --server.fileWatcherType none \
+    > logs/hub.log 2>&1 &
+sleep 4
 
 echo ""
 echo "═══════════════════════════════════════════════════"
-echo "  🍎 HARRIS FARM HUB — ALL SERVICES RUNNING"
+echo "  🍎 HARRIS FARM HUB — SERVICES RUNNING"
 echo "═══════════════════════════════════════════════════"
 echo ""
 
-for port in 8000 8501 8502 8503 8504; do
+for port in 8000 8500; do
     code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:$port)
-    if [ "$code" = "200" ]; then
+    if [ "$code" = "200" ] || [ "$code" = "302" ]; then
         status="✅"
     else
         status="❌"
     fi
     case $port in
-        8000) name="API Backend        " ;;
-        8501) name="Sales Dashboard    " ;;
-        8502) name="Profitability      " ;;
-        8503) name="Transport          " ;;
-        8504) name="Prompt Builder     " ;;
+        8000) name="API Backend  " ;;
+        8500) name="Hub          " ;;
     esac
     echo "  $status $name http://localhost:$port"
 done
 
 echo ""
-echo "  Opening Sales Dashboard..."
-open http://localhost:8501
+echo "  Opening Hub..."
+open http://localhost:8500
 
 echo ""
 echo "═══════════════════════════════════════════════════"
