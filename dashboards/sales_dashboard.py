@@ -727,6 +727,17 @@ st.dataframe(display_df, hide_index=True)
 render_ask_question("sales")
 
 # ============================================================================
+# CROSS-DASHBOARD LINKS
+# ============================================================================
+
+st.markdown("---")
+st.markdown("**Dig Deeper**")
+c1, c2, c3 = st.columns(3)
+c1.page_link("dashboards/profitability_dashboard.py", label="Margin Deep-Dive", icon="💰")
+c2.page_link("dashboards/plu_intel_dashboard.py", label="PLU Wastage Detail", icon="📊")
+c3.page_link("dashboards/revenue_bridge_dashboard.py", label="Revenue Bridge", icon="🌉")
+
+# ============================================================================
 # FOOTER
 # ============================================================================
 

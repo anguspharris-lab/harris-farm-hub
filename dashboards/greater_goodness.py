@@ -9,9 +9,26 @@ things we do every day. This is the heart of who we are.
  We've believed in nature itself." — Harris Farm Markets
 """
 
+import os
+
+import requests
 import streamlit as st
 
 from shared.styles import render_footer
+
+API_URL = os.getenv("API_URL", "http://localhost:8000")
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def _load_sustainability_kpis():
+    """Fetch sustainability KPIs from backend."""
+    try:
+        resp = requests.get(f"{API_URL}/api/sustainability/kpis", timeout=5)
+        if resp.status_code == 200:
+            return resp.json().get("kpis", [])
+    except Exception:
+        pass
+    return []
 
 # ---------------------------------------------------------------------------
 # HERO
@@ -449,24 +466,35 @@ st.markdown("")
 st.markdown("## FY26 Sustainability Scorecard")
 st.markdown("*Tracking our progress. Honest, transparent, no greenwashing.*")
 
-targets = [
-    ("100% Renewable Energy", 100, True),
-    ("B Corp Certification", 75, False),
-    ("50% Landfill Diversion", 45, False),
-    ("20% Wastage Reduction", 35, False),
-    ("ARL on All HFM Packaging", 25, False),
-    ("Scope 3 Decarbonisation Plan", 40, False),
-    ("Sustainability Hub (Public)", 60, False),
-    ("Modern Slavery Statement", 100, True),
-]
+kpis = _load_sustainability_kpis()
+if not kpis:
+    # Fallback if API unavailable
+    kpis = [
+        {"kpi_name": "100% Renewable Energy", "current_value": 100, "status": "completed", "category": "Energy", "notes": ""},
+        {"kpi_name": "B Corp Certification", "current_value": 75, "status": "in_progress", "category": "Governance", "notes": ""},
+        {"kpi_name": "Modern Slavery Statement", "current_value": 100, "status": "completed", "category": "Governance", "notes": ""},
+    ]
 
-for label, pct, achieved in targets:
+completed = sum(1 for k in kpis if k["status"] == "completed")
+avg_progress = sum(k["current_value"] for k in kpis) / len(kpis) if kpis else 0
+
+k1, k2, k3 = st.columns(3)
+k1.metric("KPIs Tracked", len(kpis))
+k2.metric("Completed", f"{completed}/{len(kpis)}")
+k3.metric("Avg Progress", f"{avg_progress:.0f}%")
+
+st.markdown("")
+
+for kpi in kpis:
+    pct = int(kpi["current_value"])
+    achieved = kpi["status"] == "completed"
     col_label, col_bar = st.columns([1, 2])
     with col_label:
-        status = " \u2705" if achieved else ""
-        st.markdown(f"**{label}**{status}")
+        icon = " \u2705" if achieved else ""
+        st.markdown(f"**{kpi['kpi_name']}**{icon}")
+        if kpi.get("notes"):
+            st.caption(kpi["notes"])
     with col_bar:
-        color = "#16a34a" if achieved else "#eab308" if pct >= 50 else "#f97316"
         st.progress(pct / 100, text=f"{pct}%")
 
 st.markdown("")

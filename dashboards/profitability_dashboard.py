@@ -730,6 +730,17 @@ st.dataframe(dept_tbl, hide_index=True, key="profit_dept_detail_table")
 render_ask_question("profitability")
 
 # ============================================================================
+# CROSS-DASHBOARD LINKS
+# ============================================================================
+
+st.markdown("---")
+st.markdown("**Dig Deeper**")
+c1, c2, c3 = st.columns(3)
+c1.page_link("dashboards/plu_intel_dashboard.py", label="PLU Wastage Hotspots", icon="📊")
+c2.page_link("dashboards/sales_dashboard.py", label="Sales Trends", icon="📈")
+c3.page_link("dashboards/buying_hub_dashboard.py", label="Buying Hub", icon="🛒")
+
+# ============================================================================
 # FOOTER
 # ============================================================================
 

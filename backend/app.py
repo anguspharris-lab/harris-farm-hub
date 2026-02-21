@@ -532,6 +532,18 @@ def init_hub_database():
                   UNIQUE(agent_name, achievement_code))''')
     c.execute("CREATE INDEX IF NOT EXISTS idx_gach_agent ON game_achievements(agent_name)")
 
+    # Sustainability KPIs for Greater Goodness dashboard
+    c.execute('''CREATE TABLE IF NOT EXISTS sustainability_kpis
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  kpi_name TEXT UNIQUE NOT NULL,
+                  category TEXT NOT NULL,
+                  target_value REAL DEFAULT 100,
+                  current_value REAL DEFAULT 0,
+                  unit TEXT DEFAULT '%',
+                  status TEXT DEFAULT 'in_progress',
+                  last_updated TEXT,
+                  notes TEXT)''')
+
     conn.commit()
     conn.close()
 
@@ -952,6 +964,48 @@ def seed_knowledge_base():
     conn.close()
 
 
+def seed_sustainability_kpis():
+    """Seed FY26 sustainability targets. Idempotent."""
+    conn = sqlite3.connect(config.HUB_DB)
+    count = conn.execute("SELECT COUNT(*) FROM sustainability_kpis").fetchone()[0]
+    if count > 0:
+        conn.close()
+        return
+    now = datetime.now().isoformat()
+    kpis = [
+        ("100% Renewable Energy", "Energy", 100, 100, "%", "completed",
+         "All stores and DC switched to 100% renewable electricity"),
+        ("B Corp Certification", "Governance", 100, 75, "%", "in_progress",
+         "Board approval Feb/Mar 2026. Compass Studio engaged for purpose activation"),
+        ("50% Landfill Diversion", "Waste", 100, 45, "%", "in_progress",
+         "Food rescue partnerships, composting, recycling programs across all stores"),
+        ("20% Wastage Reduction", "Waste", 100, 35, "%", "in_progress",
+         "Too Good To Go partnership, AI waste prediction, markdown optimisation"),
+        ("ARL on All HFM Packaging", "Packaging", 100, 25, "%", "in_progress",
+         "Australasian Recycling Label rollout across all Harris Farm branded packaging"),
+        ("Scope 3 Decarbonisation Plan", "Climate", 100, 40, "%", "in_progress",
+         "Mapping supply chain emissions, supplier engagement program underway"),
+        ("Sustainability Hub (Public)", "Transparency", 100, 60, "%", "in_progress",
+         "Public-facing sustainability reporting hub in development"),
+        ("Modern Slavery Statement", "Governance", 100, 100, "%", "completed",
+         "Published and compliant with Modern Slavery Act 2018"),
+        ("WGEA Gender Equity Targets", "People", 100, 55, "%", "in_progress",
+         "Inclusive hiring practices, pay equity review, leadership pipeline targets"),
+        ("10% Reduction in Incidents", "Safety", 100, 30, "%", "in_progress",
+         "Team and customer safety incident reduction program"),
+    ]
+    c = conn.cursor()
+    for name, cat, target, current, unit, status, notes in kpis:
+        c.execute(
+            """INSERT INTO sustainability_kpis
+               (kpi_name, category, target_value, current_value, unit, status, last_updated, notes)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            (name, cat, target, current, unit, status, now, notes),
+        )
+    conn.commit()
+    conn.close()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
@@ -961,6 +1015,7 @@ async def lifespan(app: FastAPI):
     seed_agent_control_data()
     seed_prompt_templates()
     seed_knowledge_base()
+    seed_sustainability_kpis()
     # Initialize auth database
     import auth as auth_module
     auth_module.init_auth_db()
@@ -1621,6 +1676,8 @@ async def chairman_decision(decision: ChairmanDecision):
     conn.commit()
     conn.close()
     
+    _award_points(decision.user_id, 15, "evaluation", f"Evaluated LLMs on query #{decision.query_id}")
+
     return {"status": "recorded", "query_id": decision.query_id, "winner": decision.winner}
 
 @app.post("/api/feedback")
@@ -1639,6 +1696,8 @@ async def submit_feedback(feedback: UserFeedback):
     conn.commit()
     conn.close()
     
+    _award_points(feedback.user_id, 10, "feedback", f"Gave feedback on query #{feedback.query_id}")
+
     return {"status": "recorded", "query_id": feedback.query_id, "rating": feedback.rating}
 
 @app.get("/api/templates")
@@ -1689,8 +1748,24 @@ async def create_template(template: PromptTemplate):
     template_id = c.lastrowid
     conn.commit()
     conn.close()
-    
+
+    _award_points("template_author", 15, "template", f"Created template: {template.title}")
+
     return {"status": "created", "template_id": template_id}
+
+
+@app.post("/api/templates/{template_id}/use")
+async def track_template_use(template_id: int):
+    """Increment template usage counter."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.execute(
+        "UPDATE prompt_templates SET uses = uses + 1, updated_at = ? WHERE id = ?",
+        (datetime.now().isoformat(), template_id),
+    )
+    conn.commit()
+    conn.close()
+    return {"status": "tracked"}
+
 
 @app.get("/api/analytics/performance")
 async def get_performance_analytics():
@@ -1971,6 +2046,44 @@ async def knowledge_stats():
         "total_words": total_words,
         "categories": categories,
     }
+
+
+# ============================================================================
+# SUSTAINABILITY KPIs — GREATER GOODNESS
+# ============================================================================
+
+@app.get("/api/sustainability/kpis")
+async def get_sustainability_kpis():
+    """Get all sustainability KPIs for the Greater Goodness dashboard."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    rows = conn.execute(
+        "SELECT * FROM sustainability_kpis ORDER BY id"
+    ).fetchall()
+    conn.close()
+    return {"kpis": [dict(r) for r in rows]}
+
+
+@app.post("/api/sustainability/kpis/{kpi_id}")
+async def update_sustainability_kpi(
+    kpi_id: int, current_value: float, status: str = None, notes: str = None,
+):
+    """Update a sustainability KPI's progress."""
+    conn = sqlite3.connect(config.HUB_DB)
+    now = datetime.now().isoformat()
+    updates = ["current_value = ?", "last_updated = ?"]
+    params = [current_value, now]
+    if status:
+        updates.append("status = ?")
+        params.append(status)
+    if notes:
+        updates.append("notes = ?")
+        params.append(notes)
+    params.append(kpi_id)
+    conn.execute(f"UPDATE sustainability_kpis SET {', '.join(updates)} WHERE id = ?", params)
+    conn.commit()
+    conn.close()
+    return {"status": "updated", "kpi_id": kpi_id}
 
 
 # ============================================================================
@@ -2395,6 +2508,10 @@ async def update_user_progress(
 
     conn.commit()
     conn.close()
+
+    # Award gamification points on module completion
+    if status == "completed":
+        _award_points(user_id, 20, "learning", f"Completed module {module_code.upper()}")
 
     return {"status": "updated", "user_id": user_id, "module_code": module_code.upper()}
 
@@ -3091,6 +3208,20 @@ async def get_prompt_history(user_id: str = "anonymous", limit: int = 50):
     ).fetchall()
     conn.close()
     return {"prompts": [dict(r) for r in rows]}
+
+
+def _award_points(user_id: str, points: int, category: str, reason: str):
+    """Internal helper to award gamification points to a user."""
+    try:
+        conn = sqlite3.connect(config.HUB_DB)
+        conn.execute(
+            "INSERT INTO portal_scores (user_id, points, category, reason) VALUES (?,?,?,?)",
+            (user_id, points, category, reason),
+        )
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass
 
 
 @app.post("/api/portal/score")

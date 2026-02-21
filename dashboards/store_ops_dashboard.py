@@ -888,6 +888,17 @@ stock-level data.
 render_ask_question("store_ops")
 
 # ============================================================================
+# CROSS-DASHBOARD LINKS
+# ============================================================================
+
+st.markdown("---")
+st.markdown("**Dig Deeper**")
+c1, c2, c3 = st.columns(3)
+c1.page_link("dashboards/plu_intel_dashboard.py", label="PLU Item Detail", icon="📊")
+c2.page_link("dashboards/product_intel_dashboard.py", label="Product Intelligence", icon="🔍")
+c3.page_link("dashboards/profitability_dashboard.py", label="Store Profitability", icon="💰")
+
+# ============================================================================
 # DATA SOURCE NOTES
 # ============================================================================
 

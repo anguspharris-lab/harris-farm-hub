@@ -866,5 +866,14 @@ with tab_data:
 
 # ── Footer ────────────────────────────────────────────────────────────────────
 
+# ── Cross-Dashboard Links ────────────────────────────────────────────────────
+
+st.markdown("---")
+st.markdown("**Dig Deeper**")
+c1, c2, c3 = st.columns(3)
+c1.page_link("dashboards/customer_dashboard.py", label="Customer Analytics", icon="👥")
+c2.page_link("dashboards/sales_dashboard.py", label="Sales by Store", icon="📈")
+c3.page_link("dashboards/plu_intel_dashboard.py", label="PLU Intelligence", icon="📊")
+
 render_ask_question("market_share")
 render_footer("Market Share Intelligence", f"{_fmt_period(min_p)} to {_fmt_period(max_p)}", user=user)

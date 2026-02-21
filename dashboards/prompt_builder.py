@@ -83,6 +83,14 @@ with st.sidebar:
         template = next(p for p in filtered_prompts if p["name"] == selected_template)
         if st.button("Load This Prompt", key="pb_load_btn"):
             st.session_state.loaded_prompt = template
+            # Track usage
+            try:
+                requests.post(
+                    f"{API_URL}/api/templates/{template.get('id', 0)}/use",
+                    timeout=3,
+                )
+            except Exception:
+                pass
 
 # ============================================================================
 # PROMPT DESIGN INTERFACE
@@ -376,6 +384,7 @@ with tabs[2]:  # SAVE & SHARE TAB
                     )
                     if save_resp.status_code == 200:
                         template_id = save_resp.json().get("template_id", "?")
+                        _pb_load_templates.clear()
                         st.success(f"✅ '{prompt_name}' saved to library!")
                         st.balloons()
                         st.info(f"""
