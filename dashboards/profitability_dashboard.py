@@ -750,7 +750,9 @@ try:
                 wdf[["PLU", "Item", "Dept", "Wastage $", "Sales $", "Wastage %", "Stores"]],
                 hide_index=True, key="profit_plu_wastage_table",
             )
-            st.page_link("dashboards/plu_intel_dashboard.py", label="View full PLU Wastage Analysis", icon="📊")
+            _pages = st.session_state.get("_pages", {})
+            if "plu-intel" in _pages:
+                st.page_link(_pages["plu-intel"], label="View full PLU Wastage Analysis", icon="📊")
         else:
             st.info("No significant wastage items found.")
 except ImportError:
@@ -769,10 +771,14 @@ render_ask_question("profitability")
 
 st.markdown("---")
 st.markdown("**Dig Deeper**")
+_pages = st.session_state.get("_pages", {})
 c1, c2, c3 = st.columns(3)
-c1.page_link("dashboards/plu_intel_dashboard.py", label="PLU Wastage Hotspots", icon="📊")
-c2.page_link("dashboards/sales_dashboard.py", label="Sales Trends", icon="📈")
-c3.page_link("dashboards/buying_hub_dashboard.py", label="Buying Hub", icon="🛒")
+if "plu-intel" in _pages:
+    c1.page_link(_pages["plu-intel"], label="PLU Wastage Hotspots", icon="📊")
+if "sales" in _pages:
+    c2.page_link(_pages["sales"], label="Sales Trends", icon="📈")
+if "buying-hub" in _pages:
+    c3.page_link(_pages["buying-hub"], label="Buying Hub", icon="🛒")
 
 # ============================================================================
 # FOOTER

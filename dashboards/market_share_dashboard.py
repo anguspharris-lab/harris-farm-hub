@@ -1152,10 +1152,14 @@ with tab_data:
 
 st.markdown("---")
 st.markdown("**Dig Deeper**")
+_pages = st.session_state.get("_pages", {})
 c1, c2, c3 = st.columns(3)
-c1.page_link("dashboards/customer_dashboard.py", label="Customer Analytics", icon="👥")
-c2.page_link("dashboards/sales_dashboard.py", label="Sales by Store", icon="📈")
-c3.page_link("dashboards/plu_intel_dashboard.py", label="PLU Intelligence", icon="📊")
+if "customers" in _pages:
+    c1.page_link(_pages["customers"], label="Customer Analytics", icon="👥")
+if "sales" in _pages:
+    c2.page_link(_pages["sales"], label="Sales by Store", icon="📈")
+if "plu-intel" in _pages:
+    c3.page_link(_pages["plu-intel"], label="PLU Intelligence", icon="📊")
 
 render_voice_data_box("market_share")
 render_ask_question("market_share")

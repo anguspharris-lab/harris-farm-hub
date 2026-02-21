@@ -909,7 +909,9 @@ try:
                 stdf[["PLU", "Item", "Dept", "Variance $", "Sales $", "Variance %"]],
                 hide_index=True, key="ops_stocktake_alert_table",
             )
-            st.page_link("dashboards/plu_intel_dashboard.py", label="View full Stocktake Analysis", icon="📊")
+            _pages = st.session_state.get("_pages", {})
+            if "plu-intel" in _pages:
+                st.page_link(_pages["plu-intel"], label="View full Stocktake Analysis", icon="📊")
         else:
             st.info("No significant stocktake variances found.")
 except ImportError:
@@ -929,10 +931,14 @@ render_ask_question("store_ops")
 
 st.markdown("---")
 st.markdown("**Dig Deeper**")
+_pages = st.session_state.get("_pages", {})
 c1, c2, c3 = st.columns(3)
-c1.page_link("dashboards/plu_intel_dashboard.py", label="PLU Item Detail", icon="📊")
-c2.page_link("dashboards/product_intel_dashboard.py", label="Product Intelligence", icon="🔍")
-c3.page_link("dashboards/profitability_dashboard.py", label="Store Profitability", icon="💰")
+if "plu-intel" in _pages:
+    c1.page_link(_pages["plu-intel"], label="PLU Item Detail", icon="📊")
+if "product-intel" in _pages:
+    c2.page_link(_pages["product-intel"], label="Product Intelligence", icon="🔍")
+if "profitability" in _pages:
+    c3.page_link(_pages["profitability"], label="Store Profitability", icon="💰")
 
 # ============================================================================
 # DATA SOURCE NOTES

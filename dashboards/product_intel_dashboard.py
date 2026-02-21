@@ -374,7 +374,9 @@ with tab2:
                         disp.columns = ["Store", "Sales $", "Margin $", "Wastage $", "Stocktake $"]
                         st.dataframe(disp, hide_index=True, key="prodintel_plu_store_breakdown")
 
-                    st.page_link("dashboards/plu_intel_dashboard.py", label="Full PLU Intelligence", icon="📊")
+                    _pages = st.session_state.get("_pages", {})
+                    if "plu-intel" in _pages:
+                        st.page_link(_pages["plu-intel"], label="Full PLU Intelligence", icon="📊")
                 else:
                     st.info("No PLU Intelligence data for this item.")
         except ImportError:

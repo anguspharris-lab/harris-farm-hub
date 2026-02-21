@@ -734,10 +734,14 @@ render_ask_question("sales")
 
 st.markdown("---")
 st.markdown("**Dig Deeper**")
+_pages = st.session_state.get("_pages", {})
 c1, c2, c3 = st.columns(3)
-c1.page_link("dashboards/profitability_dashboard.py", label="Margin Deep-Dive", icon="💰")
-c2.page_link("dashboards/plu_intel_dashboard.py", label="PLU Wastage Detail", icon="📊")
-c3.page_link("dashboards/revenue_bridge_dashboard.py", label="Revenue Bridge", icon="🌉")
+if "profitability" in _pages:
+    c1.page_link(_pages["profitability"], label="Margin Deep-Dive", icon="💰")
+if "plu-intel" in _pages:
+    c2.page_link(_pages["plu-intel"], label="PLU Wastage Detail", icon="📊")
+if "revenue-bridge" in _pages:
+    c3.page_link(_pages["revenue-bridge"], label="Revenue Bridge", icon="🌉")
 
 # ============================================================================
 # FOOTER
