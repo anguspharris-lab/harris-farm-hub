@@ -1,7 +1,7 @@
 # Feature Status Matrix
 **Harris Farm Markets AI Hub — Centre of Excellence**
 
-*Last Updated: 2026-02-21*
+*Last Updated: 2026-02-22*
 
 Legend:
 - **LIVE** — Fully operational, tested, data flowing
@@ -15,12 +15,15 @@ Legend:
 
 | Feature | Status | Evidence |
 |---------|--------|----------|
-| FastAPI Backend | **LIVE** | `backend/app.py` — 93+ endpoints, port 8000 |
-| Hub Portal (Documentation + Intelligence) | **LIVE** | `dashboards/hub_portal.py` — port 8515, 11 tabs |
+| FastAPI Backend | **LIVE** | `backend/app.py` — 112 endpoints, port 8000 |
+| Mission Control (Documentation) | **LIVE** | `dashboards/hub_portal.py` — 4 tabs (Docs, Catalog, Showcase, Self-Improvement) |
+| Agent Hub (Scoreboard, Arena, Network) | **LIVE** | `dashboards/agent_hub.py` — 3 tabs |
+| Analytics Engine (Data Intelligence) | **LIVE** | `dashboards/analytics_engine.py` — 4 tabs |
+| Agent Operations (WATCHDOG + Control) | **LIVE** | `dashboards/agent_operations.py` — 4 tabs |
 | SQLite Metadata Database | **LIVE** | `backend/hub_data.db` — 35 tables, 1,009 rows |
 | SQLite Aggregated Data | **LIVE** | `data/harris_farm.db` — 1.6M+ rows (weekly grain) |
 | DuckDB Transaction Engine | **LIVE** | `backend/transaction_layer.py` — 383.6M POS rows |
-| Hub Navigation (5 pillars) | **LIVE** | Single multi-page app via `st.navigation()` in `dashboards/app.py` — 18 dashboards |
+| Hub Navigation (5 pillars) | **LIVE** | Single multi-page app via `st.navigation()` in `dashboards/app.py` — 23 pages |
 | Render Deployment | **LIVE** | https://harris-farm-hub.onrender.com — persistent disk, GitHub Releases data |
 | Data Loader | **LIVE** | `data_loader.py` — auto-downloads data from GitHub Releases on deploy |
 | Start/Stop Scripts | **LIVE** | `start.sh` / `render_start.sh` — single Streamlit process |
@@ -29,54 +32,62 @@ Legend:
 
 ---
 
-## Dashboards (18 total — single multi-page app)
+## Dashboards (23 pages — single multi-page app)
 
-### Financial Hub
+### P1: For The Greater Goodness (1 page)
 
-| Dashboard | Port | Status | Data Source |
-|-----------|------|--------|-------------|
-| Sales | 8501 | **LIVE** | harris_farm.db (weekly) |
-| Profitability | 8502 | **LIVE** | harris_farm.db (weekly) |
+| Dashboard | Status | Data Source |
+|-----------|--------|-------------|
+| Greater Goodness | **LIVE** | Static content + goals |
 
-### Market Intel Hub
+### P2: Smashing It for the Customer (2 pages)
 
-| Dashboard | Port | Status | Data Source |
-|-----------|------|--------|-------------|
-| Customers | 8507 | **LIVE** | harris_farm.db (weekly) |
-| Market Share | 8508 | **LIVE** | harris_farm.db (77K rows) — 7 tabs: Overview, Spatial Map, Store Trade Areas, Trends & Shifts, Opportunities, Issues, Data Explorer. Plotly mapbox with 886 postcodes + 32 store markers. |
+| Dashboard | Status | Data Source |
+|-----------|--------|-------------|
+| Customers | **LIVE** | harris_farm.db (weekly) |
+| Market Share | **LIVE** | harris_farm.db (77K rows) — 7 tabs: Overview, Spatial Map, Store Trade Areas, Trends & Shifts, Opportunities, Issues, Data Explorer. Plotly mapbox with 886 postcodes + 32 store markers. |
 
-### Operations Hub
+### P3: Growing Legendary Leadership (6 pages)
 
-| Dashboard | Port | Status | Data Source |
-|-----------|------|--------|-------------|
-| Transport | 8503 | **LIVE** | harris_farm.db (weekly) |
+| Dashboard | Status | Data Source |
+|-----------|--------|-------------|
+| Learning Centre | **LIVE** | 12 modules, 14 lessons (hub_data.db) |
+| The Paddock | **LIVE** | AI practice conversations (session state) |
+| Academy | **LIVE** | Growing Legends Academy — 6-level maturity model, 7 prompt patterns, 6 learning paths, site quality rubrics |
+| Prompt Builder | **LIVE** | prompt_templates (hub_data.db) |
+| The Rubric | **LIVE** | AI training, prompt skills, multi-LLM comparison |
+| Hub Assistant | **LIVE** | Knowledge base (536 articles), full-text search chat |
 
-### Transactions Hub
+### P4: Today's Business, Done Better (8 pages)
 
-| Dashboard | Port | Status | Data Source |
-|-----------|------|--------|-------------|
-| Store Ops | 8511 | **LIVE** | 383.6M transactions (Parquet/DuckDB) |
-| Product Intel | 8512 | **LIVE** | Transactions + Product Hierarchy |
-| Revenue Bridge | 8513 | **LIVE** | Transactions + Fiscal Calendar |
-| Buying Hub | 8514 | **LIVE** | Transactions + Product Hierarchy |
-| PLU Intelligence | 8517 | **LIVE** | harris_farm_plu.db (27.3M rows) — 6 views: Dept Summary, Wastage Hotspots, Stocktake Variance, Top Revenue PLUs, Store Benchmarking, PLU Lookup |
+| Dashboard | Status | Data Source |
+|-----------|--------|-------------|
+| Sales | **LIVE** | harris_farm.db (weekly) |
+| Profitability | **LIVE** | harris_farm.db (weekly) |
+| Revenue Bridge | **LIVE** | 383.6M transactions (Parquet/DuckDB) + Fiscal Calendar |
+| Store Ops | **LIVE** | 383.6M transactions (Parquet/DuckDB) |
+| Buying Hub | **LIVE** | Transactions + Product Hierarchy |
+| Product Intel | **LIVE** | Transactions + Product Hierarchy |
+| PLU Intelligence | **LIVE** | harris_farm_plu.db (27.3M rows) — 6 views: Dept Summary, Wastage Hotspots, Stocktake Variance, Top Revenue PLUs, Store Benchmarking, PLU Lookup |
+| Transport | **LIVE** | harris_farm.db (weekly) |
 
-### Learning Hub
+### P5: Tomorrow's Business, Built Better (6 pages)
 
-| Dashboard | Port | Status | Data Source |
-|-----------|------|--------|-------------|
-| Learning Centre | 8510 | **LIVE** | 12 modules, 14 lessons (hub_data.db) |
-| Prompt Builder | 8504 | **LIVE** | prompt_templates (hub_data.db) |
-| The Rubric | 8505 | **LIVE** | AI training, prompt skills, multi-LLM comparison |
-| Trending | 8506 | **LIVE** | Usage analytics (hub_data.db) |
-| Hub Assistant | 8509 | **LIVE** | Knowledge base (536 articles), full-text search chat |
-| Hub Portal | 8515 | **LIVE** | Documentation, intelligence, agents, gamification |
+| Dashboard | Status | Data Source |
+|-----------|--------|-------------|
+| Analytics Engine | **LIVE** | Data Intelligence — run analyses, reports, agent tasks (hub_data.db + harris_farm.db) |
+| Agent Hub | **LIVE** | Scoreboard, Arena, Agent Network (hub_data.db) |
+| Agent Operations | **LIVE** | WATCHDOG safety & agent control pipeline (hub_data.db) |
+| AI Adoption | **LIVE** | Organisation-wide platform usage metrics (hub_data.db) |
+| Trending | **LIVE** | System analytics & usage (hub_data.db) |
+| Mission Control | **LIVE** | Documentation, data catalog, showcase, self-improvement (hub_data.db) |
 
-### Other
+### Home + Cross-cutting
 
-| Dashboard | Port | Status | Data Source |
-|-----------|------|--------|-------------|
-| Landing Page | 8500 | **LIVE** | Static + links to all hubs |
+| Dashboard | Status | Data Source |
+|-----------|--------|-------------|
+| Home (landing) | **LIVE** | hub_data.db (live metrics), harris_farm.db — 7 sections: Strategy Pillars, Goals, Quick Launch, Activity Feed, WATCHDOG, System Health |
+| Goal Alignment (all pages) | **LIVE** | `render_header(goals=, strategy_context=)` — 23 pages show coloured G1-G5 badges + strategy context |
 
 ---
 
@@ -105,7 +116,7 @@ Legend:
 |---------|--------|---------|
 | Agent Proposals Table | **LIVE** | 272+ proposals (hub_data.db), full status tracking |
 | Agent Scores Table | **LIVE** | 192+ score records across 18 agents |
-| Agent Control Panel (UI) | **LIVE** | Hub Portal tab11 — approve/reject/view scores |
+| Agent Control Panel (UI) | **LIVE** | Agent Operations — approve/reject/view scores |
 | Task Approval Workflow | **LIVE** | PENDING → APPROVED → COMPLETED/FAILED/REJECTED |
 | Agent Executor | **LIVE** | `backend/agent_executor.py` — polls, routes, executes, scores |
 | Executor API | **LIVE** | POST /api/admin/executor/run, GET /api/admin/executor/status |
@@ -126,8 +137,8 @@ Legend:
 | CLAUDE.md 7 Laws | **LIVE** | Checksum verified each session |
 | Audit Log (watchdog/audit.log) | **LIVE** | Full trail, no gaps |
 | 4 Watchdog Procedures | **LIVE** | Task execution, self-improvement, data correctness, documentation |
-| WATCHDOG AST Scanner | **LIVE** | `scripts/watchdog.py` — 16 dashboards, 134 components, 20 tests |
-| Health Check Script | **LIVE** | `watchdog/health.sh` — checks all 16 services |
+| WATCHDOG AST Scanner | **LIVE** | `scripts/watchdog.py` — 23 pages, 134 components, 20 tests |
+| Health Check Script | **LIVE** | `watchdog/health.sh` — checks all 23 pages |
 | Scan Script | **LIVE** | `watchdog/scan.sh` — security + code quality scan |
 | 7-Criteria Scoring (H/R/S/C/D/U/X) | **LIVE** | Logged per task, avg ≥7 threshold |
 | WATCHDOG Safety Analysis (LLM) | **PARTIAL** | `dashboards/shared/watchdog_safety.py` exists, WatchdogService class built, not integrated into approval flow |
@@ -146,7 +157,7 @@ Legend:
 | Weakest Criterion Detection | **LIVE** | Identifies lowest-scoring dimension |
 | Improvement Cycle Tracking | **LIVE** | `improvement_cycles` table — 5+ cycles recorded |
 | Auto-Trigger (every 5 completions) | **LIVE** | `check_improvement_trigger()` in agent_executor.py |
-| Self-Improvement Dashboard | **LIVE** | Hub Portal tab10 — KPI gauges, trends, cycles |
+| Self-Improvement Dashboard | **LIVE** | Mission Control tab 4 — KPI gauges, trends, cycles |
 | Backfill from Audit History | **LIVE** | POST /api/self-improvement/backfill |
 | MAX 3 Attempts per Criterion | **LIVE** | Enforced in procedure, tracked in improvement_cycles |
 | A/B Testing Framework | **PLANNED** | Designed in best practices, not implemented |
@@ -173,7 +184,10 @@ Legend:
 
 | Feature | Status | Details |
 |---------|--------|---------|
-| Hub Portal (11 tabs) | **LIVE** | Documentation, data catalog, intelligence, agents, learning |
+| Mission Control (4 tabs) | **LIVE** | Documentation, data catalog, showcase, self-improvement |
+| Agent Hub (3 tabs) | **LIVE** | Scoreboard, Arena, Agent Network |
+| Analytics Engine (4 tabs) | **LIVE** | Run Analysis, Reports, Agent Tasks, Demo Insights |
+| Agent Operations (4 tabs) | **LIVE** | Safety Review, Approval Queue, Execution, Audit Trail |
 | Prompt History | **LIVE** | Tracks all prompts submitted |
 | Portal Scores | **PARTIAL** | Table exists, no scores logged yet |
 | Achievements | **PARTIAL** | Table exists, no achievements awarded yet |
@@ -242,7 +256,7 @@ Legend:
 | Metric | Count |
 |--------|-------|
 | API Endpoints | ~93 |
-| Dashboards | 18 |
+| Dashboards | 23 |
 | Database Tables | 35 |
 | Test Files | 25 |
 | Tests | 1,003 |

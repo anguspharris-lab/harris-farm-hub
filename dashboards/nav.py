@@ -44,6 +44,10 @@ HUBS = [
         "color": "#059669",
         "dashboards": [
             ("Learning Centre", 8510, "\U0001f393", "AI & data skills — Prompt Academy"),
+            ("The Paddock", 8523, "\U0001f331", "Practice AI conversations"),
+            ("Academy", 8518, "\U0001f31f", "Growing Legends — your AI capability journey"),
+            ("Prompt Builder", 8504, "\U0001f527", "Design analytical prompts"),
+            ("The Rubric", 8505, "\u2696\ufe0f", "Compare AI models side-by-side"),
             ("Hub Assistant", 8509, "\U0001f4ac", "Ask questions, get guidance"),
         ],
     },
@@ -56,11 +60,12 @@ HUBS = [
         "dashboards": [
             ("Sales", 8501, "\U0001f4ca", "Revenue, store performance, trends"),
             ("Profitability", 8502, "\U0001f4b0", "GP analysis, margins, P&L"),
-            ("Transport", 8503, "\U0001f69a", "Route costs, fleet optimisation"),
+            ("Revenue Bridge", 8513, "\U0001f4c9", "Revenue decomposition & trends"),
             ("Store Ops", 8511, "\U0001f3ea", "Store-level transaction intelligence"),
             ("Buying Hub", 8514, "\U0001f6d2", "Category buying, demand & weather"),
             ("Product Intel", 8512, "\U0001f50d", "Item & category performance"),
             ("PLU Intelligence", 8517, "\U0001f4ca", "PLU-level wastage, shrinkage & margins"),
+            ("Transport", 8503, "\U0001f69a", "Route costs, fleet optimisation"),
         ],
     },
     {
@@ -70,11 +75,12 @@ HUBS = [
         "icon": "\U0001f680",
         "color": "#4ba021",
         "dashboards": [
-            ("Prompt Builder", 8504, "\U0001f527", "Design analytical prompts"),
-            ("The Rubric", 8505, "\u2696\ufe0f", "Compare AI models side-by-side"),
+            ("Analytics Engine", 8521, "\U0001f52c", "Data Intelligence command center"),
+            ("Agent Hub", 8520, "\U0001f916", "Scoreboard, Arena, Agent Network"),
+            ("Agent Operations", 8522, "\U0001f6e1\ufe0f", "WATCHDOG safety & agent control"),
+            ("AI Adoption", 8519, "\U0001f4ca", "Organisation-wide AI platform usage"),
             ("Trending", 8506, "\U0001f4c8", "System analytics & usage"),
-            ("Revenue Bridge", 8513, "\U0001f4c9", "Revenue decomposition & trends"),
-            ("Hub Portal", 8515, "\U0001f310", "Documentation, agents, governance"),
+            ("Mission Control", 8515, "\U0001f3af", "Documentation, data catalog, governance"),
         ],
     },
 ]
@@ -110,8 +116,13 @@ _PORT_TO_SLUG = {
     8505: "the-rubric",
     8506: "trending",
     8513: "revenue-bridge",
-    8515: "hub-portal",
+    8515: "mission-control",
+    8520: "agent-hub",
+    8521: "analytics-engine",
+    8522: "agent-ops",
     8517: "plu-intel",
+    8518: "academy",
+    8519: "ai-adoption",
 }
 
 

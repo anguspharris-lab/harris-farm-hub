@@ -11,9 +11,9 @@
 
 | System | Status | Evidence |
 |--------|--------|----------|
-| 16 Streamlit dashboards | Running | 16/16 healthy (Phase 1 fixed) |
-| FastAPI backend | Running | 71+ endpoints on port 8000 |
-| 383.6M transaction queries | Running | 6 analysis types, Board-ready grades |
+| 19 Streamlit dashboards | Running | 19/19 healthy |
+| FastAPI backend | Running | 112 endpoints on port 8000 |
+| 383.6M transaction queries | Running | 11 analysis types, Board-ready grades |
 | Agent approval workflow | Running | 75 proposals tracked, approve/reject UI |
 | Agent executor | Running | 44 proposals completed, all Board-ready |
 | Self-improvement engine | Running | 24 task scores, 1 improvement cycle |
@@ -44,7 +44,7 @@ These features are fully built and just need a switch flip or first use:
 
 ## Phase 1: Stabilise & Harden — COMPLETED 2026-02-18
 
-**Goal:** Ensure all 16 dashboards are reliably running, fix the 3 intermittent services, and establish baseline metrics.
+**Goal:** Ensure all dashboards are reliably running, fix the 3 intermittent services, and establish baseline metrics.
 
 ### 1.1 Fix Intermittent Dashboards — DONE
 
@@ -174,11 +174,11 @@ Wire existing endpoints into the dashboard flow:
 
 1. After each task completion, POST to /api/portal/score
 2. Define achievement criteria and award via POST /api/portal/achievements
-3. Display leaderboard prominently in Hub Portal
+3. Display leaderboard prominently in Agent Hub
 
 ### 4.2 Build Agent Leaderboard
 
-Add a dedicated leaderboard view to the Hub Portal:
+Add a dedicated leaderboard view to the Agent Hub:
 
 ```
 Rank | Agent | Avg Score | Tasks | Best Grade | Trend
@@ -202,7 +202,7 @@ Rank | Agent | Avg Score | Tasks | Best Grade | Trend
 - Set 30-day window for improvement competition
 - Track baseline scores at start
 - Award winner based on largest improvement (not highest absolute score)
-- Display competition standings in Hub Portal
+- Display competition standings in Agent Hub
 
 **Estimated effort:** 6-8 hours
 

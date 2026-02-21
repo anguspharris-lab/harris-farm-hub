@@ -1,123 +1,107 @@
 """
-Harris Farm Hub — Landing Page
-Centre of Excellence — "For The Greater Goodness"
-Aligned with Harris Farm's 5 Strategic Pillars.
+Harris Farm Hub — Mission Control
+Front page for the AI Centre of Excellence.
+Strategy pillars, 5 goals, quick launch, activity, WATCHDOG trust.
 """
 
 import sqlite3
+from datetime import datetime
 from pathlib import Path
 
 import streamlit as st
 
 from nav import HUBS, _PORT_TO_SLUG
 from shared.styles import render_footer, HFM_GREEN, HFM_DARK
+from shared.goals_config import (
+    HUB_GOALS,
+    fetch_all_goal_metrics,
+    goal_badge_html,
+    fetch_recent_activity,
+    fetch_watchdog_scores,
+)
 
 user = st.session_state.get("auth_user")
 _pages = st.session_state.get("_pages", {})
 
-# --- Hero ---
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 1 — Mission Statement + Personalised Greeting
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Time-based greeting
+_hour = datetime.now().hour
+if _hour < 12:
+    _greeting = "Good morning"
+elif _hour < 17:
+    _greeting = "Good afternoon"
+else:
+    _greeting = "Good evening"
+
+_user_name = ""
+if user and user.get("name"):
+    _user_name = f", {user['name'].split()[0]}"
+
 st.markdown(
-    f"<h1 style='margin-bottom:0;color:{HFM_GREEN};'>Harris Farm Hub</h1>"
-    "<p style='color:#6b7280;font-size:1.2em;margin-top:4px;'>"
-    "<strong>AI Centre of Excellence</strong> &mdash; For The Greater Goodness</p>"
-    "<p style='color:#9ca3af;font-size:0.95em;margin-top:2px;'>"
-    "Family owned since '71. AI-powered since '26. "
-    "Empowering every Harris Farmer with data-driven insights.</p>",
+    f"<div style='background:linear-gradient(135deg, #16a34a 0%, #15803d 50%, #166534 100%);"
+    f"color:white;padding:32px 36px;border-radius:14px;margin-bottom:20px;'>"
+    f"<div style='font-size:1em;opacity:0.85;margin-bottom:4px;'>"
+    f"{_greeting}{_user_name}</div>"
+    f"<div style='font-size:2em;font-weight:700;margin-bottom:4px;'>"
+    f"Harris Farm Hub</div>"
+    f"<div style='font-size:1.2em;font-weight:500;opacity:0.95;margin-bottom:8px;'>"
+    f"AI Centre of Excellence &mdash; For The Greater Goodness</div>"
+    f"<div style='font-size:0.95em;opacity:0.9;max-width:700px;'>"
+    f"Accelerating Harris Farm's strategy through AI that works alongside our "
+    f"people &mdash; safely, transparently, and always improving.</div>"
+    f"</div>",
     unsafe_allow_html=True,
 )
 
-# --- Strategy Banner ---
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 2 — Five Pillars Strategy (moved up from bottom)
+# ═══════════════════════════════════════════════════════════════════════════
+
 st.markdown(
-    "<div style='background:linear-gradient(135deg, #4ba021 0%, #3a8019 100%);"
-    "color:white;padding:20px 28px;border-radius:10px;margin:12px 0 20px 0;'>"
-    "<div style='font-size:1.3em;font-weight:700;margin-bottom:6px;'>"
-    "Fewer, Bigger, Better</div>"
-    "<div style='font-size:0.95em;opacity:0.95;'>"
-    "Our strategy to become Australia's most loved fresh food retailer — inside and out. "
-    "The Hub brings Pillars 4 &amp; 5 to life: smarter operations today, "
-    "AI-powered innovation for tomorrow.</div>"
-    "</div>",
+    f"<h2 style='color:{HFM_DARK};margin-bottom:4px;'>Our Strategy: Fewer, Bigger, Better</h2>"
+    "<p style='color:#6b7280;margin-top:0;'>"
+    "Vision 2030 &mdash; Australia's most loved fresh food retailer, inside and out. "
+    "Everything The Hub does maps back to these five pillars.</p>",
     unsafe_allow_html=True,
 )
 
-# --- Quick KPIs ---
-DB_PATH = Path(__file__).resolve().parent.parent / "data" / "harris_farm.db"
-
-if DB_PATH.exists():
-    conn = sqlite3.connect(str(DB_PATH))
-    try:
-        store_count = conn.execute(
-            "SELECT COUNT(DISTINCT store) FROM sales"
-        ).fetchone()[0]
-
-        total_sales = conn.execute(
-            "SELECT printf('%.1f', SUM(value)/1e6) FROM sales "
-            "WHERE measure = 'Sales - Val'"
-        ).fetchone()[0]
-
-        latest_we = conn.execute(
-            "SELECT MAX(week_ending) FROM sales"
-        ).fetchone()[0]
-
-        avg_share = conn.execute(
-            "SELECT printf('%.1f', AVG(market_share_pct)) FROM market_share "
-            "WHERE channel = 'Total'"
-        ).fetchone()[0]
-
-        customer_total = conn.execute(
-            "SELECT printf('%.0f', SUM(value)/1000) FROM customers "
-            "WHERE measure = 'Customer Count'"
-        ).fetchone()[0]
-    except Exception:
-        store_count = total_sales = latest_we = avg_share = customer_total = "—"
-    finally:
-        conn.close()
-
-    k1, k2, k3, k4 = st.columns(4)
-    k1.metric("Stores", store_count)
-    k2.metric("Total Sales", f"${total_sales}M" if total_sales else "—")
-    k3.metric("Avg Market Share", f"{avg_share}%" if avg_share else "—")
-    k4.metric("Customer Visits (K)", f"{customer_total}K" if customer_total else "—")
-
-    st.caption(f"Data through {latest_we}" if latest_we else "")
-
-st.markdown("")
-
-# --- Pillar Context ---
 PILLAR_CONTEXT = {
     "Pillar 1": {
         "tagline": "We'll do things right, from end-to-end",
         "status_items": [
-            "100% renewable energy — ACHIEVED",
-            "B Corp certification — board approval Feb/Mar",
+            "100% renewable energy \u2014 ACHIEVED",
+            "B Corp certification \u2014 board approval Feb/Mar",
         ],
     },
     "Pillar 2": {
         "tagline": "We'll take the 'you get me' feeling to a whole new level",
         "status_items": [
-            "Loyalty program pilot — Apr 2026",
-            "Voice of Customer — in progress",
+            "Loyalty program pilot \u2014 Apr 2026",
+            "Voice of Customer \u2014 in progress",
         ],
     },
     "Pillar 3": {
         "tagline": "We will be famous for attracting, developing, and retaining exceptional people",
         "status_items": [
-            "Prompt Academy — 5 levels, in progress",
-            "Prosci ADKAR — change management active",
+            "Growing Legends Academy \u2014 6 levels, LIVE",
+            "Prosci ADKAR \u2014 change management active",
         ],
     },
     "Pillar 4": {
         "tagline": "We will tidy up the supply chain, from pay to purchase",
         "status_items": [
-            "OOS reduction 20% — target Jun 2026",
-            "Buying automation — in progress",
+            "OOS reduction 20% \u2014 target Jun 2026",
+            "Grant Enders engaged \u2014 supply chain transformation",
         ],
     },
     "Pillar 5": {
         "tagline": "We'll build a brilliant back-end with tools that talk, systems that serve, data we trust",
         "status_items": [
-            "AI Centre of Excellence — CRITICAL, active",
-            "Citizen Developer Program — in progress",
+            "AI Centre of Excellence \u2014 LIVE, 19 dashboards",
+            "Citizen Developer Program \u2014 in progress",
         ],
     },
 }
@@ -131,116 +115,346 @@ def _port_to_page(port):
     return None
 
 
-# --- Pillar Cards ---
-_n_hubs = len(HUBS)
-if _n_hubs <= 3:
-    all_cols = st.columns(_n_hubs)
-elif _n_hubs <= 6:
-    row1 = st.columns(3)
-    row2 = st.columns(3) if _n_hubs > 3 else []
-    all_cols = row1 + row2
-else:
-    all_cols = st.columns(_n_hubs)
-
+p_cols = st.columns(5)
 for i, hub in enumerate(HUBS):
-    if i == 3 and _n_hubs > 3:
-        row2 = st.columns(min(3, _n_hubs - 3))
-        all_cols = all_cols[:3] + row2
-    col_idx = i if i < 3 else i
-    with all_cols[col_idx]:
+    with p_cols[i]:
         color = hub["color"]
-        icon = hub["icon"]
-        name = hub["name"]
         pillar = hub.get("pillar", "")
-        pillar_title = hub.get("pillar_title", "")
-        first_port = hub["dashboards"][0][1]
         ctx = PILLAR_CONTEXT.get(pillar, {})
         tagline = ctx.get("tagline", "")
         status_items = ctx.get("status_items", [])
 
-        # Status badges HTML
         status_html = ""
         for item in status_items:
             status_html += (
-                f"<div style='font-size:0.8em;color:#6b7280;margin:2px 0;'>"
+                f"<div style='font-size:0.78em;color:#6b7280;margin:2px 0;'>"
                 f"&bull; {item}</div>"
             )
 
-        # Card header (HTML for styling, no links)
         st.markdown(
-            f"<div style='border:2px solid {color};border-radius:12px;padding:20px;"
-            f"min-height:200px;background:white;'>"
-            f"<div style='font-size:0.75em;color:{color};font-weight:600;"
-            f"text-transform:uppercase;letter-spacing:1px;'>{pillar}</div>"
-            f"<div style='font-size:1.3em;font-weight:bold;color:{HFM_DARK};"
-            f"margin:4px 0;'>{icon} {pillar_title}</div>"
-            f"<div style='font-size:0.85em;color:#6b7280;font-style:italic;"
-            f"margin-bottom:10px;'>{tagline}</div>"
-            f"<hr style='margin:10px 0;border-color:#e5e7eb;'>"
-            f"<div style='margin-top:10px;'>{status_html}</div>"
+            f"<div style='border-left:3px solid {color};background:white;"
+            f"border-radius:0 8px 8px 0;padding:14px;min-height:160px;"
+            f"box-shadow:0 1px 3px rgba(0,0,0,0.06);'>"
+            f"<div style='font-size:0.7em;color:{color};font-weight:700;"
+            f"text-transform:uppercase;letter-spacing:0.5px;'>{pillar}</div>"
+            f"<div style='font-size:0.9em;font-weight:700;color:{HFM_DARK};"
+            f"margin:3px 0;'>{hub['icon']} {hub['name']}</div>"
+            f"<div style='font-size:0.75em;color:#9ca3af;font-style:italic;"
+            f"margin-bottom:8px;'>{tagline}</div>"
+            f"{status_html}"
             f"</div>",
             unsafe_allow_html=True,
         )
 
-        # Dashboard links — using st.page_link (session-safe, no reload)
-        for label, port, d_icon, desc in hub["dashboards"]:
-            page = _port_to_page(port)
-            if page:
-                st.page_link(page, label=f"{d_icon} {label}", use_container_width=True)
+        first_port = hub["dashboards"][0][1]
+        page = _port_to_page(first_port)
+        if page:
+            st.page_link(
+                page, label=f"View {hub['name']} \u2192", use_container_width=True
+            )
 
 st.markdown("")
 
-# --- AI Philosophy Banner ---
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 3 — The 5 Goals (Live Progress) — single DB call
+# ═══════════════════════════════════════════════════════════════════════════
+
 st.markdown(
-    "<div style='background:#f0fdf4;border-left:4px solid #4ba021;"
-    "padding:16px 20px;border-radius:0 8px 8px 0;margin:10px 0;'>"
-    "<div style='font-weight:600;color:#171819;font-size:1.05em;'>"
-    "AI as a Job Partner</div>"
-    "<div style='color:#6b7280;font-size:0.9em;margin-top:4px;'>"
-    "The Hub is about <strong>enablement, not replacement</strong>. "
-    "AI takes care of the repetitive stuff so you can focus on what matters — "
-    "serving customers, building relationships, and doing your best work.</div>"
-    "</div>",
+    f"<h2 style='color:{HFM_DARK};margin-bottom:4px;'>The 5 Goals</h2>"
+    "<p style='color:#6b7280;margin-top:0;'>Why The Hub exists &mdash; "
+    "live progress across every goal.</p>",
     unsafe_allow_html=True,
 )
-st.page_link(_pages.get("learning-centre", "/"), label="Start with the Learning Centre", use_container_width=False)
 
-# --- Harris Farm Story ---
+all_metrics = fetch_all_goal_metrics()
+
+goal_cols = st.columns(5)
+for i, (gid, goal) in enumerate(HUB_GOALS.items()):
+    with goal_cols[i]:
+        metrics = all_metrics.get(gid, {"metrics": {}, "progress": 0})
+        progress = metrics.get("progress", 0)
+        metric_items = metrics.get("metrics", {})
+
+        # Word-boundary truncation for description
+        desc = goal["description"]
+        if len(desc) > 90:
+            desc = desc[:90].rsplit(" ", 1)[0] + "..."
+        else:
+            desc = desc
+
+        # Metric lines
+        metric_html = ""
+        for label, val in metric_items.items():
+            metric_html += (
+                f"<div style='display:flex;justify-content:space-between;"
+                f"font-size:0.8em;color:#374151;margin:3px 0;'>"
+                f"<span>{label}</span>"
+                f"<span style='font-weight:600;'>{val:,}</span></div>"
+            )
+
+        bar_color = goal["color"]
+
+        st.markdown(
+            f"<div style='border-left:4px solid {goal['color']};background:white;"
+            f"border-radius:0 10px 10px 0;padding:16px;min-height:240px;"
+            f"box-shadow:0 1px 4px rgba(0,0,0,0.08);'>"
+            f"<div style='font-size:1.4em;'>{goal['icon']}</div>"
+            f"<div style='font-size:0.95em;font-weight:700;color:{HFM_DARK};"
+            f"margin:4px 0 2px;'>{goal['title']}</div>"
+            f"<div style='font-size:0.78em;color:#6b7280;margin-bottom:8px;'>"
+            f"{desc}</div>"
+            f"<div style='font-size:0.75em;color:{goal['color']};font-style:italic;"
+            f"margin-bottom:10px;'>{goal['key_question']}</div>"
+            f"<div style='margin:8px 0;'>{metric_html}</div>"
+            f"<div style='background:#e5e7eb;border-radius:6px;height:6px;margin-top:10px;'>"
+            f"<div style='background:{bar_color};height:6px;border-radius:6px;"
+            f"width:{progress}%;'></div></div>"
+            f"<div style='font-size:0.7em;color:#9ca3af;text-align:right;margin-top:2px;'>"
+            f"{progress}%</div>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+
+st.markdown("")
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 4 — Quick Launch
+# ═══════════════════════════════════════════════════════════════════════════
+
+st.markdown(
+    f"<h2 style='color:{HFM_DARK};margin-bottom:4px;'>Quick Launch</h2>"
+    "<p style='color:#6b7280;margin-top:0;'>Jump straight into what matters.</p>",
+    unsafe_allow_html=True,
+)
+
+_QUICK_LAUNCH = [
+    {"label": "When In Doubt, Ask AI", "icon": "\U0001f4a1", "slug": "learning-centre",
+     "desc": "The one habit that changes everything \u2014 start here", "goal": "G3"},
+    {"label": "Ask Our Data", "icon": "\U0001f50d", "slug": "prompt-builder",
+     "desc": "Build analytical prompts and query 383M transactions", "goal": "G2"},
+    {"label": "Learn AI", "icon": "\U0001f31f", "slug": "academy",
+     "desc": "Growing Legends Academy \u2014 6 levels from Seed to Legend", "goal": "G3"},
+    {"label": "Supply Chain", "icon": "\U0001f69a", "slug": "buying-hub",
+     "desc": "Category buying, demand forecasting, weather analysis", "goal": "G4"},
+    {"label": "Mission Control", "icon": "\U0001f3af", "slug": "mission-control",
+     "desc": "Documentation, data catalog, AI showcase, and system governance", "goal": "G1"},
+    {"label": "Hub Assistant", "icon": "\U0001f4ac", "slug": "hub-assistant",
+     "desc": "Ask about policies, procedures, and golden rules", "goal": "G2"},
+]
+
+ql_row1 = st.columns(3)
+ql_row2 = st.columns(3)
+ql_cols = ql_row1 + ql_row2
+
+for idx, ql in enumerate(_QUICK_LAUNCH):
+    with ql_cols[idx]:
+        badge = goal_badge_html(ql["goal"])
+        st.markdown(
+            f"<div style='background:white;border-radius:10px;padding:16px;"
+            f"box-shadow:0 1px 4px rgba(0,0,0,0.08);min-height:110px;'>"
+            f"<div style='font-size:1.5em;'>{ql['icon']}</div>"
+            f"<div style='font-weight:700;color:{HFM_DARK};margin:4px 0 2px;'>"
+            f"{ql['label']}</div>"
+            f"<div style='font-size:0.8em;color:#6b7280;margin-bottom:6px;'>"
+            f"{ql['desc']}</div>"
+            f"{badge}"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+        page = _pages.get(ql["slug"])
+        if page:
+            st.page_link(page, label=f"Open {ql['label']} \u2192", use_container_width=True)
+
+st.markdown("")
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 5 — What's Happening Now (Activity Feed)
+# ═══════════════════════════════════════════════════════════════════════════
+
+st.markdown(
+    f"<h2 style='color:{HFM_DARK};margin-bottom:4px;'>What's Happening Now</h2>"
+    "<p style='color:#6b7280;margin-top:0;'>Recent reports, proposals, "
+    "and improvements across The Hub.</p>",
+    unsafe_allow_html=True,
+)
+
+activity = fetch_recent_activity(limit=10)
+
+if activity:
+    def _detail_color(detail: str, item_type: str) -> str:
+        """Pick a display color based on the detail text and item type."""
+        d = (detail or "").strip().upper()
+        # Exact status matches (agent proposals)
+        if d in ("COMPLETED", "APPROVED"):
+            return "#22c55e"
+        if d in ("PENDING",):
+            return "#f59e0b"
+        if d in ("FAILED", "REJECTED"):
+            return "#ef4444"
+        # Keyword-based for reports, improvements, watchdog
+        if "GRADE:" in d:
+            return "#3b82f6"  # blue for graded reports
+        if "RISK: HIGH" in d or "RISK: CRITICAL" in d:
+            return "#ef4444"
+        if "RISK:" in d:
+            return "#f59e0b"
+        if item_type == "improvement":
+            return "#a855f7"  # purple for improvement findings
+        return "#6b7280"
+
+    feed_html = "<div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;'>"
+    for item in activity:
+        goal_badges = " ".join(goal_badge_html(g) for g in item.get("goal_ids", []))
+        detail = item.get("detail") or ""
+        detail_color = _detail_color(detail, item.get("type", ""))
+        ts = item.get("timestamp", "")[:16]
+
+        feed_html += (
+            f"<div style='background:white;border-radius:8px;padding:12px 14px;"
+            f"box-shadow:0 1px 3px rgba(0,0,0,0.06);'>"
+            f"<div style='display:flex;align-items:center;gap:8px;'>"
+            f"<span style='font-size:1.2em;'>{item['icon']}</span>"
+            f"<span style='font-size:0.85em;font-weight:600;color:{HFM_DARK};"
+            f"flex:1;'>{item['title'][:60]}</span>"
+            f"</div>"
+            f"<div style='display:flex;justify-content:space-between;align-items:center;"
+            f"margin-top:6px;'>"
+            f"<span style='font-size:0.75em;color:{detail_color};font-weight:500;'>"
+            f"{detail}</span>"
+            f"<span style='font-size:0.7em;color:#9ca3af;'>{ts}</span>"
+            f"</div>"
+            f"<div style='margin-top:4px;'>{goal_badges}</div>"
+            f"</div>"
+        )
+    feed_html += "</div>"
+    st.markdown(feed_html, unsafe_allow_html=True)
+else:
+    st.info("No recent activity yet. Start by running an analysis or submitting a prompt.")
+
+st.markdown("")
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 6 — WATCHDOG Trust & Safety
+# ═══════════════════════════════════════════════════════════════════════════
+
+st.markdown(
+    f"<h2 style='color:{HFM_DARK};margin-bottom:4px;'>"
+    "\U0001f6e1\ufe0f WATCHDOG Trust & Safety</h2>"
+    "<p style='color:#6b7280;margin-top:0;'>The Hub governs itself. "
+    "Every action logged, every output scored.</p>",
+    unsafe_allow_html=True,
+)
+
+wd_col1, wd_col2 = st.columns([2, 1])
+
+with wd_col1:
+    _LAWS = [
+        ("Honest code", "behaviour matches names"),
+        ("Full audit trail", "no gaps"),
+        ("Test before ship", "min 1 success + 1 failure per function"),
+        ("Zero secrets in code", ".env only"),
+        ("Operator authority", "Gus Harris only"),
+        ("Data correctness", "every output traceable to source"),
+        ("Document everything", "no undocumented features"),
+    ]
+    laws_html = ""
+    for i, (law, detail) in enumerate(_LAWS, 1):
+        laws_html += (
+            f"<div style='margin:4px 0;font-size:0.85em;'>"
+            f"<span style='color:{HFM_GREEN};font-weight:700;'>{i}.</span> "
+            f"<strong>{law}</strong> "
+            f"<span style='color:#9ca3af;'>&mdash; {detail}</span></div>"
+        )
+    st.markdown(
+        f"<div style='background:#f0fdf4;border:1px solid #bbf7d0;"
+        f"border-radius:10px;padding:16px;'>"
+        f"<div style='font-weight:600;color:{HFM_GREEN};margin-bottom:8px;'>"
+        f"The 7 Laws of WATCHDOG Governance</div>"
+        f"{laws_html}"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
+
+with wd_col2:
+    try:
+        import plotly.graph_objects as go
+
+        labels = ["Honest", "Reliable", "Safe", "Clean", "Data", "Usable", "Documented"]
+        values = fetch_watchdog_scores()
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatterpolar(
+            r=values + [values[0]],
+            theta=labels + [labels[0]],
+            fill="toself",
+            fillcolor="rgba(75, 160, 33, 0.15)",
+            line=dict(color=HFM_GREEN, width=2),
+            name="Avg Score",
+        ))
+        fig.update_layout(
+            polar=dict(
+                radialaxis=dict(visible=True, range=[0, 10], tickfont=dict(size=9)),
+                angularaxis=dict(tickfont=dict(size=10)),
+            ),
+            showlegend=False,
+            margin=dict(l=30, r=30, t=20, b=20),
+            height=240,
+        )
+        st.plotly_chart(fig, use_container_width=True)
+    except ImportError:
+        st.caption("Install plotly for the WATCHDOG radar chart.")
+
+    portal = _pages.get("mission-control")
+    if portal:
+        st.page_link(portal, label="Full WATCHDOG Dashboard \u2192", use_container_width=True)
+
+# Scheduler status
+try:
+    _wd_conn = __import__("sqlite3").connect(
+        str(Path(__file__).resolve().parent.parent / "backend" / "hub_data.db")
+    )
+    _wd_row = _wd_conn.execute(
+        "SELECT run_at, findings_new, health_api, health_hub "
+        "FROM watchdog_runs ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    _wd_conn.close()
+    if _wd_row:
+        from datetime import datetime as _dt
+        _ago = _dt.now() - _dt.fromisoformat(_wd_row[0])
+        _mins = int(_ago.total_seconds() / 60)
+        _ago_str = f"{_mins}m ago" if _mins < 120 else f"{_mins // 60}h ago"
+        _health = f"api:{_wd_row[2]} hub:{_wd_row[3]}"
+        st.caption(
+            f"Automated WATCHDOG: last check {_ago_str} | "
+            f"{_health} | {_wd_row[1]} new findings"
+        )
+    else:
+        st.caption("Automated WATCHDOG: starting soon...")
+except Exception:
+    pass
+
+st.markdown("")
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 7 — System Health (compact, developer-facing)
+# ═══════════════════════════════════════════════════════════════════════════
+
+with st.expander("System Health"):
+    h1, h2, h3, h4 = st.columns(4)
+    h1.metric("Dashboards", "19")
+    h2.metric("API Endpoints", "112")
+    h3.metric("Tests", "1,003")
+    h4.metric("Transaction Rows", "383.6M")
+
+# --- About (compact) ---
 with st.expander("About Harris Farm Markets"):
-    st.markdown("""
-**Founded in 1971** by David and Cathy Harris, Harris Farm Markets has been 100% family-owned
-for over fifty years. What started as a single store in Villawood has grown into 30+ stores across
-NSW, Queensland, and the ACT, united by a simple belief: **good food does good things for people.**
+    st.markdown(
+        "**Founded in 1971** by David and Cathy Harris. 100% family-owned for over "
+        "fifty years. 30+ stores across NSW, Queensland, and the ACT.\n\n"
+        "**Our Purpose:** Living the Greater Goodness \u2014 good food does good things for people.\n\n"
+        "**Our Strategy:** *Fewer, Bigger, Better* \u2014 Vision 2030: Australia's most loved "
+        "fresh food retailer, inside and out.\n\n"
+        "*Co-CEOs: Angus Harris & Luke Harris*"
+    )
 
-**Our Purpose:** Living the Greater Goodness — we believe in nature itself. Our pricing, produce,
-and partnerships are guided by seasonal abundance and a commitment to Australian farmers,
-sustainable sourcing, and community connection.
-
-**Our Strategy:** *Fewer, Bigger, Better* — we're streamlining operations, scaling what works,
-and elevating quality as we grow toward our Vision 2030: **Australia's most loved fresh food
-retailer, inside and out.**
-
-**The Hub** is our AI Centre of Excellence — Pillar 5 of our strategy brought to life.
-It empowers every Harris Farmer with data-driven insights, from store managers checking
-weekend sales to buyers optimising orders with weather forecasts.
-
-*Co-CEOs: Angus Harris & Luke Harris*
-    """)
-
-# --- Feature Status Note ---
-st.markdown(
-    "<div style='background:#fffbeb;border-left:4px solid #d97706;"
-    "padding:12px 16px;border-radius:0 8px 8px 0;margin:10px 0;'>"
-    "<div style='font-size:0.85em;color:#92400e;'>"
-    "<strong>Note:</strong> The Hub is actively evolving. "
-    "Dashboards marked <strong>LIVE</strong> are fully functional. "
-    "Features marked <strong>Future Development</strong> are planned "
-    "and being built through our autonomous development pipeline.</div>"
-    "</div>",
-    unsafe_allow_html=True,
-)
-st.page_link(_pages.get("hub-portal", "/"), label="View full feature status in Hub Portal", use_container_width=False)
-
-st.markdown("")
-
-render_footer("Harris Farm Hub", "AI Centre of Excellence")
+render_footer("Harris Farm Hub", "Mission Control \u2014 AI Centre of Excellence", user)

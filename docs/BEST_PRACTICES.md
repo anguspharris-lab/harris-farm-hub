@@ -22,7 +22,7 @@
 
 ### 1.1 FastAPI Backend + Streamlit Frontends
 
-The Hub uses a single FastAPI backend (`backend/app.py`, ~4600 lines, 93+ endpoints) serving 16 Streamlit dashboards. This is deliberate — not a monolith problem.
+The Hub uses a single FastAPI backend (`backend/app.py`, ~4600 lines, 112 endpoints) serving 19 Streamlit dashboards. This is deliberate — not a monolith problem.
 
 **Why one backend file works (for now):**
 - Single source of truth for database init, config, and all endpoints
@@ -45,7 +45,7 @@ data = resp.json()
 
 ### 1.2 Hub Navigation Pattern
 
-All 16 dashboards share navigation via `dashboards/nav.py`:
+All 23 pages share navigation via `dashboards/nav.py`:
 
 ```python
 HUBS = {
@@ -446,7 +446,7 @@ python3 scripts/watchdog.py --report   # Full scan of all dashboards
 python3 scripts/watchdog.py --check dashboards/sales_dashboard.py  # Single file
 ```
 
-Detects: nested expanders (including cross-function), component inventory, API call patterns. 16 dashboards scanned, 134 components inventoried.
+Detects: nested expanders (including cross-function), component inventory, API call patterns. 23 pages scanned, 134 components inventoried.
 
 ---
 
@@ -531,7 +531,7 @@ This creates a PENDING proposal for SelfImprovementEngine, which goes through th
 
 | File | Purpose |
 |------|---------|
-| `backend/app.py` | Primary backend (~4600 lines, 93+ endpoints) |
+| `backend/app.py` | Primary backend (~4600 lines, 112 endpoints) |
 | `backend/agent_executor.py` | Executes approved proposals |
 | `backend/agent_router.py` | NL query → analysis type routing |
 | `backend/data_analysis.py` | 11 analysis types against 383M transactions |
@@ -540,7 +540,7 @@ This creates a PENDING proposal for SelfImprovementEngine, which goes through th
 | `backend/transaction_queries.py` | 41 pre-built SQL queries |
 | `backend/product_hierarchy.py` | 72,911 product browser |
 | `backend/fiscal_calendar.py` | 5-4-4 retail calendar utilities |
-| `dashboards/nav.py` | Hub navigation (5 hubs, 16 dashboards) |
+| `dashboards/nav.py` | Hub navigation (5 pillars, 23 pages) |
 | `dashboards/shared/` | Shared components (data access, fiscal selector, styles) |
 | `CLAUDE.md` | 7 Laws governing all development |
 | `watchdog/procedures/` | 4 core operational procedures |

@@ -8,8 +8,8 @@
 
 | Service | Port | Process | What it does |
 |---------|------|---------|-------------|
-| Hub (Streamlit) | 8500 (local) / $PORT (Render) | `streamlit run dashboards/app.py` | All 17 dashboards, single process |
-| API (FastAPI) | 8000 | `uvicorn backend.app:app` | 80+ endpoints, auth, NL queries, LLM |
+| Hub (Streamlit) | 8500 (local) / $PORT (Render) | `streamlit run dashboards/app.py` | All 23 pages, single process |
+| API (FastAPI) | 8000 | `uvicorn backend.app:app` | 112 endpoints, auth, NL queries, LLM |
 
 ---
 

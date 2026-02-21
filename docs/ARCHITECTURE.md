@@ -1,6 +1,6 @@
 # Harris Farm Hub — Architecture
 
-*Last Updated: 2026-02-20 (v3.0 — Single App)*
+*Last Updated: 2026-02-22 (v3.1 — IA Restructure)*
 
 ---
 
@@ -23,7 +23,7 @@
          │                                     │
          │  ┌─────────────────────────────┐    │
          │  │ st.navigation() router      │    │
-         │  │ 17 pages across 5 pillars   │    │
+         │  │ 23 pages across 5 pillars   │    │
          │  └─────────────────────────────┘    │
          │                                     │
          │  Shared: styles, fiscal selector,   │
@@ -33,7 +33,7 @@
                         v
          ┌─────────────────────────────────────┐
          │     FastAPI Backend                 │
-         │     backend/app.py (80+ endpoints)  │
+         │     backend/app.py (112 endpoints)   │
          │                                     │
          │  Auth    NL Query   Multi-LLM       │
          │  Agent Executor   Self-Improvement  │
@@ -85,6 +85,10 @@
 | Page | File | Data Source |
 |------|------|------------|
 | Learning Centre | `learning_centre.py` | 12 modules, API |
+| The Paddock | `the_paddock.py` | Practice AI conversations |
+| Academy | `growing_legends_academy.py` | Capability journey (hub_data.db) |
+| Prompt Builder | `prompt_builder.py` | API (templates) |
+| The Rubric | `rubric_dashboard.py` | API (multi-LLM) |
 | Hub Assistant | `chatbot_dashboard.py` | Knowledge base (API) |
 
 ### Today's Business, Done Better
@@ -92,19 +96,22 @@
 |------|------|------------|
 | Sales | `sales_dashboard.py` | harris_farm.db |
 | Profitability | `profitability_dashboard.py` | harris_farm.db |
-| Transport | `transport_dashboard.py` | harris_farm.db |
+| Revenue Bridge | `revenue_bridge_dashboard.py` | Transactions (DuckDB) |
 | Store Ops | `store_ops_dashboard.py` | Transactions (DuckDB) |
 | Buying Hub | `buying_hub_dashboard.py` | Transactions (DuckDB) |
 | Product Intel | `product_intel_dashboard.py` | Transactions (DuckDB) |
+| PLU Intelligence | `plu_intel_dashboard.py` | harris_farm_plu.db |
+| Transport | `transport_dashboard.py` | harris_farm.db |
 
 ### Tomorrow's Business, Built Better
 | Page | File | Data Source |
 |------|------|------------|
-| Prompt Builder | `prompt_builder.py` | API (templates) |
-| The Rubric | `rubric_dashboard.py` | API (multi-LLM) |
+| Analytics Engine | `analytics_engine.py` | Data Intelligence (hub_data.db + harris_farm.db) |
+| Agent Hub | `agent_hub.py` | Scoreboard, Arena, Agent Network (hub_data.db) |
+| Agent Operations | `agent_operations.py` | WATCHDOG safety & agent control (hub_data.db) |
+| AI Adoption | `ai_adoption/dashboard.py` | Platform usage metrics (hub_data.db) |
 | Trending | `trending_dashboard.py` | API (analytics) |
-| Revenue Bridge | `revenue_bridge_dashboard.py` | Transactions (DuckDB) |
-| Hub Portal | `hub_portal.py` | Docs, agents, scoreboard |
+| Mission Control | `hub_portal.py` | Docs, data catalog, showcase, self-improvement |
 
 ---
 

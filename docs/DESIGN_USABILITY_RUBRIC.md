@@ -195,7 +195,7 @@
 ### Priority Fixes
 
 1. **Error Communication (4/10):** Add try/except around all API calls and data operations. Show `st.error()` with what happened + what to do. Add a connection status indicator.
-2. **Navigation (5/10):** Add a shared sidebar or header nav linking all 4 dashboards + API status page. Every dashboard should link to every other.
+2. **Navigation (5/10):** Add a shared sidebar or header nav linking all 23 pages + API status page. Every page should link to every other.
 3. **Consistency (6/10):** Standardise colour palette across all dashboards. Create a shared `hub_theme.py` with constants.
 4. **Accessibility (5/10):** Add text summaries below every chart. Ensure all interactive elements have labels.
 

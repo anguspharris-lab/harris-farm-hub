@@ -20,7 +20,7 @@
 ### Architecture & Design
 | Document | Purpose |
 |----------|---------|
-| [Architecture Overview](ARCHITECTURE.md) | System diagram, 16 dashboards, 71+ endpoints, data stack |
+| [Architecture Overview](ARCHITECTURE.md) | System diagram, 23 pages, 112 endpoints, data stack |
 | [Architecture Decisions](DECISIONS.md) | 8 ADRs: why Streamlit, SQLite, monolithic backend, etc. |
 | [Design & Usability Rubric](DESIGN_USABILITY_RUBRIC.md) | 8-criterion UX scoring framework |
 
@@ -53,27 +53,12 @@
 
 ## Quick Reference
 
-### Ports
+### Services
 
-| Port | Service |
-|------|---------|
-| 8000 | FastAPI Backend (71+ endpoints) |
-| 8500 | Landing Page |
-| 8501 | Sales Dashboard |
-| 8502 | Profitability Dashboard |
-| 8503 | Transport Dashboard |
-| 8504 | Prompt Builder |
-| 8505 | The Rubric |
-| 8506 | Trending |
-| 8507 | Customer Dashboard |
-| 8508 | Market Share |
-| 8509 | Hub Assistant |
-| 8510 | Learning Centre |
-| 8511 | Store Ops |
-| 8512 | Product Intel |
-| 8513 | Revenue Bridge |
-| 8514 | Buying Hub |
-| 8515 | Hub Portal (Documentation + Intelligence + Agents) |
+| Service | Port | Notes |
+|---------|------|-------|
+| FastAPI Backend | 8000 | 112 endpoints, auth, NL queries, LLM |
+| Streamlit App | 8500 | All 23 pages via `st.navigation()`, single process |
 
 ### Commands
 
@@ -84,7 +69,7 @@ bash start.sh
 # Run tests (1,003 tests)
 python3 -m pytest tests/ -v
 
-# Health check (all 16 services)
+# Health check
 bash watchdog/health.sh
 
 # Security scan
@@ -121,6 +106,4 @@ curl -X POST http://localhost:8000/api/agent-tasks \
 | Document | Purpose |
 |----------|---------|
 | [README.md](../README.md) | Project overview and quick start |
-| [EXECUTIVE_SUMMARY.md](../EXECUTIVE_SUMMARY.md) | Leadership briefing |
-| [DEPLOYMENT_GUIDE.md](../DEPLOYMENT_GUIDE.md) | Full deployment instructions |
 | [QUICKSTART.md](../QUICKSTART.md) | One-page onboarding |

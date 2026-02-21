@@ -1,6 +1,6 @@
 """
 Harris Farm Hub — Single Multi-Page Streamlit App
-Entry point for all 17 dashboards, consolidated via st.navigation().
+Entry point for all 22 dashboards, consolidated via st.navigation().
 One process, native sidebar nav, shared session state.
 """
 
@@ -60,8 +60,13 @@ _pages = {
     "the-rubric": st.Page(str(_DIR / "rubric_dashboard.py"), title="The Rubric", icon="\u2696\ufe0f", url_path="the-rubric"),
     "trending": st.Page(str(_DIR / "trending_dashboard.py"), title="Trending", icon="\U0001f4c8", url_path="trending"),
     "revenue-bridge": st.Page(str(_DIR / "revenue_bridge_dashboard.py"), title="Revenue Bridge", icon="\U0001f4c9", url_path="revenue-bridge"),
-    "hub-portal": st.Page(str(_DIR / "hub_portal.py"), title="Hub Portal", icon="\U0001f310", url_path="hub-portal"),
+    "mission-control": st.Page(str(_DIR / "hub_portal.py"), title="Mission Control", icon="\U0001f3af", url_path="mission-control"),
+    "agent-hub": st.Page(str(_DIR / "agent_hub.py"), title="Agent Hub", icon="\U0001f916", url_path="agent-hub"),
+    "analytics-engine": st.Page(str(_DIR / "analytics_engine.py"), title="Analytics Engine", icon="\U0001f52c", url_path="analytics-engine"),
+    "agent-ops": st.Page(str(_DIR / "agent_operations.py"), title="Agent Operations", icon="\U0001f6e1\ufe0f", url_path="agent-ops"),
     "ai-adoption": st.Page(str(_DIR / "ai_adoption" / "dashboard.py"), title="AI Adoption", icon="\U0001f4ca", url_path="ai-adoption"),
+    "academy": st.Page(str(_DIR / "growing_legends_academy.py"), title="Academy", icon="\U0001f31f", url_path="academy"),
+    "the-paddock": st.Page(str(_DIR / "the_paddock.py"), title="The Paddock", icon="\U0001f331", url_path="the-paddock"),
 }
 
 # Pillar groupings for navigation
@@ -71,11 +76,11 @@ _PILLARS = [
     {"name": "Customer", "icon": "\U0001f465", "color": "#7c3aed",
      "slugs": ["customers", "market-share"]},
     {"name": "People", "icon": "\U0001f393", "color": "#059669",
-     "slugs": ["learning-centre", "hub-assistant", "ai-adoption"]},
+     "slugs": ["learning-centre", "the-paddock", "academy", "prompt-builder", "the-rubric", "hub-assistant"]},
     {"name": "Operations", "icon": "\U0001f4ca", "color": "#d97706",
-     "slugs": ["sales", "profitability", "transport", "store-ops", "buying-hub", "product-intel", "plu-intel"]},
+     "slugs": ["sales", "profitability", "revenue-bridge", "store-ops", "buying-hub", "product-intel", "plu-intel", "transport"]},
     {"name": "Digital & AI", "icon": "\U0001f680", "color": "#4ba021",
-     "slugs": ["prompt-builder", "the-rubric", "trending", "revenue-bridge", "hub-portal"]},
+     "slugs": ["analytics-engine", "agent-hub", "agent-ops", "ai-adoption", "trending", "mission-control"]},
 ]
 
 # Store page objects in session_state so landing.py can use st.page_link()
@@ -87,9 +92,9 @@ nav = st.navigation(
         "": [_home],
         "For The Greater Goodness": [_pages["greater-goodness"]],
         "Smashing It for the Customer": [_pages["customers"], _pages["market-share"]],
-        "Growing Legendary Leadership": [_pages["learning-centre"], _pages["hub-assistant"], _pages["ai-adoption"]],
-        "Today's Business, Done Better": [_pages["sales"], _pages["profitability"], _pages["transport"], _pages["store-ops"], _pages["buying-hub"], _pages["product-intel"], _pages["plu-intel"]],
-        "Tomorrow's Business, Built Better": [_pages["prompt-builder"], _pages["the-rubric"], _pages["trending"], _pages["revenue-bridge"], _pages["hub-portal"]],
+        "Growing Legendary Leadership": [_pages["learning-centre"], _pages["the-paddock"], _pages["academy"], _pages["prompt-builder"], _pages["the-rubric"], _pages["hub-assistant"]],
+        "Today's Business, Done Better": [_pages["sales"], _pages["profitability"], _pages["revenue-bridge"], _pages["store-ops"], _pages["buying-hub"], _pages["product-intel"], _pages["plu-intel"], _pages["transport"]],
+        "Tomorrow's Business, Built Better": [_pages["analytics-engine"], _pages["agent-hub"], _pages["agent-ops"], _pages["ai-adoption"], _pages["trending"], _pages["mission-control"]],
     }
 )
 
