@@ -68,6 +68,7 @@ _pages = {
     "ai-adoption": st.Page(str(_DIR / "ai_adoption" / "dashboard.py"), title="AI Adoption", icon="\U0001f4ca", url_path="ai-adoption"),
     "academy": st.Page(str(_DIR / "growing_legends_academy.py"), title="Academy", icon="\U0001f31f", url_path="academy"),
     "the-paddock": st.Page(str(_DIR / "the_paddock.py"), title="The Paddock", icon="\U0001f331", url_path="the-paddock"),
+    "workflow-engine": st.Page(str(_DIR / "workflow_engine.py"), title="Workflow Engine", icon="\u2699\ufe0f", url_path="workflow-engine"),
 }
 
 # Pillar groupings for navigation
@@ -81,7 +82,7 @@ _PILLARS = [
     {"name": "Operations", "icon": "\U0001f4ca", "color": "#d97706",
      "slugs": ["sales", "profitability", "revenue-bridge", "store-ops", "buying-hub", "product-intel", "plu-intel", "transport"]},
     {"name": "Digital & AI", "icon": "\U0001f680", "color": "#4ba021",
-     "slugs": ["analytics-engine", "agent-hub", "agent-ops", "ai-adoption", "trending", "mission-control"]},
+     "slugs": ["workflow-engine", "analytics-engine", "agent-hub", "agent-ops", "ai-adoption", "trending", "mission-control"]},
 ]
 
 # Store page objects in session_state so landing.py can use st.page_link()
@@ -95,7 +96,7 @@ nav = st.navigation(
         "Smashing It for the Customer": [_pages["customers"], _pages["market-share"]],
         "Growing Legendary Leadership": [_pages["learning-centre"], _pages["the-paddock"], _pages["academy"], _pages["prompt-builder"], _pages["approvals"], _pages["the-rubric"], _pages["hub-assistant"]],
         "Today's Business, Done Better": [_pages["sales"], _pages["profitability"], _pages["revenue-bridge"], _pages["store-ops"], _pages["buying-hub"], _pages["product-intel"], _pages["plu-intel"], _pages["transport"]],
-        "Tomorrow's Business, Built Better": [_pages["analytics-engine"], _pages["agent-hub"], _pages["agent-ops"], _pages["ai-adoption"], _pages["trending"], _pages["mission-control"]],
+        "Tomorrow's Business, Built Better": [_pages["workflow-engine"], _pages["analytics-engine"], _pages["agent-hub"], _pages["agent-ops"], _pages["ai-adoption"], _pages["trending"], _pages["mission-control"]],
     }
 )
 

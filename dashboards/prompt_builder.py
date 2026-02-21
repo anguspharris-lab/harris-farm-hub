@@ -661,14 +661,54 @@ with tabs[1]:
 with tabs[2]:
     st.subheader("Submit for Approval")
 
+    # 4P Workflow Progress Indicator
+    _4P_STAGES = [
+        ("\u270d\ufe0f", "Prompt", "#579BFC"),
+        ("\U0001f4ca", "Prove", "#00C875"),
+        ("\U0001f4e4", "Propose", "#FDAB3D"),
+        ("\U0001f680", "Progress", "#E040FB"),
+    ]
     output = st.session_state.get("pta_output", "")
     submission_id = st.session_state.get("pta_submission_id")
     scores = st.session_state.get("pta_scores")
 
+    # Determine current stage
     if not output:
-        st.info("Generate and score an output first.")
+        _current_stage = 0  # Still in Prompt
     elif not scores:
-        st.warning("Score your output before submitting. Go to **AI Output & Scorecard** tab.")
+        _current_stage = 1  # In Prove (has output, needs scoring)
+    else:
+        _current_stage = 2  # Ready to Propose
+
+    # Render 4P progress bar
+    _stage_html = "<div style='display:flex;gap:4px;margin-bottom:16px;'>"
+    for i, (icon, name, colour) in enumerate(_4P_STAGES):
+        if i < _current_stage:
+            bg = colour
+            text_col = "white"
+            opacity = "1"
+        elif i == _current_stage:
+            bg = f"{colour}30"
+            text_col = colour
+            opacity = "1"
+        else:
+            bg = "#f3f4f6"
+            text_col = "#9ca3af"
+            opacity = "0.6"
+        _stage_html += (
+            f"<div style='flex:1;text-align:center;padding:10px 6px;background:{bg};"
+            f"border-radius:8px;opacity:{opacity};'>"
+            f"<div style='font-size:1.2em;'>{icon}</div>"
+            f"<div style='font-size:0.8em;font-weight:600;color:{text_col};'>{name}</div>"
+            f"</div>"
+        )
+    _stage_html += "</div>"
+    st.markdown(_stage_html, unsafe_allow_html=True)
+
+    if not output:
+        st.info("Generate and score an output first. You are in the **Prompt** stage.")
+    elif not scores:
+        st.warning("Score your output before submitting. Go to **AI Output & Scorecard** tab. You are in the **Prove** stage.")
     else:
         # Show summary
         avg = scores.get("average", 0)
@@ -687,11 +727,27 @@ with tabs[2]:
             f"This will be sent to **{routing.get('approver_role', 'your manager')}** for review."
         )
 
+        # Link to project (optional)
+        st.markdown("---")
+        st.markdown("**Link to a Project** (optional)")
+        try:
+            _proj_resp = requests.get(f"{API_URL}/api/workflow/projects", params={"status": "active"}, timeout=5)
+            _projects = _proj_resp.json().get("projects", []) if _proj_resp.status_code == 200 else []
+        except Exception:
+            _projects = []
+        _proj_options = ["None"] + [f"{p['name']} ({p['priority']})" for p in _projects]
+        _proj_ids = [None] + [p["id"] for p in _projects]
+        _selected_proj_idx = st.selectbox(
+            "Project", range(len(_proj_options)),
+            format_func=lambda i: _proj_options[i],
+            key="pta_project_select",
+        )
+
         st.markdown("---")
 
         # Mandatory human annotation
         st.markdown(
-            "**Add your human judgment** — at least one annotation is required. "
+            "**Add your human judgment** \u2014 at least one annotation is required. "
             "Your insight is what makes this valuable."
         )
         annotation = st.text_area(
@@ -717,6 +773,33 @@ with tabs[2]:
                         timeout=10,
                     )
                     if resp.status_code == 200:
+                        # Link to project if selected
+                        _pid = _proj_ids[_selected_proj_idx] if _selected_proj_idx and _selected_proj_idx < len(_proj_ids) else None
+                        if _pid:
+                            try:
+                                requests.post(
+                                    f"{API_URL}/api/workflow/link",
+                                    params={"submission_id": submission_id, "project_id": _pid},
+                                    timeout=5,
+                                )
+                            except Exception:
+                                pass
+
+                        # Advance workflow to proposing
+                        try:
+                            requests.post(
+                                f"{API_URL}/api/workflow/transition",
+                                json={
+                                    "submission_id": submission_id,
+                                    "to_stage": "proposing",
+                                    "triggered_by": user,
+                                    "reason": "Submitted for approval",
+                                },
+                                timeout=5,
+                            )
+                        except Exception:
+                            pass
+
                         st.success("Submitted for approval! Your manager will review it.")
                         st.balloons()
                     else:

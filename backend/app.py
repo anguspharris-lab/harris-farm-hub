@@ -678,6 +678,68 @@ def init_hub_database():
                   created_at TEXT DEFAULT (datetime('now')))''')
     c.execute("CREATE INDEX IF NOT EXISTS idx_pta_pts_user ON pta_points_log(user_id)")
 
+    # ---- Workflow Engine tables (Step 4 of PtA spec) ----
+
+    # Projects: multi-project tracking
+    c.execute('''CREATE TABLE IF NOT EXISTS pta_projects
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  name TEXT NOT NULL,
+                  description TEXT,
+                  owner_id TEXT,
+                  department TEXT,
+                  strategic_pillar TEXT,
+                  priority TEXT DEFAULT 'P3',
+                  status TEXT DEFAULT 'active',
+                  target_date TEXT,
+                  health TEXT DEFAULT 'green',
+                  tags TEXT DEFAULT '[]',
+                  created_at TEXT DEFAULT (datetime('now')),
+                  updated_at TEXT DEFAULT (datetime('now')))''')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pta_proj_status ON pta_projects(status)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pta_proj_owner ON pta_projects(owner_id)")
+
+    # Workflow transitions: state machine history
+    c.execute('''CREATE TABLE IF NOT EXISTS pta_workflow_transitions
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  submission_id INTEGER NOT NULL,
+                  from_stage TEXT NOT NULL,
+                  to_stage TEXT NOT NULL,
+                  triggered_by TEXT,
+                  reason TEXT,
+                  metadata TEXT,
+                  created_at TEXT DEFAULT (datetime('now')),
+                  FOREIGN KEY (submission_id) REFERENCES pta_submissions(id))''')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pta_wf_sub ON pta_workflow_transitions(submission_id)")
+
+    # Notifications: keep work moving
+    c.execute('''CREATE TABLE IF NOT EXISTS pta_notifications
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id TEXT NOT NULL,
+                  type TEXT NOT NULL,
+                  title TEXT NOT NULL,
+                  message TEXT NOT NULL,
+                  link TEXT,
+                  read INTEGER DEFAULT 0,
+                  created_at TEXT DEFAULT (datetime('now')))''')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pta_notif_user ON pta_notifications(user_id, read)")
+
+    # Add workflow_stage and project_id columns to pta_submissions (safe ALTER TABLE)
+    for col_def in [
+        ("workflow_stage", "TEXT DEFAULT 'draft'"),
+        ("project_id", "INTEGER"),
+        ("implementation_owner_id", "TEXT"),
+        ("implementation_status", "TEXT"),
+        ("impact_measured", "TEXT"),
+        ("completed_at", "TEXT"),
+    ]:
+        try:
+            c.execute(f"ALTER TABLE pta_submissions ADD COLUMN {col_def[0]} {col_def[1]}")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pta_stage ON pta_submissions(workflow_stage)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pta_project ON pta_submissions(project_id)")
+
     conn.commit()
     conn.close()
 
@@ -5722,6 +5784,674 @@ async def pta_leaderboard(limit: int = 20):
 
     conn.close()
     return {"leaderboard": leaders}
+
+
+# ============================================================================
+# WORKFLOW ENGINE — Step 4 of PtA Spec
+# Multi-project tracking, 4P state machine, Talent Radar, Notifications
+# ============================================================================
+
+# Valid 4P workflow transitions
+VALID_TRANSITIONS = {
+    "draft": ["prompting"],
+    "prompting": ["proving"],
+    "proving": ["proposing", "prompting"],
+    "proposing": ["approved", "revision", "escalated"],
+    "revision": ["proving"],
+    "escalated": ["approved", "revision"],
+    "approved": ["progressing"],
+    "progressing": ["completed", "blocked"],
+    "blocked": ["progressing", "revision"],
+    "completed": ["archived"],
+    "archived": [],
+}
+
+WORKFLOW_STAGES = {
+    "prompting": {"name": "Prompt", "colour": "#579BFC", "icon": "\u270d\ufe0f"},
+    "proving": {"name": "Prove", "colour": "#00C875", "icon": "\U0001f4ca"},
+    "proposing": {"name": "Propose", "colour": "#FDAB3D", "icon": "\U0001f4e4"},
+    "progressing": {"name": "Progress", "colour": "#E040FB", "icon": "\U0001f680"},
+}
+
+# Escalation rules
+ESCALATION_RULES = {
+    "board_paper": "Auto-escalate to L3 — board-level output",
+    "new_store_feasibility": "Auto-escalate to L3 — strategic decision",
+    "it_architecture_proposal": "Auto-add CIO review",
+    "amazon_partnership_review": "Auto-escalate to L3 — partnership impact",
+}
+
+
+class ProjectCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    owner_id: Optional[str] = None
+    department: Optional[str] = None
+    strategic_pillar: Optional[str] = None
+    priority: str = "P3"
+    target_date: Optional[str] = None
+    tags: Optional[list] = []
+
+
+class WorkflowTransition(BaseModel):
+    submission_id: int
+    to_stage: str
+    triggered_by: Optional[str] = None
+    reason: Optional[str] = None
+
+
+# --- Projects ---
+
+@app.post("/api/workflow/projects")
+async def create_project(project: ProjectCreate):
+    """Create a new project for multi-project tracking."""
+    conn = sqlite3.connect(config.HUB_DB)
+    c = conn.cursor()
+    c.execute(
+        """INSERT INTO pta_projects (name, description, owner_id, department,
+           strategic_pillar, priority, target_date, tags)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+        (project.name, project.description, project.owner_id, project.department,
+         project.strategic_pillar, project.priority, project.target_date,
+         json.dumps(project.tags or [])),
+    )
+    project_id = c.lastrowid
+
+    # Audit
+    c.execute(
+        "INSERT INTO pta_audit_log (user_id, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?)",
+        (project.owner_id, "project_created", "project", project_id, json.dumps({"name": project.name})),
+    )
+    conn.commit()
+    conn.close()
+    return {"id": project_id, "name": project.name, "status": "active"}
+
+
+@app.get("/api/workflow/projects")
+async def list_projects(status: str = "active", limit: int = 50):
+    """List projects with health status."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+
+    query = "SELECT * FROM pta_projects WHERE 1=1"
+    params = []
+    if status != "all":
+        query += " AND status = ?"
+        params.append(status)
+    query += " ORDER BY CASE priority WHEN 'P1' THEN 1 WHEN 'P2' THEN 2 WHEN 'P3' THEN 3 ELSE 4 END, created_at DESC LIMIT ?"
+    params.append(limit)
+
+    projects = []
+    for row in conn.execute(query, params).fetchall():
+        p = dict(row)
+        # Calculate health from linked submissions
+        sub_stats = conn.execute(
+            """SELECT COUNT(*) as total,
+                      SUM(CASE WHEN workflow_stage = 'completed' THEN 1 ELSE 0 END) as completed,
+                      SUM(CASE WHEN workflow_stage = 'blocked' THEN 1 ELSE 0 END) as blocked,
+                      SUM(CASE WHEN workflow_stage = 'proposing' AND updated_at < datetime('now', '-2 days') THEN 1 ELSE 0 END) as stale,
+                      AVG(CASE WHEN rubric_average IS NOT NULL THEN rubric_average END) as avg_quality
+               FROM pta_submissions WHERE project_id = ?""",
+            (p["id"],),
+        ).fetchone()
+        p["items_total"] = sub_stats["total"] or 0
+        p["items_completed"] = sub_stats["completed"] or 0
+        p["items_blocked"] = sub_stats["blocked"] or 0
+        p["items_stale"] = sub_stats["stale"] or 0
+        p["avg_quality"] = round(sub_stats["avg_quality"] or 0, 1)
+
+        # Auto-calculate health
+        if (sub_stats["blocked"] or 0) > 0:
+            p["health"] = "red"
+        elif (sub_stats["stale"] or 0) > 0:
+            p["health"] = "amber"
+        else:
+            p["health"] = "green"
+
+        projects.append(p)
+
+    conn.close()
+    return {"projects": projects}
+
+
+@app.get("/api/workflow/projects/{project_id}")
+async def get_project(project_id: int):
+    """Get project details with all linked submissions."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    row = conn.execute("SELECT * FROM pta_projects WHERE id = ?", (project_id,)).fetchone()
+    if not row:
+        conn.close()
+        raise HTTPException(404, "Project not found")
+
+    project = dict(row)
+
+    # Get linked submissions
+    subs = conn.execute(
+        """SELECT id, user_id, user_role, task_type, workflow_stage, rubric_average,
+                  rubric_verdict, status, created_at, updated_at
+           FROM pta_submissions WHERE project_id = ?
+           ORDER BY created_at DESC""",
+        (project_id,),
+    ).fetchall()
+    project["submissions"] = [dict(s) for s in subs]
+
+    conn.close()
+    return project
+
+
+@app.put("/api/workflow/projects/{project_id}")
+async def update_project(project_id: int, name: Optional[str] = None,
+                         status: Optional[str] = None, priority: Optional[str] = None,
+                         target_date: Optional[str] = None):
+    """Update project fields."""
+    conn = sqlite3.connect(config.HUB_DB)
+    updates = []
+    params = []
+    if name:
+        updates.append("name = ?")
+        params.append(name)
+    if status:
+        updates.append("status = ?")
+        params.append(status)
+    if priority:
+        updates.append("priority = ?")
+        params.append(priority)
+    if target_date:
+        updates.append("target_date = ?")
+        params.append(target_date)
+
+    if not updates:
+        conn.close()
+        return {"updated": False}
+
+    updates.append("updated_at = datetime('now')")
+    params.append(project_id)
+    conn.execute(f"UPDATE pta_projects SET {', '.join(updates)} WHERE id = ?", params)
+    conn.commit()
+    conn.close()
+    return {"updated": True}
+
+
+# --- Workflow Transitions ---
+
+@app.post("/api/workflow/transition")
+async def transition_workflow(t: WorkflowTransition):
+    """Transition a submission through the 4P workflow state machine."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+
+    row = conn.execute(
+        "SELECT id, workflow_stage, status FROM pta_submissions WHERE id = ?",
+        (t.submission_id,),
+    ).fetchone()
+    if not row:
+        conn.close()
+        raise HTTPException(404, "Submission not found")
+
+    current_stage = row["workflow_stage"] or "draft"
+
+    # Validate transition
+    allowed = VALID_TRANSITIONS.get(current_stage, [])
+    if t.to_stage not in allowed:
+        conn.close()
+        raise HTTPException(
+            400,
+            f"Invalid transition: {current_stage} -> {t.to_stage}. "
+            f"Allowed: {allowed}",
+        )
+
+    # Execute transition
+    now = datetime.utcnow().isoformat()
+    conn.execute(
+        "UPDATE pta_submissions SET workflow_stage = ?, updated_at = ? WHERE id = ?",
+        (t.to_stage, now, t.submission_id),
+    )
+
+    # Map workflow_stage to status for backward compatibility
+    stage_to_status = {
+        "draft": "draft",
+        "prompting": "draft",
+        "proving": "generated",
+        "proposing": "pending_approval",
+        "approved": "approved",
+        "revision": "revision_requested",
+        "escalated": "pending_approval",
+        "progressing": "approved",
+        "completed": "approved",
+        "blocked": "approved",
+        "archived": "approved",
+    }
+    new_status = stage_to_status.get(t.to_stage, row["status"])
+    conn.execute(
+        "UPDATE pta_submissions SET status = ? WHERE id = ?",
+        (new_status, t.submission_id),
+    )
+
+    # Record transition
+    conn.execute(
+        """INSERT INTO pta_workflow_transitions
+           (submission_id, from_stage, to_stage, triggered_by, reason)
+           VALUES (?, ?, ?, ?, ?)""",
+        (t.submission_id, current_stage, t.to_stage, t.triggered_by, t.reason),
+    )
+
+    # Audit log
+    conn.execute(
+        "INSERT INTO pta_audit_log (user_id, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?)",
+        (t.triggered_by, "workflow_transition", "submission", t.submission_id,
+         json.dumps({"from": current_stage, "to": t.to_stage, "reason": t.reason})),
+    )
+
+    # If completed, record completion time
+    if t.to_stage == "completed":
+        conn.execute(
+            "UPDATE pta_submissions SET completed_at = ? WHERE id = ?",
+            (now, t.submission_id),
+        )
+
+    conn.commit()
+    conn.close()
+
+    return {
+        "submission_id": t.submission_id,
+        "from_stage": current_stage,
+        "to_stage": t.to_stage,
+        "valid": True,
+    }
+
+
+@app.get("/api/workflow/transitions/{submission_id}")
+async def get_transitions(submission_id: int):
+    """Get full transition history for a submission."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    rows = conn.execute(
+        "SELECT * FROM pta_workflow_transitions WHERE submission_id = ? ORDER BY created_at",
+        (submission_id,),
+    ).fetchall()
+    conn.close()
+    return {"transitions": [dict(r) for r in rows]}
+
+
+# --- Pipeline / Kanban views ---
+
+@app.get("/api/workflow/pipeline")
+async def workflow_pipeline(project_id: Optional[int] = None, user_id: Optional[str] = None):
+    """Get all submissions grouped by workflow stage — for kanban/pipeline views."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+
+    query = """SELECT id, user_id, user_role, task_type, workflow_stage, rubric_average,
+                      rubric_verdict, status, project_id, created_at, updated_at
+               FROM pta_submissions WHERE workflow_stage IS NOT NULL"""
+    params = []
+    if project_id:
+        query += " AND project_id = ?"
+        params.append(project_id)
+    if user_id:
+        query += " AND user_id = ?"
+        params.append(user_id)
+    query += " ORDER BY updated_at DESC"
+
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+
+    # Group by stage
+    pipeline = {stage: [] for stage in VALID_TRANSITIONS}
+    for r in rows:
+        d = dict(r)
+        stage = d.get("workflow_stage", "draft")
+        if stage in pipeline:
+            pipeline[stage].append(d)
+        else:
+            pipeline.setdefault(stage, []).append(d)
+
+    return {"pipeline": pipeline}
+
+
+@app.get("/api/workflow/velocity")
+async def workflow_velocity(days: int = 30):
+    """Calculate workflow velocity metrics — avg time per stage, bottlenecks."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+
+    cutoff = (datetime.utcnow() - timedelta(days=days)).isoformat()
+
+    # Average time between transitions per stage
+    rows = conn.execute(
+        """SELECT wt1.from_stage, wt1.to_stage,
+                  AVG(julianday(wt2.created_at) - julianday(wt1.created_at)) * 24 as avg_hours
+           FROM pta_workflow_transitions wt1
+           LEFT JOIN pta_workflow_transitions wt2
+             ON wt1.submission_id = wt2.submission_id
+             AND wt2.from_stage = wt1.to_stage
+           WHERE wt1.created_at > ? AND wt2.created_at IS NOT NULL
+           GROUP BY wt1.from_stage, wt1.to_stage""",
+        (cutoff,),
+    ).fetchall()
+
+    velocity = [dict(r) for r in rows]
+
+    # Bottleneck: items stuck in each stage
+    stuck = conn.execute(
+        """SELECT workflow_stage, COUNT(*) as count,
+                  MIN(updated_at) as oldest
+           FROM pta_submissions
+           WHERE workflow_stage NOT IN ('completed', 'archived', 'draft')
+             AND updated_at < datetime('now', '-2 days')
+           GROUP BY workflow_stage
+           ORDER BY count DESC""",
+    ).fetchall()
+
+    # Overall throughput
+    completed_count = conn.execute(
+        "SELECT COUNT(*) FROM pta_submissions WHERE completed_at > ? AND workflow_stage = 'completed'",
+        (cutoff,),
+    ).fetchone()[0]
+
+    total_submitted = conn.execute(
+        "SELECT COUNT(*) FROM pta_submissions WHERE created_at > ?",
+        (cutoff,),
+    ).fetchone()[0]
+
+    conn.close()
+    return {
+        "stage_velocity": velocity,
+        "bottlenecks": [dict(s) for s in stuck],
+        "completed_last_n_days": completed_count,
+        "submitted_last_n_days": total_submitted,
+        "throughput_pct": round(completed_count / max(total_submitted, 1) * 100, 1),
+    }
+
+
+# --- Notifications ---
+
+@app.get("/api/workflow/notifications/{user_id}")
+async def get_notifications(user_id: str, unread_only: bool = True, limit: int = 50):
+    """Get notifications for a user."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    query = "SELECT * FROM pta_notifications WHERE user_id = ?"
+    params = [user_id]
+    if unread_only:
+        query += " AND read = 0"
+    query += " ORDER BY created_at DESC LIMIT ?"
+    params.append(limit)
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+    return {"notifications": [dict(r) for r in rows]}
+
+
+@app.post("/api/workflow/notifications/read")
+async def mark_notifications_read(user_id: str, notification_ids: Optional[list] = None):
+    """Mark notifications as read."""
+    conn = sqlite3.connect(config.HUB_DB)
+    if notification_ids:
+        placeholders = ",".join("?" for _ in notification_ids)
+        conn.execute(
+            f"UPDATE pta_notifications SET read = 1 WHERE id IN ({placeholders}) AND user_id = ?",
+            notification_ids + [user_id],
+        )
+    else:
+        conn.execute("UPDATE pta_notifications SET read = 1 WHERE user_id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+    return {"marked_read": True}
+
+
+def _create_notification(conn, user_id: str, ntype: str, title: str, message: str, link: str = None):
+    """Internal helper to create a notification."""
+    conn.execute(
+        "INSERT INTO pta_notifications (user_id, type, title, message, link) VALUES (?, ?, ?, ?, ?)",
+        (user_id, ntype, title, message, link),
+    )
+
+
+# --- Talent Radar / Ninja Finder ---
+
+@app.get("/api/workflow/talent-radar")
+async def talent_radar(days: int = 30):
+    """Talent Radar — surfaces rising stars, top performers, and adoption gaps."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+
+    cutoff = (datetime.utcnow() - timedelta(days=days)).isoformat()
+
+    # Per-user metrics
+    users = conn.execute(
+        """SELECT user_id, user_role,
+                  COUNT(*) as submissions,
+                  SUM(CASE WHEN workflow_stage = 'completed' OR status = 'approved' THEN 1 ELSE 0 END) as completed,
+                  AVG(CASE WHEN rubric_average IS NOT NULL THEN rubric_average END) as avg_quality,
+                  SUM(CASE WHEN status = 'approved' AND approver_notes IS NULL THEN 1 ELSE 0 END) as first_time_approvals,
+                  SUM(CASE WHEN status IN ('approved', 'revision_requested') THEN 1 ELSE 0 END) as total_decided,
+                  COUNT(DISTINCT project_id) as projects_involved
+           FROM pta_submissions
+           WHERE created_at > ?
+           GROUP BY user_id
+           ORDER BY submissions DESC""",
+        (cutoff,),
+    ).fetchall()
+
+    # Build talent profiles
+    talent = []
+    for u in users:
+        d = dict(u)
+        total_decided = d.get("total_decided") or 0
+        d["first_time_approval_rate"] = round(
+            (d.get("first_time_approvals") or 0) / max(total_decided, 1), 2
+        )
+        d["avg_quality"] = round(d.get("avg_quality") or 0, 1)
+
+        # Get points
+        pts = conn.execute(
+            "SELECT COALESCE(SUM(total_awarded), 0) FROM pta_points_log WHERE user_id = ?",
+            (d["user_id"],),
+        ).fetchone()[0]
+        d["total_points"] = pts
+        d["level"] = (
+            "AI Ninja" if pts > 2000
+            else "Prompt Master" if pts > 500
+            else "Prompt Specialist" if pts > 100
+            else "Prompt Apprentice"
+        )
+
+        # Ninja signals
+        d["ninja_score"] = _calculate_ninja_score(d)
+        talent.append(d)
+
+    # Sort by ninja score
+    talent.sort(key=lambda x: x["ninja_score"], reverse=True)
+
+    # Rising stars: biggest improvement — compare to prior period
+    prior_cutoff = (datetime.utcnow() - timedelta(days=days * 2)).isoformat()
+    rising = []
+    for t in talent[:20]:
+        prior_avg = conn.execute(
+            """SELECT AVG(rubric_average) FROM pta_submissions
+               WHERE user_id = ? AND created_at BETWEEN ? AND ? AND rubric_average IS NOT NULL""",
+            (t["user_id"], prior_cutoff, cutoff),
+        ).fetchone()[0]
+        if prior_avg:
+            t["quality_improvement"] = round((t.get("avg_quality") or 0) - prior_avg, 1)
+        else:
+            t["quality_improvement"] = 0
+        rising.append(t)
+
+    rising.sort(key=lambda x: x["quality_improvement"], reverse=True)
+
+    # Department adoption
+    dept_adoption = conn.execute(
+        """SELECT user_role as department,
+                  COUNT(DISTINCT user_id) as active_users,
+                  COUNT(*) as total_submissions,
+                  AVG(CASE WHEN rubric_average IS NOT NULL THEN rubric_average END) as avg_quality
+           FROM pta_submissions
+           WHERE created_at > ?
+           GROUP BY user_role
+           ORDER BY active_users DESC""",
+        (cutoff,),
+    ).fetchall()
+
+    conn.close()
+    return {
+        "top_performers": talent[:10],
+        "rising_stars": [r for r in rising[:5] if r["quality_improvement"] > 0],
+        "department_adoption": [dict(d) for d in dept_adoption],
+        "total_active_users": len(talent),
+        "total_ninjas": sum(1 for t in talent if t["level"] == "AI Ninja"),
+        "total_masters": sum(1 for t in talent if t["level"] == "Prompt Master"),
+    }
+
+
+def _calculate_ninja_score(user_data: dict) -> float:
+    """Calculate composite ninja score from multiple signals."""
+    submissions = user_data.get("submissions", 0)
+    avg_quality = user_data.get("avg_quality", 0)
+    ftar = user_data.get("first_time_approval_rate", 0)
+    completed = user_data.get("completed", 0)
+    projects = user_data.get("projects_involved", 0)
+
+    # Weighted composite (0-100)
+    score = (
+        min(submissions / 10, 1.0) * 20  # Volume (max 20)
+        + min(avg_quality / 10, 1.0) * 30  # Quality (max 30)
+        + ftar * 20  # First-time approval (max 20)
+        + min(completed / 5, 1.0) * 15  # Completion (max 15)
+        + min(projects / 3, 1.0) * 15  # Cross-project (max 15)
+    )
+    return round(score, 1)
+
+
+# --- Weekly/Monthly Report Generation ---
+
+@app.get("/api/workflow/report/weekly")
+async def weekly_hub_report():
+    """Auto-generated weekly Hub report — submissions, approvals, performers, gaps."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+
+    week_ago = (datetime.utcnow() - timedelta(days=7)).isoformat()
+    two_weeks = (datetime.utcnow() - timedelta(days=14)).isoformat()
+
+    # This week vs last week
+    this_week = conn.execute(
+        "SELECT COUNT(*) FROM pta_submissions WHERE created_at > ?", (week_ago,)
+    ).fetchone()[0]
+    last_week = conn.execute(
+        "SELECT COUNT(*) FROM pta_submissions WHERE created_at BETWEEN ? AND ?",
+        (two_weeks, week_ago),
+    ).fetchone()[0]
+
+    approved_this_week = conn.execute(
+        "SELECT COUNT(*) FROM pta_submissions WHERE decided_at > ? AND status = 'approved'",
+        (week_ago,),
+    ).fetchone()[0]
+
+    avg_quality = conn.execute(
+        "SELECT AVG(rubric_average) FROM pta_submissions WHERE created_at > ? AND rubric_average IS NOT NULL",
+        (week_ago,),
+    ).fetchone()[0]
+
+    # Top performers
+    top = conn.execute(
+        """SELECT user_id, SUM(total_awarded) as pts
+           FROM pta_points_log WHERE created_at > ?
+           GROUP BY user_id ORDER BY pts DESC LIMIT 5""",
+        (week_ago,),
+    ).fetchall()
+
+    # Dept with lowest submissions (the gap)
+    all_roles = conn.execute(
+        "SELECT DISTINCT user_role FROM pta_submissions"
+    ).fetchall()
+    role_counts = conn.execute(
+        """SELECT user_role, COUNT(*) as cnt FROM pta_submissions
+           WHERE created_at > ? GROUP BY user_role""",
+        (week_ago,),
+    ).fetchall()
+    active_roles = {r["user_role"] for r in role_counts}
+    gap_roles = [r[0] for r in all_roles if r[0] not in active_roles]
+
+    conn.close()
+
+    return {
+        "period": "last_7_days",
+        "submissions_this_week": this_week,
+        "submissions_last_week": last_week,
+        "change_pct": round((this_week - last_week) / max(last_week, 1) * 100, 1),
+        "approved_this_week": approved_this_week,
+        "avg_quality": round(avg_quality or 0, 1),
+        "top_performers": [{"user_id": r["user_id"], "points": r["pts"]} for r in top],
+        "adoption_gaps": gap_roles,
+    }
+
+
+@app.get("/api/workflow/report/monthly")
+async def monthly_board_report():
+    """Monthly board summary — adoption, time savings, quality, ROI."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+
+    month_ago = (datetime.utcnow() - timedelta(days=30)).isoformat()
+
+    total_users = conn.execute(
+        "SELECT COUNT(DISTINCT user_id) FROM pta_submissions WHERE created_at > ?",
+        (month_ago,),
+    ).fetchone()[0]
+    total_subs = conn.execute(
+        "SELECT COUNT(*) FROM pta_submissions WHERE created_at > ?", (month_ago,)
+    ).fetchone()[0]
+    total_approved = conn.execute(
+        "SELECT COUNT(*) FROM pta_submissions WHERE decided_at > ? AND status = 'approved'",
+        (month_ago,),
+    ).fetchone()[0]
+
+    avg_quality = conn.execute(
+        "SELECT AVG(rubric_average) FROM pta_submissions WHERE created_at > ? AND rubric_average IS NOT NULL",
+        (month_ago,),
+    ).fetchone()[0]
+
+    # Level distribution
+    levels = {"AI Ninja": 0, "Prompt Master": 0, "Prompt Specialist": 0, "Prompt Apprentice": 0}
+    user_pts = conn.execute(
+        "SELECT user_id, SUM(total_awarded) as pts FROM pta_points_log GROUP BY user_id"
+    ).fetchall()
+    for u in user_pts:
+        pts = u["pts"]
+        lvl = "AI Ninja" if pts > 2000 else "Prompt Master" if pts > 500 else "Prompt Specialist" if pts > 100 else "Prompt Apprentice"
+        levels[lvl] += 1
+
+    # Time savings estimate: 2 hours saved per approved submission (conservative)
+    est_hours_saved = total_approved * 2
+
+    conn.close()
+    return {
+        "period": "last_30_days",
+        "active_users": total_users,
+        "total_submissions": total_subs,
+        "total_approved": total_approved,
+        "avg_quality": round(avg_quality or 0, 1),
+        "level_distribution": levels,
+        "est_hours_saved": est_hours_saved,
+        "est_cost_saving_aud": est_hours_saved * 75,  # $75/hr avg loaded cost
+    }
+
+
+# --- Link submission to project ---
+
+@app.post("/api/workflow/link")
+async def link_submission_to_project(submission_id: int, project_id: int):
+    """Link a submission to a project."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.execute(
+        "UPDATE pta_submissions SET project_id = ?, updated_at = datetime('now') WHERE id = ?",
+        (project_id, submission_id),
+    )
+    conn.commit()
+    conn.close()
+    return {"linked": True, "submission_id": submission_id, "project_id": project_id}
 
 
 if __name__ == "__main__":

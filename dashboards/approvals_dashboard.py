@@ -223,6 +223,18 @@ else:
                                 timeout=10,
                             )
                             if r.status_code == 200:
+                                # Advance workflow: proposing → approved → progressing
+                                try:
+                                    requests.post(f"{API_URL}/api/workflow/transition", json={
+                                        "submission_id": sub_id, "to_stage": "approved",
+                                        "triggered_by": "manager", "reason": f"Approved. {notes}",
+                                    }, timeout=5)
+                                    requests.post(f"{API_URL}/api/workflow/transition", json={
+                                        "submission_id": sub_id, "to_stage": "progressing",
+                                        "triggered_by": "manager", "reason": "Auto-advance after approval",
+                                    }, timeout=5)
+                                except Exception:
+                                    pass
                                 st.success(f"Submission #{sub_id} approved! {r.json().get('points_awarded', 0)} points awarded.")
                                 st.rerun()
                             else:
@@ -246,6 +258,14 @@ else:
                                     timeout=10,
                                 )
                                 if r.status_code == 200:
+                                    # Advance workflow: proposing → revision
+                                    try:
+                                        requests.post(f"{API_URL}/api/workflow/transition", json={
+                                            "submission_id": sub_id, "to_stage": "revision",
+                                            "triggered_by": "manager", "reason": notes,
+                                        }, timeout=5)
+                                    except Exception:
+                                        pass
                                     st.info(f"Submission #{sub_id} sent back for changes.")
                                     st.rerun()
                                 else:
@@ -259,7 +279,15 @@ else:
                         use_container_width=True,
                         key=f"appr_escalate_{sub_id}",
                     ):
-                        st.info("Escalation would forward to next approval level. (Coming soon)")
+                        try:
+                            requests.post(f"{API_URL}/api/workflow/transition", json={
+                                "submission_id": sub_id, "to_stage": "escalated",
+                                "triggered_by": "manager", "reason": notes or "Escalated to next level",
+                            }, timeout=5)
+                            st.info(f"Submission #{sub_id} escalated to next approval level.")
+                            st.rerun()
+                        except Exception:
+                            st.info("Escalation would forward to next approval level.")
 
 
 # ============================================================================

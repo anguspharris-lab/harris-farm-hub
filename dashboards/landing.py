@@ -4,6 +4,7 @@ Front page for the AI Centre of Excellence.
 Strategy pillars, 5 goals, quick launch, activity, WATCHDOG trust.
 """
 
+import os
 import sqlite3
 from datetime import datetime
 from pathlib import Path
@@ -330,6 +331,74 @@ if activity:
     st.markdown(feed_html, unsafe_allow_html=True)
 else:
     st.info("No recent activity yet. Start by running an analysis or submitting a prompt.")
+
+st.markdown("")
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 5B — CALL TO ARMS: The Search for AI Ninjas
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Fetch ninja stats
+try:
+    import requests as _req
+    _api = os.getenv("API_URL", "http://localhost:8000")
+    _radar = _req.get(f"{_api}/api/workflow/talent-radar", timeout=3).json()
+    _ninja_count = _radar.get("total_ninjas", 0)
+    _active_users = _radar.get("total_active_users", 0)
+except Exception:
+    _ninja_count = 0
+    _active_users = 0
+
+# User level
+try:
+    _user_id = user or "unknown"
+    _stats = _req.get(f"{_api}/api/pta/user-stats/{_user_id}", timeout=3).json()
+    _user_level = _stats.get("level", "Prompt Apprentice")
+    _user_points = _stats.get("total_points", 0)
+    _level_badges = {"AI Ninja": "\U0001f977", "Prompt Master": "\U0001f525", "Prompt Specialist": "\u26a1", "Prompt Apprentice": "\U0001f331"}
+    _next_levels = {"Prompt Apprentice": (101, "Prompt Specialist"), "Prompt Specialist": (501, "Prompt Master"), "Prompt Master": (2001, "AI Ninja"), "AI Ninja": (0, "")}
+    _nxt = _next_levels.get(_user_level, (0, ""))
+    _pts_to_next = max(_nxt[0] - _user_points, 0) if _nxt[0] > 0 else 0
+except Exception:
+    _user_level = "Prompt Apprentice"
+    _user_points = 0
+    _pts_to_next = 101
+
+st.markdown(
+    f"<div style='background:linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);"
+    f"border-radius:14px;padding:32px 28px;text-align:center;margin:20px 0;'>"
+    f"<div style='font-size:2em;margin-bottom:8px;'>\U0001f977 THE SEARCH IS ON \U0001f977</div>"
+    f"<div style='color:#e0e0e0;font-size:1.05em;max-width:600px;margin:0 auto;line-height:1.6;'>"
+    f"Harris Farm is looking for the <strong style='color:#E040FB;'>Ultimate Harris Farmers</strong> "
+    f"\u2014 the AI Ninjas who will drive change in our business."
+    f"<br><br>"
+    f"They could be in any store. Any warehouse. Any office. They could be <strong style='color:#E040FB;'>YOU</strong>."
+    f"<br><br>"
+    f"<span style='color:#9ca3af;font-size:0.9em;'>"
+    f"We don't care about your title or department. We care about your curiosity, "
+    f"your drive, and your willingness to learn.</span>"
+    f"</div>"
+    f"<div style='margin-top:20px;display:flex;justify-content:center;gap:24px;'>"
+    f"<div style='background:rgba(224,64,251,0.15);padding:12px 20px;border-radius:10px;'>"
+    f"<div style='color:#E040FB;font-size:1.4em;font-weight:700;'>{_ninja_count}</div>"
+    f"<div style='color:#9ca3af;font-size:0.8em;'>AI Ninjas</div></div>"
+    f"<div style='background:rgba(255,255,255,0.08);padding:12px 20px;border-radius:10px;'>"
+    f"<div style='color:white;font-size:1.4em;font-weight:700;'>{_active_users}</div>"
+    f"<div style='color:#9ca3af;font-size:0.8em;'>Active Users</div></div>"
+    f"<div style='background:rgba(255,255,255,0.08);padding:12px 20px;border-radius:10px;'>"
+    f"<div style='color:white;font-size:1.4em;font-weight:700;'>{_user_level}</div>"
+    f"<div style='color:#9ca3af;font-size:0.8em;'>Your Level ({_user_points} pts"
+    f"{f' | {_pts_to_next} to next' if _pts_to_next > 0 else ''})</div></div>"
+    f"</div></div>",
+    unsafe_allow_html=True,
+)
+
+# CTA button — navigate to Prompt Engine
+_prompt_page = _pages.get("prompt-builder")
+if _prompt_page:
+    _cta_cols = st.columns([1, 2, 1])
+    with _cta_cols[1]:
+        st.page_link(_prompt_page, label="\U0001f680 START YOUR FIRST PROMPT", use_container_width=True)
 
 st.markdown("")
 
