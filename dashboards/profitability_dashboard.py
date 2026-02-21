@@ -19,6 +19,7 @@ from pathlib import Path
 
 from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
+from shared.voice_realtime import render_voice_data_box
 
 st.markdown("<style>.profit-positive { color: #10b981; font-weight: bold; }\n    .profit-negative { color: #ef4444; font-weight: bold; }</style>", unsafe_allow_html=True)
 user = st.session_state.get("auth_user")
@@ -759,6 +760,7 @@ except ImportError:
 # ASK A QUESTION
 # ============================================================================
 
+render_voice_data_box("profitability")
 render_ask_question("profitability")
 
 # ============================================================================

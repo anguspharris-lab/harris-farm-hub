@@ -21,6 +21,7 @@ import requests
 import streamlit as st
 
 from shared.styles import render_header, render_footer
+from shared.voice_realtime import render_voice_data_box
 from shared.learning_content import (
     MODULES,
     LESSONS,
@@ -683,5 +684,7 @@ st.caption(
     "Learning Centre | Prompt Academy | 12 modules across 3 pillars | "
     "Prosci ADKAR Change Management | Progress tracked per user"
 )
+
+render_voice_data_box("general")
 
 render_footer("Learning Centre", user=user)

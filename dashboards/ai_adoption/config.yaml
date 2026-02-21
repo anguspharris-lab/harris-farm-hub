@@ -1,0 +1,15 @@
+# AI Adoption Tracker — Platform Configuration
+# To add a new AI platform: add an entry here + create a Fetcher class in data_fetcher.py
+
+platforms:
+  openai:
+    label: ChatGPT
+    env_var: OPENAI_ADMIN_KEY
+    base_url: https://api.openai.com/v1
+  anthropic:
+    label: Claude
+    env_var: ANTHROPIC_ADMIN_KEY
+    base_url: https://api.anthropic.com/v1
+
+refresh_interval_hours: 6
+cache_db: data/ai_adoption_cache.db

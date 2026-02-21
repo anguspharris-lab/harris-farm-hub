@@ -14,6 +14,7 @@ from plu_layer import (
     plu_store_breakdown, search_plu, weekly_department_trend,
 )
 from shared.styles import HFM_GREEN
+from shared.voice_realtime import render_voice_data_box
 
 user = st.session_state.get("auth_user")
 
@@ -230,3 +231,5 @@ elif view == "PLU Lookup":
                     })[["Store", "Sales $", "GM $", "Wastage $", "Stocktake $"]],
                     use_container_width=True, hide_index=True,
                 )
+
+render_voice_data_box("plu")

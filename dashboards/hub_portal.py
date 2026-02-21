@@ -15,6 +15,7 @@ import plotly.graph_objects as go
 import requests
 
 from shared.styles import render_header, render_footer
+from shared.voice_realtime import render_voice_data_box
 from shared.portal_content import (
     load_doc, load_procedure, load_learning, load_rubric,
     get_doc_index, get_procedure_index, get_learning_index,
@@ -2855,4 +2856,6 @@ st.caption(
     "WATCHDOG Safety Active | Self-Improvement Engine Active | "
     "Agent Control Panel Active"
 )
+render_voice_data_box("general")
+
 render_footer("Hub Portal", user=user)

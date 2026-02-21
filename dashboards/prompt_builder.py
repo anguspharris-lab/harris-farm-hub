@@ -15,6 +15,7 @@ from shared.stores import STORES
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 from shared.styles import render_header, render_footer
+from shared.voice_realtime import render_voice_data_box
 
 user = st.session_state.get("auth_user")
 
@@ -568,5 +569,7 @@ with st.expander("ℹ️ Help & Documentation"):
     
     Contact the Hub team: hub-support@harrisfarm.com
     """)
+
+render_voice_data_box("general")
 
 render_footer("Prompt Builder", user=user)

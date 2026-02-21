@@ -20,12 +20,30 @@ from market_share_layer import (
     get_regions, postcode_map_data, store_trade_area, store_trade_area_trend,
     yoy_comparison, detect_shifts, flag_issues, opportunity_analysis,
     state_summary, state_trend, postcode_trend, nearest_store,
+    store_health_scorecard, store_channel_comparison, network_macro_view,
     STORE_LOCATIONS, get_postcode_coords,
 )
 from shared.styles import render_header, render_footer, HFM_GREEN
 from shared.ask_question import render_ask_question
+from shared.voice_realtime import render_voice_data_box
 
 user = st.session_state.get("auth_user")
+
+
+# Cached wrappers for expensive store health queries
+@st.cache_data(ttl=3600, show_spinner="Computing store health scores...")
+def _cached_scorecard(period):
+    return store_health_scorecard(period)
+
+
+@st.cache_data(ttl=3600, show_spinner="Loading channel data...")
+def _cached_channel_comparison(store_name, period):
+    return store_channel_comparison(store_name, period)
+
+
+@st.cache_data(ttl=3600, show_spinner="Building regional view...")
+def _cached_macro_view(period, channel):
+    return network_macro_view(period, channel)
 
 render_header(
     "Market Share Intelligence",
@@ -56,8 +74,8 @@ with col_f2:
 
 # ── Tab Layout ────────────────────────────────────────────────────────────────
 
-tab_overview, tab_map, tab_store, tab_trends, tab_opps, tab_issues, tab_data = st.tabs([
-    "Overview", "Spatial Map", "Store Trade Areas",
+tab_overview, tab_map, tab_store, tab_health, tab_trends, tab_opps, tab_issues, tab_data = st.tabs([
+    "Overview", "Spatial Map", "Store Trade Areas", "Store Health",
     "Trends & Shifts", "Opportunities", "Issues", "Data Explorer"
 ])
 
@@ -455,7 +473,271 @@ with tab_store:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TAB 4: TRENDS & SHIFTS
+# TAB 4: STORE HEALTH
+# ══════════════════════════════════════════════════════════════════════════════
+
+with tab_health:
+    st.subheader("Store Health Scorecard")
+    st.caption(
+        "Each store graded A-F based on Core+Primary trade area share, "
+        "YoY trend, and customer penetration. Channel breakdown and regional macro view below."
+    )
+
+    # --- Scorecard ---
+    scorecard = _cached_scorecard(latest)
+    if not scorecard:
+        st.warning("No scorecard data available.")
+    else:
+        # Filter by state if selected
+        if state_filter != "All":
+            scorecard = [s for s in scorecard if s["state"] == state_filter]
+
+        # Grade colour mapping
+        _GRADE_COLOURS = {"A": "#16a34a", "B": "#65a30d", "C": "#d97706", "D": "#ea580c", "F": "#dc2626"}
+
+        # Summary KPIs
+        grades = [s["grade"] for s in scorecard]
+        avg_cp = sum(s["cp_share"] for s in scorecard) / len(scorecard) if scorecard else 0
+        growing = sum(1 for s in scorecard if (s["cp_share_change"] or 0) > 0)
+        declining = sum(1 for s in scorecard if (s["cp_share_change"] or 0) < 0)
+
+        k1, k2, k3, k4 = st.columns(4)
+        k1.metric("Stores Graded", len(scorecard))
+        k2.metric("Avg Core+Primary Share", f"{avg_cp:.1f}%")
+        k3.metric("Stores Growing", growing, delta=f"{growing}/{len(scorecard)}")
+        k4.metric("Stores Declining", declining, delta=f"-{declining}", delta_color="inverse")
+
+        # Grade distribution bar
+        grade_counts = {}
+        for g in ["A", "B", "C", "D", "F"]:
+            grade_counts[g] = grades.count(g)
+
+        grade_df = pd.DataFrame([
+            {"Grade": g, "Count": c, "Colour": _GRADE_COLOURS[g]}
+            for g, c in grade_counts.items() if c > 0
+        ])
+        if not grade_df.empty:
+            fig_grades = px.bar(
+                grade_df, x="Grade", y="Count", color="Grade",
+                color_discrete_map=_GRADE_COLOURS,
+                labels={"Count": "Stores"},
+            )
+            fig_grades.update_layout(height=250, showlegend=False)
+            st.plotly_chart(fig_grades, use_container_width=True, key="grade_dist")
+
+        # Scorecard table — all stores
+        st.markdown("**All Stores — Ranked by Health Score**")
+        sc_df = pd.DataFrame(scorecard)
+        sc_display = sc_df[[
+            "grade", "store", "state", "cp_share", "cp_share_change",
+            "cp_penetration", "cp_spend", "total_postcodes", "score",
+        ]].copy()
+        sc_display.columns = [
+            "Grade", "Store", "State", "CP Share %", "YoY Change (pp)",
+            "Penetration %", "Spend $", "Trade Area PCs", "Score",
+        ]
+        sc_display["YoY Change (pp)"] = sc_display["YoY Change (pp)"].apply(
+            lambda x: f"{x:+.2f}" if x is not None else "N/A"
+        )
+        st.dataframe(sc_display, use_container_width=True, hide_index=True, height=500)
+
+        # --- Store-level channel breakdown ---
+        st.markdown("---")
+        st.subheader("Store Channel Breakdown")
+        st.caption("Instore vs Online market share in each store's surrounding postcodes (within 10km).")
+
+        health_store = st.selectbox(
+            "Select Store", [s["store"] for s in scorecard],
+            key="health_store_select"
+        )
+
+        if health_store:
+            chan_data = _cached_channel_comparison(health_store, latest)
+            if not chan_data:
+                st.info(f"No channel data for {health_store}.")
+            else:
+                cdf = pd.DataFrame(chan_data)
+
+                # KPIs for selected store
+                ck1, ck2, ck3, ck4 = st.columns(4)
+                ck1.metric("Postcodes", len(cdf))
+                ck2.metric("Avg Instore Share", f"{cdf['instore_share'].mean():.1f}%")
+                ck3.metric("Avg Online Share", f"{cdf['online_share'].mean():.2f}%")
+                ck4.metric("Online Penetration", f"{cdf['online_pen'].mean():.2f}%")
+
+                # Stacked bar: instore vs online by postcode (top 20 by total share)
+                cdf["total_share"] = cdf["instore_share"] + cdf["online_share"]
+                top_chan = cdf.nlargest(20, "total_share")
+
+                fig_chan = go.Figure()
+                fig_chan.add_trace(go.Bar(
+                    name="Instore", x=top_chan["region_name"], y=top_chan["instore_share"],
+                    marker_color="#4ba021",
+                    hovertemplate="%{x}<br>Instore: %{y:.1f}%<extra></extra>",
+                ))
+                fig_chan.add_trace(go.Bar(
+                    name="Online", x=top_chan["region_name"], y=top_chan["online_share"],
+                    marker_color="#7c3aed",
+                    hovertemplate="%{x}<br>Online: %{y:.2f}%<extra></extra>",
+                ))
+                fig_chan.update_layout(
+                    barmode="stack", height=400,
+                    xaxis_title="", yaxis_title="Market Share %",
+                    legend=dict(orientation="h", y=-0.25),
+                )
+                st.plotly_chart(fig_chan, use_container_width=True, key="store_channel_bar")
+
+                # Channel detail table
+                with st.expander("Full channel data"):
+                    chan_display = cdf[[
+                        "region_name", "postcode", "distance_km", "tier",
+                        "instore_share", "online_share", "instore_pen",
+                        "online_pen", "instore_spend", "online_spend",
+                    ]].copy()
+                    chan_display.columns = [
+                        "Region", "Postcode", "Distance km", "Tier",
+                        "Instore Share %", "Online Share %", "Instore Pen %",
+                        "Online Pen %", "Instore Spend $", "Online Spend $",
+                    ]
+                    st.dataframe(chan_display, use_container_width=True, hide_index=True, height=400)
+
+        # --- Regional Macro View ---
+        st.markdown("---")
+        st.subheader("Regional Macro View")
+        st.caption(
+            "Stores grouped into geographic clusters. Shows aggregate performance "
+            "across surrounding postcodes (within 10km of any cluster store)."
+        )
+
+        macro = _cached_macro_view(latest, channel)
+        if not macro:
+            st.info("No macro data available.")
+        else:
+            macro_df = pd.DataFrame(macro)
+
+            # Macro KPIs
+            mk1, mk2, mk3 = st.columns(3)
+            mk1.metric("Clusters", len(macro_df))
+            best = macro_df.iloc[0]
+            mk2.metric(
+                f"Strongest: {best['cluster']}",
+                f"{best['avg_share']:.1f}%",
+            )
+            worst = macro_df.iloc[-1]
+            mk3.metric(
+                f"Weakest: {worst['cluster']}",
+                f"{worst['avg_share']:.1f}%",
+            )
+
+            # Cluster comparison bar chart
+            fig_macro = go.Figure()
+            colours = [
+                "#16a34a" if (r["share_change"] or 0) >= 0 else "#dc2626"
+                for _, r in macro_df.iterrows()
+            ]
+            fig_macro.add_trace(go.Bar(
+                x=macro_df["cluster"], y=macro_df["avg_share"],
+                marker_color=colours,
+                text=macro_df["share_change"].apply(
+                    lambda x: f"{x:+.2f}pp" if x is not None else ""
+                ),
+                textposition="outside",
+                hovertemplate=(
+                    "<b>%{x}</b><br>"
+                    "Share: %{y:.1f}%<br>"
+                    "YoY: %{text}"
+                    "<extra></extra>"
+                ),
+            ))
+            fig_macro.update_layout(
+                height=400, yaxis_title="Avg Market Share %",
+                xaxis_title="", showlegend=False,
+            )
+            st.plotly_chart(fig_macro, use_container_width=True, key="macro_bar")
+
+            # Macro detail table
+            macro_display = macro_df[[
+                "cluster", "stores", "postcodes", "avg_share",
+                "share_change", "avg_penetration", "avg_spend",
+            ]].copy()
+            macro_display.columns = [
+                "Cluster", "Stores", "Postcodes", "Avg Share %",
+                "YoY Change (pp)", "Avg Penetration %", "Avg Spend $",
+            ]
+            macro_display["YoY Change (pp)"] = macro_display["YoY Change (pp)"].apply(
+                lambda x: f"{x:+.2f}" if x is not None else "N/A"
+            )
+            st.dataframe(macro_display, use_container_width=True, hide_index=True)
+
+            # Bubble map of clusters — one bubble per cluster, sized by share
+            st.markdown("**Cluster Map**")
+            _CLUSTER_STORES = {
+                "Inner Sydney": ["HFM Broadway", "HFM Potts Point", "HFM Cammeray"],
+                "Eastern Suburbs": ["HFM Bondi Junction", "HFM Bondi Beach", "HFM Bondi Westfield",
+                                    "HFM Rose Bay", "HFM Randwick"],
+                "North Shore": ["HFM Willoughby", "HFM Lane Cove", "HFM Boronia Park",
+                                "HFM Lindfield", "HFM St Ives"],
+                "Northern Beaches": ["HFM Mosman", "HFM Manly", "HFM Dee Why", "HFM Mona Vale"],
+                "Inner West": ["HFM Drummoyne", "HFM Leichhardt"],
+                "Western Sydney": ["HFM Merrylands", "HFM Baulkham Hills", "HFM Pennant Hills", "HFM Penrith"],
+                "Central Coast": ["HFM Erina"],
+                "Hunter": ["HFM Newcastle", "HFM Glendale"],
+                "Regional NSW": ["HFM Orange", "HFM Bowral", "HFM Albury"],
+                "QLD": ["HFM West End", "HFM Isle of Capri", "HFM Clayfield"],
+            }
+            cluster_coords = []
+            for _, row in macro_df.iterrows():
+                clat, clon = [], []
+                for sname in _CLUSTER_STORES.get(row["cluster"], []):
+                    si = STORE_LOCATIONS.get(sname)
+                    if si:
+                        clat.append(si["lat"])
+                        clon.append(si["lon"])
+                if clat:
+                    cluster_coords.append({
+                        "cluster": row["cluster"],
+                        "lat": sum(clat) / len(clat),
+                        "lon": sum(clon) / len(clon),
+                        "avg_share": row["avg_share"],
+                        "share_change": row["share_change"],
+                        "stores": row["stores"],
+                        "postcodes": row["postcodes"],
+                    })
+
+            if cluster_coords:
+                ccdf = pd.DataFrame(cluster_coords)
+                ccdf["size"] = ccdf["avg_share"].clip(lower=1) * 3
+                ccdf["change_text"] = ccdf["share_change"].apply(
+                    lambda x: f"{x:+.2f}pp YoY" if x is not None else ""
+                )
+                fig_cmap = px.scatter_mapbox(
+                    ccdf, lat="lat", lon="lon",
+                    size="size", color="avg_share",
+                    hover_name="cluster",
+                    custom_data=["stores", "postcodes", "avg_share", "change_text"],
+                    color_continuous_scale="Greens",
+                    zoom=8, size_max=40,
+                )
+                fig_cmap.update_traces(
+                    hovertemplate=(
+                        "<b>%{hovertext}</b><br>"
+                        "Stores: %{customdata[0]} | Postcodes: %{customdata[1]}<br>"
+                        "Avg Share: %{customdata[2]:.1f}%<br>"
+                        "%{customdata[3]}"
+                        "<extra></extra>"
+                    )
+                )
+                fig_cmap.update_layout(
+                    mapbox_style="open-street-map",
+                    mapbox=dict(center=dict(lat=-33.85, lon=151.2), zoom=9),
+                    height=500,
+                    margin=dict(l=0, r=0, t=0, b=0),
+                )
+                st.plotly_chart(fig_cmap, use_container_width=True, key="cluster_map")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 5: TRENDS & SHIFTS
 # ══════════════════════════════════════════════════════════════════════════════
 
 with tab_trends:
@@ -875,5 +1157,6 @@ c1.page_link("dashboards/customer_dashboard.py", label="Customer Analytics", ico
 c2.page_link("dashboards/sales_dashboard.py", label="Sales by Store", icon="📈")
 c3.page_link("dashboards/plu_intel_dashboard.py", label="PLU Intelligence", icon="📊")
 
+render_voice_data_box("market_share")
 render_ask_question("market_share")
 render_footer("Market Share Intelligence", f"{_fmt_period(min_p)} to {_fmt_period(max_p)}", user=user)

@@ -61,6 +61,7 @@ _pages = {
     "trending": st.Page(str(_DIR / "trending_dashboard.py"), title="Trending", icon="\U0001f4c8", url_path="trending"),
     "revenue-bridge": st.Page(str(_DIR / "revenue_bridge_dashboard.py"), title="Revenue Bridge", icon="\U0001f4c9", url_path="revenue-bridge"),
     "hub-portal": st.Page(str(_DIR / "hub_portal.py"), title="Hub Portal", icon="\U0001f310", url_path="hub-portal"),
+    "ai-adoption": st.Page(str(_DIR / "ai_adoption" / "dashboard.py"), title="AI Adoption", icon="\U0001f4ca", url_path="ai-adoption"),
 }
 
 # Pillar groupings for navigation
@@ -70,7 +71,7 @@ _PILLARS = [
     {"name": "Customer", "icon": "\U0001f465", "color": "#7c3aed",
      "slugs": ["customers", "market-share"]},
     {"name": "People", "icon": "\U0001f393", "color": "#059669",
-     "slugs": ["learning-centre", "hub-assistant"]},
+     "slugs": ["learning-centre", "hub-assistant", "ai-adoption"]},
     {"name": "Operations", "icon": "\U0001f4ca", "color": "#d97706",
      "slugs": ["sales", "profitability", "transport", "store-ops", "buying-hub", "product-intel", "plu-intel"]},
     {"name": "Digital & AI", "icon": "\U0001f680", "color": "#4ba021",
@@ -86,7 +87,7 @@ nav = st.navigation(
         "": [_home],
         "For The Greater Goodness": [_pages["greater-goodness"]],
         "Smashing It for the Customer": [_pages["customers"], _pages["market-share"]],
-        "Growing Legendary Leadership": [_pages["learning-centre"], _pages["hub-assistant"]],
+        "Growing Legendary Leadership": [_pages["learning-centre"], _pages["hub-assistant"], _pages["ai-adoption"]],
         "Today's Business, Done Better": [_pages["sales"], _pages["profitability"], _pages["transport"], _pages["store-ops"], _pages["buying-hub"], _pages["product-intel"], _pages["plu-intel"]],
         "Tomorrow's Business, Built Better": [_pages["prompt-builder"], _pages["the-rubric"], _pages["trending"], _pages["revenue-bridge"], _pages["hub-portal"]],
     }

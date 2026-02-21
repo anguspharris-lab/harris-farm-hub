@@ -21,6 +21,7 @@ from pathlib import Path
 
 from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
+from shared.voice_realtime import render_voice_data_box
 
 user = st.session_state.get("auth_user")
 
@@ -724,6 +725,7 @@ st.dataframe(display_df, hide_index=True)
 # NATURAL LANGUAGE QUERY INTERFACE
 # ============================================================================
 
+render_voice_data_box("sales")
 render_ask_question("sales")
 
 # ============================================================================

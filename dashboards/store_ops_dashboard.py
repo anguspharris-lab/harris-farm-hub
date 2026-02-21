@@ -31,6 +31,7 @@ from shared.time_filter import (
 )
 from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
+from shared.voice_realtime import render_voice_data_box
 from shared.fiscal_selector import render_fiscal_selector
 
 user = st.session_state.get("auth_user")
@@ -919,6 +920,7 @@ except ImportError:
 # ASK A QUESTION
 # ============================================================================
 
+render_voice_data_box("store_ops")
 render_ask_question("store_ops")
 
 # ============================================================================

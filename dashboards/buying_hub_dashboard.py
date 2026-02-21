@@ -23,6 +23,7 @@ from product_hierarchy import (
 
 from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
+from shared.voice_realtime import render_voice_data_box
 from shared.fiscal_selector import render_fiscal_selector
 from shared.hierarchy_filter import render_hierarchy_filter, hierarchy_filter_summary
 from shared.hourly_charts import render_hourly_analysis
@@ -476,6 +477,7 @@ with tab5:
 # ASK A QUESTION
 # ============================================================================
 
+render_voice_data_box("buying_hub")
 render_ask_question("buying_hub")
 
 # ============================================================================

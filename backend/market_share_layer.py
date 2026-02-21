@@ -511,6 +511,308 @@ def state_trend(channel="Total"):
     return [dict(r) for r in rows]
 
 
+# ---------------------------------------------------------------------------
+# Store Health Scorecard
+# ---------------------------------------------------------------------------
+
+def store_health_scorecard(period, prior_period=None):
+    """Compute a health scorecard for every store based on trade area metrics.
+
+    Optimised: pre-computes all distances once, uses single DB connection,
+    and batches queries by collecting all postcodes upfront.
+
+    Returns one dict per store with:
+    - core/primary share averages (Total channel)
+    - instore/online core share
+    - YoY share change
+    - health grade (A-F) based on composite score
+    """
+    if prior_period is None:
+        ps = str(period)
+        prior_period = int(f"{int(ps[:4]) - 1}{ps[4:]}")
+
+    coords = get_postcode_coords()
+
+    # Step 1: Pre-compute all store → postcode distances
+    store_postcodes = {}  # store_name → [(pc, dist, tier), ...]
+    all_pcs = set()
+    for store_name, store_info in STORE_LOCATIONS.items():
+        nearby = []
+        for pc, coord in coords.items():
+            d = haversine_km(store_info["lat"], store_info["lon"],
+                             coord["lat"], coord["lon"])
+            if d <= 20:
+                nearby.append((pc, d, distance_tier(d)))
+                all_pcs.add(pc)
+        store_postcodes[store_name] = nearby
+
+    # Step 2: Bulk-fetch all market share data for relevant postcodes + periods
+    conn = _get_conn()
+    all_pcs_list = list(all_pcs)
+    placeholders = ",".join("?" * len(all_pcs_list))
+
+    # Fetch current and prior period data in two queries
+    data = {}  # (pc, period, channel) → row dict
+    for p in (period, prior_period):
+        rows = conn.execute(f"""
+            SELECT region_code, channel, market_share_pct,
+                   customer_penetration_pct, spend_per_customer
+            FROM market_share
+            WHERE region_code IN ({placeholders})
+              AND period = ?
+        """, all_pcs_list + [p]).fetchall()
+        for r in rows:
+            data[(r["region_code"], p, r["channel"])] = dict(r)
+    conn.close()
+
+    # Step 3: Compute scorecard per store from pre-fetched data
+    results = []
+    for store_name, store_info in STORE_LOCATIONS.items():
+        nearby = store_postcodes[store_name]
+        if not nearby:
+            continue
+
+        record = {
+            "store": store_name,
+            "state": store_info["state"],
+            "postcode": store_info["postcode"],
+            "lat": store_info["lat"],
+            "lon": store_info["lon"],
+            "total_postcodes": len(nearby),
+        }
+
+        # Core+Primary postcodes (Total channel)
+        cp_pcs = [pc for pc, _, t in nearby if t in ("Core (0-3km)", "Primary (3-5km)")]
+
+        for tier_name, tier_label in [("Core (0-3km)", "core"), ("Primary (3-5km)", "primary")]:
+            tier_pcs = [pc for pc, _, t in nearby if t == tier_name]
+            shares = [data[(pc, period, "Total")]["market_share_pct"]
+                      for pc in tier_pcs if (pc, period, "Total") in data
+                      and data[(pc, period, "Total")]["market_share_pct"] is not None]
+            record[f"total_{tier_label}_share"] = round(sum(shares) / len(shares), 2) if shares else None
+            record[f"total_{tier_label}_count"] = len(tier_pcs)
+
+        # Instore/Online core share
+        core_pcs = [pc for pc, _, t in nearby if t == "Core (0-3km)"]
+        for chan in ("Instore", "Online"):
+            shares = [data[(pc, period, chan)]["market_share_pct"]
+                      for pc in core_pcs if (pc, period, chan) in data
+                      and data[(pc, period, chan)]["market_share_pct"] is not None]
+            record[f"{chan.lower()}_core_share"] = round(sum(shares) / len(shares), 2) if shares else None
+
+        # CP aggregate metrics
+        if cp_pcs:
+            cp_shares = [data[(pc, period, "Total")]["market_share_pct"]
+                         for pc in cp_pcs if (pc, period, "Total") in data
+                         and data[(pc, period, "Total")]["market_share_pct"] is not None]
+            cp_pens = [data[(pc, period, "Total")]["customer_penetration_pct"]
+                       for pc in cp_pcs if (pc, period, "Total") in data
+                       and data[(pc, period, "Total")]["customer_penetration_pct"] is not None]
+            cp_spends = [data[(pc, period, "Total")]["spend_per_customer"]
+                         for pc in cp_pcs if (pc, period, "Total") in data
+                         and data[(pc, period, "Total")]["spend_per_customer"] is not None]
+
+            record["cp_share"] = round(sum(cp_shares) / len(cp_shares), 2) if cp_shares else 0
+            record["cp_penetration"] = round(sum(cp_pens) / len(cp_pens), 2) if cp_pens else 0
+            record["cp_spend"] = round(sum(cp_spends) / len(cp_spends), 2) if cp_spends else 0
+
+            # Prior period
+            prior_shares = [data[(pc, prior_period, "Total")]["market_share_pct"]
+                            for pc in cp_pcs if (pc, prior_period, "Total") in data
+                            and data[(pc, prior_period, "Total")]["market_share_pct"] is not None]
+            prior_share = round(sum(prior_shares) / len(prior_shares), 2) if prior_shares else None
+            record["cp_share_prior"] = prior_share
+            record["cp_share_change"] = round(record["cp_share"] - prior_share, 2) if prior_share else None
+        else:
+            record["cp_share"] = 0
+            record["cp_penetration"] = 0
+            record["cp_spend"] = 0
+            record["cp_share_prior"] = None
+            record["cp_share_change"] = None
+
+        # Health grade: composite of share level + trend + penetration
+        score = 0
+        s = record["cp_share"]
+        if s >= 10:
+            score += 40
+        elif s >= 5:
+            score += 30
+        elif s >= 2:
+            score += 20
+        else:
+            score += 10
+
+        chg = record["cp_share_change"]
+        if chg is not None:
+            if chg >= 1:
+                score += 30
+            elif chg >= 0:
+                score += 20
+            elif chg >= -1:
+                score += 10
+
+        pen = record["cp_penetration"]
+        if pen >= 20:
+            score += 30
+        elif pen >= 10:
+            score += 20
+        elif pen >= 5:
+            score += 10
+
+        if score >= 80:
+            record["grade"] = "A"
+        elif score >= 60:
+            record["grade"] = "B"
+        elif score >= 40:
+            record["grade"] = "C"
+        elif score >= 25:
+            record["grade"] = "D"
+        else:
+            record["grade"] = "F"
+        record["score"] = score
+
+        results.append(record)
+
+    return sorted(results, key=lambda x: x["score"], reverse=True)
+
+
+def store_channel_comparison(store_name, period):
+    """Compare Instore vs Online market share across a store's trade area."""
+    store = STORE_LOCATIONS.get(store_name)
+    if not store:
+        return []
+
+    coords = get_postcode_coords()
+    nearby = []
+    for pc, coord in coords.items():
+        d = haversine_km(store["lat"], store["lon"], coord["lat"], coord["lon"])
+        if d <= 10:  # Core + Primary + Secondary only
+            nearby.append((pc, d, distance_tier(d)))
+
+    if not nearby:
+        return []
+
+    conn = _get_conn()
+    results = []
+    for pc, dist, tier in nearby:
+        rows = conn.execute("""
+            SELECT channel, market_share_pct, customer_penetration_pct,
+                   spend_per_customer, market_size_dollars
+            FROM market_share
+            WHERE region_code = ? AND period = ?
+              AND channel IN ('Instore', 'Online')
+        """, (pc, period)).fetchall()
+
+        instore = next((dict(r) for r in rows if r["channel"] == "Instore"), None)
+        online = next((dict(r) for r in rows if r["channel"] == "Online"), None)
+
+        row = conn.execute("""
+            SELECT region_name FROM market_share
+            WHERE region_code = ? AND period = ? LIMIT 1
+        """, (pc, period)).fetchone()
+        region_name = row["region_name"] if row else pc
+
+        results.append({
+            "postcode": pc,
+            "region_name": region_name,
+            "distance_km": round(dist, 1),
+            "tier": tier,
+            "instore_share": round(instore["market_share_pct"], 2) if instore and instore["market_share_pct"] else 0,
+            "online_share": round(online["market_share_pct"], 2) if online and online["market_share_pct"] else 0,
+            "instore_pen": round(instore["customer_penetration_pct"], 2) if instore and instore["customer_penetration_pct"] else 0,
+            "online_pen": round(online["customer_penetration_pct"], 2) if online and online["customer_penetration_pct"] else 0,
+            "instore_spend": round(instore["spend_per_customer"], 2) if instore and instore["spend_per_customer"] else 0,
+            "online_spend": round(online["spend_per_customer"], 2) if online and online["spend_per_customer"] else 0,
+        })
+    conn.close()
+    return sorted(results, key=lambda x: x["distance_km"])
+
+
+def network_macro_view(period, channel="Total"):
+    """Aggregate stores into regional clusters for macro analysis.
+
+    Clusters: Inner Sydney, Northern Beaches, North Shore, Eastern Suburbs,
+    Inner West, Western Sydney, Central Coast, Hunter, Regional NSW, QLD.
+    """
+    CLUSTERS = {
+        "Inner Sydney": ["HFM Broadway", "HFM Potts Point", "HFM Cammeray"],
+        "Eastern Suburbs": ["HFM Bondi Junction", "HFM Bondi Beach", "HFM Bondi Westfield",
+                            "HFM Rose Bay", "HFM Randwick"],
+        "North Shore": ["HFM Willoughby", "HFM Lane Cove", "HFM Boronia Park",
+                        "HFM Lindfield", "HFM St Ives"],
+        "Northern Beaches": ["HFM Mosman", "HFM Manly", "HFM Dee Why", "HFM Mona Vale"],
+        "Inner West": ["HFM Drummoyne", "HFM Leichhardt"],
+        "Western Sydney": ["HFM Merrylands", "HFM Baulkham Hills", "HFM Pennant Hills", "HFM Penrith"],
+        "Central Coast": ["HFM Erina"],
+        "Hunter": ["HFM Newcastle", "HFM Glendale"],
+        "Regional NSW": ["HFM Orange", "HFM Bowral", "HFM Albury"],
+        "QLD": ["HFM West End", "HFM Isle of Capri", "HFM Clayfield"],
+    }
+
+    coords = get_postcode_coords()
+    conn = _get_conn()
+    results = []
+
+    for cluster_name, store_list in CLUSTERS.items():
+        # Collect all postcodes within 10km of any store in cluster
+        cluster_pcs = set()
+        store_count = 0
+        for sn in store_list:
+            store = STORE_LOCATIONS.get(sn)
+            if not store:
+                continue
+            store_count += 1
+            for pc, coord in coords.items():
+                d = haversine_km(store["lat"], store["lon"], coord["lat"], coord["lon"])
+                if d <= 10:
+                    cluster_pcs.add(pc)
+
+        if not cluster_pcs:
+            continue
+
+        pcs = list(cluster_pcs)
+        placeholders = ",".join("?" * len(pcs))
+
+        # Current period
+        cur = conn.execute(f"""
+            SELECT AVG(market_share_pct) as avg_share,
+                   AVG(customer_penetration_pct) as avg_pen,
+                   AVG(spend_per_customer) as avg_spend,
+                   SUM(market_size_dollars) as total_market,
+                   COUNT(*) as pc_count
+            FROM market_share
+            WHERE region_code IN ({placeholders})
+              AND period = ? AND channel = ?
+        """, pcs + [period, channel]).fetchone()
+
+        # Prior year
+        ps = str(period)
+        prior_period = int(f"{int(ps[:4]) - 1}{ps[4:]}")
+        pri = conn.execute(f"""
+            SELECT AVG(market_share_pct) as avg_share
+            FROM market_share
+            WHERE region_code IN ({placeholders})
+              AND period = ? AND channel = ?
+        """, pcs + [prior_period, channel]).fetchone()
+
+        prior_share = round(pri["avg_share"], 2) if pri and pri["avg_share"] else None
+
+        results.append({
+            "cluster": cluster_name,
+            "stores": store_count,
+            "postcodes": cur["pc_count"] if cur else 0,
+            "avg_share": round(cur["avg_share"], 2) if cur and cur["avg_share"] else 0,
+            "avg_penetration": round(cur["avg_pen"], 2) if cur and cur["avg_pen"] else 0,
+            "avg_spend": round(cur["avg_spend"], 2) if cur and cur["avg_spend"] else 0,
+            "total_market": cur["total_market"] or 0,
+            "share_prior": prior_share,
+            "share_change": round(cur["avg_share"] - prior_share, 2) if cur and cur["avg_share"] and prior_share else None,
+        })
+
+    conn.close()
+    return sorted(results, key=lambda x: x["avg_share"], reverse=True)
+
+
 def postcode_trend(postcode, channel="Total"):
     """Monthly trend for a single postcode."""
     conn = _get_conn()

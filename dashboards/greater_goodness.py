@@ -15,6 +15,7 @@ import requests
 import streamlit as st
 
 from shared.styles import render_footer
+from shared.voice_realtime import render_voice_data_box
 
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 
@@ -516,5 +517,7 @@ st.markdown(
     "</div>",
     unsafe_allow_html=True,
 )
+
+render_voice_data_box("general")
 
 render_footer("Greater Goodness", "Pillar 1 — For The Greater Goodness")

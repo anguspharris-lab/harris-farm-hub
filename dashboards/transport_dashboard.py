@@ -14,6 +14,7 @@ import numpy as np
 from shared.stores import STORES, REGIONS
 from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
+from shared.voice_realtime import render_voice_data_box
 
 # Approximate km from Sydney Markets (Flemington) to each store
 STORE_DISTANCE_KM = {
@@ -579,6 +580,7 @@ if st.button("Analyze", type="primary"):
 # ASK A QUESTION
 # ============================================================================
 
+render_voice_data_box("general")
 render_ask_question("general")
 
 # ============================================================================

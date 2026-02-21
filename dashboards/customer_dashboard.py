@@ -23,6 +23,7 @@ from transaction_queries import run_query
 
 from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
+from shared.voice_realtime import render_voice_data_box
 from shared.fiscal_selector import render_fiscal_selector
 from shared.time_filter import render_time_filter, time_filter_summary, render_quick_period
 
@@ -1135,6 +1136,7 @@ with tab4:
 # ASK A QUESTION
 # ============================================================================
 
+render_voice_data_box("customers")
 render_ask_question("customers")
 
 # ============================================================================

@@ -15,6 +15,7 @@ from datetime import datetime
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 from shared.styles import render_header, render_footer
+from shared.voice_realtime import render_voice_data_box
 from shared.training_content import (
     BUILDING_BLOCKS, PROMPT_EXAMPLES, CHALLENGES,
     RUBRIC_CRITERIA, BADGES, COACH_SYSTEM_PROMPT,
@@ -653,5 +654,7 @@ with tabs[4]:
 # ============================================================================
 # FOOTER
 # ============================================================================
+
+render_voice_data_box("general")
 
 render_footer("The Rubric", user=user)

@@ -16,6 +16,7 @@ API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
+from shared.voice_realtime import render_voice_data_box
 
 user = st.session_state.get("auth_user")
 
@@ -293,6 +294,7 @@ if st.button("📝 Submit Feedback", type="primary"):
 # ASK A QUESTION
 # ============================================================================
 
+render_voice_data_box("trending")
 render_ask_question("trending")
 
 # ============================================================================
