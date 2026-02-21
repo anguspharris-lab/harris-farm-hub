@@ -18,6 +18,7 @@ import streamlit as st
 from market_share_layer import (
     db_available, get_periods, get_latest_period, get_period_range,
     get_regions, postcode_map_data, store_trade_area, store_trade_area_trend,
+    store_cumulative_summary, TRADE_AREA_RADII,
     yoy_comparison, detect_shifts, flag_issues, opportunity_analysis,
     state_summary, state_trend, postcode_trend, nearest_store,
     store_health_scorecard, store_channel_comparison, network_macro_view,
@@ -328,7 +329,10 @@ with tab_map:
 
 with tab_store:
     st.subheader("Store Trade Area Analysis")
-    st.caption("Select a store to see surrounding postcodes with performance data.")
+    st.caption(
+        "Select a store to see cumulative trade area performance. "
+        "Each radius includes ALL postcodes within that distance (not rings)."
+    )
 
     store_names = sorted(STORE_LOCATIONS.keys())
     selected_store = st.selectbox("Select Store", store_names, key="trade_area_store")
@@ -336,124 +340,156 @@ with tab_store:
     if selected_store:
         store_info = STORE_LOCATIONS[selected_store]
 
-        # Get trade area postcodes
-        ta_data = store_trade_area(selected_store, latest, channel)
+        # Get all trade area postcodes (up to 50km)
+        ta_data = store_trade_area(selected_store, latest, channel, max_km=50)
         if not ta_data:
             st.info(f"No market share data for postcodes near {selected_store}.")
         else:
             tdf = pd.DataFrame(ta_data)
 
-            # Trade area summary by tier
-            tier_summary = tdf.groupby("tier").agg(
-                postcodes=("postcode", "count"),
-                avg_share=("market_share_pct", "mean"),
-                avg_penetration=("penetration_pct", "mean"),
-                avg_spend=("spend_per_customer", "mean"),
-                total_market=("market_size", "sum"),
-            ).reset_index()
+            # Cumulative summary by radius
+            cum_summary = store_cumulative_summary(selected_store, latest, channel)
+            cum_df = pd.DataFrame(cum_summary)
 
-            # KPIs
-            core = tdf[tdf["tier"] == "Core (0-3km)"]
-            primary = tdf[tdf["tier"] == "Primary (3-5km)"]
+            # KPIs — use 0-3km and 0-5km cumulative
+            r3 = next((r for r in cum_summary if r["radius_km"] == 3), None)
+            r5 = next((r for r in cum_summary if r["radius_km"] == 5), None)
+            r10 = next((r for r in cum_summary if r["radius_km"] == 10), None)
 
             k1, k2, k3, k4 = st.columns(4)
-            k1.metric("Trade Area Postcodes", len(tdf))
-            if not core.empty:
-                k2.metric("Core Avg Share", f"{core['market_share_pct'].mean():.1f}%")
-            else:
-                k2.metric("Core Avg Share", "N/A")
-            if not primary.empty:
-                k3.metric("Primary Avg Share", f"{primary['market_share_pct'].mean():.1f}%")
-            else:
-                k3.metric("Primary Avg Share", "N/A")
-            k4.metric("Total Market", f"${tdf['market_size'].sum()/1e6:.1f}M")
+            k1.metric("Total Postcodes (50km)", len(tdf))
+            k2.metric("0-3km Avg Share", f"{r3['avg_share']:.1f}%" if r3 and r3["avg_share"] else "N/A")
+            k3.metric("0-5km Avg Share", f"{r5['avg_share']:.1f}%" if r5 and r5["avg_share"] else "N/A")
+            k4.metric("0-10km Avg Share", f"{r10['avg_share']:.1f}%" if r10 and r10["avg_share"] else "N/A")
 
-            # Tier breakdown table
-            st.markdown("**Performance by Distance Tier**")
-            tier_display = tier_summary.rename(columns={
-                "tier": "Tier", "postcodes": "Postcodes", "avg_share": "Avg Share %",
-                "avg_penetration": "Avg Penetration %", "avg_spend": "Avg Spend $",
-                "total_market": "Total Market $",
-            })
-            st.dataframe(tier_display, use_container_width=True, hide_index=True)
+            # Cumulative summary table
+            st.markdown("**Performance by Cumulative Radius**")
+            cum_display = cum_df[cum_df["postcodes"] > 0].copy()
+            cum_display = cum_display[["label", "postcodes", "avg_share", "avg_penetration",
+                                       "avg_spend", "total_market"]]
+            cum_display.columns = ["Radius", "Postcodes", "Avg Share %",
+                                   "Avg Penetration %", "Avg Spend $", "Total Market $"]
+            st.dataframe(cum_display, use_container_width=True, hide_index=True)
 
-            # Map of trade area
+            # Bar chart showing share decay with distance
+            cum_with_data = cum_df[cum_df["avg_share"].notna()].copy()
+            if not cum_with_data.empty:
+                fig_decay = px.bar(
+                    cum_with_data, x="label", y="avg_share",
+                    labels={"label": "Cumulative Radius", "avg_share": "Avg Market Share %"},
+                    color="avg_share",
+                    color_continuous_scale=["#dc2626", "#d97706", "#4ba021"],
+                    text="avg_share",
+                )
+                fig_decay.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
+                fig_decay.update_layout(
+                    height=350, showlegend=False, coloraxis_showscale=False,
+                    xaxis=dict(categoryorder="array",
+                               categoryarray=[f"0-{r}km" for r in TRADE_AREA_RADII]),
+                )
+                st.plotly_chart(fig_decay, use_container_width=True, key="ta_decay_chart")
+
+            # Map of trade area — colour by distance band
             st.markdown("**Trade Area Map**")
-            tdf["hover"] = (
-                tdf["region_name"] + " (" + tdf["postcode"] + ")<br>" +
-                "Share: " + tdf["market_share_pct"].apply(lambda x: f"{x:.1f}%") + "<br>" +
-                tdf["distance_km"].apply(lambda x: f"{x:.1f}km") + " — " + tdf["tier"]
+            map_radius = st.selectbox(
+                "Show postcodes within",
+                [f"0-{r}km" for r in TRADE_AREA_RADII],
+                index=3,  # Default 0-20km
+                key="ta_map_radius",
             )
-            tdf["size"] = tdf["market_share_pct"].clip(lower=0.5) * 2
+            map_km = int(map_radius.split("-")[1].replace("km", ""))
+            map_df = tdf[tdf["distance_km"] <= map_km].copy()
 
-            # Join with postcode coordinates for mapping
-            coords = get_postcode_coords()
-            tdf["lat"] = pd.to_numeric(tdf["postcode"].map(lambda x: coords.get(x, {}).get("lat")), errors="coerce")
-            tdf["lon"] = pd.to_numeric(tdf["postcode"].map(lambda x: coords.get(x, {}).get("lon")), errors="coerce")
-            tdf = tdf.dropna(subset=["lat", "lon"])
+            if not map_df.empty:
+                map_df["size"] = map_df["market_share_pct"].clip(lower=0.5) * 2
 
-            fig_ta = px.scatter_mapbox(
-                tdf, lat="lat", lon="lon",
-                color="tier",
-                size="size",
-                hover_name="region_name",
-                custom_data=["postcode", "market_share_pct", "penetration_pct", "distance_km", "tier"],
-                color_discrete_map={
-                    "Core (0-3km)": "#16a34a",
-                    "Primary (3-5km)": "#2563eb",
-                    "Secondary (5-10km)": "#d97706",
-                    "Extended (10-20km)": "#9333ea",
-                },
-                zoom=11, size_max=18,
+                # Join with postcode coordinates
+                coords = get_postcode_coords()
+                map_df["lat"] = pd.to_numeric(
+                    map_df["postcode"].map(lambda x: coords.get(x, {}).get("lat")), errors="coerce")
+                map_df["lon"] = pd.to_numeric(
+                    map_df["postcode"].map(lambda x: coords.get(x, {}).get("lon")), errors="coerce")
+                map_df = map_df.dropna(subset=["lat", "lon"])
+
+                if not map_df.empty:
+                    fig_ta = px.scatter_mapbox(
+                        map_df, lat="lat", lon="lon",
+                        color="market_share_pct",
+                        size="size",
+                        hover_name="region_name",
+                        custom_data=["postcode", "market_share_pct", "penetration_pct",
+                                     "distance_km", "tier"],
+                        color_continuous_scale="Greens",
+                        zoom=11, size_max=18,
+                    )
+                    fig_ta.update_traces(
+                        hovertemplate=(
+                            "<b>%{hovertext}</b> (%{customdata[0]})<br>"
+                            "Share: %{customdata[1]:.1f}%<br>"
+                            "Penetration: %{customdata[2]:.1f}%<br>"
+                            "Distance: %{customdata[3]:.1f}km (%{customdata[4]})"
+                            "<extra></extra>"
+                        )
+                    )
+
+                    # Add store marker
+                    fig_ta.add_trace(go.Scattermapbox(
+                        lat=[store_info["lat"]], lon=[store_info["lon"]],
+                        mode="markers+text",
+                        marker=dict(size=16, color="#dc2626", symbol="circle"),
+                        text=[selected_store.replace("HFM ", "")],
+                        textposition="top center",
+                        textfont=dict(size=11, color="#dc2626", family="Arial Black"),
+                        name=selected_store,
+                        hovertemplate=f"<b>{selected_store}</b><extra>Store</extra>",
+                    ))
+
+                    fig_ta.update_layout(
+                        mapbox_style="open-street-map",
+                        mapbox=dict(center=dict(lat=store_info["lat"],
+                                                lon=store_info["lon"]), zoom=11),
+                        height=550,
+                        margin=dict(l=0, r=0, t=0, b=0),
+                    )
+                    st.plotly_chart(fig_ta, use_container_width=True, key="trade_area_map")
+
+            # Trade area trend — cumulative radii
+            st.markdown("**Trade Area Share Trend by Radius**")
+            ta_radius_opts = [f"0-{r}km" for r in TRADE_AREA_RADII]
+            ta_selected_radii = st.multiselect(
+                "Compare radii",
+                ta_radius_opts,
+                default=["0-3km", "0-5km", "0-10km", "0-20km"],
+                key="ta_trend_radii",
             )
-            fig_ta.update_traces(
-                hovertemplate=(
-                    "<b>%{hovertext}</b> (%{customdata[0]})<br>"
-                    "Share: %{customdata[1]:.1f}%<br>"
-                    "Penetration: %{customdata[2]:.1f}%<br>"
-                    "Distance: %{customdata[3]:.1f}km (%{customdata[4]})"
-                    "<extra></extra>"
-                )
-            )
 
-            # Add store marker
-            fig_ta.add_trace(go.Scattermapbox(
-                lat=[store_info["lat"]], lon=[store_info["lon"]],
-                mode="markers+text",
-                marker=dict(size=16, color="#dc2626", symbol="circle"),
-                text=[selected_store.replace("HFM ", "")],
-                textposition="top center",
-                textfont=dict(size=11, color="#dc2626", family="Arial Black"),
-                name=selected_store,
-                hovertemplate=f"<b>{selected_store}</b><extra>Store</extra>",
-            ))
+            if ta_selected_radii:
+                trend_frames = []
+                for r_label in ta_selected_radii:
+                    r_km = int(r_label.split("-")[1].replace("km", ""))
+                    trend = store_trade_area_trend(selected_store, channel,
+                                                   max_km=50, tier_filter=r_km)
+                    if trend:
+                        rdf = pd.DataFrame(trend)
+                        rdf["radius"] = r_label
+                        trend_frames.append(rdf)
 
-            fig_ta.update_layout(
-                mapbox_style="open-street-map",
-                mapbox=dict(center=dict(lat=store_info["lat"], lon=store_info["lon"]), zoom=12),
-                height=550,
-                margin=dict(l=0, r=0, t=0, b=0),
-                legend=dict(orientation="h", y=-0.02),
-            )
-            st.plotly_chart(fig_ta, use_container_width=True, key="trade_area_map")
-
-            # Trade area trend
-            st.markdown("**Trade Area Share Trend**")
-            ta_tier = st.selectbox("Trend by Tier", ["All Tiers", "Core (0-3km)", "Primary (3-5km)",
-                                                      "Secondary (5-10km)", "Extended (10-20km)"],
-                                   key="ta_trend_tier")
-            tier_val = None if ta_tier == "All Tiers" else ta_tier
-            ta_trend = store_trade_area_trend(selected_store, channel, tier_val)
-            if ta_trend:
-                ttdf = pd.DataFrame(ta_trend)
-                ttdf["period_date"] = pd.to_datetime(ttdf["period"].astype(str), format="%Y%m")
-                fig_tt = px.line(
-                    ttdf, x="period_date", y="avg_share",
-                    labels={"period_date": "", "avg_share": "Avg Market Share %"},
-                    color_discrete_sequence=["#4ba021"],
-                )
-                fig_tt.update_layout(height=350)
-                st.plotly_chart(fig_tt, use_container_width=True, key="ta_trend_chart")
+                if trend_frames:
+                    all_trends = pd.concat(trend_frames, ignore_index=True)
+                    all_trends["period_date"] = pd.to_datetime(
+                        all_trends["period"].astype(str), format="%Y%m")
+                    fig_tt = px.line(
+                        all_trends, x="period_date", y="avg_share", color="radius",
+                        labels={"period_date": "", "avg_share": "Avg Market Share %",
+                                "radius": "Radius"},
+                        color_discrete_sequence=["#16a34a", "#2563eb", "#d97706",
+                                                 "#9333ea", "#6b7280"],
+                    )
+                    fig_tt.update_layout(
+                        height=400,
+                        legend=dict(orientation="h", y=-0.15),
+                    )
+                    st.plotly_chart(fig_tt, use_container_width=True, key="ta_trend_chart")
 
             # Postcode detail table
             st.markdown("**All Postcodes in Trade Area**")

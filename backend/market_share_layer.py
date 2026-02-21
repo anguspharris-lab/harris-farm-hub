@@ -212,8 +212,12 @@ def postcode_map_data(period, channel="Total"):
 # Store trade area analysis
 # ---------------------------------------------------------------------------
 
-def store_trade_area(store_name, period, channel="Total"):
-    """Get all postcodes within 20km of a store with their market share data."""
+# Cumulative trade area radii — each includes all postcodes within that distance
+TRADE_AREA_RADII = [3, 5, 10, 20, 50]
+
+
+def store_trade_area(store_name, period, channel="Total", max_km=50):
+    """Get all postcodes within max_km of a store with their market share data."""
     store = STORE_LOCATIONS.get(store_name)
     if not store:
         return []
@@ -222,39 +226,87 @@ def store_trade_area(store_name, period, channel="Total"):
     nearby_postcodes = []
     for pc, coord in coords.items():
         d = haversine_km(store["lat"], store["lon"], coord["lat"], coord["lon"])
-        if d <= 20:
+        if d <= max_km:
             nearby_postcodes.append((pc, d))
 
     if not nearby_postcodes:
         return []
 
+    # Batch fetch — single query instead of per-postcode
+    pcs = [pc for pc, _ in nearby_postcodes]
+    dist_lookup = {pc: d for pc, d in nearby_postcodes}
     conn = _get_conn()
-    results = []
-    for pc, dist in nearby_postcodes:
-        row = conn.execute("""
-            SELECT region_code, region_name, market_share_pct,
-                   customer_penetration_pct, spend_per_customer,
-                   market_size_dollars
-            FROM market_share
-            WHERE region_code = ? AND period = ? AND channel = ?
-        """, (pc, period, channel)).fetchone()
-        if row:
-            results.append({
-                "postcode": pc,
-                "region_name": row["region_name"],
-                "distance_km": round(dist, 1),
-                "tier": distance_tier(dist),
-                "market_share_pct": row["market_share_pct"] or 0,
-                "penetration_pct": row["customer_penetration_pct"] or 0,
-                "spend_per_customer": row["spend_per_customer"] or 0,
-                "market_size": row["market_size_dollars"] or 0,
-            })
+    placeholders = ",".join("?" * len(pcs))
+    rows = conn.execute(f"""
+        SELECT region_code, region_name, market_share_pct,
+               customer_penetration_pct, spend_per_customer,
+               market_size_dollars
+        FROM market_share
+        WHERE region_code IN ({placeholders}) AND period = ? AND channel = ?
+    """, pcs + [period, channel]).fetchall()
     conn.close()
+
+    results = []
+    for row in rows:
+        pc = row["region_code"]
+        dist = dist_lookup.get(pc, 999)
+        results.append({
+            "postcode": pc,
+            "region_name": row["region_name"],
+            "distance_km": round(dist, 1),
+            "tier": distance_tier(dist),
+            "market_share_pct": row["market_share_pct"] or 0,
+            "penetration_pct": row["customer_penetration_pct"] or 0,
+            "spend_per_customer": row["spend_per_customer"] or 0,
+            "market_size": row["market_size_dollars"] or 0,
+        })
     return sorted(results, key=lambda x: x["distance_km"])
 
 
-def store_trade_area_trend(store_name, channel="Total", tier_filter=None):
-    """Monthly aggregate trend for a store's trade area."""
+def store_cumulative_summary(store_name, period, channel="Total"):
+    """Aggregate metrics at cumulative radii (0-3km, 0-5km, 0-10km, 0-20km, 0-50km).
+
+    Each radius INCLUDES all postcodes within it (not rings).
+    """
+    ta = store_trade_area(store_name, period, channel, max_km=50)
+    if not ta:
+        return []
+
+    results = []
+    for radius in TRADE_AREA_RADII:
+        within = [p for p in ta if p["distance_km"] <= radius]
+        if not within:
+            results.append({
+                "radius_km": radius,
+                "label": f"0-{radius}km",
+                "postcodes": 0,
+                "avg_share": None,
+                "avg_penetration": None,
+                "avg_spend": None,
+                "total_market": 0,
+            })
+            continue
+
+        results.append({
+            "radius_km": radius,
+            "label": f"0-{radius}km",
+            "postcodes": len(within),
+            "avg_share": round(sum(p["market_share_pct"] for p in within) / len(within), 2),
+            "avg_penetration": round(sum(p["penetration_pct"] for p in within) / len(within), 2),
+            "avg_spend": round(sum(p["spend_per_customer"] for p in within) / len(within), 2),
+            "total_market": sum(p["market_size"] for p in within),
+        })
+    return results
+
+
+def store_trade_area_trend(store_name, channel="Total", max_km=50, tier_filter=None):
+    """Monthly aggregate trend for a store's trade area.
+
+    Args:
+        max_km: Maximum radius in km (default 50).
+        tier_filter: If set, only include postcodes within this cumulative radius
+                     (e.g. 5 = within 5km). Legacy string tiers also accepted.
+    """
     store = STORE_LOCATIONS.get(store_name)
     if not store:
         return []
@@ -263,10 +315,14 @@ def store_trade_area_trend(store_name, channel="Total", tier_filter=None):
     nearby = []
     for pc, coord in coords.items():
         d = haversine_km(store["lat"], store["lon"], coord["lat"], coord["lon"])
-        tier = distance_tier(d)
-        if d <= 20:
-            if tier_filter and tier != tier_filter:
-                continue
+        if d <= max_km:
+            # Support both numeric radius filter and legacy string tier filter
+            if tier_filter is not None:
+                if isinstance(tier_filter, (int, float)):
+                    if d > tier_filter:
+                        continue
+                elif distance_tier(d) != tier_filter:
+                    continue
             nearby.append(pc)
 
     if not nearby:
