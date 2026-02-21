@@ -120,8 +120,8 @@ def minimal_result():
 class TestAnalysisTypes:
     """Test the analysis type registry."""
 
-    def test_six_analysis_types(self):
-        assert len(ANALYSIS_TYPES) == 6
+    def test_analysis_types_count(self):
+        assert len(ANALYSIS_TYPES) == 11
 
     def test_required_keys(self):
         for key, info in ANALYSIS_TYPES.items():

@@ -54,7 +54,7 @@ API_BASE = os.getenv("API_URL", "http://localhost:8000")
 # ---------------------------------------------------------------------------
 
 if "lc_user_id" not in st.session_state:
-    st.session_state.lc_user_id = "default_user"
+    st.session_state.lc_user_id = (user or {}).get("email", "default_user")
 if "lc_role" not in st.session_state:
     st.session_state.lc_role = {"function": "", "department": "", "job": ""}
 
@@ -82,12 +82,13 @@ def _api_get_cached(path, params_key):
 
 
 def api_post(path, params=None):
-    """POST to the Hub API."""
+    """POST to the Hub API (sends as query params for FastAPI)."""
     try:
         resp = requests.post(f"{API_BASE}{path}", params=params, timeout=10)
+        resp.raise_for_status()
         return resp.json()
-    except Exception:
-        return {}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 def render_module_card(mod, priority=None):
@@ -213,12 +214,15 @@ def render_module_tab(pillar_key, tab_key_prefix):
     # Mark complete button
     user_id = st.session_state.lc_user_id
     if st.button(f"Mark {mod['code']} as completed", key=f"complete_{mod['code']}"):
-        api_post(
+        result = api_post(
             f"/api/learning/progress/{user_id}/{mod['code']}",
             {"status": "completed", "completion_pct": 100},
         )
-        st.success(f"{mod['code']} marked as completed!")
-        st.rerun()
+        if "error" in result:
+            st.error(f"Could not save progress: {result['error']}")
+        else:
+            st.success(f"{mod['code']} marked as completed!")
+            st.rerun()
 
 
 # ---------------------------------------------------------------------------
@@ -610,7 +614,7 @@ with tab_lab:
 
             # Update progress
             api_post(
-                f"/api/learning/progress/{st.session_state.lc_user_id}/L2",
+                f"/api/learning/progress/{st.session_state.lc_user_id}/RUBRIC_EVAL",
                 {"status": "in_progress", "completion_pct": 50, "time_spent_minutes": 5},
             )
 

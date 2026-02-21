@@ -23,6 +23,7 @@ from shared.training_content import (
 
 st.markdown("<style>.winner-card { border: 3px solid #10b981; border-radius: 10px; padding: 10px; }</style>", unsafe_allow_html=True)
 user = st.session_state.get("auth_user")
+_USER_ID = (user or {}).get("email", "anonymous")
 
 render_header("⚖️ The Rubric", "**AI Training & Prompt Skills** | Learn to write great prompts and evaluate AI responses")
 
@@ -38,6 +39,22 @@ def _rubric_load_performance():
 # ---------------------------------------------------------------------------
 # SESSION STATE DEFAULTS
 # ---------------------------------------------------------------------------
+
+def _save_rubric_progress():
+    """Persist rubric progress to backend."""
+    p = st.session_state.progress
+    try:
+        requests.post(
+            f"{API_URL}/api/learning/progress/{_USER_ID}/RUBRIC",
+            params={
+                "status": "in_progress" if p["challenges_done"] < 5 else "completed",
+                "completion_pct": min(100, p["challenges_done"] * 10 + p["evaluations_done"] * 20),
+                "score": p.get("challenges_done", 0),
+            },
+            timeout=5,
+        )
+    except Exception:
+        pass
 
 if "progress" not in st.session_state:
     st.session_state.progress = {
@@ -220,6 +237,7 @@ with tabs[1]:
                         if quality["score"] >= 4:
                             st.session_state.progress["badges"].add("prompt_pro")
                         st.session_state.progress["best_scores"][challenge["id"]] = quality["score"]
+                        _save_rubric_progress()
                     else:
                         st.error(f"API returned {resp.status_code}. Is the backend running?")
                 except requests.exceptions.ConnectionError:
@@ -554,6 +572,7 @@ with tabs[3]:
             st.session_state.progress["badges"].add("sharp_eye")
             if st.session_state.progress["evaluations_done"] >= 3:
                 st.session_state.progress["badges"].add("rubric_master")
+            _save_rubric_progress()
             st.success("Evaluation saved! Check the **My Progress** tab.")
 
 
