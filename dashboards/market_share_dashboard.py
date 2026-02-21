@@ -17,12 +17,13 @@ import streamlit as st
 
 from market_share_layer import (
     db_available, get_periods, get_latest_period, get_period_range,
-    get_regions, postcode_map_data, store_trade_area, store_trade_area_trend,
+    get_regions, postcode_map_data, postcode_map_data_with_trend,
+    store_trade_area, store_trade_area_trend,
     store_cumulative_summary, TRADE_AREA_RADII,
     yoy_comparison, detect_shifts, flag_issues, opportunity_analysis,
     state_summary, state_trend, postcode_trend, nearest_store,
     store_health_scorecard, store_channel_comparison, network_macro_view,
-    STORE_LOCATIONS, get_postcode_coords,
+    haversine_km, STORE_LOCATIONS, get_postcode_coords,
 )
 from shared.styles import render_header, render_footer, HFM_GREEN
 from shared.ask_question import render_ask_question
@@ -177,52 +178,56 @@ with tab_overview:
 # ══════════════════════════════════════════════════════════════════════════════
 
 with tab_map:
-    st.subheader(f"Market Share Map — {_fmt_period(latest)}")
-    st.caption("Bubble size = market share %. Click postcodes for details. Store markers in green.")
+    # ── Controls Row ──
+    mc1, mc2, mc3, mc4, mc5 = st.columns([1.2, 1, 1, 1, 1])
+    with mc1:
+        map_channel = st.selectbox(
+            "Channel", ["Total", "Instore", "Online"], key="map_channel")
+    with mc2:
+        map_metric = st.selectbox("Colour by", [
+            "Health Indicator", "Market Share %", "Trend Slope (pp/yr)",
+            "YoY Change (pp)", "Penetration %", "Spend/Customer",
+        ], key="map_metric")
+    with mc3:
+        radius_opts = ["All"] + [f"Within {r}km" for r in TRADE_AREA_RADII]
+        radius_filter = st.selectbox("Max Distance", radius_opts, key="map_radius")
+    with mc4:
+        map_store = st.selectbox(
+            "From Store",
+            ["Nearest Store"] + sorted(STORE_LOCATIONS.keys()),
+            key="map_store_filter",
+        )
+    with mc5:
+        map_state = st.selectbox("State", ["All", "NSW", "QLD", "ACT"], key="map_state")
 
-    map_data = postcode_map_data(latest, channel)
-    if not map_data:
+    st.subheader(f"Market Share Map — {map_channel} — {_fmt_period(latest)}")
+    st.caption("Bubble size = market share %. Includes YoY health indicators. Store markers shown.")
+
+    # ── Load data with YoY trend ──
+    map_raw = postcode_map_data_with_trend(latest, map_channel)
+    if not map_raw:
         st.warning("No spatial data available.")
     else:
-        mdf = pd.DataFrame(map_data)
-        # Ensure numeric lat/lon for scatter_mapbox
+        mdf = pd.DataFrame(map_raw)
         mdf["lat"] = pd.to_numeric(mdf["lat"], errors="coerce")
         mdf["lon"] = pd.to_numeric(mdf["lon"], errors="coerce")
         mdf = mdf.dropna(subset=["lat", "lon"])
 
-        # Filter by state if selected
-        if state_filter != "All":
+        # State filter
+        if map_state != "All":
             state_ranges = {
                 "NSW": lambda pc: 2000 <= int(pc) <= 2999,
                 "QLD": lambda pc: 4000 <= int(pc) <= 4999,
                 "ACT": lambda pc: 2600 <= int(pc) <= 2618 or int(pc) in range(2900, 2915),
             }
-            fn = state_ranges.get(state_filter)
+            fn = state_ranges.get(map_state)
             if fn:
                 mdf = mdf[mdf["postcode"].apply(lambda x: fn(x))]
 
-        # Map controls
-        col_metric, col_radius, col_store = st.columns(3)
-        with col_metric:
-            map_metric = st.selectbox("Colour by", [
-                "Market Share %", "Penetration %", "Spend/Customer"
-            ], key="map_metric")
-        with col_radius:
-            radius_opts = ["All"] + [f"Within {r}km" for r in TRADE_AREA_RADII]
-            radius_filter = st.selectbox("Max Distance", radius_opts, key="map_radius")
-        with col_store:
-            map_store = st.selectbox(
-                "From Store",
-                ["Nearest Store"] + sorted(STORE_LOCATIONS.keys()),
-                key="map_store_filter",
-            )
-
-        # Apply radius filter — cumulative from selected store
+        # Radius filter — cumulative from selected store
         if radius_filter != "All":
             max_km = int(radius_filter.replace("Within ", "").replace("km", ""))
             if map_store != "Nearest Store":
-                # Filter by distance from selected store
-                from market_share_layer import haversine_km
                 si = STORE_LOCATIONS[map_store]
                 mdf["_dist"] = mdf.apply(
                     lambda r: haversine_km(si["lat"], si["lon"], r["lat"], r["lon"]), axis=1)
@@ -233,48 +238,96 @@ with tab_map:
         if mdf.empty:
             st.info("No postcodes match the selected filters.")
         else:
-            # Build hover text
-            mdf["hover"] = (
-                mdf["region_name"] + " (" + mdf["postcode"] + ")<br>" +
-                "Share: " + mdf["market_share_pct"].apply(lambda x: f"{x:.1f}%") + "<br>" +
-                "Penetration: " + mdf["penetration_pct"].apply(lambda x: f"{x:.1f}%") + "<br>" +
-                "Spend: " + mdf["spend_per_customer"].apply(lambda x: f"${x:.0f}") + "<br>" +
-                "Nearest: " + mdf["nearest_store"] + " (" + mdf["distance_km"].apply(lambda x: f"{x:.0f}km") + ")"
-            )
+            # Fill NaN change values for display
+            mdf["yoy_change_pp"] = mdf["yoy_change_pp"].fillna(0)
+            mdf["trend_slope_annual"] = mdf["trend_slope_annual"].fillna(0)
+            mdf["health"] = mdf["health"].fillna("New")
 
-            # Determine color column
-            if map_metric == "Market Share %":
-                color_col = "market_share_pct"
-                color_scale = "Greens"
-            elif map_metric == "Penetration %":
-                color_col = "penetration_pct"
-                color_scale = "Blues"
-            else:
-                color_col = "spend_per_customer"
-                color_scale = "Oranges"
-
-            # Size by market share (minimum size for visibility)
+            # Size by market share
             mdf["bubble_size"] = mdf["market_share_pct"].clip(lower=0.3) * 2
 
-            fig = px.scatter_mapbox(
-                mdf, lat="lat", lon="lon",
-                color=color_col,
-                size="bubble_size",
-                hover_name="region_name",
-                custom_data=["postcode", "market_share_pct", "penetration_pct",
-                             "spend_per_customer", "nearest_store", "distance_km"],
-                color_continuous_scale=color_scale,
-                zoom=8, size_max=20,
-            )
+            # Health indicator colour map (based on annualised trend slope)
+            _HEALTH_COLOURS = {
+                "Accelerating": "#16a34a",
+                "Growing": "#65a30d",
+                "Stable": "#d97706",
+                "Softening": "#ea580c",
+                "Declining": "#dc2626",
+                "New": "#9ca3af",
+            }
+            # Ordered for legend
+            _HEALTH_ORDER = ["Accelerating", "Growing", "Stable",
+                             "Softening", "Declining", "New"]
 
-            # Update hover template
+            # Build the map based on selected metric
+            custom_cols = ["postcode", "market_share_pct", "yoy_change_pp",
+                           "penetration_pct", "spend_per_customer",
+                           "nearest_store", "distance_km", "health",
+                           "trend_slope_annual", "trend_months"]
+
+            if map_metric == "Health Indicator":
+                # Categorical colour by health
+                mdf["health"] = pd.Categorical(
+                    mdf["health"], categories=_HEALTH_ORDER, ordered=True)
+                fig = px.scatter_mapbox(
+                    mdf, lat="lat", lon="lon",
+                    color="health",
+                    size="bubble_size",
+                    hover_name="region_name",
+                    custom_data=custom_cols,
+                    color_discrete_map=_HEALTH_COLOURS,
+                    category_orders={"health": _HEALTH_ORDER},
+                    zoom=8, size_max=20,
+                )
+            elif map_metric == "Trend Slope (pp/yr)":
+                fig = px.scatter_mapbox(
+                    mdf, lat="lat", lon="lon",
+                    color="trend_slope_annual",
+                    size="bubble_size",
+                    hover_name="region_name",
+                    custom_data=custom_cols,
+                    color_continuous_scale="RdYlGn",
+                    color_continuous_midpoint=0,
+                    zoom=8, size_max=20,
+                )
+            elif map_metric == "YoY Change (pp)":
+                fig = px.scatter_mapbox(
+                    mdf, lat="lat", lon="lon",
+                    color="yoy_change_pp",
+                    size="bubble_size",
+                    hover_name="region_name",
+                    custom_data=custom_cols,
+                    color_continuous_scale="RdYlGn",
+                    color_continuous_midpoint=0,
+                    zoom=8, size_max=20,
+                )
+            else:
+                if map_metric == "Market Share %":
+                    color_col, color_scale = "market_share_pct", "Greens"
+                elif map_metric == "Penetration %":
+                    color_col, color_scale = "penetration_pct", "Blues"
+                else:
+                    color_col, color_scale = "spend_per_customer", "Oranges"
+                fig = px.scatter_mapbox(
+                    mdf, lat="lat", lon="lon",
+                    color=color_col,
+                    size="bubble_size",
+                    hover_name="region_name",
+                    custom_data=custom_cols,
+                    color_continuous_scale=color_scale,
+                    zoom=8, size_max=20,
+                )
+
+            # Hover template — includes YoY change + trend slope
             fig.update_traces(
                 hovertemplate=(
                     "<b>%{hovertext}</b> (%{customdata[0]})<br>"
-                    "Share: %{customdata[1]:.1f}%<br>"
-                    "Penetration: %{customdata[2]:.1f}%<br>"
-                    "Spend: $%{customdata[3]:.0f}<br>"
-                    "Nearest: %{customdata[4]} (%{customdata[5]:.0f}km)"
+                    "Share: %{customdata[1]:.1f}% (YoY: %{customdata[2]:+.2f}pp)<br>"
+                    "Trend: %{customdata[8]:+.2f}pp/yr (%{customdata[9]} months)<br>"
+                    "Penetration: %{customdata[3]:.1f}%<br>"
+                    "Spend: $%{customdata[4]:.0f}<br>"
+                    "Nearest: %{customdata[5]} (%{customdata[6]:.0f}km)<br>"
+                    "Health: %{customdata[7]}"
                     "<extra></extra>"
                 )
             )
@@ -282,15 +335,13 @@ with tab_map:
             # Add store markers
             store_lats = [s["lat"] for s in STORE_LOCATIONS.values()]
             store_lons = [s["lon"] for s in STORE_LOCATIONS.values()]
-            store_names = list(STORE_LOCATIONS.keys())
-
             fig.add_trace(go.Scattermapbox(
                 lat=store_lats, lon=store_lons,
                 mode="markers+text",
-                marker=dict(size=12, color="#4ba021", symbol="circle"),
-                text=[n.replace("HFM ", "") for n in store_names],
+                marker=dict(size=12, color="#000000", symbol="circle"),
+                text=[n.replace("HFM ", "") for n in STORE_LOCATIONS.keys()],
                 textposition="top center",
-                textfont=dict(size=9, color="#4ba021"),
+                textfont=dict(size=9, color="#333333"),
                 name="HFM Stores",
                 hovertemplate="<b>%{text}</b><extra>HFM Store</extra>",
             ))
@@ -307,13 +358,26 @@ with tab_map:
             )
             st.plotly_chart(fig, use_container_width=True, key="spatial_map")
 
-            # Summary stats below map
+            # ── Summary KPIs below map ──
             st.markdown("---")
+            health_counts = mdf["health"].value_counts()
+            hk = st.columns(6)
+            for i, h in enumerate(_HEALTH_ORDER):
+                cnt = health_counts.get(h, 0)
+                hk[i].markdown(
+                    f"<div style='text-align:center;'>"
+                    f"<span style='color:{_HEALTH_COLOURS[h]};font-size:1.5rem;"
+                    f"font-weight:700;'>{cnt}</span><br>"
+                    f"<span style='font-size:0.75rem;'>{h}</span></div>",
+                    unsafe_allow_html=True,
+                )
+
             c1, c2, c3, c4 = st.columns(4)
             c1.metric("Postcodes Shown", len(mdf))
-            c2.metric("Avg Share", f"{mdf['market_share_pct'].mean():.1f}%")
-            c3.metric("Avg Penetration", f"{mdf['penetration_pct'].mean():.1f}%")
-            c4.metric("Avg Spend", f"${mdf['spend_per_customer'].mean():.0f}")
+            c2.metric(f"Avg Share ({map_channel})", f"{mdf['market_share_pct'].mean():.1f}%")
+            avg_chg = mdf["yoy_change_pp"].mean()
+            c3.metric("Avg YoY Change", f"{avg_chg:+.2f}pp")
+            c4.metric("Avg Penetration", f"{mdf['penetration_pct'].mean():.1f}%")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
