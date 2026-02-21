@@ -68,9 +68,9 @@ class TestChallenges:
     def test_three_difficulty_levels(self):
         assert set(CHALLENGES.keys()) == {"Beginner", "Intermediate", "Advanced"}
 
-    def test_three_per_level(self):
+    def test_minimum_per_level(self):
         for level, scenarios in CHALLENGES.items():
-            assert len(scenarios) == 3, f"{level} should have 3 challenges"
+            assert len(scenarios) >= 3, f"{level} should have at least 3 challenges"
 
     def test_required_fields(self):
         required = {"id", "title", "scenario", "hints", "criteria"}

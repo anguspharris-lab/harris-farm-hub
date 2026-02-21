@@ -27,8 +27,8 @@ from data_analysis import ANALYSIS_TYPES, _build_result
 
 class TestRouterKeywordMap:
 
-    def test_six_analysis_types(self):
-        assert len(KEYWORD_MAP) == 6
+    def test_analysis_types_count(self):
+        assert len(KEYWORD_MAP) == 11
 
     def test_all_types_have_keywords(self):
         for key, config in KEYWORD_MAP.items():
@@ -82,12 +82,12 @@ class TestRouteQuery:
 
     def test_empty_query_returns_all(self):
         result = route_query("")
-        assert len(result["matched_analyses"]) == 6
+        assert len(result["matched_analyses"]) == 11
         assert result["confidence"] < 0.3
 
     def test_no_match_returns_all(self):
         result = route_query("tell me about the weather today")
-        assert len(result["matched_analyses"]) == 6
+        assert len(result["matched_analyses"]) == 11
         assert result["confidence"] < 0.3
 
     def test_has_confidence(self):
@@ -106,7 +106,7 @@ class TestRouteQuery:
 
     def test_none_query_returns_all(self):
         result = route_query(None)
-        assert len(result["matched_analyses"]) == 6
+        assert len(result["matched_analyses"]) == 11
 
 
 # =========================================================================

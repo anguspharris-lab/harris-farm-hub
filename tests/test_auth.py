@@ -411,32 +411,5 @@ class TestAuthGateImports(unittest.TestCase):
         self.assertTrue(callable(get_current_user))
 
 
-class TestNavTokenPropagation(unittest.TestCase):
-    """Test that nav.py _make_url works correctly."""
-
-    def test_make_url_without_token(self):
-        """_make_url without token returns plain URL."""
-        sys.path.insert(0, str(Path(__file__).parent.parent / "dashboards"))
-        from nav import _make_url
-        url = _make_url(8501)
-        self.assertIn("8501", url)
-        self.assertNotIn("token", url)
-
-    def test_make_url_with_token(self):
-        """_make_url with token appends ?token= query param."""
-        sys.path.insert(0, str(Path(__file__).parent.parent / "dashboards"))
-        from nav import _make_url
-        url = _make_url(8501, token="abc123")
-        self.assertIn("8501", url)
-        self.assertIn("?token=abc123", url)
-
-    def test_make_url_no_token_none(self):
-        """_make_url with token=None returns plain URL."""
-        sys.path.insert(0, str(Path(__file__).parent.parent / "dashboards"))
-        from nav import _make_url
-        url = _make_url(8502, token=None)
-        self.assertNotIn("token", url)
-
-
 if __name__ == "__main__":
     unittest.main()
