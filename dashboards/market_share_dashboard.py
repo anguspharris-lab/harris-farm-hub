@@ -201,20 +201,34 @@ with tab_map:
             if fn:
                 mdf = mdf[mdf["postcode"].apply(lambda x: fn(x))]
 
-        # Map metric selector
-        col_metric, col_tier = st.columns(2)
+        # Map controls
+        col_metric, col_radius, col_store = st.columns(3)
         with col_metric:
             map_metric = st.selectbox("Colour by", [
-                "Market Share %", "Penetration %", "Spend/Customer", "Distance Tier"
+                "Market Share %", "Penetration %", "Spend/Customer"
             ], key="map_metric")
-        with col_tier:
-            tier_filter = st.selectbox("Distance Tier", [
-                "All", "Core (0-3km)", "Primary (3-5km)", "Secondary (5-10km)",
-                "Extended (10-20km)"
-            ], key="map_tier")
+        with col_radius:
+            radius_opts = ["All"] + [f"Within {r}km" for r in TRADE_AREA_RADII]
+            radius_filter = st.selectbox("Max Distance", radius_opts, key="map_radius")
+        with col_store:
+            map_store = st.selectbox(
+                "From Store",
+                ["Nearest Store"] + sorted(STORE_LOCATIONS.keys()),
+                key="map_store_filter",
+            )
 
-        if tier_filter != "All":
-            mdf = mdf[mdf["distance_tier"] == tier_filter]
+        # Apply radius filter — cumulative from selected store
+        if radius_filter != "All":
+            max_km = int(radius_filter.replace("Within ", "").replace("km", ""))
+            if map_store != "Nearest Store":
+                # Filter by distance from selected store
+                from market_share_layer import haversine_km
+                si = STORE_LOCATIONS[map_store]
+                mdf["_dist"] = mdf.apply(
+                    lambda r: haversine_km(si["lat"], si["lon"], r["lat"], r["lon"]), axis=1)
+                mdf = mdf[mdf["_dist"] <= max_km]
+            else:
+                mdf = mdf[mdf["distance_km"] <= max_km]
 
         if mdf.empty:
             st.info("No postcodes match the selected filters.")
@@ -235,44 +249,23 @@ with tab_map:
             elif map_metric == "Penetration %":
                 color_col = "penetration_pct"
                 color_scale = "Blues"
-            elif map_metric == "Spend/Customer":
+            else:
                 color_col = "spend_per_customer"
                 color_scale = "Oranges"
-            else:
-                color_col = "distance_tier"
-                color_scale = None
 
             # Size by market share (minimum size for visibility)
             mdf["bubble_size"] = mdf["market_share_pct"].clip(lower=0.3) * 2
 
-            if color_col == "distance_tier":
-                fig = px.scatter_mapbox(
-                    mdf, lat="lat", lon="lon",
-                    color="distance_tier",
-                    size="bubble_size",
-                    hover_name="region_name",
-                    custom_data=["postcode", "market_share_pct", "penetration_pct",
-                                 "spend_per_customer", "nearest_store", "distance_km"],
-                    color_discrete_map={
-                        "Core (0-3km)": "#16a34a",
-                        "Primary (3-5km)": "#2563eb",
-                        "Secondary (5-10km)": "#d97706",
-                        "Extended (10-20km)": "#9333ea",
-                        "No Presence (20km+)": "#6b7280",
-                    },
-                    zoom=8, size_max=20,
-                )
-            else:
-                fig = px.scatter_mapbox(
-                    mdf, lat="lat", lon="lon",
-                    color=color_col,
-                    size="bubble_size",
-                    hover_name="region_name",
-                    custom_data=["postcode", "market_share_pct", "penetration_pct",
-                                 "spend_per_customer", "nearest_store", "distance_km"],
-                    color_continuous_scale=color_scale,
-                    zoom=8, size_max=20,
-                )
+            fig = px.scatter_mapbox(
+                mdf, lat="lat", lon="lon",
+                color=color_col,
+                size="bubble_size",
+                hover_name="region_name",
+                custom_data=["postcode", "market_share_pct", "penetration_pct",
+                             "spend_per_customer", "nearest_store", "distance_km"],
+                color_continuous_scale=color_scale,
+                zoom=8, size_max=20,
+            )
 
             # Update hover template
             fig.update_traces(
