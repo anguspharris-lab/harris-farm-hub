@@ -882,6 +882,40 @@ stock-level data.
 
 
 # ============================================================================
+# PLU STOCKTAKE ALERTS (from PLU Intelligence — 27.3M rows)
+# ============================================================================
+
+try:
+    from plu_layer import db_available as plu_db_ok, top_plus_by_stocktake
+    if plu_db_ok():
+        st.markdown("---")
+        st.subheader("Stocktake Variance Alerts")
+        st.caption("Items with largest stocktake discrepancies — from 27.3M weekly PLU records")
+
+        stocktake_items = top_plus_by_stocktake(limit=10)
+        if stocktake_items:
+            import pandas as _pd
+            stdf = _pd.DataFrame(stocktake_items)
+            stdf["total_variance"] = stdf["total_variance"].apply(lambda x: f"${(x or 0):,.0f}")
+            stdf["total_sales"] = stdf["total_sales"].apply(lambda x: f"${(x or 0):,.0f}")
+            stdf["variance_pct"] = stdf["variance_pct"].apply(lambda x: f"{(x or 0):.1f}%")
+            stdf = stdf.rename(columns={
+                "plu_code": "PLU", "description": "Item", "department": "Dept",
+                "total_variance": "Variance $", "total_sales": "Sales $",
+                "variance_pct": "Variance %",
+            })
+            st.dataframe(
+                stdf[["PLU", "Item", "Dept", "Variance $", "Sales $", "Variance %"]],
+                hide_index=True, key="ops_stocktake_alert_table",
+            )
+            st.page_link("dashboards/plu_intel_dashboard.py", label="View full Stocktake Analysis", icon="📊")
+        else:
+            st.info("No significant stocktake variances found.")
+except ImportError:
+    pass
+
+
+# ============================================================================
 # ASK A QUESTION
 # ============================================================================
 

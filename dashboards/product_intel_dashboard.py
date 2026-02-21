@@ -328,6 +328,57 @@ with tab2:
         except Exception as e:
             st.error(f"Price dispersion failed: {e}")
 
+        # PLU Weekly Performance from PLU Intelligence (27.3M rows)
+        try:
+            from plu_layer import db_available as plu_ok, plu_weekly_trend, plu_store_breakdown
+            if plu_ok():
+                st.markdown("---")
+                st.markdown("**PLU Weekly Performance** *(from PLU Intelligence — 27.3M rows)*")
+                trend = plu_weekly_trend(plu_input)
+                if trend:
+                    tdf = pd.DataFrame(trend)
+                    tdf["label"] = tdf.apply(lambda r: f"FY{r['fiscal_year']} W{r['fiscal_week']}", axis=1)
+                    # Make wastage positive for display
+                    tdf["wastage_abs"] = tdf["wastage"].abs()
+
+                    col_w, col_m = st.columns(2)
+                    with col_w:
+                        st.markdown("**Weekly Wastage Trend**")
+                        fig_w = px.bar(
+                            tdf, x="label", y="wastage_abs",
+                            labels={"label": "Week", "wastage_abs": "Wastage ($)"},
+                            color_discrete_sequence=["#ef4444"],
+                        )
+                        fig_w.update_layout(height=300, xaxis_tickangle=-45, showlegend=False)
+                        st.plotly_chart(fig_w, key="prodintel_plu_wastage_trend")
+                    with col_m:
+                        st.markdown("**Weekly Margin Trend**")
+                        fig_m = px.bar(
+                            tdf, x="label", y="gm",
+                            labels={"label": "Week", "gm": "Gross Margin ($)"},
+                            color_discrete_sequence=["#10b981"],
+                        )
+                        fig_m.update_layout(height=300, xaxis_tickangle=-45, showlegend=False)
+                        st.plotly_chart(fig_m, key="prodintel_plu_gm_trend")
+
+                    # Store breakdown
+                    breakdown = plu_store_breakdown(plu_input)
+                    if breakdown:
+                        st.markdown("**PLU Performance by Store** *(wastage, margin, stocktake)*")
+                        bdf = pd.DataFrame(breakdown)
+                        bdf = bdf.sort_values("sales", ascending=False)
+                        disp = bdf[["store_name", "sales", "gm", "wastage", "stocktake"]].copy()
+                        disp["wastage"] = disp["wastage"].abs()
+                        disp["stocktake"] = disp["stocktake"].abs()
+                        disp.columns = ["Store", "Sales $", "Margin $", "Wastage $", "Stocktake $"]
+                        st.dataframe(disp, hide_index=True, key="prodintel_plu_store_breakdown")
+
+                    st.page_link("dashboards/plu_intel_dashboard.py", label="Full PLU Intelligence", icon="📊")
+                else:
+                    st.info("No PLU Intelligence data for this item.")
+        except ImportError:
+            pass
+
 
 # --- Tab 3: Basket Analysis ---
 with tab3:

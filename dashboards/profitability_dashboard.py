@@ -724,6 +724,38 @@ dept_tbl.columns = ['Department', 'Sales', 'Final GP', 'GP %', 'Initial GP %',
 st.dataframe(dept_tbl, hide_index=True, key="profit_dept_detail_table")
 
 # ============================================================================
+# PLU WASTAGE HOTSPOTS (from PLU Intelligence — 27.3M rows)
+# ============================================================================
+
+try:
+    from plu_layer import db_available, top_plus_by_wastage
+    if db_available():
+        st.markdown("---")
+        st.subheader("PLU Wastage Hotspots")
+        st.caption("Top items destroying margin — from 27.3M weekly PLU records")
+
+        wastage_items = top_plus_by_wastage(limit=10)
+        if wastage_items:
+            wdf = pd.DataFrame(wastage_items)
+            wdf["total_wastage"] = wdf["total_wastage"].apply(lambda x: f"${abs(x or 0):,.0f}")
+            wdf["total_sales"] = wdf["total_sales"].apply(lambda x: f"${(x or 0):,.0f}")
+            wdf["wastage_pct"] = wdf["wastage_pct"].apply(lambda x: f"{abs(x or 0):.1f}%")
+            wdf = wdf.rename(columns={
+                "plu_code": "PLU", "description": "Item", "department": "Dept",
+                "total_wastage": "Wastage $", "total_sales": "Sales $",
+                "wastage_pct": "Wastage %", "store_count": "Stores",
+            })
+            st.dataframe(
+                wdf[["PLU", "Item", "Dept", "Wastage $", "Sales $", "Wastage %", "Stores"]],
+                hide_index=True, key="profit_plu_wastage_table",
+            )
+            st.page_link("dashboards/plu_intel_dashboard.py", label="View full PLU Wastage Analysis", icon="📊")
+        else:
+            st.info("No significant wastage items found.")
+except ImportError:
+    pass
+
+# ============================================================================
 # ASK A QUESTION
 # ============================================================================
 
