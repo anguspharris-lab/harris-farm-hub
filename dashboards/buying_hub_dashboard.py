@@ -35,6 +35,8 @@ user = st.session_state.get("auth_user")
 render_header(
     "Buying Hub",
     "**Category & buyer intelligence** | 72,911 products across 9 departments",
+    goals=["G2", "G4"],
+    strategy_context="Smarter buying decisions start here — the supply chain from pay to purchase.",
 )
 
 

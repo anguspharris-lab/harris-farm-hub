@@ -32,6 +32,8 @@ user = st.session_state.get("auth_user")
 render_header(
     "Customer Analytics",
     "**Harris Farm Markets** | Customer intelligence, segmentation & retention",
+    goals=["G1", "G2"],
+    strategy_context="Understanding who shops with us powers 'Fewer, Bigger, Better' — focus on customers who love us most.",
 )
 
 
@@ -339,8 +341,8 @@ with tab1:
         if not variance_df.empty:
             variance_df["Variance %"] = (
                 (variance_df["Actual"] - variance_df["Budget"])
-                / variance_df["Budget"] * 100
-            )
+                / variance_df["Budget"].replace(0, float("nan")) * 100
+            ).fillna(0)
             variance_df = variance_df.sort_values("Variance %")
             fig_var = px.bar(
                 variance_df.reset_index(), x="Variance %", y="store_short",

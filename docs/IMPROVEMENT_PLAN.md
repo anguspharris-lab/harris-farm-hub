@@ -38,9 +38,9 @@
 - **Effort:** 4 hours
 - **Impact:** Rubric becomes a real training tool, not just UI
 
-### 1.3 Fix test_six_analysis_types
+### 1.3 Fix test_six_analysis_types — DONE
 - **Problem:** Test expects 6 analysis types but 11 now exist. CI/CD may fail.
-- **Fix:** Update assertion to match actual agent count
+- **Fix:** Updated assertion to `== 11` in `tests/test_data_analysis.py`
 - **Effort:** 15 minutes
 - **Impact:** Clean test suite
 

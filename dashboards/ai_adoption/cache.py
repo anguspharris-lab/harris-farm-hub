@@ -3,6 +3,7 @@ AI Adoption Tracker — SQLite Cache Layer
 Stores normalised usage data from all AI platforms.
 Serves from cache on page load; background refresh every N hours.
 """
+from __future__ import annotations
 
 import sqlite3
 import datetime
@@ -12,7 +13,10 @@ from typing import Optional
 import yaml
 
 _DIR = Path(__file__).resolve().parent
-_CFG = yaml.safe_load((_DIR / "config.yaml").read_text())
+try:
+    _CFG = yaml.safe_load((_DIR / "config.yaml").read_text())
+except FileNotFoundError:
+    _CFG = {"platforms": {}, "refresh_interval_hours": 6, "cache_db": "data/ai_adoption_cache.db"}
 _DB_PATH = str(Path(__file__).resolve().parent.parent.parent / _CFG["cache_db"])
 
 

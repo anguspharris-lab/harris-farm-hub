@@ -4,6 +4,38 @@
 
 ---
 
+## [3.2.0] - 2026-02-21
+
+### Added
+- **Goal Alignment on All 19 Dashboards**: Every page now shows coloured goal badges (G1-G5) and a strategy context line connecting data to "Fewer, Bigger, Better". Enhanced `render_header()` in `shared/styles.py` with optional `goals` and `strategy_context` parameters (backward compatible).
+- **Interactive Page Quality Scoring** (Academy Tab 7): Score any Hub page against rubric criteria, direct SQLite write, leaderboard
+- **PageQualityAuditor**: Low scores generate improvement findings, closing the self-improvement loop
+- **Auto-Ingest Score Pipeline**: `backfill_scores_from_audit()` runs at startup, zero overhead after first run
+- **2 API endpoints**: `POST /api/page-quality/score`, `GET /api/page-quality/scores`
+
+### Changed
+- **Front Page Restructured**: Strategy pillars moved from Section 6 (bottom) to Section 2 (right after hero). "Our Strategy: Fewer, Bigger, Better" headline frames the page. System health metrics moved to collapsible expander.
+- **Rubric Scoring Tightened**: `_score_audience` base 5->2, `_score_visual` base 3->1, `_score_brief` inverted (build from 0), `_score_action` graduated. Average drops from ~9.76 to realistic 6-7 range.
+- **Score Regex Fixed**: Now catches all 6 audit.log score formats (was 2). D=N/A handled, stored as 0, excluded from averages.
+- **PLU Intelligence**: Migrated from `st.title` to `render_header` with G2+G4 goal alignment
+
+### Removed
+- **4 stale docs deleted**: DEPLOYMENT_GUIDE.md, EXECUTIVE_SUMMARY.md, watchdog/handover.md, watchdog/INSTALL_PROMPT.md
+- **510 junk DB rows deleted**: 145 test agent proposals, 129 zombie PENDING, 235 duplicate findings, 1 test template
+- **Mock data removed** from Prompt Builder "Run Test Query" (replaced with honest SQL preview)
+- **Port references removed** from user-facing text (3 dashboards + 1 shared module)
+
+### Fixed
+- Error messages no longer expose "port 8000" to users (3 files)
+- Stale counts updated across 17 files (dashboards: 16/17->19, endpoints: 71+/80+/93+->112, analysis types: 6->11)
+- 5 test expectations updated for tighter rubric scoring
+
+### Scores
+- Legacy Cleanup: H:9 R:9 S:9 C:9 D:9 U:9 X:9 = 9.0
+- Goal Alignment: H:9 R:9 S:9 C:9 D:9 U:9 X:9 = 9.0
+
+---
+
 ## [3.1.0] - 2026-02-21
 
 ### Added

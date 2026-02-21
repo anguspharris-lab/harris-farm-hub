@@ -240,7 +240,7 @@ HOME — Harris Farm Hub
 - [ ] RBAC enforcement (admin/operator/analyst/viewer roles)
 - [ ] Session-based authentication with secure tokens
 - [ ] API rate limiting
-- [ ] Input validation on all 93+ endpoints
+- [ ] Input validation on all 112 endpoints
 - [ ] HTTPS enforcement
 
 ### Phase 2 — Q3 FY26 (Apr-Jun 2026)
@@ -316,8 +316,8 @@ Human Question → AI Agent Proposes Analysis → WATCHDOG Safety Check
 ## 8. FEATURE STATUS — LIVE vs FUTURE DEVELOPMENT
 
 ### LIVE (Built and Working)
-- 16 Streamlit dashboards with data visualisation
-- FastAPI backend (93+ endpoints)
+- 19 Streamlit dashboards with data visualisation
+- FastAPI backend (112 endpoints)
 - Natural language → SQL query engine
 - The Rubric (multi-LLM comparison)
 - Prompt Builder with template library

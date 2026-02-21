@@ -224,7 +224,12 @@ def load_profitability_data(date_from, date_to, stores=None, promo='N'):
 # HEADER
 # ============================================================================
 
-render_header("💰 Store Profitability", "**Finance Team** | Store-level P&L, margins, shrinkage & budget variance")
+render_header(
+    "Store Profitability",
+    "**Finance Team** | Store-level P&L, margins, shrinkage & budget variance",
+    goals=["G1", "G2", "G4"],
+    strategy_context="Margin visibility drives 'Better' — understanding true profitability store by store.",
+)
 
 # ============================================================================
 # FILTERS
@@ -669,21 +674,27 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.markdown("**Strongest GP Performers:**")
-    top_3 = store_pnl.nlargest(3, 'gp_pct')
-    for _, row in top_3.iterrows():
-        st.markdown(
-            f"- **{row['display_name']}**: {row['gp_pct']:.1f}% GP "
-            f"(${row['gp']:,.0f})"
-        )
+    if not store_pnl.empty:
+        top_3 = store_pnl.nlargest(3, 'gp_pct')
+        for _, row in top_3.iterrows():
+            st.markdown(
+                f"- **{row['display_name']}**: {row['gp_pct']:.1f}% GP "
+                f"(${row['gp']:,.0f})"
+            )
+    else:
+        st.info("No store data for selected filters.")
 
 with col2:
     st.markdown("**Highest Shrinkage (Needs Attention):**")
-    worst_shrink = store_pnl.nlargest(3, 'shrinkage_pct')
-    for _, row in worst_shrink.iterrows():
-        st.markdown(
-            f"- **{row['display_name']}**: {row['shrinkage_pct']:.1f}% shrinkage "
-            f"(${row['shrinkage']:,.0f})"
-        )
+    if not store_pnl.empty:
+        worst_shrink = store_pnl.nlargest(3, 'shrinkage_pct')
+        for _, row in worst_shrink.iterrows():
+            st.markdown(
+                f"- **{row['display_name']}**: {row['shrinkage_pct']:.1f}% shrinkage "
+                f"(${row['shrinkage']:,.0f})"
+            )
+    else:
+        st.info("No store data for selected filters.")
 
 # ============================================================================
 # DEPARTMENT PROFITABILITY DETAIL

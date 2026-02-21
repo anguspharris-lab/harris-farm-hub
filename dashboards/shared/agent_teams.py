@@ -935,7 +935,7 @@ SEED_PROPOSALS = [
         "title": "WATCHDOG v8: Autonomous Safety Monitoring",
         "description": (
             "Extend the WATCHDOG governance system to include autonomous "
-            "continuous monitoring of all 16 dashboards, API endpoints, and "
+            "continuous monitoring of all 19 dashboards, API endpoints, and "
             "data pipelines. Add anomaly detection for data quality, "
             "performance degradation alerting, and automated recovery "
             "procedures. Aligned with Anthropic's constitutional AI principles."

@@ -264,7 +264,12 @@ def compute_period_delta(current_val, previous_val):
 # HEADER
 # ============================================================================
 
-render_header("📊 Sales Performance", "**Harris Farm Markets** | Weekly sales, GP, budget & shrinkage analytics")
+render_header(
+    "Sales Performance",
+    "**Harris Farm Markets** | Weekly sales, GP, budget & shrinkage analytics",
+    goals=["G1", "G2", "G4"],
+    strategy_context="Tracking revenue against budget validates 'Bigger' — are we growing where it matters?",
+)
 
 # ============================================================================
 # FILTERS

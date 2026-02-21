@@ -43,10 +43,23 @@ def parse_audit_scores(limit=50):
     if not os.path.exists(AUDIT_LOG):
         return []
 
+    # Universal pattern — catches all 6 audit.log score formats:
+    #   1. H:8 R:8 S:9 ...       (colon, no prefix)
+    #   2. Score: H=9 ... D=N/A   (mixed case, N/A value)
+    #   3. SCORE: H=9 R=9 ...     (uppercase prefix)
+    #   4. SCORE: H8 R8 S8 ...    (no delimiter)
+    #   5. SCORES: H=9 R=9 ...    (plural prefix)
+    #   6. H=9 R=9 S=9 ...        (inline, no prefix)
     pattern = re.compile(
-        r"(?:SCORES?:\s*)"
-        r"H[=:](\d+)\s*R[=:](\d+)\s*S[=:](\d+)\s*C[=:](\d+)\s*"
-        r"D[=:](\d+)\s*U[=:](\d+)\s*X[=:](\d+)"
+        r"(?:SCORES?:\s*)?"
+        r"H[=:]?(\d+)\s+"
+        r"R[=:]?(\d+)\s+"
+        r"S[=:]?(\d+)\s+"
+        r"C[=:]?(\d+)\s+"
+        r"D[=:]?(\d+|N/?A)\s+"
+        r"U[=:]?(\d+)\s+"
+        r"X[=:]?(\d+)",
+        re.IGNORECASE,
     )
     ts_pattern = re.compile(r"\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2})")
     task_pattern = re.compile(r"TASK:\s*([^|]+)")
@@ -59,7 +72,13 @@ def parse_audit_scores(limit=50):
         m = pattern.search(line)
         if not m:
             continue
-        scores = {c: int(m.group(i + 1)) for i, c in enumerate(CRITERIA)}
+        scores = {}
+        for i, c in enumerate(CRITERIA):
+            raw = m.group(i + 1)
+            if raw.upper().replace("/", "") == "NA":
+                scores[c] = 0  # D=N/A → 0 (excluded from avg)
+            else:
+                scores[c] = int(raw)
 
         ts_match = ts_pattern.search(line)
         timestamp = ts_match.group(1) if ts_match else ""
@@ -69,7 +88,8 @@ def parse_audit_scores(limit=50):
 
         scores["timestamp"] = timestamp
         scores["task"] = task
-        scores["avg"] = round(sum(scores[c] for c in CRITERIA) / 7, 1)
+        valid = [scores[c] for c in CRITERIA if scores[c] > 0]
+        scores["avg"] = round(sum(valid) / len(valid), 1) if valid else 0
         entries.append(scores)
 
         if len(entries) >= limit:
@@ -91,8 +111,8 @@ def calculate_averages(entries=None):
 
     avgs = {}
     for c in CRITERIA:
-        vals = [e[c] for e in entries]
-        avgs[c] = round(sum(vals) / len(vals), 2)
+        vals = [e[c] for e in entries if e.get(c, 0) > 0]
+        avgs[c] = round(sum(vals) / len(vals), 2) if vals else 0.0
 
     avgs["avg"] = round(sum(avgs[c] for c in CRITERIA) / 7, 2)
     avgs["count"] = len(entries)
@@ -200,7 +220,9 @@ def store_task_scores(task_name, scores_dict):
     """
     conn = sqlite3.connect(HUB_DB)
     c = conn.cursor()
-    avg = round(sum(scores_dict.get(cr, 0) for cr in CRITERIA) / 7, 2)
+    valid = [scores_dict.get(cr, 0) or 0 for cr in CRITERIA]
+    non_zero = [v for v in valid if v > 0]
+    avg = round(sum(non_zero) / len(non_zero), 2) if non_zero else 0
     c.execute(
         """INSERT INTO task_scores
            (task_name, h, r, s, c, d, u, x, avg_score, recorded_at)

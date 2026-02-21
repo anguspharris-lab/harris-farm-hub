@@ -38,6 +38,8 @@ user = st.session_state.get("auth_user")
 render_header(
     "Store Operations Intelligence",
     "**Item-level POS transaction analysis** | 383M transactions across 34 stores (FY24-FY26)",
+    goals=["G2", "G4"],
+    strategy_context="Operational efficiency at store level — reducing waste and improving on-shelf availability.",
 )
 
 

@@ -1,575 +1,778 @@
 """
-Harris Farm Hub - Super User Prompt Builder
-Advanced interface for designing custom analytical prompts
+Harris Farm Hub - Prompt-to-Approval: Prompt Engine
+The front door to data-driven decisions. Choose your task, add context, let AI analyse.
 """
 
 import os
-
-import streamlit as st
-import pandas as pd
 import json
+
 import requests
-from datetime import datetime
+import streamlit as st
+from datetime import datetime, timedelta
+
+from shared.styles import render_header, render_footer
 from shared.stores import STORES
+from shared.pta_rubric import (
+    STANDARD_RUBRIC,
+    APPROVAL_ROUTING,
+    NINJA_LEVELS,
+    get_ninja_level,
+    render_rubric_scorecard,
+)
 
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 
-from shared.styles import render_header, render_footer
-from shared.voice_realtime import render_voice_data_box
-
 user = st.session_state.get("auth_user")
 
-render_header("🔧 Prompt Builder", "**Super User Tool** | Design, test, and save custom analytical prompts")
+render_header(
+    "Prompt Engine",
+    "**Prompt-to-Approval** | Choose your task, add context, let AI analyse",
+    goals=["G2", "G3"],
+    strategy_context="The universal AI workflow — prompt the data, add your judgment, submit for approval.",
+)
 
+# ============================================================================
+# 20 TASK TEMPLATES
+# ============================================================================
 
-@st.cache_data(ttl=300, show_spinner=False)
-def _pb_load_templates(difficulty=None):
-    try:
-        url = f"{API_URL}/api/templates"
-        if difficulty:
-            url += f"?difficulty={difficulty}"
-        resp = requests.get(url, timeout=5)
-        if resp.status_code == 200:
-            return [
-                {"id": t["id"], "name": t["title"],
-                 "category": t["category"], "query": t["template"]}
-                for t in resp.json().get("templates", [])
-            ]
-    except Exception:
-        pass
-    return []
+TASK_TEMPLATES = {
+    "weekly_store_performance": {
+        "name": "Weekly Store Performance Report",
+        "roles": ["Store Manager", "Area Manager"],
+        "default_prompt": (
+            "Analyse {store_name} performance for week ending {date}. Compare sales vs budget, "
+            "vs last week, vs same week last year. Break down by department. Show waste % by "
+            "category vs target. Show sales per labour hour. Identify top 5 over-performers "
+            "and top 5 under-performers by product. Provide 3 recommended actions for next week."
+        ),
+        "data_sources": ["POS", "Waste", "Roster", "Budget"],
+        "output_format": "Executive Summary",
+    },
+    "supplier_price_comparison": {
+        "name": "Supplier Price Comparison",
+        "roles": ["Buyer", "Head of Buying"],
+        "default_prompt": (
+            "Compare pricing from all suppliers for {category} over the last {period}. "
+            "Rank by average price per unit. Show price volatility (standard deviation). "
+            "Show quality score trend if available. Calculate optimal order split to minimise "
+            "cost while maintaining quality. Flag any supplier consistently >10% above cheapest."
+        ),
+        "data_sources": ["Supplier", "Procurement", "Quality"],
+        "output_format": "Detailed Report",
+    },
+    "monthly_variance": {
+        "name": "Monthly Variance Analysis",
+        "roles": ["Finance Analyst", "CFO"],
+        "default_prompt": (
+            "Prepare budget vs actual variance report for {month} by cost centre. Flag all "
+            "variances >5%. For each flagged variance provide: amount, percentage, likely root "
+            "cause (based on historical patterns), and whether it is timing, permanent, or "
+            "one-off. Summarise total impact on EBITDA."
+        ),
+        "data_sources": ["Financial", "Budget"],
+        "output_format": "Board Paper Format",
+    },
+    "board_paper": {
+        "name": "Board Paper",
+        "roles": ["Executive", "CFO", "Head of Buying"],
+        "default_prompt": (
+            "Prepare a board paper on {topic}. Structure: Executive Summary (1 paragraph), "
+            "Background & Context, Current State (with data), Proposed Changes, Financial Impact "
+            "(3 scenarios: conservative, base, optimistic), Risk Analysis (with mitigations), "
+            "Implementation Timeline, Recommendation."
+        ),
+        "data_sources": ["All Available"],
+        "output_format": "Board Paper Format",
+    },
+    "trading_meeting_prep": {
+        "name": "Trading Meeting Report",
+        "roles": ["Area Manager", "Head of Buying", "Executive"],
+        "default_prompt": (
+            "Compile trading meeting report for week ending {date}. For each store: sales vs "
+            "budget ($ and %), sales vs LY, transaction count trend, basket size trend, waste %, "
+            "labour efficiency. Rank stores best to worst on sales vs budget. Highlight top 3 "
+            "wins and top 3 concerns across the network."
+        ),
+        "data_sources": ["POS", "Budget", "Waste", "Roster"],
+        "output_format": "Executive Summary",
+    },
+    "roster_optimisation": {
+        "name": "Roster Optimisation",
+        "roles": ["Store Manager", "Area Manager", "HR"],
+        "default_prompt": (
+            "Analyse roster efficiency for {store_name} over last 4 weeks. Show: sales per "
+            "labour hour by day of week, peak trading hours vs rostered hours, overtime as % "
+            "of total hours, department-level labour allocation vs sales contribution. "
+            "Recommend roster adjustments to improve sales per labour hour by at least 5%."
+        ),
+        "data_sources": ["Roster", "POS"],
+        "output_format": "Detailed Report",
+    },
+    "waste_analysis": {
+        "name": "Waste Analysis",
+        "roles": ["Store Manager", "Buyer", "Area Manager"],
+        "default_prompt": (
+            "Analyse waste for {store_or_category} over last {period}. Show: waste % by "
+            "category, waste $ by category, trend vs prior period, comparison to network "
+            "average. Identify top 10 SKUs by waste $ value. For each, provide: likely root "
+            "cause and recommended action. Calculate potential savings if waste reduced to "
+            "network best practice."
+        ),
+        "data_sources": ["Waste", "POS", "Inventory"],
+        "output_format": "Detailed Report",
+    },
+    "customer_demographics": {
+        "name": "Customer Demographics Analysis",
+        "roles": ["Executive", "Marketing", "Area Manager"],
+        "default_prompt": (
+            "Analyse the demographic profile within {radius}km of {location}. Show: population, "
+            "household income distribution, % professionals/managers, age distribution. Compare "
+            "to our current store network averages. Score the location's alignment with our "
+            "target customer (50%+ professionals/managers)."
+        ),
+        "data_sources": ["CBAS", "ABS", "POS"],
+        "output_format": "Executive Summary",
+    },
+    "category_review": {
+        "name": "Category Review",
+        "roles": ["Buyer", "Head of Buying"],
+        "default_prompt": (
+            "Prepare a full category review for {category}. Include: sales trend (13 weeks), "
+            "margin trend, market share (CBAS within 3/5/10/20km tiers — remember low share "
+            "does not equal opportunity), supplier performance ranking, range analysis "
+            "(top/bottom performers by margin contribution), and recommended actions."
+        ),
+        "data_sources": ["POS", "CBAS", "Supplier", "Margin"],
+        "output_format": "Detailed Report",
+    },
+    "it_architecture_proposal": {
+        "name": "IT Architecture Proposal",
+        "roles": ["IT"],
+        "default_prompt": (
+            "Prepare a technical proposal for {project}. Include: current state architecture, "
+            "proposed architecture, technology selection with justification, integration points "
+            "with existing systems (Fabric, POS, Azure AD), security considerations, cost "
+            "estimate (build + run), implementation timeline with dependencies, risk register."
+        ),
+        "data_sources": ["Infrastructure", "Vendor"],
+        "output_format": "Board Paper Format",
+    },
+    "one_on_one_prep": {
+        "name": "One-on-One Meeting Prep",
+        "roles": ["Executive", "Area Manager", "Head of Buying"],
+        "default_prompt": (
+            "Prepare for my one-on-one with {person_name} ({their_role}). Pull their area's "
+            "key metrics for last {period}: sales performance vs budget, key project status, "
+            "team metrics. Show trends. Suggest 3 discussion points based on the data."
+        ),
+        "data_sources": ["POS", "Budget", "HR", "Projects"],
+        "output_format": "Executive Summary",
+    },
+    "stockout_revenue_analysis": {
+        "name": "Stockout & Lost Revenue Analysis",
+        "roles": ["Buyer", "Store Manager", "Head of Buying"],
+        "default_prompt": (
+            "Identify stockout events across {scope} for last {period}. For each: calculate "
+            "revenue lost (normal hourly rate x hours out of stock x avg price). Rank by $ "
+            "impact. Identify root cause pattern. Provide buyer-specific action list. "
+            "Calculate total revenue recovery opportunity."
+        ),
+        "data_sources": ["POS", "Inventory", "Supplier"],
+        "output_format": "Detailed Report",
+    },
+    "energy_cost_analysis": {
+        "name": "Energy & Sustainability Report",
+        "roles": ["Finance Analyst", "Executive", "Store Manager"],
+        "default_prompt": (
+            "Analyse energy costs for {scope} over last {period}. Show: cost per store, cost "
+            "per sqm, trend vs prior year, breakdown by type. Identify top 5 stores by energy "
+            "cost per $ of sales. Estimate ROI on solar installation for stores without it. "
+            "Link to B-Corp sustainability metrics."
+        ),
+        "data_sources": ["Financial", "Utilities", "Sustainability"],
+        "output_format": "Detailed Report",
+    },
+    "transport_cost_analysis": {
+        "name": "Transport & Logistics Cost Analysis",
+        "roles": ["Executive", "Finance Analyst"],
+        "default_prompt": (
+            "Analyse transport costs from Greystanes DC to all stores for last {period}. "
+            "Show: cost per store, cost per carton, cost per $ of sales. Map routes and "
+            "identify optimisation opportunities. Compare current costs to market rates. "
+            "Flag stores where direct-to-store may be cheaper than via DC."
+        ),
+        "data_sources": ["Financial", "Logistics", "Supplier"],
+        "output_format": "Board Paper Format",
+    },
+    "competitor_pricing": {
+        "name": "Competitor Price Check",
+        "roles": ["Buyer", "Marketing", "Executive"],
+        "default_prompt": (
+            "Compare our pricing on {category_or_products} against Coles and Woolworths "
+            "within {radius}km of {store}. Show: our price, Coles price, Woolworths price, "
+            "our margin, price index. Flag items where we are >15% more expensive. Flag items "
+            "where we could increase price. Recommend pricing actions."
+        ),
+        "data_sources": ["POS", "Competitor", "Margin"],
+        "output_format": "Executive Summary",
+    },
+    "new_store_feasibility": {
+        "name": "New Store Feasibility Study",
+        "roles": ["Executive"],
+        "default_prompt": (
+            "Assess feasibility of a new Harris Farm store at {location}. Include: demographics "
+            "within 3/5/10/20km (target: 50%+ professionals/managers), existing competition "
+            "mapping, estimated catchment population, comparable store benchmarks, estimated "
+            "build cost, estimated annual sales (conservative/base/optimistic), payback period, "
+            "cannibalisation risk to existing stores."
+        ),
+        "data_sources": ["CBAS", "ABS", "POS", "Financial", "Property"],
+        "output_format": "Board Paper Format",
+    },
+    "hr_workforce_planning": {
+        "name": "Workforce Planning Report",
+        "roles": ["HR", "Executive"],
+        "default_prompt": (
+            "Prepare workforce planning report for {scope}. Show: current headcount by "
+            "department and role, turnover rate (13-week and 52-week), average tenure, "
+            "vacancies and time-to-fill, training completion rates, upcoming leave liabilities. "
+            "Compare to budget and flag variances. Identify departments at risk of understaffing."
+        ),
+        "data_sources": ["HR", "Roster", "Budget"],
+        "output_format": "Detailed Report",
+    },
+    "marketing_campaign_analysis": {
+        "name": "Marketing Campaign Performance",
+        "roles": ["Marketing", "Executive"],
+        "default_prompt": (
+            "Analyse performance of {campaign_name} campaign. Show: incremental sales during "
+            "campaign period vs control period, transaction count uplift, new vs returning "
+            "customer split, cost of campaign, ROI calculation, category-level impact, "
+            "store-level impact. Compare to previous campaigns. Recommend learnings."
+        ),
+        "data_sources": ["POS", "Marketing", "Financial"],
+        "output_format": "Detailed Report",
+    },
+    "amazon_partnership_review": {
+        "name": "Amazon Partnership Performance",
+        "roles": ["Executive", "Head of Buying"],
+        "default_prompt": (
+            "Review Amazon Fresh partnership performance for {period}. Show: orders, revenue, "
+            "average order value, product mix, margin after fees, fulfilment accuracy, customer "
+            "feedback themes. Compare to in-store equivalent metrics. Assess strategic value "
+            "vs operational cost. Recommend adjustments."
+        ),
+        "data_sources": ["Amazon", "POS", "Financial", "Margin"],
+        "output_format": "Board Paper Format",
+    },
+    "custom": {
+        "name": "Custom Analysis",
+        "roles": ["All"],
+        "default_prompt": "",
+        "data_sources": ["User Selected"],
+        "output_format": "Executive Summary",
+    },
+}
+
+ALL_ROLES = [
+    "Store Manager", "Area Manager", "Buyer", "Head of Buying",
+    "Finance Analyst", "CFO", "Marketing", "IT", "HR",
+    "Warehouse", "Executive",
+]
+
+OUTPUT_FORMATS = [
+    "Executive Summary",
+    "Detailed Report",
+    "Board Paper Format",
+    "Quick Insights",
+    "Data Table with Commentary",
+]
+
+ANALYSIS_TYPES = ["Compare", "Trend", "Rank", "Root Cause", "Forecast", "Recommend"]
+
+ALL_DATA_SOURCES = [
+    "POS", "Budget", "Waste", "Roster", "Supplier", "Inventory",
+    "Financial", "CBAS", "ABS", "HR", "Marketing", "Logistics",
+    "Procurement", "Quality", "Amazon", "Margin", "Sustainability",
+    "Infrastructure", "Vendor", "Property", "Competitor", "Projects",
+    "Utilities",
+]
 
 
 # ============================================================================
-# SIDEBAR - SAVED PROMPTS LIBRARY
+# SIDEBAR — User profile & submissions
 # ============================================================================
 
 with st.sidebar:
-    st.header("📚 Prompt Library")
+    st.header("Your Profile")
 
-    # Load templates from API (cached)
-    saved_prompts = _pb_load_templates()
-
-    if not saved_prompts:
-        saved_prompts = [
-            {"id": 1, "name": "Out of Stock Alert", "category": "retail_ops",
-             "query": "Show all products that were out of stock for more than 4 hours in the last 7 days, grouped by store with estimated lost sales"},
-        ]
-
-    # Filter by difficulty
-    difficulty_filter = st.selectbox("Difficulty", ["All", "beginner", "intermediate", "advanced"],
-                                     key="pb_sidebar_difficulty")
-
-    # Filter by category
-    sidebar_cat_filter = st.selectbox("Category", ["All", "retail_ops", "buying", "merchandising", "finance", "general"],
-                                      key="pb_sidebar_category")
-
-    filtered_prompts = saved_prompts
-    if difficulty_filter != "All":
-        try:
-            filtered_prompts = _pb_load_templates(difficulty_filter) or saved_prompts
-        except Exception:
-            pass
-
-    if sidebar_cat_filter != "All":
-        filtered_prompts = [p for p in filtered_prompts if p.get("category") == sidebar_cat_filter]
-
-    selected_template = st.selectbox(
-        "Load Template",
-        ["Start from scratch"] + [p["name"] for p in filtered_prompts],
-        key="pb_load_template",
+    user_role = st.selectbox(
+        "Your Role",
+        ALL_ROLES,
+        help="Determines which templates you see and who approves your work",
+        key="pta_role",
     )
 
-    if selected_template != "Start from scratch":
-        template = next(p for p in filtered_prompts if p["name"] == selected_template)
-        if st.button("Load This Prompt", key="pb_load_btn"):
-            st.session_state.loaded_prompt = template
-            # Track usage
-            try:
-                requests.post(
-                    f"{API_URL}/api/templates/{template.get('id', 0)}/use",
-                    timeout=3,
-                )
-            except Exception:
-                pass
+    routing = APPROVAL_ROUTING.get(user_role, {})
+    st.caption(
+        f"Approval route: {user_role} -> {routing.get('approver_role', 'N/A')} "
+        f"({routing.get('level', '')})"
+    )
+
+    # AI Ninja level
+    try:
+        stats_resp = requests.get(f"{API_URL}/api/pta/user-stats/staff", timeout=3)
+        if stats_resp.status_code == 200:
+            stats = stats_resp.json()
+            level = stats.get("level", "Prompt Apprentice")
+            points = stats.get("total_points", 0)
+            level_info = NINJA_LEVELS.get(level, {})
+            level_colour = level_info.get("colour", "#6b7280")
+            st.markdown(
+                f"<div style='background:{level_colour}15; border:1px solid {level_colour}; "
+                f"padding:10px; border-radius:8px; text-align:center; margin:8px 0;'>"
+                f"<div style='font-size:1.1em; font-weight:700; color:{level_colour};'>{level}</div>"
+                f"<div style='font-size:0.85em; color:#666;'>{points} points</div>"
+                f"<div style='font-size:0.75em; color:#999;'>"
+                f"{stats.get('approved', 0)} approved | {stats.get('avg_rubric_score', 0)}/10 avg</div>"
+                f"</div>",
+                unsafe_allow_html=True,
+            )
+    except Exception:
+        pass
+
+    st.markdown("---")
+
+    # My Submissions
+    st.subheader("My Submissions")
+    try:
+        resp = requests.get(
+            f"{API_URL}/api/pta/submissions",
+            params={"user_id": "staff", "limit": 5},
+            timeout=5,
+        )
+        if resp.status_code == 200:
+            subs = resp.json().get("submissions", [])
+            if subs:
+                for s in subs:
+                    avg = s.get("rubric_average") or 0
+                    verdict = s.get("rubric_verdict", "")
+                    status = s.get("status", "draft")
+                    colour = "#16a34a" if status == "approved" else "#d97706" if status == "pending_approval" else "#6b7280"
+                    st.markdown(
+                        f"<div style='padding:4px 0; border-bottom:1px solid #f3f4f6;'>"
+                        f"<strong>{s.get('task_type', 'custom')}</strong><br/>"
+                        f"<span style='font-size:0.8em; color:{colour};'>{status}</span>"
+                        f" | <span style='font-size:0.8em;'>{avg}/10</span>"
+                        f"</div>",
+                        unsafe_allow_html=True,
+                    )
+            else:
+                st.caption("No submissions yet. Create your first one below.")
+        else:
+            st.caption("Could not load submissions.")
+    except Exception:
+        st.caption("Backend unavailable.")
+
 
 # ============================================================================
-# PROMPT DESIGN INTERFACE
+# MAIN CONTENT — Tabbed interface
 # ============================================================================
 
-tabs = st.tabs(["🎯 Design", "🧪 Test", "💾 Save & Share", "📖 Examples"])
+tabs = st.tabs(["Build Prompt", "AI Output & Scorecard", "Submit for Approval", "Template Library"])
 
-with tabs[0]:  # DESIGN TAB
-    st.subheader("Design Your Custom Prompt")
-    
+# ---------------------------------------------------------------------------
+# TAB 1: BUILD PROMPT
+# ---------------------------------------------------------------------------
+with tabs[0]:
+
+    # Section A — What do you need?
+    st.subheader("What do you need?")
+
+    # Filter templates by role
+    available_templates = {
+        k: v for k, v in TASK_TEMPLATES.items()
+        if user_role in v["roles"] or "All" in v["roles"]
+    }
+
+    template_names = {k: v["name"] for k, v in available_templates.items()}
+    selected_key = st.selectbox(
+        "Task Type",
+        list(template_names.keys()),
+        format_func=lambda k: template_names[k],
+        help="Choose the type of analysis you need. Templates are filtered by your role.",
+        key="pta_task_type",
+    )
+
+    template = available_templates[selected_key]
+
+    # Section B — Context
+    st.subheader("Add Your Context")
+
     col1, col2 = st.columns([2, 1])
-    
+
     with col1:
-        st.markdown("### 1. What do you want to know?")
-        
-        prompt_name = st.text_input(
-            "Prompt Name",
-            value=st.session_state.get('loaded_prompt', {}).get('name', ''),
-            placeholder="e.g., 'Daily Wastage Report for Fresh Produce'",
-            key="pb_prompt_name",
+        default_prompt = template["default_prompt"]
+        prompt_text = st.text_area(
+            "Your Prompt",
+            value=default_prompt,
+            height=180,
+            help="Edit the template or write your own. Be specific: which store, what dates, what thresholds.",
+            key="pta_prompt_text",
         )
 
-        business_question = st.text_area(
-            "Business Question",
-            value=st.session_state.get('loaded_prompt', {}).get('query', ''),
-            placeholder="Describe what you want to analyze in plain English...",
-            height=100,
-            help="Be specific: Which products? Which stores? What time period? What threshold?",
-            key="pb_business_question",
-        )
-        
-        st.markdown("### 2. Data Sources")
-        
-        col_a, col_b = st.columns(2)
-        
-        with col_a:
-            data_sources = st.multiselect(
-                "Tables to Query",
-                ["Sales Transactions", "Product Master", "Inventory", "Wastage Logs",
-                 "Online Orders", "Store Master", "Supplier Data"],
-                default=["Sales Transactions"],
-                key="pb_data_sources",
-            )
-
-        with col_b:
-            time_range = st.selectbox(
-                "Time Range",
-                ["Last 24 hours", "Last 7 days", "Last 30 days", "Last 90 days",
-                 "Month to date", "Year to date", "Custom date range"],
-                key="pb_time_range",
-            )
-        
-        st.markdown("### 3. Filters & Criteria")
-        
-        col_a, col_b, col_c = st.columns(3)
-        
-        with col_a:
-            store_filter = st.multiselect(
-                "Stores",
-                ["All Stores"] + STORES,
-                default=["All Stores"],
-                key="pb_stores",
-            )
-
-        with col_b:
-            category_filter = st.multiselect(
-                "Product Categories",
-                ["All Categories", "Fresh Produce", "Dairy", "Meat & Seafood",
-                 "Bakery", "Grocery", "Frozen", "Beverages"],
-                default=["All Categories"],
-                key="pb_product_categories",
-            )
-
-        with col_c:
-            threshold = st.number_input(
-                "Alert Threshold (if applicable)",
-                min_value=0.0,
-                value=10.0,
-                help="e.g., wastage % above this value triggers alert",
-                key="pb_threshold",
-            )
-        
-        st.markdown("### 4. Output Format")
-        
-        col_a, col_b = st.columns(2)
-        
-        with col_a:
-            output_type = st.radio(
-                "Primary Output",
-                ["Table/List", "Summary Statistics", "Chart/Visualization", "Both"],
-                horizontal=True,
-                key="pb_output_type",
-            )
-
-        with col_b:
-            group_by = st.multiselect(
-                "Group Results By",
-                ["Store", "Product", "Category", "Supplier", "Day", "Week", "Month"],
-                default=["Store"],
-                key="pb_group_by",
-            )
-
-        sort_by = st.selectbox(
-            "Sort By",
-            ["Highest to Lowest", "Lowest to Highest", "Most Recent", "Alphabetical"],
-            key="pb_sort_by",
+        context_text = st.text_area(
+            "Additional Context (optional)",
+            placeholder="Add any specific context the AI should know — recent events, special circumstances, deadlines...",
+            height=80,
+            key="pta_context",
         )
 
-        limit_results = st.number_input(
-            "Limit Results To",
-            min_value=10,
-            max_value=1000,
-            value=50,
-            step=10,
-            key="pb_limit_results",
-        )
-    
     with col2:
-        st.markdown("### 💡 Quick Tips")
-        
-        st.info("""
-        **Product-Level Analysis:**
-        - Out of stock tracking
-        - Wastage patterns
-        - Over/under ordering
-        - Online miss-picks
-        - Slow movers
-        - Price optimization
-        """)
-        
-        st.success("""
-        **Best Practices:**
-        ✓ Be specific with criteria
-        ✓ Use realistic thresholds
-        ✓ Include time context
-        ✓ Consider store differences
-        ✓ Think about actionability
-        """)
-        
-        st.warning("""
-        **Common Issues:**
-        ⚠️ Too broad (no filters)
-        ⚠️ Too narrow (no results)
-        ⚠️ Missing time range
-        ⚠️ Unclear thresholds
-        """)
+        # Store/scope selector
+        if user_role in ("Store Manager",):
+            scope = st.selectbox("Your Store", STORES, key="pta_store")
+        elif user_role in ("Area Manager",):
+            scope = st.selectbox("Area", ["All Stores"] + STORES, key="pta_area")
+        else:
+            scope = st.text_input("Scope", placeholder="e.g. All stores, Fresh Produce, Sydney region", key="pta_scope")
 
-with tabs[1]:  # TEST TAB
-    st.subheader("🧪 Test Your Prompt")
-    
-    if not business_question:
-        st.warning("⬅️ Design your prompt first, then test it here")
-    else:
-        st.markdown("### Generated Query Preview")
-        
-        # Generate SQL from the prompt design
-        generated_sql = f"""
--- Auto-generated from Prompt Builder
--- Prompt: {prompt_name}
--- Question: {business_question}
+        # Date range
+        date_range = st.selectbox(
+            "Time Period",
+            ["Last 7 days", "Last 4 weeks", "Last 13 weeks", "Last 12 months",
+             "Month to date", "Year to date", "Custom"],
+            key="pta_date_range",
+        )
 
-SELECT 
-    p.product_name,
-    s.store_name,
-    DATE(i.timestamp) as date,
-    SUM(i.wastage_qty) as total_wastage_units,
-    SUM(i.wastage_qty * p.cost_per_unit) as wastage_cost,
-    (SUM(i.wastage_qty) / SUM(i.ordered_qty) * 100) as wastage_pct
-FROM inventory_logs i
-JOIN products p ON i.product_id = p.product_id
-JOIN stores s ON i.store_id = s.store_id
-WHERE i.timestamp >= CURRENT_DATE - INTERVAL '{time_range}'
-    AND i.wastage_qty > 0
-    {'AND s.store_name IN (' + ','.join([f"'{s}'" for s in store_filter if s != "All Stores"]) + ')' if "All Stores" not in store_filter else ''}
-    {'AND p.category IN (' + ','.join([f"'{c}'" for c in category_filter if c != "All Categories"]) + ')' if "All Categories" not in category_filter else ''}
-GROUP BY p.product_name, s.store_name, DATE(i.timestamp)
-HAVING wastage_pct > {threshold}
-ORDER BY wastage_cost DESC
-LIMIT {limit_results};
-        """
-        
-        st.code(generated_sql, language='sql')
-        
-        col1, col2 = st.columns([3, 1])
-        
-        with col1:
-            if st.button("▶️ Run Test Query", type="primary", use_container_width=True, key="pb_run_test"):
-                with st.spinner("Running query against database..."):
-                    # Mock test results
-                    test_results = pd.DataFrame({
-                        'Product': ['Cherry Tomatoes', 'Fresh Basil', 'Lettuce Mix', 'Stone Fruit', 'Berries'],
-                        'Store': ['Crows Nest', 'Bondi', 'Manly', 'Neutral Bay', 'Bondi'],
-                        'Wastage Units': [45, 32, 28, 51, 38],
-                        'Wastage Cost ($)': [202.50, 224.00, 84.00, 214.20, 323.00],
-                        'Wastage %': [18.2, 22.5, 15.7, 12.8, 24.1]
-                    })
-                    
-                    st.success(f"✅ Query completed successfully - {len(test_results)} rows returned")
-                    
-                    st.dataframe(test_results, hide_index=True, key="prompt_test_results")
-                    
-                    # AI Analysis
-                    st.markdown("### 🤖 AI Analysis")
-                    st.info("""
-                    **Key Findings:**
-                    - Berries show highest wastage at 24.1% ($323 cost impact)
-                    - Fresh Basil wastage at 22.5% suggests over-ordering
-                    - Bondi store appears in top 5 twice - investigate ordering practices
-                    - Total wastage cost for these items: $1,047.70 this period
-                    
-                    **Recommended Actions:**
-                    1. Reduce Fresh Basil orders at Bondi by 20%
-                    2. Review berry shelf life and display practices
-                    3. Schedule inventory review with Bondi store manager
-                    """)
-        
-        with col2:
-            st.metric("Rows Returned", "5")
-            st.metric("Query Time", "127ms")
-            st.metric("Data Quality", "98%")
+        # Analysis type
+        analysis_types = st.multiselect(
+            "Analysis Approach",
+            ANALYSIS_TYPES,
+            default=["Compare", "Recommend"],
+            help="What kind of analysis do you want?",
+            key="pta_analysis_types",
+        )
 
-with tabs[2]:  # SAVE & SHARE TAB
-    st.subheader("💾 Save & Share Your Prompt")
-    
-    if not prompt_name or not business_question:
-        st.warning("Complete the Design tab first before saving")
-    else:
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("### Prompt Details")
-            
-            category_display = st.selectbox(
-                "Category",
-                ["Retail Operations", "Buying", "Merchandising", "Finance", "General"],
-                key="pb_save_category",
-            )
-            # Map display names to API category slugs
-            category_map = {
-                "Retail Operations": "retail_ops",
-                "Buying": "buying",
-                "Merchandising": "merchandising",
-                "Finance": "finance",
-                "General": "general"
-            }
-            category = category_map.get(category_display, "general")
-            
-            tags = st.text_input(
-                "Tags (comma-separated)",
-                placeholder="e.g., wastage, fresh-produce, daily-report",
-                key="pb_tags",
-            )
+    # Data sources & output
+    col_a, col_b = st.columns(2)
+    with col_a:
+        default_sources = template.get("data_sources", [])
+        data_sources = st.multiselect(
+            "Data Sources",
+            ALL_DATA_SOURCES,
+            default=[s for s in default_sources if s in ALL_DATA_SOURCES],
+            help="Which data should the AI reference?",
+            key="pta_data_sources",
+        )
+    with col_b:
+        output_format = st.selectbox(
+            "Output Format",
+            OUTPUT_FORMATS,
+            index=OUTPUT_FORMATS.index(template.get("output_format", "Executive Summary")),
+            key="pta_output_format",
+        )
 
-            schedule_option = st.checkbox("Schedule this prompt to run automatically",
-                                          key="pb_schedule")
+    # Provider selection
+    provider = st.radio(
+        "AI Provider",
+        ["claude", "chatgpt", "grok"],
+        horizontal=True,
+        help="Claude (recommended), ChatGPT, or Grok",
+        key="pta_provider",
+    )
 
-            if schedule_option:
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    frequency = st.selectbox("Frequency", ["Daily", "Weekly", "Monthly"],
-                                             key="pb_frequency")
-                with col_b:
-                    notify_users = st.multiselect(
-                        "Notify Users",
-                        ["Gus (CEO)", "Angela (CFO)", "Fresh Buyers", "Store Managers", "Finance Team"],
-                        key="pb_notify",
-                    )
-
-            share_with = st.multiselect(
-                "Share with Teams",
-                ["Finance", "Buying", "Operations", "Store Managers", "Marketing", "All Staff"],
-                default=["Finance"],
-                key="pb_share_with",
-            )
-
-            difficulty_level = st.selectbox("Difficulty", ["beginner", "intermediate", "advanced"],
-                                            key="pb_save_difficulty")
-
-            if st.button("💾 Save Prompt", type="primary", use_container_width=True, key="pb_save_btn"):
-                try:
-                    save_resp = requests.post(
-                        f"{API_URL}/api/templates",
-                        json={
-                            "title": prompt_name,
-                            "description": business_question[:200],
-                            "template": business_question,
-                            "category": category,
-                            "difficulty": difficulty_level
-                        },
-                        timeout=10
-                    )
-                    if save_resp.status_code == 200:
-                        template_id = save_resp.json().get("template_id", "?")
-                        _pb_load_templates.clear()
-                        st.success(f"✅ '{prompt_name}' saved to library!")
-                        st.balloons()
-                        st.info(f"""
-                        **Prompt Saved!**
-                        - Name: {prompt_name}
-                        - Category: {category_display}
-                        - Difficulty: {difficulty_level}
-                        - Shared with: {', '.join(share_with)}
-                        - ID: #HF-{template_id}
-
-                        Your team can load this from the sidebar template library.
-                        """)
-                    else:
-                        st.error(f"Failed to save: API returned {save_resp.status_code}")
-                except requests.exceptions.ConnectionError:
-                    st.error("Could not connect to Hub API. Is the backend running?")
-                except Exception as e:
-                    st.error(f"Save failed: {e}")
-        
-        with col2:
-            st.markdown("### Prompt Summary")
-            
-            summary_data = {
-                "Name": prompt_name,
-                "Question": business_question[:100] + "..." if len(business_question) > 100 else business_question,
-                "Data Sources": ", ".join(data_sources),
-                "Time Range": time_range,
-                "Filters": f"{len(store_filter)} stores, {len(category_filter)} categories",
-                "Output": output_type,
-                "Created By": "Finance Team",
-                "Created": datetime.now().strftime("%Y-%m-%d %H:%M")
-            }
-            
-            for key, value in summary_data.items():
-                st.text(f"{key}: {value}")
-            
-            st.markdown("---")
-            
-            st.markdown("### Export Options")
-            
-            col_a, col_b = st.columns(2)
-            
-            with col_a:
-                if st.button("📄 Export as SQL", use_container_width=True, key="pb_export_sql"):
-                    st.download_button(
-                        "Download SQL",
-                        data=generated_sql if 'generated_sql' in locals() else "-- Run test first",
-                        file_name=f"{prompt_name.replace(' ', '_').lower()}.sql",
-                        mime="text/plain"
-                    )
-            
-            with col_b:
-                if st.button("📋 Copy Prompt URL", use_container_width=True, key="pb_copy_url"):
-                    st.code(f"https://hub.harrisfarm.com/prompts/{prompt_name.replace(' ', '-').lower()}")
-
-with tabs[3]:  # EXAMPLES TAB
-    st.subheader("📖 Example Prompts from Super Users")
-    
-    examples = [
-        {
-            "name": "Daily Out-of-Stock Alert",
-            "author": "Gus (CEO)",
-            "category": "Inventory",
-            "description": "Identifies products that went out of stock yesterday, calculates lost sales based on historical data",
-            "query": "Show all SKUs that had zero inventory for any period yesterday, estimate lost sales using 30-day average, prioritize by revenue impact",
-            "why_useful": "Catches inventory issues immediately, helps buyers prioritize reorders"
-        },
-        {
-            "name": "Weekend Fresh Produce Wastage",
-            "author": "Fresh Buying Team",
-            "category": "Waste Reduction",
-            "description": "Analyzes fresh produce wastage patterns specifically on weekends to optimize Monday ordering",
-            "query": "Compare weekend (Sat-Sun) wastage rates vs weekday rates for all fresh produce, show year-over-year trend",
-            "why_useful": "Weekend Buyer program uses this to adjust Monday orders"
-        },
-        {
-            "name": "Online Miss-Pick Root Cause",
-            "author": "Ecommerce Team",
-            "category": "Online Operations",
-            "description": "Breaks down online miss-picks by root cause (similar products, out of stock, picker error)",
-            "query": "Analyze miss-picks from last 30 days, categorize by: confusing similar items, actual OOS, picker mistake, group by store and picker",
-            "why_useful": "Identifies training needs and process improvements"
-        },
-        {
-            "name": "Over-Order Prevention",
-            "author": "Angela (CFO)",
-            "category": "Buying",
-            "description": "Flags products consistently ordered in quantities 15%+ above sales, quantifies cash tied up",
-            "query": "Compare order quantity vs actual sales for last 60 days, flag items with consistent 15%+ excess, calculate working capital impact",
-            "why_useful": "Reduces cash tied up in excess inventory, prevents wastage"
-        },
-        {
-            "name": "Slow Mover Markdown Candidates",
-            "author": "Merchandising Team",
-            "category": "Sales Optimization",
-            "description": "Identifies slow-moving products approaching expiry that should be marked down",
-            "query": "Find products with <50% normal velocity, days to expiry <7, current stock level >10 units, suggest markdown %",
-            "why_useful": "Proactive markdown strategy maximizes recovery vs wastage"
-        },
-        {
-            "name": "Store-Specific Ordering Patterns",
-            "author": "Operations Team",
-            "category": "Buying",
-            "description": "Compares ordering patterns between high-performing and low-performing stores for same products",
-            "query": "For each product category, compare order frequency, quantity, and wastage between top 3 and bottom 3 profitability stores",
-            "why_useful": "Best practice sharing - learn from high performers"
+    # Data confidence badge
+    if data_sources:
+        source_reliability = {
+            "POS": 10, "Budget": 9, "Financial": 9, "Waste": 8, "Roster": 8,
+            "Inventory": 7, "Supplier": 7, "CBAS": 7, "ABS": 8, "HR": 8,
+            "Margin": 8, "Marketing": 6, "Logistics": 7, "Procurement": 7,
+            "Quality": 6, "Amazon": 7, "Sustainability": 6, "Infrastructure": 5,
+            "Vendor": 5, "Property": 5, "Competitor": 4, "Projects": 5, "Utilities": 6,
         }
-    ]
-    
-    for example in examples:
-        with st.expander(f"**{example['name']}** by {example['author']} - {example['category']}"):
-            st.markdown(f"**Description:** {example['description']}")
-            st.markdown(f"**Query Logic:** _{example['query']}_")
-            st.success(f"✅ **Why Useful:** {example['why_useful']}")
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button(f"📋 Use as Template", key=f"use_{example['name']}"):
-                    st.session_state.loaded_prompt = {
-                        'name': example['name'],
-                        'query': example['query']
-                    }
-                    st.success("Template loaded! Go to Design tab →")
-            
-            with col2:
-                if st.button(f"▶️ Run Now", key=f"run_{example['name']}"):
-                    st.info("Query executed - check your email for results")
+        avg_reliability = sum(source_reliability.get(s, 5) for s in data_sources) / len(data_sources)
+        conf_colour = "#16a34a" if avg_reliability >= 8 else "#d97706" if avg_reliability >= 6 else "#dc2626"
+        st.markdown(
+            f"<div style='background:{conf_colour}10; border:1px solid {conf_colour}; "
+            f"padding:8px 12px; border-radius:6px; margin:8px 0;'>"
+            f"<strong style='color:{conf_colour};'>Data Confidence: {avg_reliability:.0f}/10</strong>"
+            f" — Sources: {', '.join(data_sources)}</div>",
+            unsafe_allow_html=True,
+        )
+
+    # Similar prompts hint
+    try:
+        lib_resp = requests.get(f"{API_URL}/api/templates", timeout=3)
+        if lib_resp.status_code == 200:
+            lib_templates = lib_resp.json().get("templates", [])
+            matching = [t for t in lib_templates if t.get("category") == selected_key]
+            if matching:
+                st.info(
+                    f"**{len(matching)} similar prompt(s)** found in the library. "
+                    f"Check the **Template Library** tab to build on existing work."
+                )
+    except Exception:
+        pass
+
+    st.markdown("---")
+
+    # Generate button
+    if st.button("Send to AI", type="primary", use_container_width=True, key="pta_generate_btn"):
+        if not prompt_text.strip():
+            st.error("Please write a prompt before sending.")
+        else:
+            with st.spinner("AI is analysing your data..."):
+                try:
+                    resp = requests.post(
+                        f"{API_URL}/api/pta/generate",
+                        json={
+                            "user_id": "staff",
+                            "user_role": user_role,
+                            "task_type": selected_key,
+                            "prompt_text": prompt_text,
+                            "context": context_text or None,
+                            "data_sources": data_sources,
+                            "analysis_types": analysis_types,
+                            "output_format": output_format,
+                            "provider": provider,
+                        },
+                        timeout=120,
+                    )
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        if data.get("status") == "success":
+                            st.session_state["pta_output"] = data.get("output", "")
+                            st.session_state["pta_submission_id"] = data.get("submission_id")
+                            st.session_state["pta_generation_done"] = True
+                            st.session_state["pta_scores"] = None  # reset scores
+                            st.success(
+                                f"Output generated ({data.get('tokens', 0)} tokens, "
+                                f"{data.get('latency_ms', 0):.0f}ms). "
+                                f"Go to **AI Output & Scorecard** tab to review."
+                            )
+                        else:
+                            st.error(f"Generation failed: {data.get('message', 'Unknown error')}")
+                    else:
+                        st.error(f"API error {resp.status_code}. Is the backend running?")
+                except requests.exceptions.ConnectionError:
+                    st.error("Could not connect to Hub backend. Please try again.")
+                except requests.exceptions.Timeout:
+                    st.error("Request timed out. The AI may be slow — try again.")
+
+
+# ---------------------------------------------------------------------------
+# TAB 2: AI OUTPUT & SCORECARD
+# ---------------------------------------------------------------------------
+with tabs[1]:
+    st.subheader("AI Output")
+
+    output = st.session_state.get("pta_output", "")
+    submission_id = st.session_state.get("pta_submission_id")
+
+    if not output:
+        st.info("No output yet. Go to **Build Prompt** tab and click **Send to AI**.")
+    else:
+        # Show the output
+        st.markdown(output)
+
+        st.markdown("---")
+
+        # Score button
+        st.subheader("Rubric Scorecard")
+
+        scores = st.session_state.get("pta_scores")
+        if scores:
+            render_rubric_scorecard(scores)
+        else:
+            if st.button("Score This Output", type="primary", key="pta_score_btn"):
+                with st.spinner("Scoring against 8-criteria rubric..."):
+                    try:
+                        resp = requests.post(
+                            f"{API_URL}/api/pta/score",
+                            json={
+                                "submission_id": submission_id,
+                                "output_text": output[:8000],
+                                "task_type": st.session_state.get("pta_task_type", "custom"),
+                                "user_role": st.session_state.get("pta_role", "Store Manager"),
+                            },
+                            timeout=60,
+                        )
+                        if resp.status_code == 200:
+                            data = resp.json()
+                            if data.get("status") == "success":
+                                st.session_state["pta_scores"] = data["scores"]
+                                st.rerun()
+                            else:
+                                st.error(f"Scoring failed: {data.get('message', 'Unknown error')}")
+                        else:
+                            st.error(f"API error {resp.status_code}")
+                    except Exception as e:
+                        st.error(f"Scoring error: {e}")
+
+        # Iterate section
+        st.markdown("---")
+        st.subheader("Iterate")
+
+        iteration_context = st.text_area(
+            "Add context or challenge the AI",
+            placeholder="Tell the AI what it got wrong, add context it was missing, or request changes...",
+            key="pta_iterate_context",
+        )
+        if st.button("Iterate", key="pta_iterate_btn"):
+            if not iteration_context.strip():
+                st.warning("Add some context before iterating.")
+            elif submission_id:
+                with st.spinner("AI is refining the analysis..."):
+                    try:
+                        # Send iteration as a new generation with context
+                        original_prompt = st.session_state.get("pta_prompt_text", "")
+                        resp = requests.post(
+                            f"{API_URL}/api/pta/generate",
+                            json={
+                                "user_id": "staff",
+                                "user_role": st.session_state.get("pta_role", "Store Manager"),
+                                "task_type": st.session_state.get("pta_task_type", "custom"),
+                                "prompt_text": original_prompt,
+                                "context": f"Previous output to refine:\n\n{output[:3000]}\n\nUser feedback:\n{iteration_context}",
+                                "data_sources": st.session_state.get("pta_data_sources", []),
+                                "analysis_types": st.session_state.get("pta_analysis_types", []),
+                                "output_format": st.session_state.get("pta_output_format", "Executive Summary"),
+                                "provider": st.session_state.get("pta_provider", "claude"),
+                            },
+                            timeout=120,
+                        )
+                        if resp.status_code == 200:
+                            data = resp.json()
+                            if data["status"] == "success":
+                                st.session_state["pta_output"] = data["output"]
+                                st.session_state["pta_submission_id"] = data["submission_id"]
+                                st.session_state["pta_scores"] = None
+                                st.rerun()
+                        else:
+                            st.error("Iteration failed.")
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+
+
+# ---------------------------------------------------------------------------
+# TAB 3: SUBMIT FOR APPROVAL
+# ---------------------------------------------------------------------------
+with tabs[2]:
+    st.subheader("Submit for Approval")
+
+    output = st.session_state.get("pta_output", "")
+    submission_id = st.session_state.get("pta_submission_id")
+    scores = st.session_state.get("pta_scores")
+
+    if not output:
+        st.info("Generate and score an output first.")
+    elif not scores:
+        st.warning("Score your output before submitting. Go to **AI Output & Scorecard** tab.")
+    else:
+        # Show summary
+        avg = scores.get("average", 0)
+        verdict = scores.get("verdict", "REVISE")
+        routing = APPROVAL_ROUTING.get(st.session_state.get("pta_role", "Store Manager"), {})
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Rubric Average", f"{avg}/10")
+        with col2:
+            st.metric("Verdict", verdict)
+        with col3:
+            st.metric("Approval Level", routing.get("level", "L1"))
+
+        st.caption(
+            f"This will be sent to **{routing.get('approver_role', 'your manager')}** for review."
+        )
+
+        st.markdown("---")
+
+        # Mandatory human annotation
+        st.markdown(
+            "**Add your human judgment** — at least one annotation is required. "
+            "Your insight is what makes this valuable."
+        )
+        annotation = st.text_area(
+            "Your Annotation",
+            placeholder="What context does the AI not know? What would you change? What's your recommendation?",
+            key="pta_annotation",
+        )
+
+        if st.button("Submit for Approval", type="primary", use_container_width=True, key="pta_submit_btn"):
+            if not annotation.strip():
+                st.error(
+                    "Add at least one piece of context or feedback before submitting. "
+                    "Your human judgment is what makes this valuable."
+                )
+            elif submission_id:
+                try:
+                    resp = requests.post(
+                        f"{API_URL}/api/pta/submit",
+                        json={
+                            "submission_id": submission_id,
+                            "human_annotations": [annotation],
+                        },
+                        timeout=10,
+                    )
+                    if resp.status_code == 200:
+                        st.success("Submitted for approval! Your manager will review it.")
+                        st.balloons()
+                    else:
+                        err = resp.json() if resp.headers.get("content-type", "").startswith("application/json") else {}
+                        st.error(err.get("detail", f"Submission failed ({resp.status_code})"))
+                except Exception as e:
+                    st.error(f"Error: {e}")
+
+
+# ---------------------------------------------------------------------------
+# TAB 4: TEMPLATE LIBRARY
+# ---------------------------------------------------------------------------
+with tabs[3]:
+    st.subheader("Template Library")
+    st.markdown("Browse all 20 task templates. Templates are filtered by your role.")
+
+    current_role = st.session_state.get("pta_role", "Store Manager")
+
+    for key, tmpl in TASK_TEMPLATES.items():
+        if current_role not in tmpl["roles"] and "All" not in tmpl["roles"]:
+            continue
+
+        with st.expander(f"**{tmpl['name']}**"):
+            st.markdown(f"**Roles:** {', '.join(tmpl['roles'])}")
+            st.markdown(f"**Data Sources:** {', '.join(tmpl.get('data_sources', []))}")
+            st.markdown(f"**Output Format:** {tmpl.get('output_format', 'Executive Summary')}")
+            if tmpl["default_prompt"]:
+                st.code(tmpl["default_prompt"], language=None)
+
+            if st.button("Use This Template", key=f"pta_use_{key}"):
+                st.session_state["pta_task_type"] = key
+                st.session_state["pta_prompt_text"] = tmpl["default_prompt"]
+                st.rerun()
+
+    # Also show templates from API library
+    st.markdown("---")
+    st.markdown("### Saved Prompts")
+    try:
+        resp = requests.get(f"{API_URL}/api/templates", timeout=5)
+        if resp.status_code == 200:
+            templates = resp.json().get("templates", [])
+            if templates:
+                for t in templates:
+                    with st.expander(f"**{t['title']}** — {t.get('category', '')}"):
+                        st.markdown(f"**Difficulty:** {t.get('difficulty', 'beginner')}")
+                        st.markdown(f"**Uses:** {t.get('uses', 0)}")
+                        if t.get("template"):
+                            st.code(t["template"], language=None)
+            else:
+                st.caption("No saved prompts yet.")
+    except Exception:
+        st.caption("Could not load saved prompts.")
+
 
 # ============================================================================
-# HELP SECTION
+# FOOTER
 # ============================================================================
 
-st.markdown("---")
-
-with st.expander("ℹ️ Help & Documentation"):
-    st.markdown("""
-    ### How to Use the Prompt Builder
-    
-    **1. Design Tab**
-    - Start with a clear business question
-    - Select relevant data sources
-    - Apply appropriate filters (stores, categories, time)
-    - Define output format and grouping
-    
-    **2. Test Tab**
-    - Review the auto-generated SQL
-    - Run test queries against real data
-    - Verify results match expectations
-    - Read AI analysis for insights
-    
-    **3. Save & Share Tab**
-    - Name and categorize your prompt
-    - Share with relevant teams
-    - Optionally schedule automated runs
-    - Export SQL for advanced use
-    
-    **4. Examples Tab**
-    - Learn from other super users
-    - Copy proven prompt templates
-    - Understand use cases and benefits
-    
-    ### Product-Level Analytics You Can Build
-    
-    - **Out of Stock Tracking**: Lost sales, duration, frequency by product/store
-    - **Wastage Analysis**: Costs, trends, root causes, comparison across stores
-    - **Over-Ordering Detection**: Excess inventory, cash impact, ordering patterns
-    - **Online Miss-Picks**: Picker accuracy, product confusion, error patterns
-    - **Slow Movers**: Aging inventory, markdown candidates, clearance priorities
-    - **Substitution Rates**: What gets substituted, customer acceptance, revenue impact
-    - **Inventory Velocity**: Days to turn, category comparison, seasonal patterns
-    
-    ### Advanced Tips
-    
-    - Use thresholds to focus on actionable items (e.g., wastage >10%)
-    - Group by multiple dimensions for deeper insights (store + category + day)
-    - Compare time periods to identify trends (this week vs last week)
-    - Schedule daily/weekly reports for consistent monitoring
-    - Share successful prompts with your team to standardize analysis
-    
-    ### Need Help?
-    
-    Contact the Hub team: hub-support@harrisfarm.com
-    """)
-
-render_voice_data_box("general")
-
-render_footer("Prompt Builder", user=user)
+render_footer("Prompt Engine", user=user)

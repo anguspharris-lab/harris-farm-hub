@@ -92,11 +92,37 @@ def apply_styles(extra_css: str = ""):
     st.markdown(css, unsafe_allow_html=True)
 
 
-def render_header(title: str, subtitle: str):
-    """Render standard dashboard header: title + bold subtitle + divider."""
+def render_header(title: str, subtitle: str, goals=None, strategy_context=None):
+    """Render standard dashboard header with optional goal alignment.
+
+    Args:
+        title: Page title (e.g. "Sales Performance")
+        subtitle: Bold subtitle (e.g. "**Harris Farm Markets** | ...")
+        goals: List of goal IDs (e.g. ["G1", "G2", "G4"]) to show badges
+        strategy_context: One-liner connecting this data to strategy
+    """
     st.title(title)
     st.markdown(subtitle)
-    st.caption("For The Greater Goodness — Harris Farm Markets")
+
+    if goals:
+        try:
+            from shared.goals_config import HUB_GOALS, goal_badge_html
+            badges = " ".join(goal_badge_html(g) for g in goals)
+            ctx_html = ""
+            if strategy_context:
+                ctx_html = (
+                    f"<div style='font-size:0.85em;color:#6b7280;"
+                    f"margin-top:6px;font-style:italic;'>"
+                    f"{strategy_context}</div>"
+                )
+            st.markdown(
+                f"<div style='margin:8px 0 4px;'>{badges}{ctx_html}</div>",
+                unsafe_allow_html=True,
+            )
+        except ImportError:
+            pass
+
+    st.caption("For The Greater Goodness \u2014 Harris Farm Markets")
     st.markdown("---")
 
 

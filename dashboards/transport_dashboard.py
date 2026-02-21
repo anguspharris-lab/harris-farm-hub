@@ -181,7 +181,12 @@ def generate_transport_data():
 
 user = st.session_state.get("auth_user")
 
-render_header("🚚 Transport & Logistics", "**Operations Team** | Delivery costs, route efficiency & fleet analysis")
+render_header(
+    "Transport & Logistics",
+    "**Operations Team** | Delivery costs, route efficiency & fleet analysis",
+    goals=["G4"],
+    strategy_context="Tidying up the supply chain — from Sydney Markets to store shelf, every route matters.",
+)
 
 # ============================================================================
 # LOAD DATA
@@ -479,8 +484,9 @@ with col2:
     fig_vehicles.update_layout(height=300, showlegend=False)
     st.plotly_chart(fig_vehicles, key="transport_cost_per_pallet_vehicle")
 
-    best_vehicle = vehicle_analysis.loc[vehicle_analysis['cost_per_pallet'].idxmin(), 'vehicle_type']
-    st.markdown(f"**Finding:** {best_vehicle}s offer best cost-per-pallet ratio")
+    if not vehicle_analysis.empty:
+        best_vehicle = vehicle_analysis.loc[vehicle_analysis['cost_per_pallet'].idxmin(), 'vehicle_type']
+        st.markdown(f"**Finding:** {best_vehicle}s offer best cost-per-pallet ratio")
 
 # ============================================================================
 # SCENARIO MODELING

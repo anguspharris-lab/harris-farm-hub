@@ -97,8 +97,8 @@ def _handle_question(question: str, page_context: str, auto_read: bool):
         except requests.exceptions.ConnectionError:
             status.update(label="Connection failed", state="error")
             st.error(
-                "Could not connect to Hub API on port 8000. "
-                "Is the backend running?"
+                "Could not connect to the Hub backend. "
+                "Please try again in a moment."
             )
             return
         except Exception as e:

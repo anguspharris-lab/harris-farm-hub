@@ -8,6 +8,7 @@ Primary metric: Market Share % (reliable). Dollar values are directional only.
 """
 
 import sqlite3
+import traceback
 from pathlib import Path
 
 import pandas as pd
@@ -49,12 +50,40 @@ def _cached_macro_view(period, channel):
 
 render_header(
     "Market Share Intelligence",
-    "Postcode-level competitive analysis | Spatial mapping | Trade areas | Trends"
+    "Postcode-level competitive analysis | Spatial mapping | Trade areas | Trends",
+    goals=["G1", "G2"],
+    strategy_context="Where we're winning and losing market position — essential for 'Fewer, Bigger' expansion decisions.",
 )
 
 if not db_available():
     st.error("Database not found.")
     st.stop()
+
+
+def _safe_int(pc, default=0):
+    """Safely convert a postcode to int, returning default on failure."""
+    try:
+        return int(pc)
+    except (ValueError, TypeError):
+        return default
+
+
+_STATE_RANGES = {
+    "NSW": lambda pc: 2000 <= _safe_int(pc) <= 2999,
+    "QLD": lambda pc: 4000 <= _safe_int(pc) <= 4999,
+    "ACT": lambda pc: 2600 <= _safe_int(pc) <= 2618 or _safe_int(pc) in range(2900, 2915),
+}
+
+
+def _filter_by_state(df, state, postcode_col="postcode"):
+    """Filter DataFrame by Australian state based on postcode ranges. Returns df unchanged if state is 'All'."""
+    if state == "All":
+        return df
+    fn = _STATE_RANGES.get(state)
+    if fn and not df.empty:
+        return df[df[postcode_col].apply(fn)]
+    return df
+
 
 # ── Sidebar Filters ──────────────────────────────────────────────────────────
 
@@ -131,16 +160,7 @@ with tab_overview:
     map_data = postcode_map_data(latest, channel)
     if map_data:
         mdf = pd.DataFrame(map_data)
-        if state_filter != "All":
-            # Filter by state using postcode ranges
-            state_ranges = {
-                "NSW": lambda pc: 2000 <= int(pc) <= 2999,
-                "QLD": lambda pc: 4000 <= int(pc) <= 4999,
-                "ACT": lambda pc: 2600 <= int(pc) <= 2618 or int(pc) in (2900, 2901, 2902, 2903, 2904, 2905, 2906, 2911, 2912, 2913, 2914),
-            }
-            fn = state_ranges.get(state_filter)
-            if fn:
-                mdf = mdf[mdf["postcode"].apply(lambda x: fn(x))]
+        mdf = _filter_by_state(mdf, state_filter)
 
         if not mdf.empty:
             c1, c2 = st.columns(2)
@@ -214,21 +234,16 @@ with tab_map:
         mdf = mdf.dropna(subset=["lat", "lon"])
 
         # State filter
-        if map_state != "All":
-            state_ranges = {
-                "NSW": lambda pc: 2000 <= int(pc) <= 2999,
-                "QLD": lambda pc: 4000 <= int(pc) <= 4999,
-                "ACT": lambda pc: 2600 <= int(pc) <= 2618 or int(pc) in range(2900, 2915),
-            }
-            fn = state_ranges.get(map_state)
-            if fn:
-                mdf = mdf[mdf["postcode"].apply(lambda x: fn(x))]
+        mdf = _filter_by_state(mdf, map_state)
 
         # Radius filter — cumulative from selected store
         if radius_filter != "All":
             max_km = int(radius_filter.replace("Within ", "").replace("km", ""))
             if map_store != "Nearest Store":
-                si = STORE_LOCATIONS[map_store]
+                si = STORE_LOCATIONS.get(map_store)
+                if not si:
+                    st.warning(f"Store location not found for '{map_store}'.")
+                    st.stop()
                 mdf["_dist"] = mdf.apply(
                     lambda r: haversine_km(si["lat"], si["lon"], r["lat"], r["lon"]), axis=1)
                 mdf = mdf[mdf["_dist"] <= max_km]
@@ -704,19 +719,22 @@ with tab_health:
         else:
             macro_df = pd.DataFrame(macro)
 
-            # Macro KPIs
-            mk1, mk2, mk3 = st.columns(3)
-            mk1.metric("Clusters", len(macro_df))
-            best = macro_df.iloc[0]
-            mk2.metric(
-                f"Strongest: {best['cluster']}",
-                f"{best['avg_share']:.1f}%",
-            )
-            worst = macro_df.iloc[-1]
-            mk3.metric(
-                f"Weakest: {worst['cluster']}",
-                f"{worst['avg_share']:.1f}%",
-            )
+            if macro_df.empty:
+                st.info("No macro data available.")
+            else:
+                # Macro KPIs
+                mk1, mk2, mk3 = st.columns(3)
+                mk1.metric("Clusters", len(macro_df))
+                best = macro_df.iloc[0]
+                mk2.metric(
+                    f"Strongest: {best['cluster']}",
+                    f"{best['avg_share']:.1f}%",
+                )
+                worst = macro_df.iloc[-1]
+                mk3.metric(
+                    f"Weakest: {worst['cluster']}",
+                    f"{worst['avg_share']:.1f}%",
+                )
 
             # Cluster comparison bar chart
             fig_macro = go.Figure()
@@ -858,15 +876,7 @@ with tab_trends:
             ydf["lon"] = pd.to_numeric(ydf["lon"], errors="coerce")
 
         # Filter by state
-        if state_filter != "All":
-            state_ranges = {
-                "NSW": lambda pc: 2000 <= int(pc) <= 2999,
-                "QLD": lambda pc: 4000 <= int(pc) <= 4999,
-                "ACT": lambda pc: 2600 <= int(pc) <= 2618 or int(pc) in range(2900, 2915),
-            }
-            fn = state_ranges.get(state_filter)
-            if fn:
-                ydf = ydf[ydf["region_code"].apply(lambda x: fn(x))]
+        ydf = _filter_by_state(ydf, state_filter, postcode_col="region_code")
 
         # Filter out no-presence postcodes
         ydf = ydf[ydf["distance_tier"] != "No Presence (20km+)"]
@@ -995,77 +1005,75 @@ with tab_opps:
         odf = pd.DataFrame(opps)
 
         # Filter by state
-        if state_filter != "All":
-            state_ranges = {
-                "NSW": lambda pc: 2000 <= int(pc) <= 2999,
-                "QLD": lambda pc: 4000 <= int(pc) <= 4999,
-                "ACT": lambda pc: 2600 <= int(pc) <= 2618 or int(pc) in range(2900, 2915),
-            }
-            fn = state_ranges.get(state_filter)
-            if fn:
-                odf = odf[odf["postcode"].apply(lambda x: fn(x))]
+        odf = _filter_by_state(odf, state_filter)
 
-        # Quadrant scatter
-        fig_quad = px.scatter(
-            odf, x="penetration_pct", y="market_share_pct",
-            color="opportunity_type",
-            size="market_size",
-            hover_name="region_name",
-            custom_data=["postcode", "spend_per_customer", "nearest_store",
-                         "distance_km", "distance_tier", "opportunity_type"],
-            labels={
-                "penetration_pct": "Customer Penetration %",
-                "market_share_pct": "Market Share %",
-                "opportunity_type": "Type",
-            },
-            color_discrete_map={
-                "Stronghold": "#16a34a",
-                "Growth Opportunity": "#2563eb",
-                "Basket Opportunity": "#d97706",
-                "Retention Risk": "#dc2626",
-                "Monitor": "#9ca3af",
-            },
-            size_max=30,
-        )
-        fig_quad.update_traces(
-            hovertemplate=(
-                "<b>%{hovertext}</b> (%{customdata[0]})<br>"
-                "Share: %{y:.1f}% | Penetration: %{x:.1f}%<br>"
-                "Spend: $%{customdata[1]:.0f}<br>"
-                "Store: %{customdata[2]} (%{customdata[3]:.0f}km, %{customdata[4]})<br>"
-                "Type: %{customdata[5]}"
-                "<extra></extra>"
+        if odf.empty:
+            st.info("No opportunity data for the selected state filter.")
+        else:
+            # Ensure numeric for size parameter
+            odf["market_size"] = pd.to_numeric(odf["market_size"], errors="coerce").fillna(0).clip(lower=0)
+
+            # Quadrant scatter
+            fig_quad = px.scatter(
+                odf, x="penetration_pct", y="market_share_pct",
+                color="opportunity_type",
+                size="market_size",
+                hover_name="region_name",
+                custom_data=["postcode", "spend_per_customer", "nearest_store",
+                             "distance_km", "distance_tier", "opportunity_type"],
+                labels={
+                    "penetration_pct": "Customer Penetration %",
+                    "market_share_pct": "Market Share %",
+                    "opportunity_type": "Type",
+                },
+                color_discrete_map={
+                    "Stronghold": "#16a34a",
+                    "Growth Opportunity": "#2563eb",
+                    "Basket Opportunity": "#d97706",
+                    "Retention Risk": "#dc2626",
+                    "Monitor": "#9ca3af",
+                },
+                size_max=30,
             )
-        )
+            fig_quad.update_traces(
+                hovertemplate=(
+                    "<b>%{hovertext}</b> (%{customdata[0]})<br>"
+                    "Share: %{y:.1f}% | Penetration: %{x:.1f}%<br>"
+                    "Spend: $%{customdata[1]:.0f}<br>"
+                    "Store: %{customdata[2]} (%{customdata[3]:.0f}km, %{customdata[4]})<br>"
+                    "Type: %{customdata[5]}"
+                    "<extra></extra>"
+                )
+            )
 
-        # Add quadrant reference lines
-        fig_quad.add_hline(y=5, line_dash="dash", line_color="#d1d5db", annotation_text="5% share")
-        fig_quad.add_vline(x=15, line_dash="dash", line_color="#d1d5db", annotation_text="15% penetration")
+            # Add quadrant reference lines
+            fig_quad.add_hline(y=5, line_dash="dash", line_color="#d1d5db", annotation_text="5% share")
+            fig_quad.add_vline(x=15, line_dash="dash", line_color="#d1d5db", annotation_text="15% penetration")
 
-        fig_quad.update_layout(height=600, legend=dict(orientation="h", y=-0.12))
-        st.plotly_chart(fig_quad, use_container_width=True, key="opportunity_scatter")
+            fig_quad.update_layout(height=600, legend=dict(orientation="h", y=-0.12))
+            st.plotly_chart(fig_quad, use_container_width=True, key="opportunity_scatter")
 
-        # Summary counts
-        type_counts = odf["opportunity_type"].value_counts()
-        cols = st.columns(5)
-        for i, (opp_type, count) in enumerate(type_counts.items()):
-            if i < 5:
-                cols[i].metric(opp_type, count)
+            # Summary counts
+            type_counts = odf["opportunity_type"].value_counts()
+            cols = st.columns(5)
+            for i, (opp_type, count) in enumerate(type_counts.items()):
+                if i < 5:
+                    cols[i].metric(opp_type, count)
 
-        # Detailed tables by opportunity type
-        for opp_type in ["Stronghold", "Growth Opportunity", "Basket Opportunity", "Retention Risk"]:
-            subset = odf[odf["opportunity_type"] == opp_type]
-            if not subset.empty:
-                with st.expander(f"{opp_type} — {len(subset)} postcodes"):
-                    display = subset[["region_name", "postcode", "market_share_pct",
-                                      "penetration_pct", "spend_per_customer",
-                                      "nearest_store", "distance_km", "distance_tier"]].copy()
-                    display.columns = ["Region", "Postcode", "Share %", "Penetration %",
-                                       "Spend $", "Nearest Store", "Distance km", "Tier"]
-                    st.dataframe(
-                        display.sort_values("Share %", ascending=False),
-                        use_container_width=True, hide_index=True,
-                    )
+            # Detailed tables by opportunity type
+            for opp_type in ["Stronghold", "Growth Opportunity", "Basket Opportunity", "Retention Risk"]:
+                subset = odf[odf["opportunity_type"] == opp_type]
+                if not subset.empty:
+                    with st.expander(f"{opp_type} — {len(subset)} postcodes"):
+                        display = subset[["region_name", "postcode", "market_share_pct",
+                                          "penetration_pct", "spend_per_customer",
+                                          "nearest_store", "distance_km", "distance_tier"]].copy()
+                        display.columns = ["Region", "Postcode", "Share %", "Penetration %",
+                                           "Spend $", "Nearest Store", "Distance km", "Tier"]
+                        st.dataframe(
+                            display.sort_values("Share %", ascending=False),
+                            use_container_width=True, hide_index=True,
+                        )
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1082,12 +1090,7 @@ with tab_issues:
     else:
         # Filter by state
         if state_filter != "All":
-            state_ranges = {
-                "NSW": lambda pc: 2000 <= int(pc) <= 2999,
-                "QLD": lambda pc: 4000 <= int(pc) <= 4999,
-                "ACT": lambda pc: 2600 <= int(pc) <= 2618 or int(pc) in range(2900, 2915),
-            }
-            fn = state_ranges.get(state_filter)
+            fn = _STATE_RANGES.get(state_filter)
             if fn:
                 issues = [i for i in issues if fn(i["postcode"])]
 
@@ -1194,15 +1197,7 @@ with tab_data:
         edf = pd.DataFrame(map_data)
 
         # Filter by state
-        if state_filter != "All":
-            state_ranges = {
-                "NSW": lambda pc: 2000 <= int(pc) <= 2999,
-                "QLD": lambda pc: 4000 <= int(pc) <= 4999,
-                "ACT": lambda pc: 2600 <= int(pc) <= 2618 or int(pc) in range(2900, 2915),
-            }
-            fn = state_ranges.get(state_filter)
-            if fn:
-                edf = edf[edf["postcode"].apply(lambda x: fn(x))]
+        edf = _filter_by_state(edf, state_filter)
 
         # Tier filter
         data_tier = st.selectbox("Distance Tier", ["All", "Core (0-3km)", "Primary (3-5km)",

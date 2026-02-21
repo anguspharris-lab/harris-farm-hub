@@ -3,6 +3,7 @@ AI Adoption Tracker — Platform Data Fetchers
 Abstract base class + concrete fetchers for OpenAI and Anthropic admin APIs.
 To add a new platform: create a new Fetcher subclass + add config.yaml entry.
 """
+from __future__ import annotations
 
 import datetime
 import os
@@ -14,7 +15,10 @@ import httpx
 import yaml
 
 _DIR = Path(__file__).resolve().parent
-_CFG = yaml.safe_load((_DIR / "config.yaml").read_text())
+try:
+    _CFG = yaml.safe_load((_DIR / "config.yaml").read_text())
+except FileNotFoundError:
+    _CFG = {"platforms": {}, "refresh_interval_hours": 6, "cache_db": "data/ai_adoption_cache.db"}
 
 
 class PlatformFetcher(ABC):

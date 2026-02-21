@@ -468,7 +468,7 @@ class TestScoreAudience:
 
     def test_good_summary(self, complete_result):
         score, _ = _score_audience(complete_result)
-        assert 7 <= score <= 10
+        assert 5 <= score <= 10  # Tighter rubric: base=2, needs $ or % for quantified bonus
 
     def test_no_summary(self, empty_result):
         score, _ = _score_audience(empty_result)
@@ -499,7 +499,7 @@ class TestScoreAction:
 
     def test_complete_recs(self, complete_result):
         score, _ = _score_action(complete_result)
-        assert score == 10  # 2/2 fully specified
+        assert score >= 8  # Graduated scoring: fields filled + count bonus
 
     def test_no_recs(self, empty_result):
         score, _ = _score_action(empty_result)
@@ -511,7 +511,7 @@ class TestScoreAction:
             {"action": "Do Y", "owner": "Team B", "timeline": "1w", "priority": "high"},
         ]}
         score, rationale = _score_action(result)
-        assert "1/2" in rationale
+        assert "fields" in rationale  # Graduated: reports fields/total across recs
 
 
 class TestScoreVisual:
@@ -519,7 +519,7 @@ class TestScoreVisual:
 
     def test_good_tables(self, complete_result):
         score, _ = _score_visual(complete_result)
-        assert score >= 7
+        assert score >= 5  # Tighter: base=1, 1 table with 5 rows + columns
 
     def test_no_tables(self, empty_result):
         score, _ = _score_visual(empty_result)
@@ -544,7 +544,7 @@ class TestScoreBrief:
 
     def test_concise_report(self, complete_result):
         score, _ = _score_brief(complete_result)
-        assert score >= 8
+        assert score >= 5  # Build-from-0: summary + findings + recs sweet spots
 
     def test_verbose_report(self):
         result = {

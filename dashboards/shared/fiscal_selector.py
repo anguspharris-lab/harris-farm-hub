@@ -147,7 +147,10 @@ def render_fiscal_selector(
             format_func=lambda x: q_options[x],
             key=f"{key_prefix}_quarter",
         )
-        q = next(q for q in quarters if q["quarter_no"] == selected_q)
+        q = next((q for q in quarters if q["quarter_no"] == selected_q), None)
+        if not q:
+            st.warning("Selected quarter not found in data.")
+            return _empty_result()
         start, end = q["start"], q["end"]
         label = f"FY{selected_fy} Q{selected_q}"
         pt = "quarter"
@@ -165,7 +168,10 @@ def render_fiscal_selector(
             format_func=lambda x: m_options[x],
             key=f"{key_prefix}_month",
         )
-        m = next(m for m in months if m["month_no"] == selected_m)
+        m = next((m for m in months if m["month_no"] == selected_m), None)
+        if not m:
+            st.warning("Selected month not found in data.")
+            return _empty_result()
         start, end = m["start"], m["end"]
         label = f"{m['name']} FY{selected_fy} ({m['weeks']}w)"
         pt = "month"
@@ -183,7 +189,10 @@ def render_fiscal_selector(
             format_func=lambda x: w_options[x],
             key=f"{key_prefix}_week",
         )
-        w = next(w for w in weeks if w["week_no"] == selected_w)
+        w = next((w for w in weeks if w["week_no"] == selected_w), None)
+        if not w:
+            st.warning("Selected week not found in data.")
+            return _empty_result()
         start, end = w["start"], w["end"]
         label = f"{w['name']} FY{selected_fy}"
         pt = "week"

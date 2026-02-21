@@ -23,3 +23,36 @@
 - Lesson: Use full paths in startup scripts or ensure PATH is set
 
 [IMPROVE] 2026-02-17 00:43 | S | attempt 1/3 | 8.4->8.4 | SUCCESS | Test cycle recording (no actual improvement)
+
+## 2026-02-21 Session — Goals Framework & Front Page Transformation
+
+### Task: Hub Transformation (Goals + Mission Control + Academy Integration)
+
+**Phase 1: Initial Build**
+- Created `dashboards/shared/goals_config.py` — G1-G5 goals framework, page mapping, utilities
+- Rewrote `dashboards/landing.py` — Mission Control with 6 sections (hero, goals, activity, launch, WATCHDOG, pillars)
+- Added goal_tags to `dashboards/shared/academy_content.py` — 6 paths, 5 challenges, 5 showcase items
+- Added goal callout + badge rendering to `dashboards/growing_legends_academy.py`
+- Added Academy banner to `dashboards/hub_portal.py`
+- Created `docs/GOALS.md` and `docs/CURRENT_STATE.md`
+- Updated `docs/FEATURE_STATUS.md`
+
+**Phase 2: Self-Improvement Iteration**
+- Replaced 5 separate DB connections with single `fetch_all_goal_metrics()`
+- Replaced hardcoded goal tags in activity feed with contextual `goals_for_analysis_type()`
+- Added goal badge rendering to Academy learning paths, arena, and showcase
+- Moved WATCHDOG radar to `fetch_watchdog_scores()` function
+- Added time-of-day personalised greeting
+- Added system health metrics row (4 KPIs)
+
+**Phase 3: Deep Audit Bug Fixes (8 bugs)**
+- BUG 11: None timestamp crash — added `or ""` on all SQLite timestamp fields
+- BUG 2: Activity feed color — new `_detail_color()` with keyword matching
+- BUG 9: SQL injection — parameterized queries for G4 supply chain counts
+- BUG 10: Silent errors — `logging.warning()` instead of bare except
+- BUG 24: AI Adoption missing from nav.py — added port 8519 + slug
+- BUG 3: Mid-word truncation — `rsplit(" ", 1)[0]` word boundary
+- BUG 16: Redundant _pages — single fetch at file scope in Academy
+- Performance: Single DB connection for all 5 goals
+
+[IMPROVE] 2026-02-21 19:45 | ALL | attempt 1/3 | N/A->8.7 | SUCCESS | Goals framework, Mission Control, Academy integration, 8 bugs fixed

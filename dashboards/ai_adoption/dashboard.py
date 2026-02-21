@@ -3,6 +3,7 @@ Harris Farm Hub — AI Adoption Tracker
 Tracks AI platform usage across the organisation.
 Pulls from OpenAI and Anthropic admin APIs, caches in SQLite, serves from cache.
 """
+from __future__ import annotations
 
 import datetime
 
@@ -17,7 +18,9 @@ user = st.session_state.get("auth_user")
 
 render_header(
     "AI Adoption Tracker",
-    "Organisation-wide AI platform usage | Claude & ChatGPT | Auto-refreshing"
+    "Organisation-wide AI platform usage | Claude & ChatGPT | Auto-refreshing",
+    goals=["G3", "G5"],
+    strategy_context="Tracking AI capability growth across the business \u2014 are our people becoming superstars?",
 )
 
 # ── Lazy imports (cache/fetcher depend on yaml) ─────────────────────────────

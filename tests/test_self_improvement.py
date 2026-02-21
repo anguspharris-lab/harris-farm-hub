@@ -139,6 +139,56 @@ class TestParseAuditScores:
         monkeypatch.setattr("self_improvement.AUDIT_LOG", str(tmp_path / "nope.log"))
         assert parse_audit_scores() == []
 
+    def test_format_no_prefix(self, tmp_path, monkeypatch):
+        """Format 1: H:8 R:8 S:9 ... (colon, no SCORE prefix)"""
+        log = tmp_path / "audit.log"
+        log.write_text(
+            "[2026-02-13] TASK: P1 Build | H:8 R:8 S:9 C:8 D:7 U:8 X:8 = 8.0\n"
+        )
+        monkeypatch.setattr("self_improvement.AUDIT_LOG", str(log))
+        entries = parse_audit_scores()
+        assert len(entries) == 1
+        assert entries[0]["H"] == 8
+        assert entries[0]["D"] == 7
+
+    def test_format_na_value(self, tmp_path, monkeypatch):
+        """Format 2: Score: H=9 ... D=N/A (N/A value stored as 0)"""
+        log = tmp_path / "audit.log"
+        log.write_text(
+            "[2026-02-14] TASK: Test | Score: H=9 R=9 S=9 C=8 D=N/A U=8 X=9 avg=8.7\n"
+        )
+        monkeypatch.setattr("self_improvement.AUDIT_LOG", str(log))
+        entries = parse_audit_scores()
+        assert len(entries) == 1
+        assert entries[0]["D"] == 0
+        assert entries[0]["H"] == 9
+        # avg excludes D=0: (9+9+9+8+8+9)/6 = 8.7
+        assert entries[0]["avg"] == pytest.approx(8.7, abs=0.1)
+
+    def test_format_no_delimiter(self, tmp_path, monkeypatch):
+        """Format 4: SCORE: H8 R8 S8 C8 D9 U9 X8 (no = or :)"""
+        log = tmp_path / "audit.log"
+        log.write_text(
+            "SCORE: H8 R8 S8 C8 D9 U9 X8 avg=8.3\n"
+        )
+        monkeypatch.setattr("self_improvement.AUDIT_LOG", str(log))
+        entries = parse_audit_scores()
+        assert len(entries) == 1
+        assert entries[0]["H"] == 8
+        assert entries[0]["D"] == 9
+
+    def test_format_inline_no_prefix(self, tmp_path, monkeypatch):
+        """Format 6: H=9 R=9 ... (inline, no SCORE prefix)"""
+        log = tmp_path / "audit.log"
+        log.write_text(
+            "[2026-02-21] TASK: Nav Fix | H=9 R=9 S=9 C=8 D=9 U=9 X=8 avg=8.7\n"
+        )
+        monkeypatch.setattr("self_improvement.AUDIT_LOG", str(log))
+        entries = parse_audit_scores()
+        assert len(entries) == 1
+        assert entries[0]["U"] == 9
+        assert entries[0]["X"] == 8
+
 
 # ---------------------------------------------------------------------------
 # Tests: calculate_averages
@@ -322,3 +372,70 @@ class TestSelfImprovementAPI:
         resp = self.client.post("/api/self-improvement/backfill")
         assert resp.status_code == 200
         assert "rows_inserted" in resp.json()
+
+
+# ---------------------------------------------------------------------------
+# Tests: PageQualityAuditor
+# ---------------------------------------------------------------------------
+
+class TestPageQualityAuditor:
+    def test_low_score_generates_finding(self, tmp_path):
+        db_path = str(tmp_path / "hub_data.db")
+        conn = sqlite3.connect(db_path)
+        conn.execute(
+            "CREATE TABLE page_quality_scores "
+            "(id INTEGER PRIMARY KEY AUTOINCREMENT, page_name TEXT, "
+            "rubric_type TEXT, scorer TEXT, scores_json TEXT, "
+            "total_score INTEGER, max_score INTEGER, "
+            "created_at TEXT DEFAULT (datetime('now')))"
+        )
+        conn.execute(
+            "INSERT INTO page_quality_scores "
+            "(page_name, rubric_type, scores_json, total_score, max_score) "
+            "VALUES (?, ?, ?, ?, ?)",
+            ("Sales Dashboard", "dashboard", "{}", 20, 35),
+        )
+        conn.commit()
+        conn.close()
+
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
+        from continuous_improvement import PageQualityAuditor
+        findings = PageQualityAuditor(db_path=db_path).audit()
+        assert len(findings) == 1
+        assert "Sales Dashboard" in findings[0]["title"]
+        assert findings[0]["category"] == "page_quality"
+
+    def test_high_score_no_finding(self, tmp_path):
+        db_path = str(tmp_path / "hub_data.db")
+        conn = sqlite3.connect(db_path)
+        conn.execute(
+            "CREATE TABLE page_quality_scores "
+            "(id INTEGER PRIMARY KEY AUTOINCREMENT, page_name TEXT, "
+            "rubric_type TEXT, scorer TEXT, scores_json TEXT, "
+            "total_score INTEGER, max_score INTEGER, "
+            "created_at TEXT DEFAULT (datetime('now')))"
+        )
+        conn.execute(
+            "INSERT INTO page_quality_scores "
+            "(page_name, rubric_type, scores_json, total_score, max_score) "
+            "VALUES (?, ?, ?, ?, ?)",
+            ("Sales Dashboard", "dashboard", "{}", 32, 35),
+        )
+        conn.commit()
+        conn.close()
+
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
+        from continuous_improvement import PageQualityAuditor
+        findings = PageQualityAuditor(db_path=db_path).audit()
+        assert len(findings) == 0
+
+    def test_no_table_no_crash(self, tmp_path):
+        db_path = str(tmp_path / "hub_data.db")
+        conn = sqlite3.connect(db_path)
+        conn.execute("CREATE TABLE dummy (id INTEGER)")
+        conn.close()
+
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
+        from continuous_improvement import PageQualityAuditor
+        findings = PageQualityAuditor(db_path=db_path).audit()
+        assert findings == []

@@ -1,7 +1,7 @@
 """
 Harris Farm Hub — Portal Content Loader
 Reads and structures existing documentation, procedures, learnings, rubrics,
-and audit metrics for the Hub Documentation Portal (port 8515).
+and audit metrics for the Hub Documentation Portal.
 """
 
 import json
@@ -188,27 +188,40 @@ def parse_audit_metrics():
 
     content = AUDIT_LOG.read_text(encoding="utf-8")
 
-    # Find score patterns like "H8 R8 S8 C8 D9 U9 X8"
+    # Universal score pattern — catches all audit.log format variations
     score_pattern = re.compile(
-        r"H(\d+)\s+R(\d+)\s+S(\d+)\s+C(\d+)\s+D(\d+)\s+U(\d+)\s+X(\d+)")
+        r"(?:SCORES?:\s*)?"
+        r"H[=:]?(\d+)\s+"
+        r"R[=:]?(\d+)\s+"
+        r"S[=:]?(\d+)\s+"
+        r"C[=:]?(\d+)\s+"
+        r"D[=:]?(\d+|N/?A)\s+"
+        r"U[=:]?(\d+)\s+"
+        r"X[=:]?(\d+)",
+        re.IGNORECASE)
     matches = score_pattern.findall(content)
 
     score_entries = []
     for m in matches:
+        d_raw = m[4]
+        d_val = 0 if d_raw.upper().replace("/", "") == "NA" else int(d_raw)
         scores = {
             "H": int(m[0]), "R": int(m[1]), "S": int(m[2]),
-            "C": int(m[3]), "D": int(m[4]), "U": int(m[5]),
+            "C": int(m[3]), "D": d_val, "U": int(m[5]),
             "X": int(m[6]),
         }
-        scores["avg"] = round(sum(scores.values()) / 7, 1)
+        valid = [v for v in scores.values() if v > 0]
+        scores["avg"] = round(sum(valid) / len(valid), 1) if valid else 0
         score_entries.append(scores)
 
     # Calculate averages
     avg_scores = {}
     if score_entries:
-        for key in ["H", "R", "S", "C", "D", "U", "X", "avg"]:
-            vals = [e[key] for e in score_entries]
-            avg_scores[key] = round(sum(vals) / len(vals), 1)
+        for key in ["H", "R", "S", "C", "D", "U", "X"]:
+            vals = [e[key] for e in score_entries if e.get(key, 0) > 0]
+            avg_scores[key] = round(sum(vals) / len(vals), 1) if vals else 0
+        vals = [e["avg"] for e in score_entries if e.get("avg", 0) > 0]
+        avg_scores["avg"] = round(sum(vals) / len(vals), 1) if vals else 0
 
     # Count [TASK] entries
     task_count = content.count("[TASK]")

@@ -142,7 +142,7 @@ Each file received:
 
 - [x] All 21 modified files pass `ast.parse()` syntax check
 - [x] `voice_realtime.py` imports cleanly with Python 3.9+
-- [x] 16 dashboards have both import and function call
+- [x] 19 dashboards have both import and function call
 - [x] DASHBOARD_TOOLS has 10 context-specific tool definitions
 - [x] DEFAULT_TOOL provides fallback for "general" context
 - [x] Existing `ask_question.py` component untouched and functional

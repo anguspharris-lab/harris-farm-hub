@@ -31,6 +31,8 @@ user = st.session_state.get("auth_user")
 render_header(
     "Revenue Bridge",
     "**Revenue decomposition & financial trends** | Network and store-level analysis",
+    goals=["G1", "G2"],
+    strategy_context="Decomposing what's driving growth or decline — the financial story behind 'Bigger'.",
 )
 
 

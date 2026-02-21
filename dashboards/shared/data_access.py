@@ -24,7 +24,7 @@ def get_db_path() -> Path:
 
     if _DB_PATH_CACHE is None:
         # Project root is 2 levels up from the shared/ directory
-        shared_dir = Path(__file__).parent
+        shared_dir = Path(__file__).resolve().parent
         project_root = shared_dir.parent.parent
         _DB_PATH_CACHE = project_root / "data" / "harris_farm.db"
 

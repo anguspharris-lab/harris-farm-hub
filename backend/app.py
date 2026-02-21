@@ -466,6 +466,18 @@ def init_hub_database():
     c.execute("CREATE INDEX IF NOT EXISTS idx_if_status ON improvement_findings(status)")
     c.execute("CREATE INDEX IF NOT EXISTS idx_if_category ON improvement_findings(category)")
 
+    # Page quality scores (Academy site quality rubric)
+    c.execute('''CREATE TABLE IF NOT EXISTS page_quality_scores
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  page_name TEXT NOT NULL,
+                  rubric_type TEXT NOT NULL,
+                  scorer TEXT DEFAULT 'anonymous',
+                  scores_json TEXT NOT NULL,
+                  total_score INTEGER NOT NULL,
+                  max_score INTEGER NOT NULL,
+                  created_at TEXT DEFAULT (datetime('now')))''')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pqs_page ON page_quality_scores(page_name)")
+
     # Agent Control Panel: approval queue
     c.execute('''CREATE TABLE IF NOT EXISTS agent_proposals
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -543,6 +555,128 @@ def init_hub_database():
                   status TEXT DEFAULT 'in_progress',
                   last_updated TEXT,
                   notes TEXT)''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS watchdog_runs
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  run_at TEXT NOT NULL,
+                  health_api TEXT,
+                  health_hub TEXT,
+                  findings_total INTEGER DEFAULT 0,
+                  findings_new INTEGER DEFAULT 0,
+                  scores_backfilled INTEGER DEFAULT 0,
+                  health_metrics_json TEXT,
+                  created_at TEXT DEFAULT (datetime('now')))''')
+
+    # ---- The Paddock: AI skills assessment tables ----
+    c.execute('''CREATE TABLE IF NOT EXISTS paddock_users
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  hub_user_id TEXT,
+                  name TEXT NOT NULL,
+                  employee_id TEXT,
+                  store TEXT NOT NULL,
+                  department TEXT NOT NULL,
+                  role_tier INTEGER NOT NULL DEFAULT 3,
+                  tech_comfort INTEGER DEFAULT 3,
+                  ai_experience TEXT,
+                  created_at TEXT DEFAULT (datetime('now')))''')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pu_hub_user ON paddock_users(hub_user_id)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pu_store ON paddock_users(store)")
+
+    c.execute('''CREATE TABLE IF NOT EXISTS paddock_responses
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id INTEGER NOT NULL,
+                  module TEXT NOT NULL,
+                  question_id TEXT NOT NULL,
+                  answer TEXT,
+                  score INTEGER DEFAULT 0,
+                  time_taken_seconds INTEGER,
+                  created_at TEXT DEFAULT (datetime('now')),
+                  FOREIGN KEY (user_id) REFERENCES paddock_users(id))''')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pr_user ON paddock_responses(user_id)")
+    c.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_pr_unique ON paddock_responses(user_id, module, question_id)")
+
+    c.execute('''CREATE TABLE IF NOT EXISTS paddock_results
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id INTEGER NOT NULL,
+                  maturity_level INTEGER NOT NULL,
+                  awareness_score INTEGER DEFAULT 0,
+                  usage_score INTEGER DEFAULT 0,
+                  critical_score INTEGER DEFAULT 0,
+                  applied_score INTEGER DEFAULT 0,
+                  confidence_score INTEGER DEFAULT 0,
+                  overall_score INTEGER DEFAULT 0,
+                  created_at TEXT DEFAULT (datetime('now')),
+                  FOREIGN KEY (user_id) REFERENCES paddock_users(id))''')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pres_user ON paddock_results(user_id)")
+
+    c.execute('''CREATE TABLE IF NOT EXISTS paddock_feedback
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id INTEGER NOT NULL,
+                  experience_rating INTEGER,
+                  confusion_notes TEXT,
+                  improvement_suggestions TEXT,
+                  created_at TEXT DEFAULT (datetime('now')),
+                  FOREIGN KEY (user_id) REFERENCES paddock_users(id))''')
+
+    # ---- Prompt-to-Approval System tables ----
+
+    # PtA submissions: the core workflow table
+    c.execute('''CREATE TABLE IF NOT EXISTS pta_submissions
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id TEXT NOT NULL,
+                  user_role TEXT NOT NULL,
+                  task_type TEXT NOT NULL,
+                  original_prompt TEXT NOT NULL,
+                  assembled_prompt TEXT,
+                  data_sources TEXT DEFAULT '[]',
+                  context_text TEXT,
+                  analysis_types TEXT DEFAULT '[]',
+                  output_format TEXT DEFAULT 'Executive Summary',
+                  ai_output TEXT,
+                  ai_provider TEXT DEFAULT 'claude',
+                  ai_tokens INTEGER DEFAULT 0,
+                  ai_latency_ms REAL DEFAULT 0,
+                  human_annotations TEXT DEFAULT '[]',
+                  iteration_count INTEGER DEFAULT 1,
+                  version_history TEXT DEFAULT '[]',
+                  rubric_scores TEXT,
+                  rubric_average REAL,
+                  rubric_verdict TEXT,
+                  advanced_rubric_scores TEXT,
+                  approval_level TEXT,
+                  approver_role TEXT,
+                  status TEXT DEFAULT 'draft',
+                  approver_notes TEXT,
+                  decided_at TEXT,
+                  created_at TEXT DEFAULT (datetime('now')),
+                  updated_at TEXT DEFAULT (datetime('now')))''')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pta_user ON pta_submissions(user_id)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pta_status ON pta_submissions(status)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pta_type ON pta_submissions(task_type)")
+
+    # PtA audit log: every action tracked
+    c.execute('''CREATE TABLE IF NOT EXISTS pta_audit_log
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id TEXT,
+                  action TEXT NOT NULL,
+                  entity_type TEXT,
+                  entity_id INTEGER,
+                  details TEXT,
+                  created_at TEXT DEFAULT (datetime('now')))''')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pta_audit_entity ON pta_audit_log(entity_type, entity_id)")
+
+    # PtA user points (staff gamification)
+    c.execute('''CREATE TABLE IF NOT EXISTS pta_points_log
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id TEXT NOT NULL,
+                  action TEXT NOT NULL,
+                  points INTEGER NOT NULL,
+                  multiplier REAL DEFAULT 1.0,
+                  total_awarded INTEGER NOT NULL,
+                  reference_id INTEGER,
+                  reference_type TEXT,
+                  created_at TEXT DEFAULT (datetime('now')))''')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_pta_pts_user ON pta_points_log(user_id)")
 
     conn.commit()
     conn.close()
@@ -1010,6 +1144,14 @@ def seed_sustainability_kpis():
 async def lifespan(app: FastAPI):
     # Startup
     init_hub_database()
+    # Auto-ingest audit scores into task_scores (idempotent)
+    try:
+        from self_improvement import backfill_scores_from_audit
+        _backfilled = backfill_scores_from_audit()
+        if _backfilled:
+            print(f"  Backfilled {_backfilled} score entries from audit.log")
+    except Exception:
+        pass  # Non-critical — scores still readable from audit.log
     seed_learning_data()
     seed_arena_data()
     seed_agent_control_data()
@@ -1065,8 +1207,19 @@ async def lifespan(app: FastAPI):
         _timer.daemon = True
         _timer.start()
         print("Scheduled analysis: every {} hours (first run in 5 min)".format(schedule_hours))
+    # Start WATCHDOG background scheduler
+    from watchdog_scheduler import WatchdogScheduler
+    watchdog_hours = int(os.getenv("WATCHDOG_INTERVAL_HOURS", "6"))
+    if watchdog_hours > 0:
+        app.state.watchdog = WatchdogScheduler(
+            interval_hours=watchdog_hours, db_path=config.HUB_DB
+        )
+        app.state.watchdog.start(delay=120)
+        print("🐕 WATCHDOG scheduler: every {}h (first run in 2 min)".format(watchdog_hours))
     yield
     # Shutdown
+    if hasattr(app.state, "watchdog"):
+        app.state.watchdog.stop()
     print("👋 Hub shutting down")
 
 # ============================================================================
@@ -4133,6 +4286,25 @@ async def watchdog_audit_trail(limit: int = 100):
     }
 
 
+@app.get("/api/watchdog/scheduler/status")
+async def watchdog_scheduler_status():
+    """Return WATCHDOG background scheduler status."""
+    if not hasattr(app.state, "watchdog"):
+        return {"running": False, "message": "Scheduler not initialized"}
+    return app.state.watchdog.status()
+
+
+@app.post("/api/watchdog/scheduler/run")
+async def watchdog_scheduler_trigger():
+    """Trigger an immediate WATCHDOG cycle (admin)."""
+    if not hasattr(app.state, "watchdog"):
+        raise HTTPException(status_code=503, detail="Scheduler not initialized")
+    import threading
+    t = threading.Thread(target=app.state.watchdog._run_cycle, daemon=True)
+    t.start()
+    return {"triggered": True, "message": "WATCHDOG cycle started"}
+
+
 # ---------------------------------------------------------------------------
 # INTELLIGENCE / DATA ANALYSIS ENDPOINTS
 # ---------------------------------------------------------------------------
@@ -4638,6 +4810,67 @@ async def backfill_scores():
 
 
 # ============================================================================
+# PAGE QUALITY SCORING ENDPOINTS
+# ============================================================================
+
+@app.post("/api/page-quality/score")
+async def submit_page_quality_score(request: Request):
+    """Submit a page quality score against dashboard or content rubric."""
+    body = await request.json()
+    page_name = body.get("page_name", "")
+    rubric_type = body.get("rubric_type", "")
+    scorer = body.get("scorer", "anonymous")
+    scores = body.get("scores", {})
+
+    if not page_name or rubric_type not in ("dashboard", "content"):
+        raise HTTPException(
+            status_code=422,
+            detail="page_name and rubric_type ('dashboard' or 'content') required",
+        )
+
+    import json as _json
+    total = sum(scores.values())
+    max_score = 35 if rubric_type == "dashboard" else 25
+
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.execute(
+        "INSERT INTO page_quality_scores "
+        "(page_name, rubric_type, scorer, scores_json, total_score, max_score) "
+        "VALUES (?,?,?,?,?,?)",
+        (page_name, rubric_type, scorer, _json.dumps(scores), total, max_score),
+    )
+    conn.commit()
+    conn.close()
+    return {"stored": True, "total": total, "max": max_score,
+            "pct": round(total / max_score * 100, 1) if max_score else 0}
+
+
+@app.get("/api/page-quality/scores")
+async def page_quality_scores(page_name: str = "", limit: int = 20):
+    """Get page quality score history, optionally filtered by page."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    if page_name:
+        rows = conn.execute(
+            "SELECT * FROM page_quality_scores WHERE page_name = ? "
+            "ORDER BY id DESC LIMIT ?", (page_name, limit)
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM page_quality_scores ORDER BY id DESC LIMIT ?",
+            (limit,)
+        ).fetchall()
+    conn.close()
+
+    import json as _json
+    results = []
+    for r in [dict(row) for row in rows]:
+        r["scores"] = _json.loads(r.pop("scores_json", "{}"))
+        results.append(r)
+    return results
+
+
+# ============================================================================
 # CONTINUOUS IMPROVEMENT ENDPOINTS
 # ============================================================================
 
@@ -5018,6 +5251,477 @@ async def executor_status():
         "pending_total": counts.get("PENDING", 0),
         "recent_completions": [dict(r) for r in recent],
     }
+
+
+# ============================================================================
+# PROMPT-TO-APPROVAL SYSTEM ENDPOINTS
+# ============================================================================
+
+
+class PtaGenerateRequest(BaseModel):
+    """Request to generate AI output from a structured prompt."""
+    user_id: str = "staff"
+    user_role: str = "Store Manager"
+    task_type: str
+    prompt_text: str
+    context: Optional[str] = None
+    data_sources: Optional[List[str]] = None
+    analysis_types: Optional[List[str]] = None
+    output_format: str = "Executive Summary"
+    provider: str = "claude"
+
+
+class PtaScoreRequest(BaseModel):
+    """Request to score an AI output against the rubric."""
+    submission_id: Optional[int] = None
+    output_text: str
+    task_type: Optional[str] = None
+    user_role: Optional[str] = None
+
+
+class PtaSubmitRequest(BaseModel):
+    """Request to submit for approval."""
+    submission_id: int
+    human_annotations: Optional[List[str]] = None
+
+
+@app.post("/api/pta/generate")
+async def pta_generate(request: PtaGenerateRequest):
+    """Generate AI analysis from a structured prompt and auto-score it."""
+
+    # Build system prompt with role context
+    system_prompt = (
+        f"You are a senior business analyst at Harris Farm Markets, Australia's premium "
+        f"fresh food retailer. You are producing a {request.output_format} for a "
+        f"{request.user_role}.\n\n"
+        f"Task type: {request.task_type}\n"
+    )
+    if request.data_sources:
+        system_prompt += f"Data sources available: {', '.join(request.data_sources)}\n"
+    if request.analysis_types:
+        system_prompt += f"Analysis approach: {', '.join(request.analysis_types)}\n"
+    if request.context:
+        system_prompt += f"\nAdditional context: {request.context}\n"
+
+    system_prompt += (
+        "\n\nProvide a thorough, professional analysis. Use markdown formatting. "
+        "Include specific numbers where possible. Be honest about limitations. "
+        "End with clear, actionable recommendations with owners and timelines."
+    )
+
+    messages = [{"role": "user", "content": request.prompt_text}]
+
+    # Call selected LLM
+    provider_fn = {"claude": _chat_claude, "chatgpt": _chat_chatgpt, "grok": _chat_grok}
+    fn = provider_fn.get(request.provider, _chat_claude)
+    result = await fn(system_prompt, messages)
+
+    if result["status"] == "error":
+        return {
+            "status": "error",
+            "message": result["response"],
+            "submission_id": None,
+        }
+
+    # Store submission in database
+    now = datetime.now().isoformat()
+    conn = sqlite3.connect(config.HUB_DB)
+    c = conn.cursor()
+    c.execute(
+        """INSERT INTO pta_submissions
+           (user_id, user_role, task_type, original_prompt, assembled_prompt,
+            data_sources, context_text, analysis_types, output_format,
+            ai_output, ai_provider, ai_tokens, ai_latency_ms, status, created_at, updated_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+        (
+            request.user_id, request.user_role, request.task_type,
+            request.prompt_text, system_prompt,
+            json.dumps(request.data_sources or []),
+            request.context,
+            json.dumps(request.analysis_types or []),
+            request.output_format,
+            result["response"], result["provider"],
+            result.get("tokens", 0), result.get("latency_ms", 0),
+            "generated", now, now,
+        ),
+    )
+    submission_id = c.lastrowid
+
+    # Log the action
+    c.execute(
+        "INSERT INTO pta_audit_log (user_id, action, entity_type, entity_id, details, created_at) "
+        "VALUES (?,?,?,?,?,?)",
+        (request.user_id, "generate", "submission", submission_id,
+         json.dumps({"task_type": request.task_type, "provider": request.provider}), now),
+    )
+    conn.commit()
+    conn.close()
+
+    return {
+        "status": "success",
+        "submission_id": submission_id,
+        "output": result["response"],
+        "provider": result["provider"],
+        "tokens": result.get("tokens", 0),
+        "latency_ms": result.get("latency_ms", 0),
+    }
+
+
+@app.post("/api/pta/score")
+async def pta_score(request: PtaScoreRequest):
+    """Score an AI output against the 8-criteria standard rubric using Claude."""
+
+    scoring_prompt = (
+        'You are a senior business analyst scoring an AI-generated analysis for Harris Farm Markets.\n\n'
+        'Score this output against these 8 criteria, each rated 1-10:\n'
+        '1. Audience Fit: Tailored to the reader\'s role and decision needs?\n'
+        '2. Storytelling: Clear narrative arc from problem to solution?\n'
+        '3. Actionability: Specific next steps with owners and timelines?\n'
+        '4. Visual Quality: Professional formatting, effective data presentation?\n'
+        '5. Completeness: All necessary information present?\n'
+        '6. Brevity: Concise — every sentence earns its place?\n'
+        '7. Data Integrity: Claims backed by sourced data?\n'
+        '8. Honesty: Transparent about limitations and risks?\n\n'
+        'Respond in this exact JSON format (no markdown fencing):\n'
+        '{"scores":{"audience_fit":{"score":8,"rationale":"..."},"storytelling":{"score":7,"rationale":"..."},'
+        '"actionability":{"score":9,"rationale":"..."},"visual_quality":{"score":7,"rationale":"..."},'
+        '"completeness":{"score":8,"rationale":"..."},"brevity":{"score":8,"rationale":"..."},'
+        '"data_integrity":{"score":6,"rationale":"..."},"honesty":{"score":9,"rationale":"..."}},'
+        '"average":7.8,"verdict":"REVISE","improvements":["suggestion1","suggestion2"]}\n\n'
+        'Verdicts: "SHIP" if average >= 8.0, "REVISE" if 5.0-7.9, "REJECT" if < 5.0'
+    )
+
+    if request.user_role:
+        scoring_prompt += f"\n\nTarget audience role: {request.user_role}"
+    if request.task_type:
+        scoring_prompt += f"\nTask type: {request.task_type}"
+
+    messages = [{"role": "user", "content": f"Score this output:\n\n{request.output_text[:8000]}"}]
+
+    result = await _chat_claude(scoring_prompt, messages)
+
+    if result["status"] == "error":
+        return {"status": "error", "message": result["response"]}
+
+    # Parse the JSON response
+    try:
+        raw = result["response"].strip()
+        # Strip markdown code fences if present
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
+        if raw.endswith("```"):
+            raw = raw[:-3]
+        if raw.startswith("json"):
+            raw = raw[4:]
+        scores_data = json.loads(raw.strip())
+    except (json.JSONDecodeError, Exception):
+        # Fallback: try to extract JSON from the response
+        import re as _re
+        match = _re.search(r'\{[\s\S]*\}', result["response"])
+        if match:
+            try:
+                scores_data = json.loads(match.group())
+            except json.JSONDecodeError:
+                return {"status": "error", "message": "Could not parse rubric scores from AI response"}
+        else:
+            return {"status": "error", "message": "Could not parse rubric scores from AI response"}
+
+    # Update submission if ID provided
+    if request.submission_id:
+        now = datetime.now().isoformat()
+        conn = sqlite3.connect(config.HUB_DB)
+        c = conn.cursor()
+        c.execute(
+            """UPDATE pta_submissions
+               SET rubric_scores = ?, rubric_average = ?, rubric_verdict = ?,
+                   status = 'scored', updated_at = ?
+               WHERE id = ?""",
+            (json.dumps(scores_data), scores_data.get("average", 0),
+             scores_data.get("verdict", "REVISE"), now, request.submission_id),
+        )
+        c.execute(
+            "INSERT INTO pta_audit_log (user_id, action, entity_type, entity_id, details, created_at) "
+            "VALUES (?,?,?,?,?,?)",
+            ("system", "score", "submission", request.submission_id,
+             json.dumps({"average": scores_data.get("average"), "verdict": scores_data.get("verdict")}), now),
+        )
+
+        # Auto-save to prompt library if score >= 9.0
+        avg_score = scores_data.get("average", 0)
+        if avg_score >= 9.0:
+            sub_row = c.execute(
+                "SELECT original_prompt, task_type, user_role, output_format FROM pta_submissions WHERE id = ?",
+                (request.submission_id,),
+            ).fetchone()
+            if sub_row:
+                prompt_text, task_type, role, fmt = sub_row
+                title = "{} (auto-saved, {}/10)".format(
+                    task_type.replace("_", " ").title(), avg_score
+                )
+                c.execute(
+                    "INSERT INTO prompt_templates (title, description, template, category, difficulty, uses, avg_rating, created_at, updated_at) "
+                    "VALUES (?,?,?,?,?,?,?,?,?)",
+                    (title, "Auto-saved from PtA — scored {}/10".format(avg_score),
+                     prompt_text, task_type, "advanced", 0, avg_score, now, now),
+                )
+                c.execute(
+                    "INSERT INTO pta_audit_log (user_id, action, entity_type, entity_id, details, created_at) "
+                    "VALUES (?,?,?,?,?,?)",
+                    ("system", "auto_save_library", "submission", request.submission_id,
+                     json.dumps({"avg_score": avg_score}), now),
+                )
+
+                # Award points for library save
+                c.execute(
+                    "SELECT user_id FROM pta_submissions WHERE id = ?", (request.submission_id,)
+                )
+                user_row = c.fetchone()
+                if user_row:
+                    c.execute(
+                        "INSERT INTO pta_points_log (user_id, action, points, multiplier, total_awarded, reference_id, reference_type, created_at) "
+                        "VALUES (?,?,?,?,?,?,?,?)",
+                        (user_row[0], "prompt_saved_to_library", 200, 1.0, 200, request.submission_id, "submission", now),
+                    )
+
+        conn.commit()
+        conn.close()
+
+    return {
+        "status": "success",
+        "scores": scores_data,
+        "auto_saved_to_library": scores_data.get("average", 0) >= 9.0,
+    }
+
+
+@app.post("/api/pta/submit")
+async def pta_submit(request: PtaSubmitRequest):
+    """Submit a scored output for approval."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    row = conn.execute("SELECT * FROM pta_submissions WHERE id = ?", (request.submission_id,)).fetchone()
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Submission not found")
+
+    # Require at least one human annotation
+    annotations = request.human_annotations or []
+    existing = json.loads(row["human_annotations"] or "[]")
+    all_annotations = existing + annotations
+    if not all_annotations:
+        conn.close()
+        raise HTTPException(
+            status_code=400,
+            detail="At least one human annotation is required before submitting. "
+                   "Your human judgment is what makes this valuable.",
+        )
+
+    now = datetime.now().isoformat()
+    conn.execute(
+        """UPDATE pta_submissions
+           SET status = 'pending_approval', human_annotations = ?, updated_at = ?
+           WHERE id = ?""",
+        (json.dumps(all_annotations), now, request.submission_id),
+    )
+    conn.execute(
+        "INSERT INTO pta_audit_log (user_id, action, entity_type, entity_id, details, created_at) "
+        "VALUES (?,?,?,?,?,?)",
+        (row["user_id"], "submit_for_approval", "submission", request.submission_id,
+         json.dumps({"annotations_count": len(all_annotations)}), now),
+    )
+    conn.commit()
+    conn.close()
+
+    return {"status": "success", "message": "Submitted for approval", "submission_id": request.submission_id}
+
+
+@app.get("/api/pta/submissions")
+async def pta_list_submissions(
+    status: Optional[str] = None,
+    user_id: Optional[str] = None,
+    task_type: Optional[str] = None,
+    limit: int = 50,
+):
+    """List PtA submissions with optional filters."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+
+    query = "SELECT id, user_id, user_role, task_type, output_format, rubric_average, rubric_verdict, status, created_at FROM pta_submissions WHERE 1=1"
+    params = []
+
+    if status:
+        query += " AND status = ?"
+        params.append(status)
+    if user_id:
+        query += " AND user_id = ?"
+        params.append(user_id)
+    if task_type:
+        query += " AND task_type = ?"
+        params.append(task_type)
+
+    query += " ORDER BY created_at DESC LIMIT ?"
+    params.append(limit)
+
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+
+    return {"submissions": [dict(r) for r in rows]}
+
+
+@app.get("/api/pta/submissions/{submission_id}")
+async def pta_get_submission(submission_id: int):
+    """Get full details of a single PtA submission."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    row = conn.execute("SELECT * FROM pta_submissions WHERE id = ?", (submission_id,)).fetchone()
+    conn.close()
+    if not row:
+        raise HTTPException(status_code=404, detail="Submission not found")
+    result = dict(row)
+    # Parse JSON fields
+    for field in ("data_sources", "analysis_types", "human_annotations", "version_history", "rubric_scores", "advanced_rubric_scores"):
+        if result.get(field):
+            try:
+                result[field] = json.loads(result[field])
+            except (json.JSONDecodeError, TypeError):
+                pass
+    return result
+
+
+@app.post("/api/pta/approve/{submission_id}")
+async def pta_approve(submission_id: int, approver: str = "manager", notes: Optional[str] = None):
+    """Approve a pending submission."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    row = conn.execute("SELECT * FROM pta_submissions WHERE id = ?", (submission_id,)).fetchone()
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Submission not found")
+    if row["status"] != "pending_approval":
+        conn.close()
+        raise HTTPException(status_code=400, detail=f"Cannot approve submission in '{row['status']}' status")
+
+    now = datetime.now().isoformat()
+    conn.execute(
+        """UPDATE pta_submissions
+           SET status = 'approved', approver_notes = ?, decided_at = ?, updated_at = ?
+           WHERE id = ?""",
+        (notes, now, now, submission_id),
+    )
+    conn.execute(
+        "INSERT INTO pta_audit_log (user_id, action, entity_type, entity_id, details, created_at) "
+        "VALUES (?,?,?,?,?,?)",
+        (approver, "approve", "submission", submission_id, json.dumps({"notes": notes}), now),
+    )
+
+    # Award points for first-time approval
+    avg = row["rubric_average"] or 0
+    points = 25  # approved_first_time base
+    if avg >= 9.0:
+        points += 100
+    elif avg >= 8.0:
+        points += 50
+    conn.execute(
+        "INSERT INTO pta_points_log (user_id, action, points, multiplier, total_awarded, reference_id, reference_type, created_at) "
+        "VALUES (?,?,?,?,?,?,?,?)",
+        (row["user_id"], "approved_first_time", points, 1.0, points, submission_id, "submission", now),
+    )
+
+    conn.commit()
+    conn.close()
+    return {"status": "success", "message": "Submission approved", "points_awarded": points}
+
+
+@app.post("/api/pta/request-changes/{submission_id}")
+async def pta_request_changes(submission_id: int, approver: str = "manager", notes: str = ""):
+    """Send a submission back for revision."""
+    now = datetime.now().isoformat()
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.execute(
+        """UPDATE pta_submissions
+           SET status = 'revision_requested', approver_notes = ?, updated_at = ?
+           WHERE id = ?""",
+        (notes, now, submission_id),
+    )
+    conn.execute(
+        "INSERT INTO pta_audit_log (user_id, action, entity_type, entity_id, details, created_at) "
+        "VALUES (?,?,?,?,?,?)",
+        (approver, "request_changes", "submission", submission_id, json.dumps({"notes": notes}), now),
+    )
+    conn.commit()
+    conn.close()
+    return {"status": "success", "message": "Changes requested"}
+
+
+@app.get("/api/pta/user-stats/{user_id}")
+async def pta_user_stats(user_id: str):
+    """Get PtA stats and points for a user."""
+    conn = sqlite3.connect(config.HUB_DB)
+
+    total_points = conn.execute(
+        "SELECT COALESCE(SUM(total_awarded), 0) FROM pta_points_log WHERE user_id = ?", (user_id,)
+    ).fetchone()[0]
+
+    submissions_count = conn.execute(
+        "SELECT COUNT(*) FROM pta_submissions WHERE user_id = ?", (user_id,)
+    ).fetchone()[0]
+
+    approved_count = conn.execute(
+        "SELECT COUNT(*) FROM pta_submissions WHERE user_id = ? AND status = 'approved'", (user_id,)
+    ).fetchone()[0]
+
+    avg_score = conn.execute(
+        "SELECT COALESCE(AVG(rubric_average), 0) FROM pta_submissions WHERE user_id = ? AND rubric_average IS NOT NULL",
+        (user_id,),
+    ).fetchone()[0]
+
+    conn.close()
+
+    # Determine ninja level
+    level = "Prompt Apprentice"
+    if total_points > 2000:
+        level = "AI Ninja"
+    elif total_points > 500:
+        level = "Prompt Master"
+    elif total_points > 100:
+        level = "Prompt Specialist"
+
+    return {
+        "user_id": user_id,
+        "total_points": total_points,
+        "level": level,
+        "submissions": submissions_count,
+        "approved": approved_count,
+        "avg_rubric_score": round(avg_score, 1),
+    }
+
+
+@app.get("/api/pta/leaderboard")
+async def pta_leaderboard(limit: int = 20):
+    """Get PtA leaderboard — top users by points."""
+    conn = sqlite3.connect(config.HUB_DB)
+    rows = conn.execute(
+        """SELECT user_id, SUM(total_awarded) as total_points,
+                  COUNT(*) as actions
+           FROM pta_points_log
+           GROUP BY user_id
+           ORDER BY total_points DESC
+           LIMIT ?""",
+        (limit,),
+    ).fetchall()
+
+    leaders = []
+    for r in rows:
+        uid, pts, actions = r
+        level = "AI Ninja" if pts > 2000 else "Prompt Master" if pts > 500 else "Prompt Specialist" if pts > 100 else "Prompt Apprentice"
+        leaders.append({
+            "user_id": uid,
+            "total_points": pts,
+            "level": level,
+            "actions": actions,
+        })
+
+    conn.close()
+    return {"leaderboard": leaders}
 
 
 if __name__ == "__main__":

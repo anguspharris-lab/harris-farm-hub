@@ -208,6 +208,151 @@ def postcode_map_data(period, channel="Total"):
     return results
 
 
+def postcode_map_data_with_trend(period, channel="Total", lookback_months=6):
+    """Postcode map data with rolling trend analysis and health indicators.
+
+    Instead of a single YoY snapshot, this computes the trend direction
+    using a simple linear slope over the last `lookback_months` of data.
+
+    Health categories (based on annualised trend slope):
+      Accelerating: strong positive slope, share up >1pp/year pace
+      Growing: positive slope, 0.2-1pp/year pace
+      Stable: flat slope, within ±0.2pp/year
+      Softening: negative slope, -0.2 to -1pp/year pace
+      Declining: strong negative slope, >1pp/year decline
+      New: fewer than 3 data points available
+
+    Also includes YoY point-in-time change for reference.
+    """
+    ps = str(period)
+    prior_year_period = int(f"{int(ps[:4]) - 1}{ps[4:]}")
+
+    conn = _get_conn()
+
+    # Get current period data
+    cur_rows = conn.execute("""
+        SELECT region_code, region_name, market_share_pct,
+               customer_penetration_pct, spend_per_customer,
+               market_size_dollars, transactions_per_customer
+        FROM market_share
+        WHERE period = ? AND channel = ? AND length(region_code) = 4
+        ORDER BY region_name
+    """, (period, channel)).fetchall()
+
+    # Get all recent periods for trend computation — last N months + prior year
+    all_periods = conn.execute(
+        "SELECT DISTINCT period FROM market_share WHERE period <= ? ORDER BY period DESC",
+        (period,),
+    ).fetchall()
+    recent_periods = [r[0] for r in all_periods[:lookback_months]]
+    recent_periods.sort()
+
+    # Fetch trend data for all postcodes across recent periods (single query)
+    if recent_periods:
+        ph = ",".join("?" * len(recent_periods))
+        trend_rows = conn.execute(f"""
+            SELECT region_code, period, market_share_pct
+            FROM market_share
+            WHERE period IN ({ph}) AND channel = ? AND length(region_code) = 4
+        """, recent_periods + [channel]).fetchall()
+    else:
+        trend_rows = []
+
+    # Fetch prior year for YoY comparison
+    prior_map = {}
+    prior_rows = conn.execute("""
+        SELECT region_code, market_share_pct, customer_penetration_pct
+        FROM market_share
+        WHERE period = ? AND channel = ? AND length(region_code) = 4
+    """, (prior_year_period, channel)).fetchall()
+    for r in prior_rows:
+        prior_map[r["region_code"]] = (r["market_share_pct"], r["customer_penetration_pct"])
+
+    conn.close()
+
+    # Build trend lookup: postcode → [(period_idx, share), ...]
+    trend_data = {}
+    period_idx = {p: i for i, p in enumerate(recent_periods)}
+    for r in trend_rows:
+        pc = r["region_code"]
+        pi = period_idx.get(r["period"])
+        if pi is not None and r["market_share_pct"] is not None:
+            trend_data.setdefault(pc, []).append((pi, r["market_share_pct"]))
+
+    def _compute_slope(points):
+        """Simple linear regression slope (share change per month)."""
+        n = len(points)
+        if n < 3:
+            return None
+        sx = sum(p[0] for p in points)
+        sy = sum(p[1] for p in points)
+        sxx = sum(p[0] ** 2 for p in points)
+        sxy = sum(p[0] * p[1] for p in points)
+        denom = n * sxx - sx * sx
+        if denom == 0:
+            return 0
+        return (n * sxy - sx * sy) / denom
+
+    coords = get_postcode_coords()
+    results = []
+    for r in cur_rows:
+        pc = r["region_code"]
+        pc_coord = coords.get(pc)
+        if not pc_coord:
+            continue
+
+        store_name, dist_km, tier = nearest_store(pc)
+        current = r["market_share_pct"] or 0
+
+        # YoY change
+        prior = prior_map.get(pc)
+        prior_share = prior[0] if prior and prior[0] is not None else None
+        yoy_change = round(current - prior_share, 2) if prior_share is not None else None
+
+        # Trend slope (per month, annualised × 12)
+        points = trend_data.get(pc, [])
+        slope_per_month = _compute_slope(points)
+        if slope_per_month is not None:
+            annualised_slope = round(slope_per_month * 12, 2)
+        else:
+            annualised_slope = None
+
+        # Health classification based on trend slope
+        if annualised_slope is None:
+            health = "New"
+        elif annualised_slope > 1:
+            health = "Accelerating"
+        elif annualised_slope > 0.2:
+            health = "Growing"
+        elif annualised_slope >= -0.2:
+            health = "Stable"
+        elif annualised_slope >= -1:
+            health = "Softening"
+        else:
+            health = "Declining"
+
+        results.append({
+            "postcode": pc,
+            "region_name": r["region_name"],
+            "lat": pc_coord["lat"],
+            "lon": pc_coord["lon"],
+            "market_share_pct": current,
+            "prior_share_pct": round(prior_share, 2) if prior_share is not None else None,
+            "yoy_change_pp": yoy_change,
+            "trend_slope_annual": annualised_slope,
+            "trend_months": len(points),
+            "health": health,
+            "penetration_pct": r["customer_penetration_pct"] or 0,
+            "spend_per_customer": r["spend_per_customer"] or 0,
+            "market_size": r["market_size_dollars"] or 0,
+            "txn_per_customer": r["transactions_per_customer"] or 0,
+            "nearest_store": store_name or "Unknown",
+            "distance_km": dist_km or 999,
+            "distance_tier": tier or "No Presence (20km+)",
+        })
+    return results
+
+
 # ---------------------------------------------------------------------------
 # Store trade area analysis
 # ---------------------------------------------------------------------------

@@ -32,6 +32,8 @@ user = st.session_state.get("auth_user")
 render_header(
     "Product Intelligence",
     "**Item-level performance analytics** | Top items, basket analysis, PLU deep dive",
+    goals=["G2", "G4"],
+    strategy_context="Know which products drive your business — item-level visibility for 'Better' ranging.",
 )
 
 

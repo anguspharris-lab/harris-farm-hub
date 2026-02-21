@@ -1,6 +1,6 @@
 # Harris Farm Hub — AI Centre of Excellence
 
-> **17 dashboards. One platform. Zero complexity.**
+> **19 dashboards. One platform. Zero complexity.**
 
 The Hub is Harris Farm Markets' centralized AI platform — Sales, Profitability, Customer Analytics, Market Share, Transport, Store Ops, Product Intel, and more — all powered by 383M POS transactions, wrapped in a single Streamlit app with shared authentication.
 
@@ -52,7 +52,7 @@ Data Layer
     |-- hub_data.db (SQLite) — app state, knowledge base, chat history
 ```
 
-### Dashboards (17 pages, 5 pillars)
+### Dashboards (19 pages, 5 pillars)
 
 | Pillar | Pages |
 |--------|-------|
@@ -224,7 +224,7 @@ harris-farm-hub/
       stores.py                 # Store list constants
       data_access.py            # SQLite helpers
   backend/
-    app.py                      # FastAPI server (80+ endpoints)
+    app.py                      # FastAPI server (112 endpoints)
     auth.py                     # Authentication (bcrypt, sessions)
     fiscal_calendar.py          # 5-4-4 fiscal calendar logic
     transaction_layer.py        # DuckDB parquet query engine

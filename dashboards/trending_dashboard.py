@@ -24,7 +24,12 @@ user = st.session_state.get("auth_user")
 # HEADER
 # ============================================================================
 
-render_header("📈 Trending & Self-Improvement", "**System Analytics** | Usage patterns, LLM performance & feedback trends")
+render_header(
+    "Trending & Self-Improvement",
+    "**System Analytics** | Usage patterns, LLM performance & feedback trends",
+    goals=["G5"],
+    strategy_context="The Hub watches itself \u2014 measurably better this week than last week.",
+)
 
 # ============================================================================
 # LOAD DATA FROM API
@@ -128,7 +133,7 @@ if llm_wins:
         st.plotly_chart(fig_pie,
                         key="trending_pie_chart")
 else:
-    st.info("No Rubric evaluations yet. Use The Rubric (port 8505) to compare AI responses and pick winners.")
+    st.info("No Rubric evaluations yet. Use **The Rubric** page to compare AI responses and pick winners.")
 
 # ============================================================================
 # TOP QUERIES

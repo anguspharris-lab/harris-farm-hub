@@ -26,7 +26,17 @@ st.markdown("<style>.winner-card { border: 3px solid #10b981; border-radius: 10p
 user = st.session_state.get("auth_user")
 _USER_ID = (user or {}).get("email", "anonymous")
 
-render_header("⚖️ The Rubric", "**AI Training & Prompt Skills** | Learn to write great prompts and evaluate AI responses")
+render_header(
+    "The Rubric",
+    "**AI Training & Prompt Skills** | Learn to write great prompts and evaluate AI responses",
+    goals=["G3", "G5"],
+    strategy_context="Building prompt superstars \u2014 compare AI models, learn what works, get better every time.",
+)
+
+# Cross-link to Academy
+_academy_pages = st.session_state.get("_pages", {})
+if "academy" in _academy_pages:
+    st.page_link(_academy_pages["academy"], label="\U0001f31f Learn more about rubrics and prompt patterns in the Academy", icon=None)
 
 
 @st.cache_data(ttl=300, show_spinner=False)
@@ -358,7 +368,7 @@ with tabs[2]:
                     else:
                         st.error(f"API returned {resp.status_code}. Check the backend.")
                 except requests.exceptions.ConnectionError:
-                    st.error("Could not connect to Hub API on port 8000.")
+                    st.error("Could not connect to the Hub backend. Please try again in a moment.")
                 except requests.exceptions.Timeout:
                     st.error("Request timed out — try again.")
                 except Exception as e:
@@ -636,7 +646,7 @@ with tabs[4]:
     else:
         st.success(
             "You're an AI prompt expert! Keep practising and share your "
-            "skills with the team. Try the **Prompt Builder** (port 8504) "
+            "skills with the team. Try the **Prompt Builder** page "
             "for more advanced analytical prompts."
         )
 

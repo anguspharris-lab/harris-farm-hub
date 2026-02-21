@@ -19,7 +19,7 @@ def _score_audience(result):
     if not summary:
         return 0, "No executive summary"
 
-    score = 5  # Base for having a summary
+    score = 2  # Base for having a summary
     length = len(summary)
 
     if length <= 500:
@@ -32,9 +32,11 @@ def _score_audience(result):
 
     # Contains key numbers?
     if "$" in summary or "%" in summary:
-        score += 1  # Quantified
+        score += 2  # Quantified
     if any(w in summary.lower() for w in ["found", "identified", "analysed", "analyzed"]):
         score += 1  # Active voice
+    if any(w in summary.lower() for w in ["recommend", "suggest", "should", "action"]):
+        score += 1  # Actionable
 
     return min(score, 10), "Summary: {} chars".format(length)
 
@@ -69,18 +71,26 @@ def _score_action(result):
     if not recs:
         return 0, "No recommendations"
 
-    complete = 0
+    total_fields = 0
+    max_fields = len(recs) * 3  # owner + timeline + priority per rec
+
     for r in recs:
-        has_owner = bool(r.get("owner"))
-        has_timeline = bool(r.get("timeline"))
-        has_priority = bool(r.get("priority"))
-        if has_owner and has_timeline and has_priority:
-            complete += 1
+        if r.get("owner"):
+            total_fields += 1
+        if r.get("timeline"):
+            total_fields += 1
+        if r.get("priority"):
+            total_fields += 1
 
-    pct = complete / len(recs)
-    score = round(pct * 10)
+    if max_fields == 0:
+        return 0, "No recommendation fields"
 
-    return score, "{}/{} recommendations fully specified".format(complete, len(recs))
+    pct = total_fields / max_fields
+    count_bonus = min(len(recs), 3) / 3  # up to 1.0 bonus for 3+ recs
+    score = round(pct * 8 + count_bonus * 2)
+
+    return min(score, 10), "{}/{} fields across {} recs".format(
+        total_fields, max_fields, len(recs))
 
 
 def _score_visual(result):
@@ -92,7 +102,7 @@ def _score_visual(result):
     total_rows = sum(len(t.get("rows", [])) for t in tables)
     has_columns = all(t.get("columns") for t in tables)
 
-    score = 3  # Base for having tables
+    score = 1  # Base for having tables
     if has_columns:
         score += 2
     if total_rows >= 5:
@@ -105,6 +115,8 @@ def _score_visual(result):
         score += 1  # Multiple evidence tables
     if total_rows >= 20:
         score += 1
+    if has_columns and all(len(t.get("columns", [])) >= 3 for t in tables):
+        score += 1  # Rich column structure
 
     return min(score, 10), "{} tables, {} rows".format(len(tables), total_rows)
 
@@ -153,30 +165,39 @@ def _score_brief(result):
     findings = result.get("findings", [])
     recs = result.get("recommendations", [])
 
-    score = 10  # Start high, deduct for verbosity
+    # Must have content to score brevity
+    if not summary and not findings:
+        return 0, "No content to evaluate brevity"
 
-    if len(summary) > 800:
-        score -= 2
-    elif len(summary) > 500:
-        score -= 1
+    score = 0
 
-    if len(findings) > 100:
-        score -= 2  # Too many findings
-    elif len(findings) > 50:
-        score -= 1
+    # Summary sweet spot: 100-500 chars
+    if 100 <= len(summary) <= 500:
+        score += 4  # Concise and substantive
+    elif 50 <= len(summary) <= 800:
+        score += 2  # Acceptable
+    elif len(summary) > 800:
+        score += 1  # Too verbose
 
-    if len(recs) > 10:
-        score -= 2
-    elif len(recs) > 5:
-        score -= 1
+    # Findings sweet spot: 3-15
+    if 3 <= len(findings) <= 15:
+        score += 3
+    elif 1 <= len(findings) <= 50:
+        score += 1
 
-    # Check for filler words in summary
+    # Recommendations sweet spot: 2-5
+    if 2 <= len(recs) <= 5:
+        score += 3
+    elif 1 <= len(recs) <= 10:
+        score += 1
+
+    # Filler word penalty
     filler_words = ["however", "furthermore", "additionally", "moreover",
                     "it should be noted", "it is worth noting"]
     filler_count = sum(1 for f in filler_words if f in summary.lower())
-    score -= filler_count
+    score = max(score - filler_count, 0)
 
-    return max(score, 0), "Summary {} chars, {} findings, {} recs".format(
+    return min(score, 10), "Summary {} chars, {} findings, {} recs".format(
         len(summary), len(findings), len(recs))
 
 

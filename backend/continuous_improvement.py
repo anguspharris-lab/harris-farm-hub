@@ -683,6 +683,66 @@ class FindingsManager:
 
 
 # ============================================================================
+# 1E: PAGE QUALITY AUDITOR
+# ============================================================================
+
+class PageQualityAuditor:
+    """Check page_quality_scores for pages below quality threshold.
+
+    Generates improvement findings for pages scoring below 80%.
+    Dashboard threshold: 28/35. Content threshold: 20/25.
+    """
+
+    DASHBOARD_THRESHOLD = 28  # 80% of 35
+    CONTENT_THRESHOLD = 20    # 80% of 25
+
+    def __init__(self, db_path=None):
+        self.db_path = db_path or HUB_DB
+
+    def audit(self):
+        findings = []
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute(
+                "SELECT page_name, rubric_type, "
+                "AVG(total_score) as avg_total, MAX(max_score) as max_score, "
+                "COUNT(*) as review_count "
+                "FROM page_quality_scores "
+                "GROUP BY page_name, rubric_type "
+                "HAVING review_count >= 1"
+            ).fetchall()
+            conn.close()
+
+            for row in rows:
+                threshold = (self.DASHBOARD_THRESHOLD
+                             if row["rubric_type"] == "dashboard"
+                             else self.CONTENT_THRESHOLD)
+                if row["avg_total"] < threshold:
+                    pct = round(row["avg_total"] / row["max_score"] * 100)
+                    findings.append({
+                        "category": "page_quality",
+                        "severity": "medium" if pct < 60 else "low",
+                        "file_path": "dashboards/",
+                        "line_number": 0,
+                        "title": "{} scores {:.0f}/{} ({}%)".format(
+                            row["page_name"], row["avg_total"],
+                            row["max_score"], pct),
+                        "detail": "Page scored below quality threshold ({}/{}) "
+                                  "across {} review(s).".format(
+                                      threshold, row["max_score"],
+                                      row["review_count"]),
+                        "recommendation": "Review {} against the {} rubric and "
+                                          "improve lowest-scoring criteria.".format(
+                                              row["page_name"],
+                                              row["rubric_type"]),
+                    })
+        except Exception:
+            pass  # Table may not exist yet
+        return findings
+
+
+# ============================================================================
 # 1F: FULL AUDIT ORCHESTRATOR
 # ============================================================================
 
@@ -693,10 +753,13 @@ def run_full_audit(db_path=None):
     perf = PerformanceAuditor()
     health = HealthMetricsCollector()
 
+    page_quality = PageQualityAuditor(db_path=db_path)
+
     all_findings = []
     all_findings.extend(safety.audit())
     all_findings.extend(docs.audit())
     all_findings.extend(perf.audit())
+    all_findings.extend(page_quality.audit())
 
     health_metrics = health.collect()
 

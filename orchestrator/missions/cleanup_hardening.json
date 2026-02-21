@@ -1,6 +1,6 @@
 {
   "name": "Codebase Cleanup & Hardening",
-  "description": "Remove dead code, consolidate duplicate files, update base prompt to reflect current system state (16 dashboards, not 6), and fix known limitations.",
+  "description": "Remove dead code, consolidate duplicate files, update base prompt to reflect current system state (19 dashboards), and fix known limitations.",
   "abort_on_safety_fail": true,
   "max_retries_per_task": 1,
   "timeout_seconds_per_task": 300,
@@ -22,7 +22,7 @@
     },
     {
       "name": "Update orchestrator base prompt",
-      "success_criteria": "Base prompt reflects current 16-dashboard, 93-endpoint system. Tests pass.",
+      "success_criteria": "Base prompt reflects current 19-dashboard, 112-endpoint system. Tests pass.",
       "tasks": [
         {
           "name": "Update orchestrator prompts to reflect current system",
