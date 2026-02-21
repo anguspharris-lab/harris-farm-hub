@@ -68,7 +68,7 @@ tab_overview, tab_map, tab_store, tab_trends, tab_opps, tab_issues, tab_data = s
 with tab_overview:
     # State-level KPIs
     states = state_summary(latest, channel)
-    aus = next((s for s in states if s["region_code"] == "AUS"), None)
+    aus = next((s for s in states if s["state"] == "AUS"), None)
 
     if aus:
         k1, k2, k3, k4 = st.columns(4)
@@ -79,11 +79,11 @@ with tab_overview:
 
     # State breakdown
     st.subheader("State Performance")
-    state_rows = [s for s in states if s["region_code"] != "AUS"]
+    state_rows = [s for s in states if s["state"] != "AUS"]
     if state_rows:
         sdf = pd.DataFrame(state_rows)
         sdf = sdf.rename(columns={
-            "region_code": "State", "market_share_pct": "Share %",
+            "state": "State", "market_share_pct": "Share %",
             "customer_penetration_pct": "Penetration %",
             "spend_per_customer": "Spend/Customer",
             "market_size_dollars": "Market Size $",
