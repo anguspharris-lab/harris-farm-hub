@@ -184,6 +184,10 @@ with tab_map:
         st.warning("No spatial data available.")
     else:
         mdf = pd.DataFrame(map_data)
+        # Ensure numeric lat/lon for scatter_mapbox
+        mdf["lat"] = pd.to_numeric(mdf["lat"], errors="coerce")
+        mdf["lon"] = pd.to_numeric(mdf["lon"], errors="coerce")
+        mdf = mdf.dropna(subset=["lat", "lon"])
 
         # Filter by state if selected
         if state_filter != "All":
@@ -382,21 +386,10 @@ with tab_store:
             )
             tdf["size"] = tdf["market_share_pct"].clip(lower=0.5) * 2
 
-            fig_ta = px.scatter_mapbox(
-                tdf, lat="postcode", lon="postcode",  # placeholder
-                hover_name="region_name",
-                color="tier",
-                color_discrete_map={
-                    "Core (0-3km)": "#16a34a",
-                    "Primary (3-5km)": "#2563eb",
-                    "Secondary (5-10km)": "#d97706",
-                    "Extended (10-20km)": "#9333ea",
-                },
-            )
-            # Actually need lat/lon — join with coords
+            # Join with postcode coordinates for mapping
             coords = get_postcode_coords()
-            tdf["lat"] = tdf["postcode"].map(lambda x: coords.get(x, {}).get("lat"))
-            tdf["lon"] = tdf["postcode"].map(lambda x: coords.get(x, {}).get("lon"))
+            tdf["lat"] = pd.to_numeric(tdf["postcode"].map(lambda x: coords.get(x, {}).get("lat")), errors="coerce")
+            tdf["lon"] = pd.to_numeric(tdf["postcode"].map(lambda x: coords.get(x, {}).get("lon")), errors="coerce")
             tdf = tdf.dropna(subset=["lat", "lon"])
 
             fig_ta = px.scatter_mapbox(
@@ -762,6 +755,10 @@ with tab_trends:
         st.info("No comparison data available for selected periods.")
     else:
         ydf = pd.DataFrame(yoy_data)
+        # Ensure numeric lat/lon for scatter_mapbox
+        if "lat" in ydf.columns:
+            ydf["lat"] = pd.to_numeric(ydf["lat"], errors="coerce")
+            ydf["lon"] = pd.to_numeric(ydf["lon"], errors="coerce")
 
         # Filter by state
         if state_filter != "All":
