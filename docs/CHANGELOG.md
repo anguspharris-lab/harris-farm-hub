@@ -4,6 +4,55 @@
 
 ---
 
+## [3.1.0] - 2026-02-21
+
+### Added
+- **PLU Intelligence Dashboard** (`plu_intel_dashboard.py`): 6 analytical views — Department Summary, Wastage Hotspots, Stocktake Variance, Top Revenue PLUs, Store Benchmarking, PLU Lookup with weekly trends and store breakdown
+- **PLU Data Layer** (`backend/plu_layer.py`): Query engine for `harris_farm_plu.db` (27.3M rows, 3 fiscal years, 43 stores, 26K+ PLUs)
+- **PLU Database** (`harris_farm_plu.db`, 3.1GB): Ingested from 3 years of weekly PLU results — tables: weekly_plu_results, dim_item (75K), dim_store (43), dim_week (156). Deployed via GitHub Releases (split into 2 parts)
+- **Market Share Data Interpretation Rules** added to CLAUDE.md: 10 critical rules for CBAS data including distance tiers, Layer 1/2 separation, empirical success profiles
+
+### Changed
+- Dashboards: 17 → 18 (added PLU Intelligence under Pillar 4 Operations)
+- `data_loader.py`: Added PLU database download (2 parts, 3.1GB total)
+- `.gitignore`: Added `*.part_*` pattern
+
+---
+
+## [3.0.0] - 2026-02-21
+
+### Added
+- **Market Share Dashboard — Complete Rebuild** with 7 tabs:
+  - Overview: national/state KPIs and trend charts, top/bottom 15 postcodes
+  - Spatial Map: interactive Plotly mapbox with 886 postcodes + 32 store markers, colored by share/penetration/spend/distance tier
+  - Store Trade Areas: select any store to see Core/Primary/Secondary/Extended postcode tiers with performance data and trend charts
+  - Trends & Shifts: YoY comparison with gainers/losers, RdYlGn diverging share-change map, month-on-month anomaly detection
+  - Opportunities: quadrant scatter (penetration vs share) identifying Strongholds, Growth Opportunities, Basket Opportunities, Retention Risks
+  - Issues: automated flagging of Core/Primary trade area share declines with severity levels
+  - Data Explorer: full filterable/sortable table with CSV download
+- **Market Share Data Layer** (`backend/market_share_layer.py`): 32 geocoded store locations, 1,040 postcode coordinates, haversine distance calculations, trade area analysis, YoY comparison, shift detection, issue flagging, opportunity scoring
+- **Postcode coordinates** (`data/postcode_coords.json`): 1,040 Australian postcode lat/lon via pgeocode/ABS data
+
+---
+
+## [2.6.0] - 2026-02-20
+
+### Added
+- **Single Multi-Page App Consolidation**: All 17 dashboards consolidated into one `st.navigation()` app via `dashboards/app.py`. Single process, native sidebar nav, shared session state.
+- **Authentication System**: Site password + user accounts with login/register/password-reset. `shared/auth_gate.py` → `backend/auth.py`
+- **Session-safe navigation**: All HTML `<a href>` links replaced with `st.page_link()` to preserve `st.session_state`
+- **Render Deployment**: Live at https://harris-farm-hub.onrender.com with persistent disk, data files via GitHub Releases
+- **Data Loader** (`data_loader.py`): Auto-downloads data files from GitHub Releases on first deploy. Handles multi-part files >2GB.
+- **Password Reset**: POST `/api/auth/reset-password` endpoint — requires site access code for identity verification
+
+### Changed
+- Architecture: 17 separate Streamlit processes → 1 multi-page app
+- `init_auth_db()`: Now re-syncs site password and admin credentials from env vars on every startup
+- Landing page: Complete rewrite using `st.page_link()` for all navigation links
+- Deployment scripts: `render_start.sh`, `start.sh`, `docker-compose.yml` updated for single-process
+
+---
+
 ## [2.5.0] - 2026-02-18
 
 ### Added

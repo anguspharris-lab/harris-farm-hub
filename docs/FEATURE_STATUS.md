@@ -1,7 +1,7 @@
 # Feature Status Matrix
 **Harris Farm Markets AI Hub — Centre of Excellence**
 
-*Last Updated: 2026-02-18*
+*Last Updated: 2026-02-21*
 
 Legend:
 - **LIVE** — Fully operational, tested, data flowing
@@ -20,14 +20,16 @@ Legend:
 | SQLite Metadata Database | **LIVE** | `backend/hub_data.db` — 35 tables, 1,009 rows |
 | SQLite Aggregated Data | **LIVE** | `data/harris_farm.db` — 1.6M+ rows (weekly grain) |
 | DuckDB Transaction Engine | **LIVE** | `backend/transaction_layer.py` — 383.6M POS rows |
-| Hub Navigation (5 hubs) | **LIVE** | `dashboards/nav.py` — 16 dashboards across 5 hubs |
-| Start/Stop Scripts | **LIVE** | `start.sh` / stop via port kill |
+| Hub Navigation (5 pillars) | **LIVE** | Single multi-page app via `st.navigation()` in `dashboards/app.py` — 18 dashboards |
+| Render Deployment | **LIVE** | https://harris-farm-hub.onrender.com — persistent disk, GitHub Releases data |
+| Data Loader | **LIVE** | `data_loader.py` — auto-downloads data from GitHub Releases on deploy |
+| Start/Stop Scripts | **LIVE** | `start.sh` / `render_start.sh` — single Streamlit process |
 | WATCHDOG Governance (CLAUDE.md) | **LIVE** | 7 Laws, audit.log, 4 procedures |
 | Test Suite | **LIVE** | 1,003 tests across 25 files |
 
 ---
 
-## Dashboards (16 total)
+## Dashboards (18 total — single multi-page app)
 
 ### Financial Hub
 
@@ -41,7 +43,7 @@ Legend:
 | Dashboard | Port | Status | Data Source |
 |-----------|------|--------|-------------|
 | Customers | 8507 | **LIVE** | harris_farm.db (weekly) |
-| Market Share | 8508 | **LIVE** | harris_farm.db (weekly) |
+| Market Share | 8508 | **LIVE** | harris_farm.db (77K rows) — 7 tabs: Overview, Spatial Map, Store Trade Areas, Trends & Shifts, Opportunities, Issues, Data Explorer. Plotly mapbox with 886 postcodes + 32 store markers. |
 
 ### Operations Hub
 
@@ -57,6 +59,7 @@ Legend:
 | Product Intel | 8512 | **LIVE** | Transactions + Product Hierarchy |
 | Revenue Bridge | 8513 | **LIVE** | Transactions + Fiscal Calendar |
 | Buying Hub | 8514 | **LIVE** | Transactions + Product Hierarchy |
+| PLU Intelligence | 8517 | **LIVE** | harris_farm_plu.db (27.3M rows) — 6 views: Dept Summary, Wastage Hotspots, Stocktake Variance, Top Revenue PLUs, Store Benchmarking, PLU Lookup |
 
 ### Learning Hub
 
@@ -85,6 +88,9 @@ Legend:
 | Product Hierarchy (Parquet) | **LIVE** | 72,911 products, 5-level tree (Dept→MajGrp→MinGrp→HFM→SKU) |
 | Fiscal Calendar (Parquet) | **LIVE** | 4,018 daily rows, 45 columns, FY2016-FY2026, 5-4-4 pattern |
 | Weekly Aggregated (SQLite) | **LIVE** | 1.6M+ rows: sales, customers, market share (FY2017-FY2024) |
+| PLU Weekly Results (SQLite) | **LIVE** | harris_farm_plu.db — 27.3M rows, 3 FYs, 43 stores, 26K+ PLUs, 3.1GB |
+| Postcode Coordinates (JSON) | **LIVE** | 1,040 Australian postcode lat/lon coordinates |
+| Store Coordinates | **LIVE** | 32 retail store lat/lon in `backend/market_share_layer.py` |
 | Employee Roles | **LIVE** | 211 roles: 3 Functions, 36 Departments, 140 Jobs |
 | Knowledge Base | **LIVE** | 536 articles with full-text search |
 | Learning Modules | **LIVE** | 12 modules (L1-L4, D1-D4, K1-K4), 16 lessons |
@@ -156,6 +162,8 @@ Legend:
 | Session Management | **LIVE** | Token-based, expiry, revocation |
 | Auth Gate for Dashboards | **LIVE** | `dashboards/shared/auth_gate.py` |
 | Site Password | **LIVE** | Optional site-wide access code |
+| Password Reset | **LIVE** | POST /api/auth/reset-password — requires site access code |
+| Credential Sync | **LIVE** | `init_auth_db()` re-syncs from env vars on every startup |
 | Admin User Management | **LIVE** | CRUD users, view sessions, audit log |
 | Role-Based Access Control | **PLANNED** | User roles exist but not enforced on endpoints |
 
@@ -234,7 +242,7 @@ Legend:
 | Metric | Count |
 |--------|-------|
 | API Endpoints | ~93 |
-| Dashboards | 16 |
+| Dashboards | 18 |
 | Database Tables | 35 |
 | Test Files | 25 |
 | Tests | 1,003 |

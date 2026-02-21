@@ -36,9 +36,30 @@ No KPI should exist in isolation — it must be derivable from the underlying tr
 - Never mix postcode market share into transactional sales metrics
 
 ## Store Network
-- Use Harris Farm Markets' actual store names (21+ stores across NSW)
+- 32 retail stores across NSW and QLD (plus concessions, meats, online)
+- Store coordinates geocoded in `backend/market_share_layer.py` STORE_LOCATIONS dict
 - Stores are physical locations, not postcodes or regions
 - Each store has its own revenue, margin, wastage, OOS profile
+
+## PLU Weekly Results Database (harris_farm_plu.db)
+- **Source:** 3 years of PLU-level weekly results (FY2024-FY2026)
+- **Rows:** 27.3M across weekly_plu_results fact table
+- **Dimensions:** dim_item (75K PLUs), dim_store (43), dim_week (156)
+- **Metrics:** sales_ex_gst, gst, cogs, wastage, stocktake_cost, other_cost, gross_margin
+- **Channels:** Retail, Online Shopify, Ext Conc., Online Uber, Online Amazon
+- **Critical:** numpy int32 from parquet must be converted to Python native types before SQLite insertion
+- Wastage values are negative (cost outflows), stocktake_cost also negative
+- Accessed via `backend/plu_layer.py`
+
+## Market Share Data (Layer 2 — CBAS)
+- **Table:** market_share in harris_farm.db (77K rows)
+- **Grain:** postcode × channel × month (1,040 postcodes, 37 months, 3 channels)
+- **Primary metric:** Market Share % (reliable, comparable)
+- **Dollar values:** Directional estimates only — NEVER use as actual HFM revenue
+- **NEVER mix** Layer 2 (market share) dollar values with Layer 1 (POS/ERP) revenue
+- **Distance tiers:** Core (0-3km), Primary (3-5km), Secondary (5-10km), Extended (10-20km), No Presence (20km+)
+- **Comparison:** Always same-month YoY, never sequential months
+- **Postcode coords:** `data/postcode_coords.json` (1,040 postcodes, pgeocode/ABS)
 
 ## Mock Data Rules
 - Seed: numpy RandomState(42) for deterministic output
