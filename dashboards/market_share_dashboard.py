@@ -243,7 +243,8 @@ with tab_map:
             mdf["trend_slope_annual"] = mdf["trend_slope_annual"].fillna(0)
             mdf["health"] = mdf["health"].fillna("New")
 
-            # Size by market share
+            # Size by market share — ensure numeric, non-negative, no NaN
+            mdf["market_share_pct"] = pd.to_numeric(mdf["market_share_pct"], errors="coerce").fillna(0)
             mdf["bubble_size"] = mdf["market_share_pct"].clip(lower=0.3) * 2
 
             # Health indicator colour map (based on annualised trend slope)
@@ -458,6 +459,8 @@ with tab_store:
             map_df = tdf[tdf["distance_km"] <= map_km].copy()
 
             if not map_df.empty:
+                map_df["market_share_pct"] = pd.to_numeric(
+                    map_df["market_share_pct"], errors="coerce").fillna(0)
                 map_df["size"] = map_df["market_share_pct"].clip(lower=0.5) * 2
 
                 # Join with postcode coordinates
@@ -792,6 +795,7 @@ with tab_health:
 
             if cluster_coords:
                 ccdf = pd.DataFrame(cluster_coords)
+                ccdf["avg_share"] = pd.to_numeric(ccdf["avg_share"], errors="coerce").fillna(0)
                 ccdf["size"] = ccdf["avg_share"].clip(lower=1) * 3
                 ccdf["change_text"] = ccdf["share_change"].apply(
                     lambda x: f"{x:+.2f}pp YoY" if x is not None else ""
@@ -910,8 +914,10 @@ with tab_trends:
 
             # Share change map
             st.markdown("**Share Change Map**")
-            ydf_map = ydf.dropna(subset=["lat", "lon"])
+            ydf_map = ydf.dropna(subset=["lat", "lon"]).copy()
             if not ydf_map.empty:
+                ydf_map["share_change"] = pd.to_numeric(
+                    ydf_map["share_change"], errors="coerce").fillna(0)
                 ydf_map["abs_change"] = ydf_map["share_change"].abs().clip(lower=0.3) * 3
                 fig_yoy_map = px.scatter_mapbox(
                     ydf_map, lat="lat", lon="lon",
