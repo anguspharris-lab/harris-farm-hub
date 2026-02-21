@@ -335,25 +335,29 @@ def yoy_comparison(period_current, period_prior, channel="Total"):
 
 
 def detect_shifts(channel="Total", threshold_pp=2.0):
-    """Find postcodes with significant month-on-month share changes across all periods."""
+    """Find postcodes with significant month-on-month share changes across all periods.
+
+    Uses a LAG window function instead of correlated subquery for performance.
+    """
     conn = _get_conn()
     rows = conn.execute("""
-        SELECT c.period as current_period, c.region_code, c.region_name,
-               c.market_share_pct as current_share,
-               p.market_share_pct as prior_share,
-               c.market_share_pct - p.market_share_pct as shift
-        FROM market_share c
-        JOIN market_share p ON c.region_code = p.region_code
-            AND p.channel = c.channel
-        WHERE c.channel = ?
-            AND length(c.region_code) = 4
-            AND p.period = (
-                SELECT MAX(m2.period) FROM market_share m2
-                WHERE m2.period < c.period AND m2.region_code = c.region_code
-                AND m2.channel = c.channel
-            )
-            AND ABS(c.market_share_pct - p.market_share_pct) >= ?
-        ORDER BY ABS(c.market_share_pct - p.market_share_pct) DESC
+        SELECT current_period, region_code, region_name,
+               current_share, prior_share, shift
+        FROM (
+            SELECT period as current_period, region_code, region_name,
+                   market_share_pct as current_share,
+                   LAG(market_share_pct) OVER (
+                       PARTITION BY region_code ORDER BY period
+                   ) as prior_share,
+                   market_share_pct - LAG(market_share_pct) OVER (
+                       PARTITION BY region_code ORDER BY period
+                   ) as shift
+            FROM market_share
+            WHERE channel = ? AND length(region_code) = 4
+        )
+        WHERE prior_share IS NOT NULL
+          AND ABS(shift) >= ?
+        ORDER BY ABS(shift) DESC
     """, (channel, threshold_pp)).fetchall()
     conn.close()
     return [dict(r) for r in rows]
