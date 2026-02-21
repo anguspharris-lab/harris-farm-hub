@@ -4,6 +4,49 @@
 
 ---
 
+## [3.4.0] - 2026-02-22
+
+### Added
+- **Prompt-to-Approval System** — the core workflow for making Harris Farm a data-first business
+  - **Prompt Engine** (`prompt_builder.py` rewrite): 20 role-filtered task templates (weekly store performance, waste analysis, board paper, roster optimisation, etc.), Claude/ChatGPT/Grok AI generation, iteration loop, human annotation gate
+  - **Rubric Engine** (`shared/pta_rubric.py`): 8-criteria standard rubric (Audience Fit, Storytelling, Actionability, Visual Quality, Completeness, Brevity, Data Integrity, Honesty) + 5-tier advanced rubric (CTO Panel, CLO Panel, Strategic Alignment, Implementation Readiness, Presentation Quality)
+  - **Approvals Dashboard** (`approvals_dashboard.py`): New page — managers review, approve, or request changes on PtA submissions. Status filtering, rubric scorecard display, approval/reject actions
+  - **10 PtA API endpoints**: generate, score, submit, list/get submissions, approve, request-changes, user-stats, leaderboard
+  - **3 database tables**: `pta_submissions` (full workflow state), `pta_audit_log` (every action tracked), `pta_points_log` (gamification points)
+  - **AI Ninja Gamification**: 4 levels (Prompt Apprentice → Prompt Specialist → Prompt Master → AI Ninja), points for generate/score/submit/approve actions, leaderboard
+  - **Auto-save to library**: Prompts scoring 9.0+ automatically saved to `prompt_templates` with 200 bonus points
+  - **Data confidence badges**: Source reliability scoring (POS=10, Competitor=4, etc.)
+  - **6 PtA lessons** seeded into knowledge base (545 total articles)
+- **Market Share improvements**: Store Health Scorecard refinements, trend slope visualisation enhancements
+- **PLU Intelligence**: Dashboard layout and query improvements
+
+### Changed
+- Dashboards: 23 → 24 (added Approvals under P3)
+- API endpoints: ~93 → ~103 (added 10 PtA endpoints)
+- Database tables: 35 → 38 (3 PtA tables)
+- Knowledge base: 536 → 545 articles (6 PtA lessons)
+- Prompt Builder renamed to Prompt Engine (rocket icon)
+- P3 (Growing Legendary Leadership): 6 → 7 pages
+
+### Scores
+- PtA System: AF:8 ST:8 AC:9 VQ:7 CO:8 BR:8 DI:7 HO:9 = 8.0 (SHIP)
+
+---
+
+## [3.3.0] - 2026-02-22
+
+### Added
+- **KB Chat Unification** (`shared/kb_chat.py`): Shared chat component for Hub Assistant and Learning Centre Company Knowledge tab. Key-prefixed widget namespacing prevents DuplicateWidgetID errors
+- **Hub Restructure**: Broke up portal monolith — Mission Control, Agent Hub, Analytics Engine, Agent Operations now separate pages
+- **"When In Doubt, Ask AI" lesson**: New Start Here lesson seeded into Learning Centre
+
+### Fixed
+- Hub Assistant "0 documents | 0 words" — self-healing cache clears on empty result
+- Company Knowledge search empty text — `doc.get("content")` → `doc.get("snippet")`
+- Quick Links destroying session state — HTML `<a href>` → `st.page_link()`
+
+---
+
 ## [3.2.0] - 2026-02-21
 
 ### Added

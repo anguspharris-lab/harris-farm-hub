@@ -7,8 +7,8 @@
 ## Architecture
 
 - **Frontend:** Streamlit (single multi-page app via `st.navigation()`)
-- **Backend:** FastAPI on port 8000 (`backend/app.py`, 112 endpoints)
-- **Entry Point:** `dashboards/app.py` -- runs all 23 pages in one process
+- **Backend:** FastAPI on port 8000 (`backend/app.py`, ~103 endpoints)
+- **Entry Point:** `dashboards/app.py` -- runs all 24 pages in one process
 - **Auth:** `shared/auth_gate.py` -- bcrypt + session tokens, site password option
 - **Deployment:** Render (persistent disk, GitHub Releases data loader)
 - **Governance:** WATCHDOG 7 Laws, CLAUDE.md SHA-256 verified, `watchdog/audit.log`
@@ -27,11 +27,12 @@ Home (landing.py)
 |   +-- Customers
 |   +-- Market Share
 |
-+-- Growing Legendary Leadership (6 pages)
++-- Growing Legendary Leadership (7 pages)
 |   +-- Learning Centre
 |   +-- The Paddock
 |   +-- Academy
-|   +-- Prompt Builder
+|   +-- Prompt Engine
+|   +-- Approvals
 |   +-- The Rubric
 |   +-- Hub Assistant
 |
@@ -67,7 +68,8 @@ Home (landing.py)
 | Learning Centre | `learning_centre.py` | G3 | LIVE |
 | The Paddock | `the_paddock.py` | G3 | LIVE |
 | Academy | `growing_legends_academy.py` | G3 | LIVE |
-| Prompt Builder | `prompt_builder.py` | G2, G3 | LIVE |
+| Prompt Engine | `prompt_builder.py` | G2, G3 | LIVE |
+| Approvals | `approvals_dashboard.py` | G2, G3 | LIVE |
 | The Rubric | `rubric_dashboard.py` | G3, G5 | LIVE |
 | Hub Assistant | `chatbot_dashboard.py` | G2, G3 | LIVE |
 | Sales | `sales_dashboard.py` | G1, G2, G4 | LIVE |
@@ -98,7 +100,7 @@ Home (landing.py)
 | Market Share | `harris_farm.db` | 77K | SQLite |
 | Customers | `harris_farm.db` | 17K | SQLite |
 | PLU Results | `harris_farm_plu.db` | 27.3M | SQLite |
-| Hub State | `hub_data.db` | 35 tables | SQLite |
+| Hub State | `hub_data.db` | 38 tables | SQLite |
 
 ---
 
@@ -128,14 +130,16 @@ Every dashboard shows its goal alignment in the header via `render_header(goals=
 
 - **Learning Centre** (`learning_centre.py`): 12 modules (L1-L4, D1-D4, K1-K4), 5 tabs
 - **Academy** (`growing_legends_academy.py`): 6 maturity levels (Seed to Legend), 7 prompt patterns, 6 learning paths, 5 arena challenges, 8 tabs, site quality rubrics
-- **Prompt Builder** (`prompt_builder.py`): 17 templates, structured prompt design
-- **Hub Assistant** (`chatbot_dashboard.py`): 545 knowledge base articles, full-text search
+- **Prompt Engine** (`prompt_builder.py`): 20 role-filtered task templates, PtA workflow (generate → score → iterate → annotate → submit → approve)
+- **Approvals** (`approvals_dashboard.py`): Managers review, approve, or request changes on PtA submissions
+- **Hub Assistant** (`chatbot_dashboard.py`): 545 knowledge base articles, full-text search + RAG chat
 
 ---
 
 ## Rubric System
 
 - **The Rubric** (`rubric_dashboard.py`): Multi-LLM comparison, 5-building-block scoring
+- **PtA Rubric Engine** (`shared/pta_rubric.py`): 8-criteria standard (AF, ST, AC, VQ, CO, BR, DI, HO) + 5-tier advanced. Verdicts: SHIP (8.0+), REVISE (5.0-7.9), REJECT (<5.0)
 - **5-Tier Evaluation** (`shared/agent_teams.py`): CTO (25) + CLO (25) + Strategic (30) + Implementation (25) + Presentation (25) = 130 max, 110 threshold
 - **WATCHDOG Scoring**: H/R/S/C/D/U/X criteria, 7+ average required
 - **Site Quality Rubrics** (Academy): Dashboard Quality (7 criteria/35pts), Page Content (5 criteria/25pts)
@@ -176,10 +180,27 @@ Agent system runs 11 analysis types including basket, stockout, demand, slow_mov
 
 ---
 
+## Prompt-to-Approval System
+
+The PtA system is the core workflow for making Harris Farm a data-first business. Every person starts with the Prompt Engine, generates AI output, scores it against the 8-criteria rubric, iterates with human context, and submits for approval.
+
+- **20 task templates** across 11 roles (store performance, waste analysis, board paper, category review, etc.)
+- **8-criteria rubric**: Audience Fit, Storytelling, Actionability, Visual Quality, Completeness, Brevity, Data Integrity, Honesty
+- **5-tier advanced rubric**: CTO Panel, CLO Panel, Strategic Alignment, Implementation Readiness, Presentation Quality
+- **Approval routing**: L1 Team → L2 Department → L3 Executive → L4 Board (mapped by role)
+- **AI Ninja gamification**: Prompt Apprentice (0-100pts) → Specialist (101-500) → Master (501-2000) → AI Ninja (2001+)
+- **10 API endpoints**: generate, score, submit, list/get submissions, approve, request-changes, user-stats, leaderboard
+- **3 database tables**: pta_submissions, pta_audit_log, pta_points_log
+- **Auto-save**: Prompts scoring 9.0+ auto-saved to library with 200 bonus points
+
+---
+
 ## Known Issues
 
 - WATCHDOG Safety LLM analysis built but not integrated into approval flow
 - Risk level auto-assessment field exists but not auto-populated
 - Role-Based Access Control designed but not enforced on endpoints
 - Arena UI is minimal (tables + API exist, 12 proposals)
-- Gamification tables exist but limited data (no user scores logged yet)
+- PtA data validation layer is directional (confidence badges) — not yet cross-source validated
+- PtA email notifications on approval not yet implemented
+- PtA escalation workflow placeholder only ("Coming soon")

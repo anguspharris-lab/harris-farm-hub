@@ -3,7 +3,7 @@
 ## Logo
 - Logo is at `assets/logo.png` (already copied)
 - Add to ALL dashboards top-left: `st.image("assets/logo.png", width=200)`
-- Consistent across all 19 dashboards
+- Consistent across all 24 dashboards
 
 ## Brand Colours
 - HFM Green: `#4ba021` (primary brand, Pillar 5 accent)
@@ -28,7 +28,7 @@
 - P5 Digital & AI: `#4ba021`
 
 ## Design Principles
-- Light theme throughout (NOT dark navy) — all 19 dashboards use `HFM_BG=#f5f5f5`
+- Light theme throughout (NOT dark navy) — all 24 dashboards use `HFM_BG=#f5f5f5`
 - Green gradient hero banners (`border-radius:14px`)
 - Colored left-border accent on cards
 - "For The Greater Goodness" tagline in mission statement

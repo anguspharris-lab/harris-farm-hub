@@ -22,7 +22,7 @@
 
 ### 1.1 FastAPI Backend + Streamlit Frontends
 
-The Hub uses a single FastAPI backend (`backend/app.py`, ~4600 lines, 112 endpoints) serving 19 Streamlit dashboards. This is deliberate — not a monolith problem.
+The Hub uses a single FastAPI backend (`backend/app.py`, ~5000 lines, ~103 endpoints) serving 24 Streamlit dashboards via a single `st.navigation()` app. This is deliberate — not a monolith problem.
 
 **Why one backend file works (for now):**
 - Single source of truth for database init, config, and all endpoints
@@ -45,7 +45,7 @@ data = resp.json()
 
 ### 1.2 Hub Navigation Pattern
 
-All 23 pages share navigation via `dashboards/nav.py`:
+All 24 pages share navigation via `dashboards/app.py` (`st.navigation()`):
 
 ```python
 HUBS = {

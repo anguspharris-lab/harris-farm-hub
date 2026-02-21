@@ -23,7 +23,7 @@
          │                                     │
          │  ┌─────────────────────────────┐    │
          │  │ st.navigation() router      │    │
-         │  │ 23 pages across 5 pillars   │    │
+         │  │ 24 pages across 5 pillars   │    │
          │  └─────────────────────────────┘    │
          │                                     │
          │  Shared: styles, fiscal selector,   │
@@ -33,7 +33,7 @@
                         v
          ┌─────────────────────────────────────┐
          │     FastAPI Backend                 │
-         │     backend/app.py (112 endpoints)   │
+         │     backend/app.py (~103 endpoints)   │
          │                                     │
          │  Auth    NL Query   Multi-LLM       │
          │  Agent Executor   Self-Improvement  │

@@ -23,7 +23,7 @@ Legend:
 | SQLite Metadata Database | **LIVE** | `backend/hub_data.db` — 35 tables, 1,009 rows |
 | SQLite Aggregated Data | **LIVE** | `data/harris_farm.db` — 1.6M+ rows (weekly grain) |
 | DuckDB Transaction Engine | **LIVE** | `backend/transaction_layer.py` — 383.6M POS rows |
-| Hub Navigation (5 pillars) | **LIVE** | Single multi-page app via `st.navigation()` in `dashboards/app.py` — 23 pages |
+| Hub Navigation (5 pillars) | **LIVE** | Single multi-page app via `st.navigation()` in `dashboards/app.py` — 24 pages |
 | Render Deployment | **LIVE** | https://harris-farm-hub.onrender.com — persistent disk, GitHub Releases data |
 | Data Loader | **LIVE** | `data_loader.py` — auto-downloads data from GitHub Releases on deploy |
 | Start/Stop Scripts | **LIVE** | `start.sh` / `render_start.sh` — single Streamlit process |
@@ -47,16 +47,17 @@ Legend:
 | Customers | **LIVE** | harris_farm.db (weekly) |
 | Market Share | **LIVE** | harris_farm.db (77K rows) — 7 tabs: Overview, Spatial Map, Store Trade Areas, Trends & Shifts, Opportunities, Issues, Data Explorer. Plotly mapbox with 886 postcodes + 32 store markers. |
 
-### P3: Growing Legendary Leadership (6 pages)
+### P3: Growing Legendary Leadership (7 pages)
 
 | Dashboard | Status | Data Source |
 |-----------|--------|-------------|
 | Learning Centre | **LIVE** | 12 modules, 14 lessons (hub_data.db) |
 | The Paddock | **LIVE** | AI practice conversations (session state) |
 | Academy | **LIVE** | Growing Legends Academy — 6-level maturity model, 7 prompt patterns, 6 learning paths, site quality rubrics |
-| Prompt Builder | **LIVE** | prompt_templates (hub_data.db) |
+| Prompt Engine | **LIVE** | 20 task templates, PtA workflow — generate, score, iterate, annotate, submit (hub_data.db) |
+| Approvals | **LIVE** | Managers review/approve/reject PtA submissions, rubric scorecard display (hub_data.db) |
 | The Rubric | **LIVE** | AI training, prompt skills, multi-LLM comparison |
-| Hub Assistant | **LIVE** | Knowledge base (536 articles), full-text search chat |
+| Hub Assistant | **LIVE** | Knowledge base (545 articles), full-text search chat |
 
 ### P4: Today's Business, Done Better (8 pages)
 
@@ -180,6 +181,27 @@ Legend:
 
 ---
 
+## Prompt-to-Approval System
+
+| Feature | Status | Details |
+|---------|--------|---------|
+| Prompt Engine (20 templates) | **LIVE** | Role-filtered task templates, Claude/ChatGPT/Grok generation |
+| 8-Criteria Standard Rubric | **LIVE** | `shared/pta_rubric.py` — AF, ST, AC, VQ, CO, BR, DI, HO (1-10 each) |
+| 5-Tier Advanced Rubric | **LIVE** | CTO Panel, CLO Panel, Strategic, Implementation, Presentation |
+| Human Annotation Gate | **LIVE** | Must add ≥1 annotation before submission |
+| Approval Workflow (4 levels) | **LIVE** | L1 Team → L2 Department → L3 Executive → L4 Board |
+| Approvals Dashboard | **LIVE** | `approvals_dashboard.py` — review, approve, request changes |
+| AI Ninja Gamification | **LIVE** | 4 levels (Apprentice → Specialist → Master → Ninja), points, leaderboard |
+| Auto-Save to Library | **LIVE** | Prompts scoring 9.0+ auto-saved to prompt_templates, 200 pts |
+| Data Confidence Badges | **LIVE** | Source reliability scoring (POS=10, Competitor=4, etc.) |
+| PtA Audit Log | **LIVE** | Every action tracked in `pta_audit_log` table |
+| PtA Points System | **LIVE** | `pta_points_log` table — generate, score, submit, approve actions |
+| PtA Leaderboard | **LIVE** | GET /api/pta/leaderboard — top users by points |
+| Similar Prompts Hint | **LIVE** | Shows matching library prompts when creating new ones |
+| Iteration Loop | **LIVE** | Challenge AI, add context, refine — max 5 iterations |
+
+---
+
 ## Portal & Gamification
 
 | Feature | Status | Details |
@@ -232,6 +254,7 @@ Legend:
 | Analytics | 2 | **LIVE** |
 | Knowledge Base | 2 | **LIVE** |
 | Chat | 1 | **LIVE** |
+| Prompt-to-Approval | 10 | **LIVE** |
 | Roles | 3 | **LIVE** |
 | Learning | 5 | **LIVE** |
 | Transactions | 8 | **LIVE** |
@@ -247,7 +270,7 @@ Legend:
 | Self-Improvement | 5 | **LIVE** |
 | Admin Agent Control | 6 | **LIVE** |
 | Admin Executor | 2 | **LIVE** |
-| **Total** | **~93** | |
+| **Total** | **~103** | |
 
 ---
 
@@ -255,16 +278,16 @@ Legend:
 
 | Metric | Count |
 |--------|-------|
-| API Endpoints | ~93 |
-| Dashboards | 23 |
-| Database Tables | 35 |
+| API Endpoints | ~103 |
+| Dashboards | 24 |
+| Database Tables | 38 |
 | Test Files | 25 |
 | Tests | 1,003 |
 | Backend Modules | 16 |
 | Analysis Types | 11 |
 | Transaction Rows | 383.6M |
 | Products | 72,911 |
-| Knowledge Articles | 536 |
+| Knowledge Articles | 545 |
 | Intelligence Reports | 140+ |
 | Agent Proposals | 272+ |
 | Agent Scores | 192+ |
