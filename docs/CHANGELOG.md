@@ -4,6 +4,25 @@
 
 ---
 
+## [3.5.0] - 2026-02-22
+
+### Added
+- **Academy Gamification Engine** — transforms the Growing Legends Academy from content-only to interactive XP-driven learning
+  - XP system: 13 action types (login, module_complete, arena_submit, daily_challenge, prompt_score, badge_earned, quality_review, etc.)
+  - 6-level progression matching maturity model: Seed (0-99) → Sprout (100-299) → Grower (300-599) → Harvester (600-999) → Cultivator (1000-1499) → Legend (1500+)
+  - Streak engine: consecutive day tracking, 0.1x multiplier per day (max 2.0x), auto-awards login XP
+  - Daily challenges: 60 pre-seeded challenges (prompt_writing, quiz, score_this, pattern_practice, module_complete), deterministic daily rotation
+  - Badge system: 21 badges across 5 categories (achievement, streak, level, arena, learning), auto-detection and award
+  - Leaderboard: period filtering (all/week/month), XP-ranked with level icons and streak counts
+- **New backend module:** `backend/academy_engine.py` (380 lines) — all gamification logic centralised
+- **5 new database tables:** academy_xp_log, academy_streaks, academy_daily_challenges, academy_daily_completions, academy_badges
+- **10 new API endpoints:** `/api/academy/` (xp/award, xp/{user}, profile/{user}, streak/checkin, streak/{user}, leaderboard, daily-challenge, daily-challenge/complete, badges/{user}, badges/check)
+- **Academy page:** 2 new tabs (My Progress, Leaderboard), "You Are Here" marker on Journey tab, XP rewards callout on Arena tab
+- **Sidebar XP widget:** persistent level + XP display on every page, session-guarded streak check-in
+- **Integration hooks:** module completion → +50 XP, daily login → +5 XP, quality review → +10 XP
+
+---
+
 ## [3.4.0] - 2026-02-22
 
 ### Added

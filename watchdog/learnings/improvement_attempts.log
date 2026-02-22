@@ -96,3 +96,24 @@ Audit-first approach found 70-80% of infrastructure already existed. Used existi
 Spec mentioned PostgreSQL but existing Hub uses SQLite. Stayed consistent — no migration needed.
 
 [IMPROVE] 2026-02-22 07:30 | ALL | attempt 1/3 | N/A->8.0 | SUCCESS | PtA 6-phase build: 20 templates, rubric engine, approvals, gamification, 10 API endpoints
+
+---
+
+### 2026-02-22 Session — Academy Gamification Engine Build
+
+**What:** Built complete gamification engine for Growing Legends Academy — XP system, streaks, daily challenges, badges, leaderboards.
+
+**Architecture decisions:**
+1. New `academy_engine.py` module (380 lines) — centralises all logic, follows `agent_game.py` pattern
+2. New `academy_xp_log` table (not wrapping portal_scores) — different schema, different level system
+3. Pre-seeded daily challenges (60 in pool) — deterministic rotation via date mod, no LLM cost
+4. Sidebar XP widget in app.py — session-guarded streak check-in (once per session)
+
+**Key learnings:**
+- Python 3.9 f-string limitation: backslash escapes inside f-string expressions cause SyntaxError. Must extract `dict.get("key", "\Uxxxx")` into a variable first, then use the variable in the f-string.
+- SQLite UPSERT pattern: `INSERT ... ON CONFLICT(user_id) DO UPDATE SET` works well for streak tracking (single row per user).
+- Badge auto-detection: query current state (XP, streak, module count, action counts) in one pass, compare against eligibility rules, batch-insert new badges. Avoids recursive badge-check loops.
+
+**Result:** 5 files, 1,266 lines added, 10/10 endpoints returning 200, full E2E tested (checkin → XP → level up → badge → challenge → leaderboard).
+
+[IMPROVE] 2026-02-22 16:05 | ALL | attempt 1/3 | N/A->8.5 | SUCCESS | Academy Gamification Engine: XP system, streaks, daily challenges, 21 badges, leaderboard, 10 endpoints, 5 tables

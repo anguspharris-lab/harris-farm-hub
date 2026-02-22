@@ -15,15 +15,15 @@ Legend:
 
 | Feature | Status | Evidence |
 |---------|--------|----------|
-| FastAPI Backend | **LIVE** | `backend/app.py` — 112 endpoints, port 8000 |
+| FastAPI Backend | **LIVE** | `backend/app.py` — ~147 endpoints, port 8000 |
 | Mission Control (Documentation) | **LIVE** | `dashboards/hub_portal.py` — 4 tabs (Docs, Catalog, Showcase, Self-Improvement) |
 | Agent Hub (Scoreboard, Arena, Network) | **LIVE** | `dashboards/agent_hub.py` — 3 tabs |
 | Analytics Engine (Data Intelligence) | **LIVE** | `dashboards/analytics_engine.py` — 4 tabs |
 | Agent Operations (WATCHDOG + Control) | **LIVE** | `dashboards/agent_operations.py` — 4 tabs |
-| SQLite Metadata Database | **LIVE** | `backend/hub_data.db` — 35 tables, 1,009 rows |
+| SQLite Metadata Database | **LIVE** | `backend/hub_data.db` — ~56 tables |
 | SQLite Aggregated Data | **LIVE** | `data/harris_farm.db` — 1.6M+ rows (weekly grain) |
 | DuckDB Transaction Engine | **LIVE** | `backend/transaction_layer.py` — 383.6M POS rows |
-| Hub Navigation (5 pillars) | **LIVE** | Single multi-page app via `st.navigation()` in `dashboards/app.py` — 24 pages |
+| Hub Navigation (5 pillars) | **LIVE** | Single multi-page app via `st.navigation()` in `dashboards/app.py` — 26 pages |
 | Render Deployment | **LIVE** | https://harris-farm-hub.onrender.com — persistent disk, GitHub Releases data |
 | Data Loader | **LIVE** | `data_loader.py` — auto-downloads data from GitHub Releases on deploy |
 | Start/Stop Scripts | **LIVE** | `start.sh` / `render_start.sh` — single Streamlit process |
@@ -32,7 +32,7 @@ Legend:
 
 ---
 
-## Dashboards (23 pages — single multi-page app)
+## Dashboards (26 pages — single multi-page app)
 
 ### P1: For The Greater Goodness (1 page)
 
@@ -53,7 +53,7 @@ Legend:
 |-----------|--------|-------------|
 | Learning Centre | **LIVE** | 12 modules, 14 lessons (hub_data.db) |
 | The Paddock | **LIVE** | AI practice conversations (session state) |
-| Academy | **LIVE** | Growing Legends Academy — 6-level maturity model, 7 prompt patterns, 6 learning paths, site quality rubrics |
+| Academy | **LIVE** | Growing Legends Academy — 6-level maturity model, 7 prompt patterns, 6 learning paths, site quality rubrics, **Gamification Engine:** XP system (13 action types), streak tracking (1.0-2.0x multiplier), 60 daily challenges, 21 badges, leaderboard, 10 tabs |
 | Prompt Engine | **LIVE** | 20 task templates, PtA workflow — generate, score, iterate, annotate, submit (hub_data.db) |
 | Approvals | **LIVE** | Managers review/approve/reject PtA submissions, rubric scorecard display (hub_data.db) |
 | The Rubric | **LIVE** | AI training, prompt skills, multi-LLM comparison |
@@ -72,10 +72,11 @@ Legend:
 | PLU Intelligence | **LIVE** | harris_farm_plu.db (27.3M rows) — 6 views: Dept Summary, Wastage Hotspots, Stocktake Variance, Top Revenue PLUs, Store Benchmarking, PLU Lookup |
 | Transport | **LIVE** | harris_farm.db (weekly) |
 
-### P5: Tomorrow's Business, Built Better (6 pages)
+### P5: Tomorrow's Business, Built Better (7 pages)
 
 | Dashboard | Status | Data Source |
 |-----------|--------|-------------|
+| Workflow Engine | **LIVE** | 4P state machine (Prompt→Prove→Propose→Progress), multi-project tracking, talent radar, velocity metrics (hub_data.db) |
 | Analytics Engine | **LIVE** | Data Intelligence — run analyses, reports, agent tasks (hub_data.db + harris_farm.db) |
 | Agent Hub | **LIVE** | Scoreboard, Arena, Agent Network (hub_data.db) |
 | Agent Operations | **LIVE** | WATCHDOG safety & agent control pipeline (hub_data.db) |
@@ -270,7 +271,8 @@ Legend:
 | Self-Improvement | 5 | **LIVE** |
 | Admin Agent Control | 6 | **LIVE** |
 | Admin Executor | 2 | **LIVE** |
-| **Total** | **~103** | |
+| Academy Gamification | 10 | **LIVE** |
+| **Total** | **~147** | |
 
 ---
 
@@ -278,9 +280,9 @@ Legend:
 
 | Metric | Count |
 |--------|-------|
-| API Endpoints | ~103 |
-| Dashboards | 24 |
-| Database Tables | 38 |
+| API Endpoints | ~147 |
+| Dashboards | 26 |
+| Database Tables | ~56 |
 | Test Files | 25 |
 | Tests | 1,003 |
 | Backend Modules | 16 |

@@ -1,6 +1,6 @@
 # Harris Farm Hub — Architecture
 
-*Last Updated: 2026-02-22 (v3.1 — IA Restructure)*
+*Last Updated: 2026-02-22 (v3.5 — Academy Gamification Engine)*
 
 ---
 

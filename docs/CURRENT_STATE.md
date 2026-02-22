@@ -129,7 +129,7 @@ Every dashboard shows its goal alignment in the header via `render_header(goals=
 ## Learning Features
 
 - **Learning Centre** (`learning_centre.py`): 12 modules (L1-L4, D1-D4, K1-K4), 5 tabs
-- **Academy** (`growing_legends_academy.py`): 6 maturity levels (Seed to Legend), 7 prompt patterns, 6 learning paths, 5 arena challenges, 8 tabs, site quality rubrics
+- **Academy** (`growing_legends_academy.py`): 6 maturity levels (Seed to Legend), 7 prompt patterns, 6 learning paths, 5 arena challenges, 10 tabs, site quality rubrics. **Gamification Engine:** XP system (13 action types, 6 levels), streak tracking (1.0-2.0x multiplier), 60 daily challenges, 21 badges, leaderboard. Backend: `academy_engine.py`, 5 tables, 10 `/api/academy/` endpoints.
 - **Prompt Engine** (`prompt_builder.py`): 20 role-filtered task templates, PtA workflow (generate → score → iterate → annotate → submit → approve)
 - **Approvals** (`approvals_dashboard.py`): Managers review, approve, or request changes on PtA submissions
 - **Hub Assistant** (`chatbot_dashboard.py`): 545 knowledge base articles, full-text search + RAG chat
