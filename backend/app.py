@@ -740,6 +740,73 @@ def init_hub_database():
     c.execute("CREATE INDEX IF NOT EXISTS idx_pta_stage ON pta_submissions(workflow_stage)")
     c.execute("CREATE INDEX IF NOT EXISTS idx_pta_project ON pta_submissions(project_id)")
 
+    # ---- Academy Gamification Tables ----
+    c.execute('''CREATE TABLE IF NOT EXISTS academy_xp_log
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id TEXT NOT NULL,
+                  xp_amount INTEGER NOT NULL,
+                  base_amount INTEGER NOT NULL,
+                  multiplier REAL DEFAULT 1.0,
+                  action_type TEXT NOT NULL,
+                  reference_id TEXT,
+                  reference_type TEXT,
+                  description TEXT,
+                  created_at TEXT DEFAULT (datetime('now')))''')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_axp_user ON academy_xp_log(user_id)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_axp_action ON academy_xp_log(action_type)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_axp_created ON academy_xp_log(created_at)")
+
+    c.execute('''CREATE TABLE IF NOT EXISTS academy_streaks
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id TEXT UNIQUE NOT NULL,
+                  current_streak INTEGER DEFAULT 0,
+                  longest_streak INTEGER DEFAULT 0,
+                  last_active_date TEXT,
+                  streak_multiplier REAL DEFAULT 1.0,
+                  total_active_days INTEGER DEFAULT 0,
+                  updated_at TEXT DEFAULT (datetime('now')))''')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_astrk_user ON academy_streaks(user_id)")
+
+    c.execute('''CREATE TABLE IF NOT EXISTS academy_daily_challenges
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  challenge_code TEXT UNIQUE NOT NULL,
+                  title TEXT NOT NULL,
+                  description TEXT NOT NULL,
+                  challenge_type TEXT NOT NULL,
+                  difficulty TEXT DEFAULT 'beginner',
+                  xp_reward INTEGER DEFAULT 20,
+                  target_level TEXT,
+                  metadata_json TEXT DEFAULT '{}',
+                  active INTEGER DEFAULT 1,
+                  created_at TEXT DEFAULT (datetime('now')))''')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_adc_type ON academy_daily_challenges(challenge_type)")
+
+    c.execute('''CREATE TABLE IF NOT EXISTS academy_daily_completions
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id TEXT NOT NULL,
+                  challenge_id INTEGER NOT NULL,
+                  challenge_date TEXT NOT NULL,
+                  completed_at TEXT DEFAULT (datetime('now')),
+                  xp_earned INTEGER DEFAULT 0,
+                  UNIQUE(user_id, challenge_id, challenge_date),
+                  FOREIGN KEY (challenge_id) REFERENCES academy_daily_challenges(id))''')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_adcomp_user ON academy_daily_completions(user_id)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_adcomp_date ON academy_daily_completions(challenge_date)")
+
+    c.execute('''CREATE TABLE IF NOT EXISTS academy_badges
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id TEXT NOT NULL,
+                  badge_code TEXT NOT NULL,
+                  badge_name TEXT NOT NULL,
+                  badge_icon TEXT DEFAULT '',
+                  badge_description TEXT,
+                  category TEXT DEFAULT 'achievement',
+                  xp_awarded INTEGER DEFAULT 0,
+                  earned_at TEXT DEFAULT (datetime('now')),
+                  UNIQUE(user_id, badge_code))''')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_abadge_user ON academy_badges(user_id)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_abadge_code ON academy_badges(badge_code)")
+
     conn.commit()
     conn.close()
 
@@ -1220,6 +1287,14 @@ async def lifespan(app: FastAPI):
     seed_prompt_templates()
     seed_knowledge_base()
     seed_sustainability_kpis()
+    # Seed Academy daily challenges
+    try:
+        from academy_engine import seed_daily_challenges
+        _seeded = seed_daily_challenges(config.HUB_DB)
+        if _seeded:
+            print(f"  Seeded {_seeded} Academy daily challenges")
+    except Exception as e:
+        print(f"  Academy challenge seeding skipped: {e}")
     # Initialize auth database
     import auth as auth_module
     auth_module.init_auth_db()
@@ -2727,6 +2802,12 @@ async def update_user_progress(
     # Award gamification points on module completion
     if status == "completed":
         _award_points(user_id, 20, "learning", f"Completed module {module_code.upper()}")
+        # Academy XP engine hook
+        try:
+            from academy_engine import on_module_complete
+            on_module_complete(config.HUB_DB, user_id, module_code.upper())
+        except Exception:
+            pass
 
     return {"status": "updated", "user_id": user_id, "module_code": module_code.upper()}
 
@@ -6452,6 +6533,92 @@ async def link_submission_to_project(submission_id: int, project_id: int):
     conn.commit()
     conn.close()
     return {"linked": True, "submission_id": submission_id, "project_id": project_id}
+
+
+# ============================================================================
+# ACADEMY GAMIFICATION ENGINE
+# XP system, streaks, daily challenges, badges, leaderboards
+# ============================================================================
+
+@app.post("/api/academy/xp/award")
+async def academy_award_xp(user_id: str, action_type: str,
+                            base_xp: Optional[int] = None,
+                            reference_id: Optional[str] = None,
+                            reference_type: Optional[str] = None,
+                            description: Optional[str] = None):
+    """Award XP to a user with streak multiplier auto-applied."""
+    from academy_engine import award_xp
+    result = award_xp(config.HUB_DB, user_id, action_type, base_xp=base_xp,
+                      reference_id=reference_id, reference_type=reference_type,
+                      description=description)
+    return result
+
+
+@app.get("/api/academy/xp/{user_id}")
+async def academy_get_xp(user_id: str):
+    """Get user's total XP and level info."""
+    from academy_engine import get_user_xp
+    return get_user_xp(config.HUB_DB, user_id)
+
+
+@app.get("/api/academy/profile/{user_id}")
+async def academy_profile(user_id: str):
+    """Full profile: XP, level, streak, badges, recent activity."""
+    from academy_engine import get_full_profile
+    return get_full_profile(config.HUB_DB, user_id)
+
+
+@app.post("/api/academy/streak/checkin")
+async def academy_streak_checkin(user_id: str):
+    """Record daily engagement and update streak."""
+    from academy_engine import update_streak
+    return update_streak(config.HUB_DB, user_id)
+
+
+@app.get("/api/academy/streak/{user_id}")
+async def academy_get_streak(user_id: str):
+    """Get streak data for a user."""
+    from academy_engine import get_streak
+    return get_streak(config.HUB_DB, user_id)
+
+
+@app.get("/api/academy/leaderboard")
+async def academy_leaderboard(period: str = "all", limit: int = 50):
+    """Individual leaderboard ranked by XP."""
+    from academy_engine import get_leaderboard
+    return {"leaderboard": get_leaderboard(config.HUB_DB, period=period, limit=limit)}
+
+
+@app.get("/api/academy/daily-challenge")
+async def academy_daily_challenge(user_id: str):
+    """Get today's challenge and whether the user has completed it."""
+    from academy_engine import get_todays_challenge
+    challenge = get_todays_challenge(config.HUB_DB, user_id)
+    if not challenge:
+        return {"challenge": None, "message": "No challenges available. Check back soon!"}
+    return {"challenge": challenge}
+
+
+@app.post("/api/academy/daily-challenge/complete")
+async def academy_complete_challenge(user_id: str, challenge_id: int):
+    """Mark today's challenge complete and award XP."""
+    from academy_engine import complete_daily_challenge
+    return complete_daily_challenge(config.HUB_DB, user_id, challenge_id)
+
+
+@app.get("/api/academy/badges/{user_id}")
+async def academy_badges(user_id: str):
+    """Get earned and locked badges for a user."""
+    from academy_engine import get_user_badges
+    return get_user_badges(config.HUB_DB, user_id)
+
+
+@app.post("/api/academy/badges/check")
+async def academy_check_badges(user_id: str):
+    """Run badge eligibility check and award new badges."""
+    from academy_engine import check_and_award_badges
+    newly = check_and_award_badges(config.HUB_DB, user_id)
+    return {"newly_awarded": [b["name"] for b in newly], "count": len(newly)}
 
 
 if __name__ == "__main__":

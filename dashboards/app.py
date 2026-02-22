@@ -152,6 +152,51 @@ if active_pillar and len(active_pillar["slugs"]) > 1:
 st.markdown("---")
 
 # ---------------------------------------------------------------------------
+# Sidebar: Academy XP widget (persistent across all pages)
+# ---------------------------------------------------------------------------
+
+_auth_user = st.session_state.get("auth_user")
+if _auth_user:
+    _uid = _auth_user.get("email", "")
+    if _uid:
+        import requests as _req
+        _API = os.getenv("API_URL", "http://localhost:8000")
+
+        # Streak check-in (once per session)
+        if "academy_checkin_done" not in st.session_state:
+            try:
+                _req.post(f"{_API}/api/academy/streak/checkin",
+                          params={"user_id": _uid}, timeout=3)
+                st.session_state["academy_checkin_done"] = True
+            except Exception:
+                pass
+
+        # Load XP summary
+        if "academy_sidebar_xp" not in st.session_state:
+            try:
+                _r = _req.get(f"{_API}/api/academy/xp/{_uid}", timeout=3)
+                st.session_state["academy_sidebar_xp"] = _r.json() if _r.status_code == 200 else {}
+            except Exception:
+                st.session_state["academy_sidebar_xp"] = {}
+
+        _xp = st.session_state.get("academy_sidebar_xp", {})
+        if _xp.get("total_xp") is not None:
+            _lvl_icon = _xp.get("icon", "\U0001f331")
+            _lvl_name = _xp.get("name", "Seed")
+            _total = _xp.get("total_xp", 0)
+            with st.sidebar:
+                st.markdown(
+                    f"<div style='background:linear-gradient(135deg, #059669, #047857);"
+                    f"color:white;border-radius:10px;padding:10px 14px;margin-bottom:12px;'>"
+                    f"<div style='font-weight:700;font-size:0.95em;'>"
+                    f"{_lvl_icon} {_lvl_name}</div>"
+                    f"<div style='font-size:0.8em;opacity:0.9;'>"
+                    f"{_total:,} XP</div>"
+                    f"</div>",
+                    unsafe_allow_html=True,
+                )
+
+# ---------------------------------------------------------------------------
 # Run the selected page
 # ---------------------------------------------------------------------------
 

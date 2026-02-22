@@ -6,8 +6,11 @@ A self-learning destination that ties together the Learning Centre, Rubric,
 Prompt Builder, Arena, and Showcase into a single inspiring page.
 
 6-level maturity model: Seed → Sprout → Grower → Harvester → Cultivator → Legend
+Gamification: XP system, streaks, daily challenges, badges, leaderboards.
 """
 
+import os
+import requests
 import streamlit as st
 
 from shared.styles import render_header, render_footer, HFM_GREEN
@@ -26,6 +29,8 @@ from shared.academy_content import (
     ACADEMY_SELF_SCORE,
 )
 from shared.training_content import BUILDING_BLOCKS, RUBRIC_CRITERIA
+
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 user = st.session_state.get("auth_user")
 _pages = st.session_state.get("_pages", {})
@@ -75,10 +80,28 @@ st.markdown(
 
 
 # ============================================================================
-# 8 TABS
+# Helper: load Academy profile
+# ============================================================================
+
+def _load_profile():
+    """Load user's Academy profile from the API. Cached per session."""
+    if "academy_profile" not in st.session_state:
+        uid = (user or {}).get("email", "anonymous")
+        try:
+            r = requests.get(f"{API_URL}/api/academy/profile/{uid}", timeout=5)
+            st.session_state["academy_profile"] = r.json() if r.status_code == 200 else {}
+        except Exception:
+            st.session_state["academy_profile"] = {}
+    return st.session_state["academy_profile"]
+
+
+# ============================================================================
+# 10 TABS
 # ============================================================================
 
 tabs = st.tabs([
+    "\U0001f4ca My Progress",
+    "\U0001f3c5 Leaderboard",
     "\U0001f331 Journey",
     "\U0001f9e0 Patterns",
     "\u2696\ufe0f Rubric",
@@ -91,25 +114,291 @@ tabs = st.tabs([
 
 
 # ────────────────────────────────────────────────────────────────────────────
-# TAB 1: CAPABILITY JOURNEY
+# TAB 0: MY PROGRESS — XP, level, streak, daily challenge, badges
 # ────────────────────────────────────────────────────────────────────────────
 
 with tabs[0]:
+    profile = _load_profile()
+    uid = (user or {}).get("email", "anonymous")
+
+    if not profile or not profile.get("total_xp") and profile.get("total_xp") != 0:
+        # First visit — trigger check-in
+        try:
+            requests.post(f"{API_URL}/api/academy/streak/checkin",
+                          params={"user_id": uid}, timeout=5)
+            st.session_state.pop("academy_profile", None)
+            profile = _load_profile()
+        except Exception:
+            pass
+
+    total_xp = profile.get("total_xp", 0)
+    level_name = profile.get("name", "Seed")
+    level_icon = profile.get("icon", "\U0001f331")
+    progress_pct = profile.get("progress_pct", 0)
+    xp_to_next = profile.get("xp_to_next", 100)
+    streak = profile.get("streak", {})
+    current_streak = streak.get("current_streak", 0)
+    multiplier = streak.get("streak_multiplier", 1.0)
+    badges = profile.get("badges", {})
+    recent = profile.get("recent_activity", [])
+
+    # XP + Level hero
+    st.markdown("### Your Academy Progress")
+
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        st.metric("Total XP", f"{total_xp:,}")
+    with c2:
+        st.metric("Level", f"{level_icon} {level_name}")
+    with c3:
+        fire = "\U0001f525" * min(max(current_streak // 3, 1), 5) if current_streak > 0 else "-"
+        st.metric("Streak", f"{current_streak} days {fire}")
+    with c4:
+        st.metric("Multiplier", f"{multiplier:.1f}x")
+
+    # XP progress bar
+    max_xp = profile.get("max_xp")
+    min_xp = profile.get("min_xp", 0)
+    if max_xp:
+        bar_pct = min(progress_pct, 100)
+        next_level_name = ""
+        for lv in MATURITY_LEVELS:
+            if lv["name"] != level_name:
+                for lt in [{"name": "Seed", "min": 0}, {"name": "Sprout", "min": 100},
+                           {"name": "Grower", "min": 300}, {"name": "Harvester", "min": 600},
+                           {"name": "Cultivator", "min": 1000}, {"name": "Legend", "min": 1500}]:
+                    if lt["min"] == (max_xp + 1 if max_xp else 0):
+                        next_level_name = lt["name"]
+        st.markdown(
+            f"<div style='margin:8px 0;'>"
+            f"<div style='display:flex;justify-content:space-between;font-size:0.85em;'>"
+            f"<span>{level_icon} {level_name} ({min_xp} XP)</span>"
+            f"<span>{xp_to_next} XP to next level</span>"
+            f"</div>"
+            f"<div style='background:#e2e8f0;border-radius:8px;height:16px;margin:4px 0;'>"
+            f"<div style='background:linear-gradient(90deg, #059669, #34d399);width:{bar_pct}%;"
+            f"height:100%;border-radius:8px;transition:width 0.3s;'></div></div>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+    elif level_name == "Legend":
+        st.markdown(
+            "<div style='background:#fef3c7;border-radius:8px;padding:12px;text-align:center;'>"
+            "\U0001f3c6 <strong>You've reached Legend status!</strong> "
+            "Keep earning XP to climb the leaderboard.</div>",
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("---")
+
+    # Daily Challenge
+    st.markdown("#### Today's Challenge")
+    try:
+        ch_resp = requests.get(f"{API_URL}/api/academy/daily-challenge",
+                               params={"user_id": uid}, timeout=5).json()
+        ch = ch_resp.get("challenge")
+    except Exception:
+        ch = None
+
+    if ch:
+        completed = ch.get("completed_today", False)
+        diff_colors = {"beginner": "#22c55e", "intermediate": "#eab308", "advanced": "#ef4444"}
+        diff_color = diff_colors.get(ch.get("difficulty", "beginner"), "#6b7280")
+
+        st.markdown(
+            f"<div style='background:#f0fdf4;border:2px solid #bbf7d0;border-radius:12px;"
+            f"padding:16px;margin-bottom:16px;'>"
+            f"<div style='display:flex;justify-content:space-between;align-items:center;'>"
+            f"<div style='font-weight:700;font-size:1.1em;color:#166534;'>"
+            f"\U0001f4c5 {ch['title']}</div>"
+            f"<div style='display:flex;gap:8px;'>"
+            f"<span style='background:{diff_color};color:white;padding:2px 10px;"
+            f"border-radius:12px;font-size:0.8em;'>{ch.get('difficulty', 'beginner').title()}</span>"
+            f"<span style='background:#059669;color:white;padding:2px 10px;"
+            f"border-radius:12px;font-size:0.8em;'>+{ch.get('xp_reward', 20)} XP</span>"
+            f"</div></div>"
+            f"<div style='margin-top:8px;color:#374151;'>{ch['description']}</div>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+
+        if completed:
+            st.success("You've completed today's challenge! Come back tomorrow for a new one.")
+        else:
+            if st.button("Mark Challenge Complete", type="primary",
+                         key="academy_complete_daily", use_container_width=True):
+                try:
+                    r = requests.post(
+                        f"{API_URL}/api/academy/daily-challenge/complete",
+                        params={"user_id": uid, "challenge_id": ch["id"]},
+                        timeout=5,
+                    )
+                    if r.status_code == 200:
+                        result = r.json()
+                        xp = result.get("xp_earned", 0)
+                        st.success(f"Challenge complete! +{xp} XP earned!")
+                        st.session_state.pop("academy_profile", None)
+                        st.rerun()
+                except Exception:
+                    st.error("Could not record completion. Try again.")
+    else:
+        st.info("No daily challenge available right now. Check back soon!")
+
+    st.markdown("---")
+
+    # Badge Gallery
+    st.markdown("#### Badges")
+    earned = badges.get("earned", [])
+    locked = badges.get("locked", [])
+    total_earned = badges.get("total_earned", 0)
+    total_avail = badges.get("total_available", 0)
+
+    st.caption(f"{total_earned} / {total_avail} badges earned")
+
+    if earned:
+        badge_cols = st.columns(min(len(earned), 6))
+        for i, b in enumerate(earned[:12]):
+            with badge_cols[i % len(badge_cols)]:
+                _b_icon = b.get("badge_icon", "\U0001f3c5")
+                _b_name = b.get("badge_name", "")
+                st.markdown(
+                    f"<div style='text-align:center;padding:8px;background:#f0fdf4;"
+                    f"border-radius:10px;border:1px solid #bbf7d0;margin-bottom:8px;'>"
+                    f"<div style='font-size:1.6em;'>{_b_icon}</div>"
+                    f"<div style='font-weight:600;font-size:0.85em;'>{_b_name}</div>"
+                    f"</div>",
+                    unsafe_allow_html=True,
+                )
+
+    if locked:
+        with st.expander(f"Locked badges ({len(locked)})"):
+            lock_cols = st.columns(min(len(locked), 6))
+            for i, b in enumerate(locked[:18]):
+                with lock_cols[i % len(lock_cols)]:
+                    st.markdown(
+                        f"<div style='text-align:center;padding:8px;background:#f1f5f9;"
+                        f"border-radius:10px;border:1px solid #e2e8f0;margin-bottom:8px;"
+                        f"opacity:0.5;'>"
+                        f"<div style='font-size:1.6em;'>\U0001f512</div>"
+                        f"<div style='font-weight:600;font-size:0.85em;color:#94a3b8;'>"
+                        f"{b.get('name', '')}</div>"
+                        f"<div style='font-size:0.75em;color:#94a3b8;'>{b.get('desc', '')}</div>"
+                        f"</div>",
+                        unsafe_allow_html=True,
+                    )
+
+    st.markdown("---")
+
+    # Recent Activity Feed
+    st.markdown("#### Recent Activity")
+    if recent:
+        for act in recent[:8]:
+            action_icons = {
+                "login": "\U0001f44b", "module_complete": "\U0001f4da",
+                "daily_challenge": "\U0001f4c5", "badge_earned": "\U0001f3c5",
+                "prompt_score_high": "\U0001f48e", "prompt_score_medium": "\U0001f4dd",
+                "quality_review": "\U0001f4cf", "arena_submit": "\u2694\ufe0f",
+            }
+            icon = action_icons.get(act.get("action_type", ""), "\u2728")
+            st.markdown(
+                f"<div style='display:flex;align-items:center;gap:10px;padding:6px 0;"
+                f"border-bottom:1px solid #f1f5f9;font-size:0.9em;'>"
+                f"<span>{icon}</span>"
+                f"<span style='flex:1;'>{act.get('description', act.get('action_type', ''))}</span>"
+                f"<span style='color:#059669;font-weight:600;'>+{act.get('xp_amount', 0)} XP</span>"
+                f"<span style='color:#94a3b8;font-size:0.8em;'>{act.get('created_at', '')[:10]}</span>"
+                f"</div>",
+                unsafe_allow_html=True,
+            )
+    else:
+        st.caption("No activity yet. Complete a daily challenge or module to get started!")
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# TAB 1: LEADERBOARD
+# ────────────────────────────────────────────────────────────────────────────
+
+with tabs[1]:
+    st.markdown("### Academy Leaderboard")
+
+    period = st.selectbox(
+        "Period",
+        ["all", "month", "week"],
+        format_func=lambda x: {"all": "All Time", "month": "This Month", "week": "This Week"}.get(x, x),
+        key="academy_lb_period",
+    )
+
+    try:
+        lb_resp = requests.get(
+            f"{API_URL}/api/academy/leaderboard",
+            params={"period": period, "limit": 30},
+            timeout=5,
+        ).json()
+        leaders = lb_resp.get("leaderboard", [])
+    except Exception:
+        leaders = []
+
+    if leaders:
+        uid = (user or {}).get("email", "anonymous")
+        for entry in leaders:
+            is_me = entry["user_id"] == uid
+            bg = "#f0fdf4" if is_me else "#ffffff"
+            border = "2px solid #22c55e" if is_me else "1px solid #f1f5f9"
+            me_tag = " (You)" if is_me else ""
+            display_name = entry["user_id"].split("@")[0] if "@" in entry["user_id"] else entry["user_id"]
+            _e_icon = entry.get("level_icon", "\U0001f331")
+            _e_level = entry.get("level_name", "Seed")
+            _e_streak = entry.get("current_streak", 0)
+            _e_xp = entry.get("total_xp", 0)
+
+            st.markdown(
+                f"<div style='display:flex;align-items:center;padding:10px 14px;"
+                f"border-radius:8px;margin-bottom:6px;background:{bg};border:{border};'>"
+                f"<div style='width:40px;font-weight:700;font-size:1.2em;color:#6b7280;'>"
+                f"#{entry['rank']}</div>"
+                f"<div style='width:36px;font-size:1.4em;text-align:center;'>"
+                f"{_e_icon}</div>"
+                f"<div style='flex:1;'>"
+                f"<div style='font-weight:600;'>{display_name}{me_tag}</div>"
+                f"<div style='font-size:0.8em;color:#6b7280;'>"
+                f"{_e_level} | "
+                f"\U0001f525 {_e_streak} day streak</div>"
+                f"</div>"
+                f"<div style='font-weight:700;color:#059669;font-size:1.1em;'>"
+                f"{_e_xp:,} XP</div>"
+                f"</div>",
+                unsafe_allow_html=True,
+            )
+    else:
+        st.info("No leaderboard data yet. Be the first to earn XP!")
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# TAB 2: CAPABILITY JOURNEY
+# ────────────────────────────────────────────────────────────────────────────
+
+with tabs[2]:
     st.markdown("### Your Capability Journey")
     st.markdown(
         "Six levels from your first AI conversation to leading transformation. "
         "Every level has clear skills, exercises, and a rubric score target."
     )
 
-    # Progress bar showing all 6 levels
+    # Progress bar showing all 6 levels with "You Are Here" marker
+    _profile = _load_profile()
+    _user_level = _profile.get("name", "Seed") if _profile else "Seed"
+
     level_names = [lv["name"] for lv in MATURITY_LEVELS]
     level_icons = [lv["icon"] for lv in MATURITY_LEVELS]
     bar_html = "".join(
         f"<div style='flex:1;text-align:center;padding:8px 4px;"
         f"background:{lv['color']};color:{lv['text_color']};"
-        f"font-weight:600;font-size:0.85em;"
+        f"font-weight:{'800' if lv['name'] == _user_level else '600'};"
+        f"font-size:{'0.95em' if lv['name'] == _user_level else '0.85em'};"
         f"{'border-radius:10px 0 0 10px;' if i == 0 else ''}"
-        f"{'border-radius:0 10px 10px 0;' if i == len(MATURITY_LEVELS) - 1 else ''}'>"
+        f"{'border-radius:0 10px 10px 0;' if i == len(MATURITY_LEVELS) - 1 else ''}"
+        f"{'box-shadow:inset 0 0 0 3px rgba(0,0,0,0.3);' if lv['name'] == _user_level else ''}'>"
+        f"{'📍 ' if lv['name'] == _user_level else ''}"
         f"{lv['icon']} {lv['name']}</div>"
         for i, lv in enumerate(MATURITY_LEVELS)
     )
@@ -159,10 +448,10 @@ with tabs[0]:
 
 
 # ────────────────────────────────────────────────────────────────────────────
-# TAB 2: PROMPT MASTERY — 7 Patterns
+# TAB 3: PROMPT MASTERY — 7 Patterns
 # ────────────────────────────────────────────────────────────────────────────
 
-with tabs[1]:
+with tabs[3]:
     st.markdown("### Prompt Mastery")
     st.markdown(
         "Seven proven patterns that transform basic prompts into powerful ones. "
@@ -218,10 +507,10 @@ with tabs[1]:
 
 
 # ────────────────────────────────────────────────────────────────────────────
-# TAB 3: THE RUBRIC EXPLAINED
+# TAB 4: THE RUBRIC EXPLAINED
 # ────────────────────────────────────────────────────────────────────────────
 
-with tabs[2]:
+with tabs[4]:
     st.markdown("### The Rubric Explained")
     st.markdown(
         "Two rubric systems power the Hub: a **Prompt Quality Rubric** (25 pts) "
@@ -292,10 +581,10 @@ with tabs[2]:
 
 
 # ────────────────────────────────────────────────────────────────────────────
-# TAB 4: LEARNING PATHS
+# TAB 5: LEARNING PATHS
 # ────────────────────────────────────────────────────────────────────────────
 
-with tabs[3]:
+with tabs[5]:
     st.markdown("### Learning Paths")
     st.markdown(
         "Not sure where to start? Pick the path that matches your role and level."
@@ -365,14 +654,25 @@ with tabs[3]:
 
 
 # ────────────────────────────────────────────────────────────────────────────
-# TAB 5: THE ARENA
+# TAB 6: THE ARENA
 # ────────────────────────────────────────────────────────────────────────────
 
-with tabs[4]:
+with tabs[6]:
     st.markdown("### The Arena")
     st.markdown(
         "Weekly prompt challenges that test your skills against real Harris Farm "
         "scenarios. Submit your best prompt and see how it scores."
+    )
+
+    # XP rewards callout
+    st.markdown(
+        "<div style='background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;"
+        "padding:10px 14px;margin-bottom:16px;font-size:0.9em;'>"
+        "\u2728 <strong>XP Rewards:</strong> "
+        "Submit a challenge = <strong>+30 XP</strong> | "
+        "Win a challenge = <strong>+100 XP</strong>"
+        "</div>",
+        unsafe_allow_html=True,
     )
 
     # Active challenge hero card
@@ -421,10 +721,10 @@ with tabs[4]:
 
 
 # ────────────────────────────────────────────────────────────────────────────
-# TAB 6: SHOWCASE HIGHLIGHTS
+# TAB 7: SHOWCASE HIGHLIGHTS
 # ────────────────────────────────────────────────────────────────────────────
 
-with tabs[5]:
+with tabs[7]:
     st.markdown("### Showcase Highlights")
     st.markdown(
         "Real AI implementations built by the Harris Farm team. "
@@ -456,10 +756,10 @@ with tabs[5]:
 
 
 # ────────────────────────────────────────────────────────────────────────────
-# TAB 7: SITE QUALITY RUBRICS
+# TAB 8: SITE QUALITY RUBRICS
 # ────────────────────────────────────────────────────────────────────────────
 
-with tabs[6]:
+with tabs[8]:
     st.markdown("### Site Quality Rubrics")
     st.markdown(
         "Use these rubrics to evaluate **any page in the Hub**. They drive "
@@ -610,7 +910,16 @@ with tabs[6]:
             )
             _conn.commit()
             _conn.close()
-            st.success(f"Score submitted: {_total}/{_rubric['max_points']} ({_pct}%)")
+            # Award Academy XP for quality review
+            try:
+                requests.post(f"{API_URL}/api/academy/xp/award",
+                              params={"user_id": _scorer, "action_type": "quality_review",
+                                      "description": f"Reviewed {_sel_page}"},
+                              timeout=3)
+                st.session_state.pop("academy_profile", None)
+            except Exception:
+                pass
+            st.success(f"Score submitted: {_total}/{_rubric['max_points']} ({_pct}%) — +10 XP earned!")
         else:
             st.warning("Database not found — score not saved.")
 
@@ -662,10 +971,10 @@ with tabs[6]:
 
 
 # ────────────────────────────────────────────────────────────────────────────
-# TAB 8: QUICK LINKS
+# TAB 9: QUICK LINKS
 # ────────────────────────────────────────────────────────────────────────────
 
-with tabs[7]:
+with tabs[9]:
     st.markdown("### Quick Links")
 
     c1, c2 = st.columns(2)
