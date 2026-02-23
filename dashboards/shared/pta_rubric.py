@@ -257,7 +257,7 @@ Respond in this exact JSON format:
 def _score_colour(score):
     """Return colour based on score: green 8+, amber 6-7, red <6."""
     if score >= 8:
-        return "#16a34a"
+        return "#2ECC71"
     elif score >= 6:
         return "#d97706"
     return "#dc2626"
@@ -266,7 +266,7 @@ def _score_colour(score):
 def _verdict_style(verdict):
     """Return (colour, icon) for verdict."""
     if verdict == "SHIP":
-        return "#16a34a", "check-circle"
+        return "#2ECC71", "check-circle"
     elif verdict == "REVISE":
         return "#d97706", "alert-triangle"
     return "#dc2626", "x-circle"
@@ -318,11 +318,11 @@ def render_rubric_scorecard(scores_data):
 
             with col:
                 st.markdown(
-                    f"""<div style="text-align:center; padding:8px; border:1px solid #e5e7eb;
-                    border-radius:8px; background:white;">
+                    f"""<div style="text-align:center; padding:8px; border:1px solid rgba(255,255,255,0.08);
+                    border-radius:8px; background:rgba(255,255,255,0.05);">
                     <div style="font-size:2em; font-weight:700; color:{colour};">{score_val}</div>
-                    <div style="font-size:0.85em; font-weight:600; color:#374151;">{info['name']}</div>
-                    <div style="font-size:0.7em; color:#9ca3af; margin-top:4px;">{rationale[:60]}</div>
+                    <div style="font-size:0.85em; font-weight:600; color:#B0BEC5;">{info['name']}</div>
+                    <div style="font-size:0.7em; color:#8899AA; margin-top:4px;">{rationale[:60]}</div>
                     </div>""",
                     unsafe_allow_html=True,
                 )

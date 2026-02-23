@@ -65,12 +65,12 @@ st.markdown(
 
 # Goal connection callout
 st.markdown(
-    f"<div style='background:#faf5ff;border:1px solid #d8b4fe;border-radius:10px;"
+    f"<div style='background:rgba(124,58,237,0.08);border:1px solid rgba(216,180,254,0.3);border-radius:10px;"
     f"padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;'>"
     f"<span style='font-size:1.3em;'>\U0001f31f</span>"
     f"<div>"
     f"<strong style='color:#7c3aed;'>Goal 3: Train Our Superstars</strong>"
-    f"<span style='color:#6b7280;font-size:0.9em;'> &mdash; "
+    f"<span style='color:#8899AA;font-size:0.9em;'> &mdash; "
     f"Making every Harris Farmer more capable with AI, at their own pace.</span>"
     f"</div>"
     f"<div>{goal_badge_html('G3')}</div>"
@@ -175,7 +175,7 @@ with tabs[0]:
             f"<span>{level_icon} {level_name} ({min_xp} XP)</span>"
             f"<span>{xp_to_next} XP to next level</span>"
             f"</div>"
-            f"<div style='background:#e2e8f0;border-radius:8px;height:16px;margin:4px 0;'>"
+            f"<div style='background:rgba(255,255,255,0.1);border-radius:8px;height:16px;margin:4px 0;'>"
             f"<div style='background:linear-gradient(90deg, #059669, #34d399);width:{bar_pct}%;"
             f"height:100%;border-radius:8px;transition:width 0.3s;'></div></div>"
             f"</div>",
@@ -183,7 +183,7 @@ with tabs[0]:
         )
     elif level_name == "Legend":
         st.markdown(
-            "<div style='background:#fef3c7;border-radius:8px;padding:12px;text-align:center;'>"
+            "<div style='background:rgba(254,243,199,0.1);border-radius:8px;padding:12px;text-align:center;'>"
             "\U0001f3c6 <strong>You've reached Legend status!</strong> "
             "Keep earning XP to climb the leaderboard.</div>",
             unsafe_allow_html=True,
@@ -203,10 +203,10 @@ with tabs[0]:
     if ch:
         completed = ch.get("completed_today", False)
         diff_colors = {"beginner": "#22c55e", "intermediate": "#eab308", "advanced": "#ef4444"}
-        diff_color = diff_colors.get(ch.get("difficulty", "beginner"), "#6b7280")
+        diff_color = diff_colors.get(ch.get("difficulty", "beginner"), "#8899AA")
 
         st.markdown(
-            f"<div style='background:#f0fdf4;border:2px solid #bbf7d0;border-radius:12px;"
+            f"<div style='background:rgba(46,204,113,0.08);border:2px solid rgba(187,247,208,0.3);border-radius:12px;"
             f"padding:16px;margin-bottom:16px;'>"
             f"<div style='display:flex;justify-content:space-between;align-items:center;'>"
             f"<div style='font-weight:700;font-size:1.1em;color:#166534;'>"
@@ -217,7 +217,7 @@ with tabs[0]:
             f"<span style='background:#059669;color:white;padding:2px 10px;"
             f"border-radius:12px;font-size:0.8em;'>+{ch.get('xp_reward', 20)} XP</span>"
             f"</div></div>"
-            f"<div style='margin-top:8px;color:#374151;'>{ch['description']}</div>"
+            f"<div style='margin-top:8px;color:#B0BEC5;'>{ch['description']}</div>"
             f"</div>",
             unsafe_allow_html=True,
         )
@@ -262,8 +262,8 @@ with tabs[0]:
                 _b_icon = b.get("badge_icon", "\U0001f3c5")
                 _b_name = b.get("badge_name", "")
                 st.markdown(
-                    f"<div style='text-align:center;padding:8px;background:#f0fdf4;"
-                    f"border-radius:10px;border:1px solid #bbf7d0;margin-bottom:8px;'>"
+                    f"<div style='text-align:center;padding:8px;background:rgba(46,204,113,0.08);"
+                    f"border-radius:10px;border:1px solid rgba(187,247,208,0.3);margin-bottom:8px;'>"
                     f"<div style='font-size:1.6em;'>{_b_icon}</div>"
                     f"<div style='font-weight:600;font-size:0.85em;'>{_b_name}</div>"
                     f"</div>",
@@ -276,8 +276,8 @@ with tabs[0]:
             for i, b in enumerate(locked[:18]):
                 with lock_cols[i % len(lock_cols)]:
                     st.markdown(
-                        f"<div style='text-align:center;padding:8px;background:#f1f5f9;"
-                        f"border-radius:10px;border:1px solid #e2e8f0;margin-bottom:8px;"
+                        f"<div style='text-align:center;padding:8px;background:rgba(255,255,255,0.03);"
+                        f"border-radius:10px;border:1px solid rgba(255,255,255,0.08);margin-bottom:8px;"
                         f"opacity:0.5;'>"
                         f"<div style='font-size:1.6em;'>\U0001f512</div>"
                         f"<div style='font-weight:600;font-size:0.85em;color:#94a3b8;'>"
@@ -302,7 +302,7 @@ with tabs[0]:
             icon = action_icons.get(act.get("action_type", ""), "\u2728")
             st.markdown(
                 f"<div style='display:flex;align-items:center;gap:10px;padding:6px 0;"
-                f"border-bottom:1px solid #f1f5f9;font-size:0.9em;'>"
+                f"border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.9em;'>"
                 f"<span>{icon}</span>"
                 f"<span style='flex:1;'>{act.get('description', act.get('action_type', ''))}</span>"
                 f"<span style='color:#059669;font-weight:600;'>+{act.get('xp_amount', 0)} XP</span>"
@@ -342,8 +342,8 @@ with tabs[1]:
         uid = (user or {}).get("email", "anonymous")
         for entry in leaders:
             is_me = entry["user_id"] == uid
-            bg = "#f0fdf4" if is_me else "#ffffff"
-            border = "2px solid #22c55e" if is_me else "1px solid #f1f5f9"
+            bg = "rgba(46,204,113,0.08)" if is_me else "rgba(255,255,255,0.05)"
+            border = "2px solid #22c55e" if is_me else "1px solid rgba(255,255,255,0.05)"
             me_tag = " (You)" if is_me else ""
             display_name = entry["user_id"].split("@")[0] if "@" in entry["user_id"] else entry["user_id"]
             _e_icon = entry.get("level_icon", "\U0001f331")
@@ -354,13 +354,13 @@ with tabs[1]:
             st.markdown(
                 f"<div style='display:flex;align-items:center;padding:10px 14px;"
                 f"border-radius:8px;margin-bottom:6px;background:{bg};border:{border};'>"
-                f"<div style='width:40px;font-weight:700;font-size:1.2em;color:#6b7280;'>"
+                f"<div style='width:40px;font-weight:700;font-size:1.2em;color:#8899AA;'>"
                 f"#{entry['rank']}</div>"
                 f"<div style='width:36px;font-size:1.4em;text-align:center;'>"
                 f"{_e_icon}</div>"
                 f"<div style='flex:1;'>"
                 f"<div style='font-weight:600;'>{display_name}{me_tag}</div>"
-                f"<div style='font-size:0.8em;color:#6b7280;'>"
+                f"<div style='font-size:0.8em;color:#8899AA;'>"
                 f"{_e_level} | "
                 f"\U0001f525 {_e_streak} day streak</div>"
                 f"</div>"
@@ -404,7 +404,7 @@ with tabs[2]:
     )
     st.markdown(
         f"<div style='display:flex;border-radius:10px;overflow:hidden;"
-        f"margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,0.08);'>"
+        f"margin-bottom:24px;border:1px solid rgba(255,255,255,0.08);'>"
         f"{bar_html}</div>",
         unsafe_allow_html=True,
     )
@@ -421,7 +421,7 @@ with tabs[2]:
                 st.markdown(
                     f"<div style='background:{lv['color']};color:{lv['text_color']};"
                     f"border-radius:14px;padding:20px;min-height:180px;"
-                    f"box-shadow:0 2px 8px rgba(0,0,0,0.06);'>"
+                    f"border:1px solid rgba(255,255,255,0.08);'>"
                     f"<div style='font-size:2em;'>{lv['icon']}</div>"
                     f"<div style='font-size:1.2em;font-weight:700;'>{lv['name']}</div>"
                     f"<div style='font-size:0.85em;opacity:0.85;font-style:italic;'>"
@@ -464,12 +464,12 @@ with tabs[3]:
     for i, block in enumerate(BUILDING_BLOCKS):
         with bb_cols[i]:
             st.markdown(
-                f"<div style='background:#f0fdf4;border-radius:10px;padding:12px;"
-                f"text-align:center;border:1px solid #bbf7d0;min-height:100px;'>"
+                f"<div style='background:rgba(46,204,113,0.08);border-radius:10px;padding:12px;"
+                f"text-align:center;border:1px solid rgba(187,247,208,0.3);min-height:100px;'>"
                 f"<div style='font-size:1.4em;font-weight:700;color:#059669;'>"
                 f"{block['icon']}</div>"
                 f"<div style='font-weight:600;'>{block['name']}</div>"
-                f"<div style='font-size:0.8em;color:#555;'>{block['short']}</div>"
+                f"<div style='font-size:0.8em;color:#B0BEC5;'>{block['short']}</div>"
                 f"</div>",
                 unsafe_allow_html=True,
             )
@@ -486,7 +486,7 @@ with tabs[3]:
 
             st.markdown("**Harris Farm Example:**")
             st.markdown(
-                f"<div style='background:#f0fdf4;border-left:4px solid #059669;"
+                f"<div style='background:rgba(46,204,113,0.08);border-left:4px solid #059669;"
                 f"padding:12px 16px;border-radius:0 8px 8px 0;margin:8px 0;'>"
                 f"{pattern['hfm_example']}</div>",
                 unsafe_allow_html=True,
@@ -549,10 +549,10 @@ with tabs[4]:
             st.markdown(f"**Panelists:** {tier['panelists']}")
             st.markdown(
                 f"<div style='display:flex;gap:12px;margin:12px 0;'>"
-                f"<div style='flex:1;background:#f0fdf4;border-left:4px solid #22c55e;"
+                f"<div style='flex:1;background:rgba(46,204,113,0.08);border-left:4px solid #22c55e;"
                 f"padding:12px;border-radius:0 8px 8px 0;'>"
                 f"<strong>What 8+ looks like:</strong><br>{tier['what_8_looks_like']}</div>"
-                f"<div style='flex:1;background:#fef2f2;border-left:4px solid #ef4444;"
+                f"<div style='flex:1;background:rgba(239,68,68,0.08);border-left:4px solid #ef4444;"
                 f"padding:12px;border-radius:0 8px 8px 0;'>"
                 f"<strong>What 5 looks like:</strong><br>{tier['what_5_looks_like']}</div>"
                 f"</div>",
@@ -570,7 +570,7 @@ with tabs[4]:
     for ex in SCORE_THIS_EXERCISES:
         st.markdown(f"**{ex['label']}**")
         st.markdown(
-            f"<div style='background:#f8fafc;border:1px solid #e2e8f0;padding:14px;"
+            f"<div style='background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);padding:14px;"
             f"border-radius:8px;font-family:monospace;margin:8px 0;'>"
             f"{ex['prompt']}</div>",
             unsafe_allow_html=True,
@@ -592,7 +592,7 @@ with tabs[5]:
 
     # "Where should I start?" guide
     st.markdown(
-        "<div style='background:#f0fdf4;border:2px solid #bbf7d0;border-radius:12px;"
+        "<div style='background:rgba(46,204,113,0.08);border:2px solid rgba(187,247,208,0.3);border-radius:12px;"
         "padding:16px;margin-bottom:20px;'>"
         "<strong>Where should I start?</strong><br>"
         "\U0001f331 Never used AI? \u2192 <strong>AI Foundations</strong><br>"
@@ -620,7 +620,7 @@ with tabs[5]:
                 st.markdown(
                     f"<div style='background:{path['color']};color:{path['text_color']};"
                     f"border-radius:14px;padding:20px;min-height:200px;"
-                    f"box-shadow:0 2px 8px rgba(0,0,0,0.06);'>"
+                    f"border:1px solid rgba(255,255,255,0.08);'>"
                     f"<div style='font-size:1.15em;font-weight:700;'>{path['name']}</div>"
                     f"<div style='display:flex;gap:8px;margin:6px 0;flex-wrap:wrap;'>"
                     f"<span style='background:rgba(255,255,255,0.3);padding:2px 8px;"
@@ -666,7 +666,7 @@ with tabs[6]:
 
     # XP rewards callout
     st.markdown(
-        "<div style='background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;"
+        "<div style='background:rgba(254,243,199,0.1);border:1px solid rgba(251,191,36,0.3);border-radius:8px;"
         "padding:10px 14px;margin-bottom:16px;font-size:0.9em;'>"
         "\u2728 <strong>XP Rewards:</strong> "
         "Submit a challenge = <strong>+30 XP</strong> | "
@@ -681,7 +681,7 @@ with tabs[6]:
         ch = active[0]
         ch_badges = " ".join(goal_badge_html(g) for g in ch.get("goal_tags", []))
         st.markdown(
-            f"<div style='background:#f0fdf4;border:3px solid #22c55e;"
+            f"<div style='background:rgba(46,204,113,0.08);border:3px solid #22c55e;"
             f"border-radius:14px;padding:24px;margin-bottom:20px;'>"
             f"<div style='display:flex;justify-content:space-between;align-items:center;'>"
             f"<div style='font-size:1.3em;font-weight:700;color:#166534;'>"
@@ -690,7 +690,7 @@ with tabs[6]:
             f"border-radius:20px;font-size:0.8em;font-weight:600;'>"
             f"{ch['difficulty']}</span>"
             f"</div>"
-            f"<div style='margin-top:12px;color:#374151;line-height:1.6;'>"
+            f"<div style='margin-top:12px;color:#B0BEC5;line-height:1.6;'>"
             f"{ch['description']}</div>"
             f"<div style='margin-top:10px;'>{ch_badges}</div>"
             f"</div>",
@@ -736,11 +736,11 @@ with tabs[7]:
         st.markdown(
             f"<div style='border-left:4px solid #059669;padding:12px 16px;"
             f"margin:12px 0;border-radius:0 8px 8px 0;"
-            f"background:#f8fafc;'>"
+            f"background:rgba(255,255,255,0.03);'>"
             f"<div style='font-weight:700;font-size:1.05em;'>{item['name']}</div>"
             f"<div style='color:#059669;font-weight:600;font-size:0.9em;'>"
             f"{item['stat']}</div>"
-            f"<div style='font-size:0.9em;color:#555;margin-top:4px;'>"
+            f"<div style='font-size:0.9em;color:#B0BEC5;margin-top:4px;'>"
             f"{item['description']}</div>"
             f"<div style='margin-top:6px;'>{sc_badges}</div>"
             f"</div>",
@@ -773,11 +773,11 @@ with tabs[8]:
     for crit in DASHBOARD_QUALITY_RUBRIC["criteria"]:
         st.markdown(
             f"<div style='display:flex;align-items:center;padding:8px 0;"
-            f"border-bottom:1px solid #f1f5f9;'>"
+            f"border-bottom:1px solid rgba(255,255,255,0.05);'>"
             f"<div style='width:180px;font-weight:600;'>{crit['name']}</div>"
             f"<div style='width:40px;text-align:center;color:#059669;"
             f"font-weight:700;'>/{crit['max']}</div>"
-            f"<div style='flex:1;color:#555;font-size:0.9em;'>"
+            f"<div style='flex:1;color:#B0BEC5;font-size:0.9em;'>"
             f"{crit['description']}</div>"
             f"</div>",
             unsafe_allow_html=True,
@@ -792,11 +792,11 @@ with tabs[8]:
     for crit in PAGE_CONTENT_RUBRIC["criteria"]:
         st.markdown(
             f"<div style='display:flex;align-items:center;padding:8px 0;"
-            f"border-bottom:1px solid #f1f5f9;'>"
+            f"border-bottom:1px solid rgba(255,255,255,0.05);'>"
             f"<div style='width:180px;font-weight:600;'>{crit['name']}</div>"
             f"<div style='width:40px;text-align:center;color:#059669;"
             f"font-weight:700;'>/{crit['max']}</div>"
-            f"<div style='flex:1;color:#555;font-size:0.9em;'>"
+            f"<div style='flex:1;color:#B0BEC5;font-size:0.9em;'>"
             f"{crit['description']}</div>"
             f"</div>",
             unsafe_allow_html=True,
@@ -821,10 +821,10 @@ with tabs[8]:
             f"<strong>{name}</strong>"
             f"<span style='color:{bar_color};font-weight:700;'>{data['score']}/5</span>"
             f"</div>"
-            f"<div style='background:#e2e8f0;border-radius:4px;height:8px;margin:4px 0;'>"
+            f"<div style='background:rgba(255,255,255,0.1);border-radius:4px;height:8px;margin:4px 0;'>"
             f"<div style='background:{bar_color};width:{bar_pct}%;height:100%;"
             f"border-radius:4px;'></div></div>"
-            f"<div style='font-size:0.8em;color:#666;'>{data['rationale']}</div>"
+            f"<div style='font-size:0.8em;color:#8899AA;'>{data['rationale']}</div>"
             f"</div>",
             unsafe_allow_html=True,
         )
@@ -1020,7 +1020,7 @@ with tabs[9]:
 
 st.markdown("---")
 st.markdown(
-    "<div style='background:linear-gradient(135deg, #f0fdf4, #dcfce7);"
+    "<div style='background:linear-gradient(135deg, rgba(46,204,113,0.08), rgba(46,204,113,0.04));"
     "border-radius:12px;padding:20px;text-align:center;margin:16px 0;'>"
     "<div style='font-size:1.3em;font-weight:700;color:#166534;'>"
     "\"Every expert was once a beginner.\"</div>"

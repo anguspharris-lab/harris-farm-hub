@@ -20,7 +20,7 @@ HUBS = [
         "pillar": "Pillar 1",
         "pillar_title": "For The Greater Goodness",
         "icon": "\U0001f331",
-        "color": "#16a34a",
+        "color": "#2ECC71",
         "dashboards": [
             ("Greater Goodness", 8516, "\U0001f331", "Our purpose, sustainability & community impact"),
         ],
@@ -32,8 +32,7 @@ HUBS = [
         "icon": "\U0001f465",
         "color": "#7c3aed",
         "dashboards": [
-            ("Customers", 8507, "\U0001f465", "Customer insights, trends & loyalty readiness"),
-            ("Market Share", 8508, "\U0001f5fa\ufe0f", "Postcode share, penetration, competitor benchmarks"),
+            ("Customer Hub", 8507, "\U0001f465", "Customer intelligence & competitive position — POS + CBAS"),
         ],
     },
     {
@@ -73,7 +72,7 @@ HUBS = [
         "pillar": "Pillar 5",
         "pillar_title": "Tomorrow's Business, Built Better",
         "icon": "\U0001f680",
-        "color": "#4ba021",
+        "color": "#2ECC71",
         "dashboards": [
             ("Analytics Engine", 8521, "\U0001f52c", "Data Intelligence command center"),
             ("Agent Hub", 8520, "\U0001f916", "Scoreboard, Arena, Agent Network"),
@@ -81,6 +80,16 @@ HUBS = [
             ("AI Adoption", 8519, "\U0001f4ca", "Organisation-wide AI platform usage"),
             ("Trending", 8506, "\U0001f4c8", "System analytics & usage"),
             ("Mission Control", 8515, "\U0001f3af", "Documentation, data catalog, governance"),
+        ],
+    },
+    {
+        "name": "Way of Working",
+        "pillar": "",
+        "pillar_title": "Way of Working",
+        "icon": "\U0001f4cb",
+        "color": "#6366f1",
+        "dashboards": [
+            ("Way of Working", 8524, "\U0001f4cb", "Strategic initiative tracking via Monday.com"),
         ],
     },
 ]
@@ -123,6 +132,7 @@ _PORT_TO_SLUG = {
     8517: "plu-intel",
     8518: "academy",
     8519: "ai-adoption",
+    8524: "way-of-working",
 }
 
 

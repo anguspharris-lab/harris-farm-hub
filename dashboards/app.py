@@ -44,61 +44,118 @@ _DIR = Path(__file__).resolve().parent
 _home = st.Page(str(_DIR / "landing.py"), title="Home", icon="\U0001f34e", default=True)
 
 _pages = {
+    # Strategy overview (all 5 pillars, initiatives, goals)
+    "strategy-overview": st.Page(str(_DIR / "strategy_overview.py"), title="Strategy Overview", icon="\U0001f3af", url_path="strategy-overview"),
+    # Pillar intro pages (strategic front doors)
+    "intro-people": st.Page(str(_DIR / "intro_p3_people.py"), title="Growing Legends", icon="\U0001f393", url_path="intro-people"),
+    "intro-operations": st.Page(str(_DIR / "intro_p4_operations.py"), title="Operations HQ", icon="\U0001f4ca", url_path="intro-operations"),
+    "intro-digital": st.Page(str(_DIR / "intro_p5_digital.py"), title="Digital & AI HQ", icon="\U0001f680", url_path="intro-digital"),
+    # Way of Working
+    "way-of-working": st.Page(str(_DIR / "way_of_working" / "dashboard.py"), title="Way of Working", icon="\U0001f4cb", url_path="way-of-working"),
+    # Marketing Assets
+    "marketing-assets": st.Page(str(_DIR / "marketing_assets.py"), title="Marketing Assets", icon="\U0001f4c1", url_path="marketing-assets"),
+    # P1 Greater Goodness
     "greater-goodness": st.Page(str(_DIR / "greater_goodness.py"), title="Greater Goodness", icon="\U0001f331", url_path="greater-goodness"),
-    "customers": st.Page(str(_DIR / "customer_dashboard.py"), title="Customers", icon="\U0001f465", url_path="customers"),
-    "market-share": st.Page(str(_DIR / "market_share_dashboard.py"), title="Market Share", icon="\U0001f5fa\ufe0f", url_path="market-share"),
-    "learning-centre": st.Page(str(_DIR / "learning_centre.py"), title="Learning Centre", icon="\U0001f393", url_path="learning-centre"),
+    # P2 Customer
+    "customers": st.Page(str(_DIR / "customer_hub" / "dashboard.py"), title="Customer Hub", icon="\U0001f465", url_path="customers"),
+    # P3 People
+    "skills-academy": st.Page(str(_DIR / "skills_academy.py"), title="Skills Academy", icon="\U0001f4da", url_path="skills-academy"),
     "hub-assistant": st.Page(str(_DIR / "chatbot_dashboard.py"), title="Hub Assistant", icon="\U0001f4ac", url_path="hub-assistant"),
+    "the-paddock": st.Page(str(_DIR / "the_paddock.py"), title="The Paddock", icon="\U0001f331", url_path="the-paddock"),
+    "prompt-builder": st.Page(str(_DIR / "prompt_builder.py"), title="Prompt Engine", icon="\U0001f680", url_path="prompt-builder"),
+    "approvals": st.Page(str(_DIR / "approvals_dashboard.py"), title="Approvals", icon="\u2705", url_path="approvals"),
+    "the-rubric": st.Page(str(_DIR / "rubric_dashboard.py"), title="The Rubric", icon="\u2696\ufe0f", url_path="the-rubric"),
+    # P4 Operations
     "sales": st.Page(str(_DIR / "sales_dashboard.py"), title="Sales", icon="\U0001f4ca", url_path="sales"),
     "profitability": st.Page(str(_DIR / "profitability_dashboard.py"), title="Profitability", icon="\U0001f4b0", url_path="profitability"),
-    "transport": st.Page(str(_DIR / "transport_dashboard.py"), title="Transport", icon="\U0001f69a", url_path="transport"),
+    "revenue-bridge": st.Page(str(_DIR / "revenue_bridge_dashboard.py"), title="Revenue Bridge", icon="\U0001f4c9", url_path="revenue-bridge"),
     "store-ops": st.Page(str(_DIR / "store_ops_dashboard.py"), title="Store Ops", icon="\U0001f3ea", url_path="store-ops"),
     "buying-hub": st.Page(str(_DIR / "buying_hub_dashboard.py"), title="Buying Hub", icon="\U0001f6d2", url_path="buying-hub"),
     "product-intel": st.Page(str(_DIR / "product_intel_dashboard.py"), title="Product Intel", icon="\U0001f50d", url_path="product-intel"),
     "plu-intel": st.Page(str(_DIR / "plu_intel_dashboard.py"), title="PLU Intelligence", icon="\U0001f4ca", url_path="plu-intel"),
-    "prompt-builder": st.Page(str(_DIR / "prompt_builder.py"), title="Prompt Engine", icon="\U0001f680", url_path="prompt-builder"),
-    "approvals": st.Page(str(_DIR / "approvals_dashboard.py"), title="Approvals", icon="\u2705", url_path="approvals"),
-    "the-rubric": st.Page(str(_DIR / "rubric_dashboard.py"), title="The Rubric", icon="\u2696\ufe0f", url_path="the-rubric"),
-    "trending": st.Page(str(_DIR / "trending_dashboard.py"), title="Trending", icon="\U0001f4c8", url_path="trending"),
-    "revenue-bridge": st.Page(str(_DIR / "revenue_bridge_dashboard.py"), title="Revenue Bridge", icon="\U0001f4c9", url_path="revenue-bridge"),
-    "mission-control": st.Page(str(_DIR / "hub_portal.py"), title="Mission Control", icon="\U0001f3af", url_path="mission-control"),
-    "agent-hub": st.Page(str(_DIR / "agent_hub.py"), title="Agent Hub", icon="\U0001f916", url_path="agent-hub"),
+    "transport": st.Page(str(_DIR / "transport_dashboard.py"), title="Transport", icon="\U0001f69a", url_path="transport"),
+    # P5 Digital & AI
+    "workflow-engine": st.Page(str(_DIR / "workflow_engine.py"), title="Workflow Engine", icon="\u2699\ufe0f", url_path="workflow-engine"),
     "analytics-engine": st.Page(str(_DIR / "analytics_engine.py"), title="Analytics Engine", icon="\U0001f52c", url_path="analytics-engine"),
+    "agent-hub": st.Page(str(_DIR / "agent_hub.py"), title="Agent Hub", icon="\U0001f916", url_path="agent-hub"),
     "agent-ops": st.Page(str(_DIR / "agent_operations.py"), title="Agent Operations", icon="\U0001f6e1\ufe0f", url_path="agent-ops"),
     "ai-adoption": st.Page(str(_DIR / "ai_adoption" / "dashboard.py"), title="AI Adoption", icon="\U0001f4ca", url_path="ai-adoption"),
-    "academy": st.Page(str(_DIR / "growing_legends_academy.py"), title="Academy", icon="\U0001f31f", url_path="academy"),
-    "the-paddock": st.Page(str(_DIR / "the_paddock.py"), title="The Paddock", icon="\U0001f331", url_path="the-paddock"),
-    "workflow-engine": st.Page(str(_DIR / "workflow_engine.py"), title="Workflow Engine", icon="\u2699\ufe0f", url_path="workflow-engine"),
+    "trending": st.Page(str(_DIR / "trending_dashboard.py"), title="Trending", icon="\U0001f4c8", url_path="trending"),
+    "mission-control": st.Page(str(_DIR / "hub_portal.py"), title="Mission Control", icon="\U0001f3af", url_path="mission-control"),
+    "adoption": st.Page(str(_DIR / "adoption_dashboard.py"), title="Adoption", icon="\U0001f4c8", url_path="adoption"),
 }
 
-# Pillar groupings for navigation
-_PILLARS = [
-    {"name": "Greater Goodness", "icon": "\U0001f331", "color": "#16a34a",
-     "slugs": ["greater-goodness"]},
-    {"name": "Customer", "icon": "\U0001f465", "color": "#7c3aed",
-     "slugs": ["customers", "market-share"]},
-    {"name": "People", "icon": "\U0001f393", "color": "#059669",
-     "slugs": ["learning-centre", "the-paddock", "academy", "prompt-builder", "approvals", "the-rubric", "hub-assistant"]},
-    {"name": "Operations", "icon": "\U0001f4ca", "color": "#d97706",
-     "slugs": ["sales", "profitability", "revenue-bridge", "store-ops", "buying-hub", "product-intel", "plu-intel", "transport"]},
-    {"name": "Digital & AI", "icon": "\U0001f680", "color": "#4ba021",
-     "slugs": ["workflow-engine", "analytics-engine", "agent-hub", "agent-ops", "ai-adoption", "trending", "mission-control"]},
+# Section groupings for navigation (purpose-based, not pillar-based)
+_SECTIONS = [
+    {"name": "Strategy", "icon": "\U0001f3af", "color": "#2ECC71",
+     "slugs": ["strategy-overview", "greater-goodness", "intro-people",
+               "intro-operations", "intro-digital", "way-of-working"]},
+    {"name": "AI Skills", "icon": "\u2b50", "color": "#8B5CF6",
+     "slugs": ["skills-academy", "the-paddock", "prompt-builder", "hub-assistant"]},
+    {"name": "Operations", "icon": "\U0001f4ca", "color": "#F1C40F",
+     "slugs": ["customers", "sales", "profitability", "revenue-bridge",
+               "store-ops", "buying-hub", "product-intel", "plu-intel",
+               "transport", "analytics-engine"]},
+    {"name": "Back of House", "icon": "\u2699\ufe0f", "color": "#8899AA",
+     "is_muted": True,
+     "slugs": ["the-rubric", "approvals", "workflow-engine", "agent-ops",
+               "mission-control", "ai-adoption", "adoption", "trending",
+               "agent-hub", "marketing-assets"]},
 ]
 
-# Store page objects in session_state so landing.py can use st.page_link()
+# Store page objects and sections in session_state so landing.py can use them
 st.session_state["_pages"] = _pages
 st.session_state["_home"] = _home
+st.session_state["_sections"] = _SECTIONS
 
-nav = st.navigation(
-    {
-        "": [_home],
-        "For The Greater Goodness": [_pages["greater-goodness"]],
-        "Smashing It for the Customer": [_pages["customers"], _pages["market-share"]],
-        "Growing Legendary Leadership": [_pages["learning-centre"], _pages["the-paddock"], _pages["academy"], _pages["prompt-builder"], _pages["approvals"], _pages["the-rubric"], _pages["hub-assistant"]],
-        "Today's Business, Done Better": [_pages["sales"], _pages["profitability"], _pages["revenue-bridge"], _pages["store-ops"], _pages["buying-hub"], _pages["product-intel"], _pages["plu-intel"], _pages["transport"]],
-        "Tomorrow's Business, Built Better": [_pages["workflow-engine"], _pages["analytics-engine"], _pages["agent-hub"], _pages["agent-ops"], _pages["ai-adoption"], _pages["trending"], _pages["mission-control"]],
-    }
-)
+# ---------------------------------------------------------------------------
+# Role-based navigation filtering
+# ---------------------------------------------------------------------------
+from shared.role_config import get_role_pages
+
+_hub_role = user.get("hub_role", "user") if isinstance(user, dict) else "user"
+
+_allowed_slugs = get_role_pages(_hub_role)  # None means "all"
+
+if _allowed_slugs is not None:
+    _allowed_set = set(_allowed_slugs)
+    _visible_pages = {k: v for k, v in _pages.items() if k in _allowed_set}
+else:
+    _visible_pages = _pages
+
+# Build nav dict — only include sections that have at least one visible page
+_full_nav = {
+    "": [_home],
+    "Strategy": [
+        "strategy-overview", "greater-goodness",
+        "intro-people", "intro-operations", "intro-digital",
+        "way-of-working",
+    ],
+    "AI Skills": [
+        "skills-academy", "the-paddock", "prompt-builder", "hub-assistant",
+    ],
+    "Operations": [
+        "customers", "sales", "profitability", "revenue-bridge",
+        "store-ops", "buying-hub", "product-intel", "plu-intel",
+        "transport", "analytics-engine",
+    ],
+    "Back of House": [
+        "the-rubric", "approvals", "workflow-engine", "agent-ops",
+        "mission-control", "ai-adoption", "adoption", "trending",
+        "agent-hub", "marketing-assets",
+    ],
+}
+
+_nav_dict = {}
+for section, slugs_or_pages in _full_nav.items():
+    if section == "":
+        _nav_dict[""] = [_home]
+        continue
+    filtered = [_visible_pages[s] for s in slugs_or_pages if s in _visible_pages]
+    if filtered:
+        _nav_dict[section] = filtered
+
+nav = st.navigation(_nav_dict)
 
 # ---------------------------------------------------------------------------
 # Navigation header — uses st.page_link (preserves session, no page reload)
@@ -106,56 +163,144 @@ nav = st.navigation(
 
 current_slug = nav.url_path
 
-# Build slug-to-pillar lookup
-_slug_to_pillar = {}
-for p in _PILLARS:
-    for s in p["slugs"]:
-        _slug_to_pillar[s] = p
+# Log page view (fire-and-forget — never block rendering)
+_auth_user = st.session_state.get("auth_user")
+if _auth_user and current_slug:
+    try:
+        import requests as _pv_req
+        _pv_api = os.getenv("API_URL", "http://localhost:8000")
+        _pv_req.post(
+            f"{_pv_api}/api/analytics/pageview",
+            json={
+                "user_id": _auth_user.get("email", ""),
+                "user_email": _auth_user.get("email", ""),
+                "page_slug": current_slug or "home",
+                "user_role": _auth_user.get("hub_role", "user"),
+            },
+            timeout=1,
+        )
+    except Exception:
+        pass
 
-active_pillar = _slug_to_pillar.get(current_slug)
+# Build slug-to-section lookup
+_slug_to_section = {}
+for _sec in _SECTIONS:
+    for s in _sec["slugs"]:
+        _slug_to_section[s] = _sec
+
+active_section = _slug_to_section.get(current_slug)
 
 # Logo
 _logo = _DIR.parent / "assets" / "logo.png"
 if _logo.exists():
     st.image(str(_logo), width=180)
 
-# Row 1: Home + 5 pillar tabs using st.page_link (session-safe)
-cols = st.columns(1 + len(_PILLARS))
+# Row 1: Home + section tabs (only those with visible pages)
+_visible_sections = [s for s in _SECTIONS if any(slug in _visible_pages for slug in s["slugs"])]
+
+cols = st.columns(1 + len(_visible_sections))
 
 with cols[0]:
     st.page_link(_home, label="\U0001f34e Home", use_container_width=True)
 
-for i, pillar in enumerate(_PILLARS):
+for i, section in enumerate(_visible_sections):
     with cols[i + 1]:
-        first_slug = pillar["slugs"][0]
-        label = f"{pillar['icon']} {pillar['name']}"
-        st.page_link(_pages[first_slug], label=label, use_container_width=True)
+        first_slug = next((s for s in section["slugs"] if s in _visible_pages), section["slugs"][0])
+        label = f"{section['icon']} {section['name']}"
+        st.page_link(_visible_pages.get(first_slug, _pages[first_slug]), label=label, use_container_width=True)
 
-# Row 2: Sub-pages within active pillar
-if active_pillar and len(active_pillar["slugs"]) > 1:
-    sub_cols = st.columns(len(active_pillar["slugs"]))
-    for j, slug in enumerate(active_pillar["slugs"]):
-        with sub_cols[j]:
-            page = _pages[slug]
-            is_current = slug == current_slug
-            if is_current:
-                st.markdown(
-                    f"<div style='text-align:center;padding:8px 6px;"
-                    f"border-bottom:3px solid {active_pillar['color']};"
-                    f"font-weight:600;color:{active_pillar['color']};'>"
-                    f"{page.title}</div>",
-                    unsafe_allow_html=True,
-                )
-            else:
-                st.page_link(page, label=page.title, use_container_width=True)
+# De-emphasize Back of House tab (last muted section)
+if _visible_sections and _visible_sections[-1].get("is_muted"):
+    _n = 1 + len(_visible_sections)
+    st.markdown(
+        f"<style>"
+        f"[data-testid='stHorizontalBlock']:first-of-type "
+        f"> [data-testid='column']:nth-child({_n}) button {{"
+        f"  color: #8899AA !important;"
+        f"  font-size: 0.88em !important;"
+        f"  opacity: 0.5;"
+        f"}}"
+        f"[data-testid='stHorizontalBlock']:first-of-type "
+        f"> [data-testid='column']:nth-child({_n}) button:hover {{"
+        f"  opacity: 1;"
+        f"  color: #B0BEC5 !important;"
+        f"}}"
+        f"</style>",
+        unsafe_allow_html=True,
+    )
+
+# Row 2: Sub-pages within active section (only visible ones)
+if active_section:
+    _visible_sub = [s for s in active_section["slugs"] if s in _visible_pages]
+    # Hide marketing-assets from sub-nav (URL-only access)
+    _visible_sub = [s for s in _visible_sub if s != "marketing-assets"]
+    if len(_visible_sub) > 1:
+        sub_cols = st.columns(len(_visible_sub))
+        _sec_color = active_section["color"]
+        for j, slug in enumerate(_visible_sub):
+            with sub_cols[j]:
+                page = _visible_pages[slug]
+                is_current = slug == current_slug
+                # Truncate long titles when many sub-tabs
+                _title = page.title
+                if len(_visible_sub) > 7 and len(_title) > 12:
+                    _title = _title[:11] + "\u2026"
+                if is_current:
+                    st.markdown(
+                        f"<div style='text-align:center;padding:8px 6px;"
+                        f"border-bottom:3px solid {_sec_color};"
+                        f"font-weight:600;color:{_sec_color};'>"
+                        f"{_title}</div>",
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    st.page_link(page, label=_title, use_container_width=True)
 
 st.markdown("---")
 
 # ---------------------------------------------------------------------------
-# Sidebar: Academy XP widget (persistent across all pages)
+# Sidebar: Role selector + Academy XP widget
 # ---------------------------------------------------------------------------
 
 _auth_user = st.session_state.get("auth_user")
+
+# Role selector — shown when user has default role
+if _auth_user and _auth_user.get("hub_role", "user") == "user":
+    with st.sidebar:
+        from shared.role_config import get_all_roles, get_role_display_name
+        _role_options = get_all_roles()
+        _role_keys = [k for k, _ in _role_options]
+        _role_labels = [n for _, n in _role_options]
+        st.markdown(
+            "<div style='background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);"
+            "border-radius:8px;padding:10px 12px;margin-bottom:10px;'>"
+            "<div style='font-weight:600;font-size:0.85em;color:#2ECC71;'>"
+            "Personalise your Hub</div>"
+            "<div style='font-size:0.78em;color:#8899AA;'>"
+            "Select your role to see relevant pages only.</div>"
+            "</div>",
+            unsafe_allow_html=True,
+        )
+        _chosen_idx = st.selectbox(
+            "I am a...", range(len(_role_labels)),
+            format_func=lambda i: _role_labels[i],
+            key="role_selector",
+        )
+        if st.button("Set My Role", key="set_role_btn", use_container_width=True):
+            _chosen_role = _role_keys[_chosen_idx]
+            try:
+                import requests as _role_req
+                _role_api = os.getenv("API_URL", "http://localhost:8000")
+                _role_req.put(
+                    f"{_role_api}/api/auth/role",
+                    json={"email": _auth_user["email"], "hub_role": _chosen_role},
+                    timeout=3,
+                )
+                _auth_user["hub_role"] = _chosen_role
+                st.session_state["auth_user"] = _auth_user
+                st.rerun()
+            except Exception:
+                st.error("Could not save role. Try again.")
 if _auth_user:
     _uid = _auth_user.get("email", "")
     if _uid:
@@ -186,11 +331,12 @@ if _auth_user:
             _total = _xp.get("total_xp", 0)
             with st.sidebar:
                 st.markdown(
-                    f"<div style='background:linear-gradient(135deg, #059669, #047857);"
+                    f"<div style='background:rgba(46,204,113,0.12);"
+                    f"border:1px solid rgba(46,204,113,0.25);"
                     f"color:white;border-radius:10px;padding:10px 14px;margin-bottom:12px;'>"
-                    f"<div style='font-weight:700;font-size:0.95em;'>"
+                    f"<div style='font-weight:700;font-size:0.95em;color:#2ECC71;'>"
                     f"{_lvl_icon} {_lvl_name}</div>"
-                    f"<div style='font-size:0.8em;opacity:0.9;'>"
+                    f"<div style='font-size:0.8em;color:#B0BEC5;'>"
                     f"{_total:,} XP</div>"
                     f"</div>",
                     unsafe_allow_html=True,

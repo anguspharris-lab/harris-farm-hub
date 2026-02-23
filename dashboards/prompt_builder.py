@@ -358,7 +358,7 @@ with st.sidebar:
                     avg = s.get("rubric_average") or 0
                     verdict = s.get("rubric_verdict", "")
                     status = s.get("status", "draft")
-                    colour = "#16a34a" if status == "approved" else "#d97706" if status == "pending_approval" else "#6b7280"
+                    colour = "#2ECC71" if status == "approved" else "#d97706" if status == "pending_approval" else "#6b7280"
                     st.markdown(
                         f"<div style='padding:4px 0; border-bottom:1px solid #f3f4f6;'>"
                         f"<strong>{s.get('task_type', 'custom')}</strong><br/>"
@@ -492,7 +492,7 @@ with tabs[0]:
             "Vendor": 5, "Property": 5, "Competitor": 4, "Projects": 5, "Utilities": 6,
         }
         avg_reliability = sum(source_reliability.get(s, 5) for s in data_sources) / len(data_sources)
-        conf_colour = "#16a34a" if avg_reliability >= 8 else "#d97706" if avg_reliability >= 6 else "#dc2626"
+        conf_colour = "#2ECC71" if avg_reliability >= 8 else "#d97706" if avg_reliability >= 6 else "#dc2626"
         st.markdown(
             f"<div style='background:{conf_colour}10; border:1px solid {conf_colour}; "
             f"padding:8px 12px; border-radius:6px; margin:8px 0;'>"

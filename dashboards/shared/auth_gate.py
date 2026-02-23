@@ -35,6 +35,13 @@ _LOGIN_CSS = """
         visibility: hidden !important;
     }
 
+    /* Dark navy background */
+    .main, [data-testid="stAppViewContainer"],
+    [data-testid="stHeader"],
+    [data-testid="stAppViewContainer"] > section > div {
+        background-color: #0B1628 !important;
+    }
+
     /* Center content and constrain width */
     .block-container {
         max-width: 440px !important;
@@ -42,10 +49,23 @@ _LOGIN_CSS = """
         padding-top: 4rem !important;
     }
 
+    /* Text colors for dark bg */
+    .main p, .main li, .main span, .main div,
+    .main label, .stCaption, small { color: #B0BEC5 !important; }
+    .main strong, .main b, .main h1, .main h2, .main h3 { color: #FFFFFF !important; }
+
+    /* Input fields on dark */
+    .stTextInput > div > div {
+        background-color: #1A2D50 !important;
+        border-color: rgba(255,255,255,0.12) !important;
+    }
+    .stTextInput input { color: #FFFFFF !important; }
+    .stTextInput label { color: #B0BEC5 !important; }
+
     /* Green submit button */
     .stFormSubmitButton > button,
     [data-testid="stFormSubmitButton"] > button {
-        background-color: #4ba021 !important;
+        background-color: #2ECC71 !important;
         color: white !important;
         border: none !important;
         border-radius: 8px !important;
@@ -56,13 +76,20 @@ _LOGIN_CSS = """
 
     .stFormSubmitButton > button:hover,
     [data-testid="stFormSubmitButton"] > button:hover {
-        background-color: #3d8a1b !important;
+        background-color: #27AE60 !important;
     }
 
     /* Toggle button (Create Account / Sign In) */
     .stButton > button {
         border-radius: 8px !important;
+        color: #B0BEC5 !important;
     }
+
+    /* Dividers */
+    hr { border-color: rgba(255,255,255,0.08) !important; }
+
+    /* Checkbox */
+    [data-testid="stCheckbox"] label { color: #8899AA !important; }
 </style>
 """
 
@@ -80,7 +107,7 @@ def require_login(api_url=None):
 
     # Dev bypass
     if os.getenv("AUTH_ENABLED", "true").lower() in ("false", "0", "no"):
-        return {"id": 0, "email": "dev@local", "name": "Developer", "role": "admin"}
+        return {"id": 0, "email": "dev@local", "name": "Developer", "role": "admin", "hub_role": "admin"}
 
     # Fast path: already logged in this session — no API call needed
     if st.session_state.get("auth_token") and st.session_state.get("auth_user"):
@@ -132,10 +159,12 @@ def _render_auth_page(api_url):
     st.markdown(
         '<div style="text-align:center;margin-bottom:2rem;">'
         '<div style="font-size:3rem;margin-bottom:0.5rem;">&#127822;</div>'
-        '<div style="font-size:1.75rem;font-weight:700;color:#171819;'
-        'letter-spacing:-0.5px;margin-bottom:0.25rem;">Harris Farm Hub</div>'
-        '<div style="font-size:0.8rem;color:#888;'
-        'letter-spacing:2px;text-transform:uppercase;font-weight:400;">'
+        '<div style="font-size:1.75rem;font-weight:700;color:#FFFFFF;'
+        'font-family:Georgia,serif;letter-spacing:-0.5px;margin-bottom:0.25rem;">'
+        'Harris Farm Hub</div>'
+        '<div style="font-size:0.8rem;color:#8899AA;'
+        'letter-spacing:2px;text-transform:uppercase;font-weight:400;'
+        'font-family:Trebuchet MS,sans-serif;">'
         'AI Centre of Excellence</div>'
         '</div>',
         unsafe_allow_html=True,
@@ -155,8 +184,9 @@ def _render_auth_page(api_url):
 
     # Footer
     st.markdown(
-        '<div style="text-align:center;margin-top:2rem;color:#aaa;'
-        'font-size:0.75rem;">Harris Farm Markets &middot; Powered by AI</div>',
+        '<div style="text-align:center;margin-top:2rem;color:#8899AA;'
+        'font-size:0.75rem;font-family:Trebuchet MS,sans-serif;">'
+        'Harris Farm Markets &middot; Powered by AI</div>',
         unsafe_allow_html=True,
     )
 

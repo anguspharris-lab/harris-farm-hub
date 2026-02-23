@@ -568,7 +568,7 @@ with tab3:
                 avg = agent.get("avg_score", 0)
                 color = "green" if avg >= 8 else "orange" if avg >= 6 else "red"
                 st.markdown(
-                    "<div style='text-align:center;border:1px solid #e5e7eb;"
+                    "<div style='text-align:center;border:1px solid rgba(255,255,255,0.08);"
                     "border-radius:8px;padding:16px;margin:4px'>"
                     "<b>{}</b><br>"
                     "<span style='font-size:2em;color:{}'>{:.1f}</span>"

@@ -262,7 +262,7 @@ def _render_component(
             position: relative;
             overflow: hidden;
         }}
-        #vdb-mic-btn:hover {{ background: #e8f5e9; border-color: #4ba021; }}
+        #vdb-mic-btn:hover {{ background: #e8f5e9; border-color: #2ECC71; }}
         #vdb-mic-btn.listening {{
             background: #ef4444;
             border-color: #dc2626;
@@ -274,7 +274,7 @@ def _render_component(
             animation: vdb-spin 1s infinite linear;
         }}
         #vdb-mic-btn.speaking {{
-            background: #4ba021;
+            background: #2ECC71;
             border-color: #3d8a1b;
             animation: vdb-pulse 1s infinite;
         }}

@@ -16,3 +16,5 @@ bcrypt
 duckdb
 openpyxl
 pyyaml
+folium
+streamlit-folium

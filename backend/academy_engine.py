@@ -29,15 +29,31 @@ XP_ACTIONS = {
     "first_prompt": 10,
     "showcase_submit": 25,
     "quality_review": 10,
+    # Skills Academy + Paddock actions
+    "skills_assessment_pass": 75,
+    "skills_assessment_submit": 15,
+    "paddock_attempt": 20,
+    "paddock_tier_up": 50,
+    "flag_submit": 5,
+    # v3 — Placement, adaptive, social
+    "placement_complete": 25,
+    "mindset_assessment": 20,
+    "micro_challenge": 15,
+    "peer_battle_submit": 10,
+    "peer_battle_win": 30,
+    "exercise_stretch": 10,
+    "exercise_elite": 20,
+    "skip_ahead_pass": 50,
+    "l6_enterprise": 100,
 }
 
 LEVEL_THRESHOLDS = [
-    {"name": "Seed",       "icon": "\U0001f331", "min_xp": 0,    "max_xp": 99},
-    {"name": "Sprout",     "icon": "\U0001f33f", "min_xp": 100,  "max_xp": 299},
-    {"name": "Grower",     "icon": "\U0001f33b", "min_xp": 300,  "max_xp": 599},
-    {"name": "Harvester",  "icon": "\U0001f9fa", "min_xp": 600,  "max_xp": 999},
-    {"name": "Cultivator", "icon": "\U0001f333", "min_xp": 1000, "max_xp": 1499},
-    {"name": "Legend",     "icon": "\U0001f3c6", "min_xp": 1500, "max_xp": None},
+    {"name": "Seed",        "icon": "\U0001f331", "min_xp": 0,    "max_xp": 49},
+    {"name": "Sprout",      "icon": "\U0001f33f", "min_xp": 50,   "max_xp": 149},
+    {"name": "Growing",     "icon": "\U0001f33b", "min_xp": 150,  "max_xp": 399},
+    {"name": "Harvest",     "icon": "\U0001f33e", "min_xp": 400,  "max_xp": 799},
+    {"name": "Canopy",      "icon": "\U0001f333", "min_xp": 800,  "max_xp": 1499},
+    {"name": "Root System", "icon": "\U0001f3c6", "min_xp": 1500, "max_xp": None},
 ]
 
 STREAK_CONFIG = {
@@ -60,12 +76,12 @@ BADGE_DEFINITIONS = [
     {"code": "streak_7",         "name": "7-Day Streak",       "icon": "\U0001f525",   "desc": "One full week streak", "category": "streak"},
     {"code": "streak_14",        "name": "14-Day Streak",      "icon": "\U0001f4aa",   "desc": "Two-week commitment", "category": "streak"},
     {"code": "streak_30",        "name": "Monthly Legend",     "icon": "\U0001f451",   "desc": "30-day engagement streak", "category": "streak"},
-    # Levels
+    # Levels (v3: Seed→Sprout→Growing→Harvest→Canopy→Root System)
     {"code": "level_sprout",     "name": "Sprouted!",          "icon": "\U0001f33f",   "desc": "Reached Sprout level", "category": "level"},
-    {"code": "level_grower",     "name": "Growing Strong",     "icon": "\U0001f33b",   "desc": "Reached Grower level", "category": "level"},
-    {"code": "level_harvester",  "name": "Reaping Results",    "icon": "\U0001f9fa",   "desc": "Reached Harvester level", "category": "level"},
-    {"code": "level_cultivator", "name": "Shaping the Farm",   "icon": "\U0001f333",   "desc": "Reached Cultivator level", "category": "level"},
-    {"code": "level_legend",     "name": "Growing Legend",     "icon": "\U0001f3c6",   "desc": "Achieved Legend status!", "category": "level"},
+    {"code": "level_growing",    "name": "Growing Strong",     "icon": "\U0001f33b",   "desc": "Reached Growing level", "category": "level"},
+    {"code": "level_harvest",    "name": "Reaping Results",    "icon": "\U0001f33e",   "desc": "Reached Harvest level", "category": "level"},
+    {"code": "level_canopy",     "name": "Under the Canopy",   "icon": "\U0001f333",   "desc": "Reached Canopy level", "category": "level"},
+    {"code": "level_root_system","name": "Root System",        "icon": "\U0001f3c6",   "desc": "Achieved Root System status!", "category": "level"},
     # Learning
     {"code": "modules_3",        "name": "Keen Learner",       "icon": "\U0001f4da",   "desc": "Completed 3 Learning Centre modules", "category": "learning"},
     {"code": "modules_6",        "name": "Halfway There",      "icon": "\U0001f393",   "desc": "Completed 6 Learning Centre modules", "category": "learning"},
@@ -79,6 +95,26 @@ BADGE_DEFINITIONS = [
     # Daily challenges
     {"code": "daily_5",          "name": "5 Dailies",          "icon": "\U0001f4c5",   "desc": "Completed 5 daily challenges", "category": "achievement"},
     {"code": "daily_20",         "name": "Daily Devotee",      "icon": "\U0001f31f",   "desc": "Completed 20 daily challenges", "category": "achievement"},
+    # Skills Academy badges
+    {"code": "l_series_complete",  "name": "L-Series Graduate",  "icon": "\U0001f9e0", "desc": "Completed all 5 Core AI Skills modules", "category": "learning"},
+    {"code": "d_series_complete",  "name": "D-Series Graduate",  "icon": "\U0001f4ca", "desc": "Completed all 5 Data + AI modules", "category": "learning"},
+    {"code": "skills_master",      "name": "Skills Master",      "icon": "\U0001f396\ufe0f", "desc": "Completed all 10 Skills Academy modules", "category": "achievement"},
+    # Paddock badges
+    {"code": "paddock_harvester",  "name": "Paddock Harvester",  "icon": "\U0001f9d1\u200d\U0001f33e", "desc": "Reached Harvester tier in The Paddock", "category": "achievement"},
+    {"code": "paddock_legend",     "name": "Paddock Legend",     "icon": "\U0001f3c6", "desc": "Reached Legend tier in The Paddock", "category": "achievement"},
+    {"code": "jedi_council",       "name": "Jedi Council",       "icon": "\u2b50",    "desc": "Entered the Top 5 on The Paddock leaderboard", "category": "achievement"},
+    # Flag contributor
+    {"code": "flag_contributor",   "name": "Flag Contributor",   "icon": "\U0001f6a9", "desc": "Submitted 5 flags to help improve the Hub", "category": "achievement"},
+    # v3 — Placement, adaptive, social badges
+    {"code": "placement_done",     "name": "Placed!",            "icon": "\U0001f3af", "desc": "Completed the Placement Challenge", "category": "achievement"},
+    {"code": "adaptive_stretch",   "name": "Stretch Runner",     "icon": "\U0001f4aa", "desc": "Completed 5 stretch-tier exercises", "category": "achievement"},
+    {"code": "adaptive_elite",     "name": "Elite Performer",    "icon": "\U0001f947", "desc": "Completed 5 elite-tier exercises", "category": "achievement"},
+    {"code": "skip_ahead",         "name": "Skip Ahead!",        "icon": "\u23e9",     "desc": "Passed a skip-ahead challenge", "category": "achievement"},
+    {"code": "mindset_assessed",   "name": "Self Aware",         "icon": "\U0001f9e0", "desc": "Completed first mindset assessment", "category": "achievement"},
+    {"code": "hipo_flagged",       "name": "High Potential",     "icon": "\u2b50",     "desc": "Detected as HiPo (composite > 7.0)", "category": "achievement"},
+    {"code": "peer_battler",       "name": "Battle Ready",       "icon": "\u2694\ufe0f","desc": "Won 3 peer battles", "category": "achievement"},
+    {"code": "micro_streak_7",     "name": "Quick Draw",         "icon": "\u26a1",     "desc": "7 consecutive daily micro-challenges", "category": "achievement"},
+    {"code": "l6_starter",         "name": "Enterprise Thinker", "icon": "\U0001f3e2", "desc": "Started L6 enterprise content", "category": "achievement"},
 ]
 
 
@@ -104,7 +140,7 @@ def get_level_for_xp(total_xp):
                 "progress_pct": progress_pct,
                 "xp_to_next": max(xp_to_next, 0),
             }
-    return {"level_index": 5, "name": "Legend", "icon": "\U0001f3c6",
+    return {"level_index": 5, "name": "Root System", "icon": "\U0001f3c6",
             "min_xp": 1500, "max_xp": None, "progress_pct": 100.0, "xp_to_next": 0}
 
 
@@ -428,9 +464,9 @@ def check_and_award_badges(db_path, user_id):
 
     # Level badges
     level_badges = {
-        "Sprout": "level_sprout", "Grower": "level_grower",
-        "Harvester": "level_harvester", "Cultivator": "level_cultivator",
-        "Legend": "level_legend",
+        "Sprout": "level_sprout", "Growing": "level_growing",
+        "Harvest": "level_harvest", "Canopy": "level_canopy",
+        "Root System": "level_root_system",
     }
     for lv_name, badge_code in level_badges.items():
         lv_data = next((l for l in LEVEL_THRESHOLDS if l["name"] == lv_name), None)
@@ -468,6 +504,22 @@ def check_and_award_badges(db_path, user_id):
         eligible.append("first_arena")
     if action_counts.get("arena_submit", 0) >= 3:
         eligible.append("arena_3")
+
+    # v3 badges
+    if action_counts.get("placement_complete", 0) >= 1:
+        eligible.append("placement_done")
+    if action_counts.get("exercise_stretch", 0) >= 5:
+        eligible.append("adaptive_stretch")
+    if action_counts.get("exercise_elite", 0) >= 5:
+        eligible.append("adaptive_elite")
+    if action_counts.get("skip_ahead_pass", 0) >= 1:
+        eligible.append("skip_ahead")
+    if action_counts.get("mindset_assessment", 0) >= 1:
+        eligible.append("mindset_assessed")
+    if action_counts.get("peer_battle_win", 0) >= 3:
+        eligible.append("peer_battler")
+    if action_counts.get("l6_enterprise", 0) >= 1:
+        eligible.append("l6_starter")
 
     # Award new badges
     newly_awarded = []

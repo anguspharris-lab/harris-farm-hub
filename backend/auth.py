@@ -114,6 +114,13 @@ def init_auth_db(db_path=None):
         )
     """)
 
+    # Safe migration: add hub_role column if it doesn't exist
+    existing_cols = [
+        row[1] for row in c.execute("PRAGMA table_info(users)").fetchall()
+    ]
+    if "hub_role" not in existing_cols:
+        c.execute("ALTER TABLE users ADD COLUMN hub_role TEXT NOT NULL DEFAULT 'user'")
+
     conn.commit()
 
     # Sync site password from env var on every startup
@@ -229,7 +236,7 @@ def authenticate_user(email, password):
     """Authenticate user by email and password. Returns user dict or None."""
     conn = _get_conn()
     row = conn.execute(
-        "SELECT id, email, name, password_hash, role, active FROM users WHERE email = ?",
+        "SELECT id, email, name, password_hash, role, active, hub_role FROM users WHERE email = ?",
         (email,),
     ).fetchone()
     conn.close()
@@ -246,6 +253,7 @@ def authenticate_user(email, password):
         "email": row["email"],
         "name": row["name"],
         "role": row["role"],
+        "hub_role": row["hub_role"] or "user",
     }
 
 
@@ -362,7 +370,8 @@ def verify_session(token):
     conn = _get_conn()
     row = conn.execute(
         """
-        SELECT s.id, s.user_id, s.expires_at, u.email, u.name, u.role, u.active
+        SELECT s.id, s.user_id, s.expires_at, u.email, u.name, u.role, u.active,
+               u.hub_role
         FROM sessions s
         JOIN users u ON s.user_id = u.id
         WHERE s.token = ?
@@ -389,6 +398,7 @@ def verify_session(token):
         "email": row["email"],
         "name": row["name"],
         "role": row["role"],
+        "hub_role": row["hub_role"] or "user",
     }
 
 

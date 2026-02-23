@@ -1,669 +1,787 @@
 """
-The Paddock -- AI Skills Assessment for Harris Farm
-Native Streamlit dashboard: welcome, register, 5 assessment modules, results, admin.
+The Paddock -- Progressive Difficulty AI Skills Challenge
+How far can you go? One wrong answer and it's game over.
 """
-import json
+
+import os
 import time
+from datetime import datetime
+from typing import Optional
 
 import pandas as pd
-import plotly.graph_objects as go
+import requests
 import streamlit as st
 
 from shared.styles import render_header, render_footer
-from shared.paddock_questions import (
-    STORE_NAMES, get_departments, suggest_role_tier, ROLE_TIER_LABELS,
-    TECH_COMFORT_OPTIONS, AI_EXPERIENCE_OPTIONS,
-    MODULE_IDS, MODULE_META, MATURITY_LEVELS,
-    get_module_questions, score_question, get_maturity,
-    calculate_overall, get_recommendations,
-)
-import paddock_layer
 
-# ============================================================================
-# INIT — detect returning user
-# ============================================================================
+# ---------------------------------------------------------------------------
+# Config
+# ---------------------------------------------------------------------------
+
+API_URL = os.getenv("API_URL", "http://localhost:8000")
+
+# Tier constants (duplicated from paddock_engine for display only)
+TIER_MAP = {
+    0: "Unranked",
+    1: "Seed", 2: "Seed",
+    3: "Sprout", 4: "Sprout",
+    5: "Grower", 6: "Grower",
+    7: "Harvester", 8: "Harvester",
+    9: "Cultivator",
+    10: "Legend",
+}
+TIER_ICONS = {
+    "Unranked": "\u2753",
+    "Seed": "\U0001f331",
+    "Sprout": "\U0001f33f",
+    "Grower": "\U0001f33b",
+    "Harvester": "\U0001f9d1\u200d\U0001f33e",
+    "Cultivator": "\U0001f30d",
+    "Legend": "\U0001f3c6",
+}
+TIER_ORDER = ["Unranked", "Seed", "Sprout", "Grower", "Harvester", "Cultivator", "Legend"]
+
+BRAND_GREEN = "#2ECC71"
+
+
+# ---------------------------------------------------------------------------
+# API helpers
+# ---------------------------------------------------------------------------
+
+def _api_post(path, json_body=None):
+    # type: (str, Optional[dict]) -> Optional[dict]
+    """Fire a POST request to the backend. Returns JSON dict or None."""
+    try:
+        url = "{}/api/paddock{}".format(API_URL, path)
+        resp = requests.post(url, json=json_body or {}, timeout=5)
+        if resp.ok:
+            return resp.json()
+        return None
+    except Exception:
+        return None
+
+
+def _api_get(path):
+    # type: (str) -> Optional[dict]
+    """Fire a GET request to the backend. Returns JSON dict/list or None."""
+    try:
+        url = "{}/api/paddock{}".format(API_URL, path)
+        resp = requests.get(url, timeout=5)
+        if resp.ok:
+            return resp.json()
+        return None
+    except Exception:
+        return None
+
+
+# ---------------------------------------------------------------------------
+# Utility helpers
+# ---------------------------------------------------------------------------
+
+def _tier_for_level(level):
+    # type: (int) -> str
+    return TIER_MAP.get(level, "Unranked")
+
+
+def _icon_for_tier(tier_name):
+    # type: (str) -> str
+    return TIER_ICONS.get(tier_name, "\u2753")
+
+
+def _format_time(seconds):
+    # type: (Optional[int]) -> str
+    if not seconds or seconds <= 0:
+        return "--"
+    mins = seconds // 60
+    secs = seconds % 60
+    if mins > 0:
+        return "{}m {}s".format(mins, secs)
+    return "{}s".format(secs)
+
+
+def _tier_colour(tier_name):
+    # type: (str) -> str
+    colours = {
+        "Unranked": "#94a3b8",
+        "Seed": "#84cc16",
+        "Sprout": "#22c55e",
+        "Grower": "#f59e0b",
+        "Harvester": "#f97316",
+        "Cultivator": "#8b5cf6",
+        "Legend": "#eab308",
+    }
+    return colours.get(tier_name, "#94a3b8")
+
+
+def _reset_playing_state():
+    """Clear all playing-related session state."""
+    keys_to_clear = [
+        "paddock_attempt_id",
+        "paddock_current_level",
+        "paddock_current_question",
+        "paddock_answered_questions",
+        "paddock_result",
+        "paddock_answer_result",
+        "paddock_start_time",
+    ]
+    for k in keys_to_clear:
+        if k in st.session_state:
+            del st.session_state[k]
+
+
+# ---------------------------------------------------------------------------
+# State initialisation
+# ---------------------------------------------------------------------------
 
 user = st.session_state.get("auth_user")
+user_email = (user or {}).get("email", "")
 
-if "paddock_step" not in st.session_state:
-    hub_email = (user or {}).get("email")
-    if hub_email:
-        existing = paddock_layer.get_user_by_hub_id(hub_email)
-        if existing:
-            result = paddock_layer.get_results(existing["id"])
-            if result:
-                st.session_state.paddock_step = "results"
-                st.session_state.paddock_user_id = existing["id"]
-            else:
-                # Resume incomplete assessment
-                st.session_state.paddock_step = "assess"
-                st.session_state.paddock_user_id = existing["id"]
-                _u = existing
-                # Find first incomplete module
-                for idx, mod in enumerate(MODULE_IDS):
-                    qs = get_module_questions(mod, _u["role_tier"])
-                    answered = paddock_layer.count_answered(_u["id"], mod)
-                    if answered < len(qs):
-                        st.session_state.paddock_module_idx = idx
-                        st.session_state.paddock_question_idx = answered
-                        st.session_state.paddock_show_intro = (answered == 0)
-                        break
-                else:
-                    st.session_state.paddock_module_idx = 0
-                    st.session_state.paddock_question_idx = 0
-                    st.session_state.paddock_show_intro = True
-        else:
-            st.session_state.paddock_step = "welcome"
-    else:
-        st.session_state.paddock_step = "welcome"
+if "paddock_state" not in st.session_state:
+    st.session_state["paddock_state"] = "welcome"
 
 
-# ============================================================================
+# ===================================================================
 # WELCOME SCREEN
-# ============================================================================
+# ===================================================================
 
 def render_welcome():
+    """Welcome screen with hero banner, start button, history & leaderboard."""
+
+    # --- Hero banner ---
     st.markdown(
-        "<div style='background:linear-gradient(135deg, #4ba021 0%, #3d8a1b 100%);"
+        "<div style='background:linear-gradient(135deg, {} 0%, #3d8a1b 100%);"
         "color:white;padding:60px 32px;border-radius:14px;text-align:center;"
-        "margin:20px 0;'>"
-        "<div style='font-size:4em;margin-bottom:16px;'>\U0001f331</div>"
+        "margin:0 0 24px;'>".format(BRAND_GREEN)
+        + "<div style='font-size:4em;margin-bottom:12px;'>\U0001f331</div>"
         "<div style='font-size:2.4em;font-weight:800;margin-bottom:8px;'>"
         "The Paddock</div>"
-        "<div style='font-size:1.1em;opacity:0.9;max-width:520px;margin:0 auto 24px;'>"
-        "G'day! Welcome to The Paddock -- where Harris Farmers grow their AI skills."
-        "</div>"
-        "<div style='font-size:0.9em;opacity:0.7;'>"
-        "5 quick modules | About 15-20 minutes | Fun, not a test</div>"
+        "<div style='font-size:1.15em;opacity:0.92;max-width:560px;"
+        "margin:0 auto 12px;'>"
+        "G'day! Welcome to The Paddock &mdash; Harris Farm's AI skills "
+        "challenge.</div>"
+        "<div style='font-size:0.95em;opacity:0.75;max-width:520px;"
+        "margin:0 auto;'>"
+        "How far can you go? Answer questions of increasing difficulty. "
+        "One wrong answer and it's game over!</div>"
         "</div>",
         unsafe_allow_html=True,
     )
 
+    # --- Tier progression strip ---
+    tier_labels = [
+        ("\U0001f331", "Seed", "1-2"),
+        ("\U0001f33f", "Sprout", "3-4"),
+        ("\U0001f33b", "Grower", "5-6"),
+        ("\U0001f9d1\u200d\U0001f33e", "Harvester", "7-8"),
+        ("\U0001f30d", "Cultivator", "9"),
+        ("\U0001f3c6", "Legend", "10"),
+    ]
+    cols = st.columns(len(tier_labels))
+    for i, (icon, name, levels) in enumerate(tier_labels):
+        with cols[i]:
+            st.markdown(
+                "<div style='text-align:center;'>"
+                "<div style='font-size:1.8em;'>{}</div>"
+                "<div style='font-weight:700;font-size:0.9em;'>{}</div>"
+                "<div style='color:#888;font-size:0.75em;'>Lv {}</div>"
+                "</div>".format(icon, name, levels),
+                unsafe_allow_html=True,
+            )
+
     st.markdown("")
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("\U0001f331 Let's Get Started", use_container_width=True, type="primary"):
-            st.session_state.paddock_step = "register"
-            st.rerun()
 
-    # Admin shortcut
-    if (user or {}).get("role") == "admin":
-        st.markdown("---")
-        if st.button("\U0001f33f Admin: The Greenhouse", use_container_width=True):
-            st.session_state.paddock_step = "admin"
-            st.rerun()
+    # --- Personal best ---
+    if user_email:
+        best = _api_get("/user/{}/best".format(user_email))
+        if best:
+            tier_name = best.get("tier_name", "Unranked")
+            tier_icon = _icon_for_tier(tier_name)
+            best_level = best.get("max_level_reached", 0)
+            st.markdown(
+                "<div style='text-align:center;padding:16px;background:#f0f7ed;"
+                "border-radius:10px;border:2px solid {};margin-bottom:20px;'>"
+                "<div style='font-size:0.85em;color:#666;'>Your Personal Best</div>"
+                "<div style='font-size:1.6em;font-weight:800;margin:4px 0;'>"
+                "{} {} &mdash; Level {}</div>"
+                "</div>".format(BRAND_GREEN, tier_icon, tier_name, best_level),
+                unsafe_allow_html=True,
+            )
 
-
-# ============================================================================
-# REGISTRATION SCREEN
-# ============================================================================
-
-def render_register():
-    st.markdown("### \U0001f331 Tell us about yourself")
-    st.caption("So we can tailor the assessment to your role.")
-
-    with st.form("paddock_register", clear_on_submit=False):
-        name = st.text_input("Full Name", placeholder="e.g. Jane Smith")
-        employee_id = st.text_input("Employee ID (optional)", placeholder='e.g. HFM1234 or "Guest"')
-
-        store = st.selectbox("Store / Location", [""] + STORE_NAMES)
-
-        depts = get_departments(store) if store else []
-        department = st.selectbox("Department", [""] + depts) if depts else ""
-
-        suggested = suggest_role_tier(department) if department else 3
-        role_tier = st.selectbox(
-            "Your Role Level",
-            options=list(ROLE_TIER_LABELS.keys()),
-            format_func=lambda k: f"{k}. {ROLE_TIER_LABELS[k]}",
-            index=suggested - 1,
-        )
-
-        st.markdown("**How comfortable are you with technology?**")
-        tc_labels = {o["value"]: f"{o['emoji']} {o['label']}" for o in TECH_COMFORT_OPTIONS}
-        tech_comfort = st.select_slider(
-            "Tech comfort", options=[1, 2, 3, 4, 5],
-            format_func=lambda v: tc_labels[v], value=3,
-            label_visibility="collapsed",
-        )
-
-        st.markdown("**Have you used any AI tools before?**")
-        ai_exp = st.radio(
-            "AI experience",
-            [o["value"] for o in AI_EXPERIENCE_OPTIONS],
-            format_func=lambda v: next(o["label"] for o in AI_EXPERIENCE_OPTIONS if o["value"] == v),
-            label_visibility="collapsed",
-        )
-
-        submitted = st.form_submit_button("\U0001f680 Start the Assessment", use_container_width=True)
-
-        if submitted:
-            if not name or not store or not department:
-                st.error("Please fill in your name, store, and department.")
-            else:
-                hub_email = (user or {}).get("email")
-                p_user = paddock_layer.register_user(
-                    name=name, store=store, department=department,
-                    role_tier=role_tier, hub_user_id=hub_email,
-                    employee_id=employee_id or None,
-                    tech_comfort=tech_comfort, ai_experience=ai_exp,
-                )
-                st.session_state.paddock_user_id = p_user["id"]
-                st.session_state.paddock_step = "assess"
-                st.session_state.paddock_module_idx = 0
-                st.session_state.paddock_question_idx = 0
-                st.session_state.paddock_show_intro = True
-                st.session_state.paddock_start_time = time.time()
-                st.rerun()
-
-
-# ============================================================================
-# ASSESSMENT SCREEN
-# ============================================================================
-
-def render_assessment():
-    p_user = paddock_layer.get_user(st.session_state.paddock_user_id)
-    if not p_user:
-        st.error("User not found. Please start over.")
-        return
-
-    module_idx = st.session_state.get("paddock_module_idx", 0)
-    question_idx = st.session_state.get("paddock_question_idx", 0)
-    module_id = MODULE_IDS[module_idx]
-    meta = MODULE_META[module_id]
-    questions = get_module_questions(module_id, p_user["role_tier"])
-
-    # Overall progress
-    total_q = sum(len(get_module_questions(m, p_user["role_tier"])) for m in MODULE_IDS)
-    done_q = sum(
-        len(get_module_questions(MODULE_IDS[i], p_user["role_tier"]))
-        for i in range(module_idx)
-    ) + question_idx
-    st.progress(done_q / total_q if total_q > 0 else 0,
-                text=f"Module {module_idx + 1} of 5: {meta['title']}")
-
-    # Module intro
-    if st.session_state.get("paddock_show_intro", True):
-        _render_module_intro(meta, module_idx, len(questions))
-        return
-
-    # Render question
-    if question_idx < len(questions):
-        _render_question(questions[question_idx], module_id, p_user, question_idx, len(questions))
-    else:
-        _advance_module(module_idx, p_user)
-
-
-def _render_module_intro(meta, module_idx, q_count):
-    st.markdown(
-        f"<div style='text-align:center;padding:40px 20px;'>"
-        f"<div style='font-size:4em;'>{meta['icon']}</div>"
-        f"<div style='font-size:1.6em;font-weight:700;margin:12px 0 4px;'>"
-        f"Module {module_idx + 1}: {meta['title']}</div>"
-        f"<div style='color:#666;margin-bottom:8px;'>{meta['subtitle']}</div>"
-        f"<div style='color:#999;font-size:0.9em;'>{q_count} questions</div>"
-        f"</div>",
-        unsafe_allow_html=True,
-    )
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("Let's Go \U0001f331", use_container_width=True, type="primary"):
-            st.session_state.paddock_show_intro = False
-            st.session_state.paddock_start_time = time.time()
-            st.rerun()
-
-
-def _render_question(question, module_id, p_user, q_idx, q_total):
-    qtype = question["type"]
-    qid = question["id"]
-
-    st.markdown(f"**Question {q_idx + 1} of {q_total}**")
-    st.markdown(f"### {question['text']}")
-
-    answer = None
-
-    if qtype == "multiple_choice":
-        options = question["options"]
-        answer = st.radio(
-            "Select one:", [o["value"] for o in options],
-            format_func=lambda v: next(o["label"] for o in options if o["value"] == v),
-            key=f"q_{qid}", label_visibility="collapsed",
-        )
-
-    elif qtype == "multiple_select":
-        options = question["options"]
-        max_sel = question.get("max_select")
-        if max_sel:
-            st.caption(f"Select up to {max_sel}")
-        selected = []
-        for o in options:
-            if st.checkbox(o["label"], key=f"q_{qid}_{o['value']}"):
-                selected.append(o["value"])
-        if max_sel and len(selected) > max_sel:
-            st.warning(f"Please select at most {max_sel} options.")
+    # --- Start button ---
+    col_l, col_mid, col_r = st.columns([1, 2, 1])
+    with col_mid:
+        if st.button(
+            "\U0001f331 Start Challenge",
+            use_container_width=True,
+            type="primary",
+            key="btn_start_challenge",
+        ):
+            _start_new_attempt()
             return
-        answer = selected if selected else None
 
-    elif qtype == "prompt_comparison":
-        options = question["options"]
-        col_a, col_b = st.columns(2)
-        with col_a:
-            st.markdown(
-                f"<div style='background:#f0f7ed;padding:16px;border-radius:10px;"
-                f"border:2px solid #ddd;min-height:120px;'>"
-                f"<strong>{options[0]['label']}</strong><br><br>"
-                f"<em>\"{options[0]['prompt']}\"</em></div>",
-                unsafe_allow_html=True,
-            )
-        with col_b:
-            st.markdown(
-                f"<div style='background:#f0f7ed;padding:16px;border-radius:10px;"
-                f"border:2px solid #ddd;min-height:120px;'>"
-                f"<strong>{options[1]['label']}</strong><br><br>"
-                f"<em>\"{options[1]['prompt']}\"</em></div>",
-                unsafe_allow_html=True,
-            )
-        answer = st.radio(
-            "Which is better?",
-            [o["value"] for o in options],
-            format_func=lambda v: next(o["label"] for o in options if o["value"] == v),
-            key=f"q_{qid}", horizontal=True,
-        )
-
-    elif qtype == "slider":
-        answer = st.slider(
-            "Your answer",
-            min_value=question.get("min", 1),
-            max_value=question.get("max", 10),
-            value=5, key=f"q_{qid}",
-            label_visibility="collapsed",
-        )
-        labels = question.get("labels", {})
-        if labels:
-            cols = st.columns(len(labels))
-            for i, (val, label) in enumerate(sorted(labels.items())):
-                with cols[i]:
-                    st.caption(f"{val}: {label}")
-
-    elif qtype == "free_text":
-        answer = st.text_area(
-            "Your answer",
-            placeholder=question.get("placeholder", "Type your answer..."),
-            key=f"q_{qid}", label_visibility="collapsed",
-        )
-
-    # Submit button
     st.markdown("")
-    if st.button("Next \u2192", use_container_width=True, type="primary", key=f"next_{qid}"):
-        if answer is None or answer == [] or answer == "":
-            if qtype not in ("free_text",):
-                st.warning("Please select an answer before continuing.")
-                return
 
-        # Score and save
-        elapsed = int(time.time() - st.session_state.get("paddock_start_time", time.time()))
-        score = score_question(question, answer)
-        paddock_layer.save_response(
-            st.session_state.paddock_user_id, module_id,
-            qid, answer, score, elapsed,
-        )
-
-        # Advance
-        module_idx = st.session_state.paddock_module_idx
-        questions = get_module_questions(module_id, p_user["role_tier"])
-
-        if q_idx + 1 < len(questions):
-            st.session_state.paddock_question_idx = q_idx + 1
-        else:
-            _advance_module(module_idx, p_user)
-
-        st.session_state.paddock_start_time = time.time()
-        st.rerun()
-
-
-def _advance_module(module_idx, p_user):
-    if module_idx + 1 < len(MODULE_IDS):
-        st.session_state.paddock_module_idx = module_idx + 1
-        st.session_state.paddock_question_idx = 0
-        st.session_state.paddock_show_intro = True
+    # --- Tabs: History & Leaderboard ---
+    if user_email:
+        tab_hist, tab_lb = st.tabs(["My History", "Leaderboard"])
+        with tab_hist:
+            _render_history_tab()
+        with tab_lb:
+            _render_leaderboard()
     else:
-        # All done — calculate results
-        result = paddock_layer.calculate_results(st.session_state.paddock_user_id)
-        # Learning Centre integration
-        hub_email = (user or {}).get("email")
-        paddock_layer.update_learning_progress(hub_email, result["maturity"]["level"])
-        st.session_state.paddock_step = "results"
+        _render_leaderboard()
+
+
+def _start_new_attempt():
+    """Call API to start an attempt, transition to playing state."""
+    _reset_playing_state()
+    data = _api_post("/attempt/start", {"user_id": user_email})
+    if not data or "attempt_id" not in data:
+        st.error("Could not start the challenge. Please try again.")
+        return
+
+    st.session_state["paddock_attempt_id"] = data["attempt_id"]
+    st.session_state["paddock_current_level"] = data.get("current_level", 1)
+    st.session_state["paddock_current_question"] = data.get("question")
+    st.session_state["paddock_answered_questions"] = []
+    st.session_state["paddock_answer_result"] = None
+    st.session_state["paddock_start_time"] = time.time()
+    st.session_state["paddock_state"] = "playing"
     st.rerun()
 
 
-# ============================================================================
-# RESULTS SCREEN
-# ============================================================================
+# ===================================================================
+# PLAYING SCREEN
+# ===================================================================
 
-def render_results():
-    p_user = paddock_layer.get_user(st.session_state.paddock_user_id)
-    result = paddock_layer.get_results(st.session_state.paddock_user_id)
-    if not p_user or not result:
-        st.error("Results not found.")
+def render_playing():
+    """Active quiz: one question at a time with progressive difficulty."""
+    attempt_id = st.session_state.get("paddock_attempt_id")
+    current_level = st.session_state.get("paddock_current_level", 1)
+    question = st.session_state.get("paddock_current_question")
+    answer_result = st.session_state.get("paddock_answer_result")
+
+    if not attempt_id or not question:
+        st.error("Something went wrong. Returning to welcome.")
+        st.session_state["paddock_state"] = "welcome"
+        _reset_playing_state()
+        st.rerun()
         return
 
-    maturity = get_maturity(result["overall_score"])
-
-    # Hero badge
+    # --- Progress header ---
+    tier_name = _tier_for_level(current_level)
+    tier_icon = _icon_for_tier(tier_name)
     st.markdown(
-        f"<div style='text-align:center;padding:30px 20px;background:linear-gradient(135deg, #4ba021 0%, #3d8a1b 100%);"
-        f"color:white;border-radius:14px;margin-bottom:20px;'>"
-        f"<div style='font-size:3.5em;'>{maturity['icon']}</div>"
-        f"<div style='font-size:1.8em;font-weight:800;margin:8px 0;'>"
-        f"You're a {maturity['name']}!</div>"
-        f"<div style='font-size:1.0em;opacity:0.9;max-width:500px;margin:0 auto;'>"
-        f"{maturity['message']}</div>"
-        f"<div style='font-size:2.5em;font-weight:900;margin-top:16px;'>"
-        f"{result['overall_score']}<span style='font-size:0.4em;opacity:0.7;'>/100</span></div>"
-        f"</div>",
+        "<div style='text-align:center;margin-bottom:4px;'>"
+        "<span style='font-size:1.3em;font-weight:700;'>"
+        "Level {} &mdash; {} Zone {}</span>"
+        "</div>".format(current_level, tier_name, tier_icon),
+        unsafe_allow_html=True,
+    )
+    st.progress(current_level / 10)
+
+    # --- Show answer feedback if we just answered ---
+    if answer_result is not None:
+        _render_answer_feedback(answer_result)
+        return
+
+    # --- Question card ---
+    _render_question_card(question, attempt_id, current_level)
+
+
+def _render_question_card(question, attempt_id, current_level):
+    """Render the question and submit button."""
+    q_id = question.get("id")
+    q_text = question.get("question_text", "")
+    q_type = question.get("question_type", "multiple_choice")
+    options = question.get("options", [])
+    topic = question.get("topic", "")
+
+    # Difficulty badge
+    diff_level = question.get("difficulty_level", current_level)
+    tier_for_q = _tier_for_level(diff_level)
+    badge_colour = _tier_colour(tier_for_q)
+    st.markdown(
+        "<div style='margin-bottom:12px;'>"
+        "<span style='background:{};color:white;padding:4px 12px;"
+        "border-radius:12px;font-size:0.8em;font-weight:600;'>"
+        "Level {} &bull; {}</span>"
+        "</div>".format(badge_colour, diff_level, topic.replace("_", " ").title() if topic else "General"),
         unsafe_allow_html=True,
     )
 
-    # Radar chart
-    col_radar, col_breakdown = st.columns([1, 1])
+    # Question text
+    st.markdown(
+        "<div style='font-size:1.25em;font-weight:600;line-height:1.5;"
+        "margin-bottom:16px;'>{}</div>".format(q_text),
+        unsafe_allow_html=True,
+    )
 
-    with col_radar:
-        st.markdown("#### Your AI Skills Profile")
-        categories = ["Awareness", "Usage", "Critical Thinking", "Applied Skills", "Confidence"]
-        values = [
-            result["awareness_score"], result["usage_score"],
-            result["critical_score"], result["applied_score"],
-            result["confidence_score"],
-        ]
-        fig = go.Figure(data=go.Scatterpolar(
-            r=values + [values[0]],
-            theta=categories + [categories[0]],
-            fill="toself",
-            fillcolor="rgba(75, 160, 33, 0.2)",
-            line=dict(color="#4ba021", width=2),
-        ))
-        fig.update_layout(
-            polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
-            showlegend=False, height=350, margin=dict(l=60, r=60, t=30, b=30),
+    # Widget key includes level to avoid DuplicateWidgetID
+    widget_key = "paddock_answer_lv{}_q{}".format(current_level, q_id)
+
+    answer = None
+
+    if q_type == "multiple_choice" and options:
+        opt_values = [o["value"] for o in options]
+        opt_labels = {o["value"]: o["label"] for o in options}
+        answer = st.radio(
+            "Select your answer:",
+            opt_values,
+            format_func=lambda v, lbl=opt_labels: lbl.get(v, v),
+            key=widget_key,
+            label_visibility="collapsed",
         )
-        st.plotly_chart(fig, use_container_width=True)
-
-    with col_breakdown:
-        st.markdown("#### Module Breakdown")
-        module_names = {
-            "awareness": "\U0001f41d Awareness",
-            "usage": "\U0001f331 Usage",
-            "critical": "\U0001f50d Critical Thinking",
-            "applied": "\U0001f33e Applied Skills",
-            "confidence": "\U0001f33b Confidence",
-        }
-        for mod in MODULE_IDS:
-            score_val = result.get(f"{mod}_score", 0)
-            st.markdown(f"**{module_names[mod]}** — {score_val}/100")
-            st.progress(score_val / 100)
-
-    # Learning path recommendations
-    st.markdown("---")
-    st.markdown("### \U0001f4da Your Learning Path")
-    st.caption(f"Personalised for a {ROLE_TIER_LABELS.get(p_user['role_tier'], 'team member')} at {maturity['name']} level")
-
-    recs = get_recommendations(maturity["level"], p_user["role_tier"])
-    if recs:
-        cols = st.columns(min(len(recs), 3))
-        type_icons = {"video": "\U0001f3ac", "hands-on": "\U0001f9ea", "article": "\U0001f4d6", "workshop": "\U0001f3af"}
-        for i, rec in enumerate(recs):
-            with cols[i % len(cols)]:
-                icon = type_icons.get(rec["type"], "\U0001f4d6")
-                st.markdown(
-                    f"<div style='background:#f0f7ed;padding:16px;border-radius:10px;"
-                    f"border-left:4px solid #4ba021;margin-bottom:12px;'>"
-                    f"<div style='font-size:0.8em;color:#4ba021;font-weight:600;'>"
-                    f"{icon} {rec['type'].upper()} | {rec['duration']}</div>"
-                    f"<div style='font-weight:700;margin:6px 0 4px;'>{rec['title']}</div>"
-                    f"<div style='font-size:0.85em;color:#666;'>{rec['description']}</div>"
-                    f"</div>",
-                    unsafe_allow_html=True,
-                )
-
-    # Feedback form
-    st.markdown("---")
-    st.markdown("### \U0001f4ac How was the experience?")
-
-    existing_fb = paddock_layer.get_feedback(st.session_state.paddock_user_id)
-    if existing_fb:
-        st.success("Thanks for your feedback!")
     else:
-        with st.form("paddock_feedback"):
-            rating = st.slider("Rate your experience", 1, 5, 4,
-                               format="%d stars", help="1 = poor, 5 = excellent")
-            confusion = st.text_area("Was anything confusing?", placeholder="Optional...", key="fb_conf")
-            improvement = st.text_area("What would make this better?", placeholder="Optional...", key="fb_imp")
-            if st.form_submit_button("Submit Feedback", use_container_width=True):
-                paddock_layer.save_feedback(
-                    st.session_state.paddock_user_id,
-                    experience_rating=rating,
-                    confusion_notes=confusion or None,
-                    improvement_suggestions=improvement or None,
-                )
-                st.success("Thanks for the feedback!")
-                st.rerun()
+        # Fallback for any other type — text input
+        answer = st.text_input("Your answer:", key=widget_key)
 
-    # Start over
-    st.markdown("---")
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("\U0001f504 Start Over (New Assessment)", use_container_width=True):
-            for key in list(st.session_state.keys()):
-                if key.startswith("paddock_") or key.startswith("q_") or key.startswith("next_"):
-                    del st.session_state[key]
-            st.session_state.paddock_step = "welcome"
-            st.rerun()
+    st.markdown("")
+    if st.button(
+        "Submit Answer",
+        use_container_width=True,
+        type="primary",
+        key="btn_submit_lv{}_q{}".format(current_level, q_id),
+    ):
+        if not answer:
+            st.warning("Please select an answer before submitting.")
+            return
+        _submit_answer(attempt_id, q_id, answer)
 
 
-# ============================================================================
-# ADMIN / GREENHOUSE SCREEN
-# ============================================================================
+def _submit_answer(attempt_id, question_id, answer):
+    """Submit answer to API and handle result."""
+    path = "/attempt/{}/answer/{}".format(attempt_id, question_id)
+    data = _api_post(path, {"answer": answer})
 
-def render_admin():
-    if (user or {}).get("role") != "admin":
-        st.warning("Admin access required.")
-        if st.button("\u2190 Back to Welcome"):
-            st.session_state.paddock_step = "welcome"
-            st.rerun()
+    if not data:
+        st.error("Could not submit your answer. Please try again.")
         return
 
-    st.markdown("## \U0001f33f The Greenhouse — Admin Dashboard")
+    # Build record for the answered-questions list
+    current_q = st.session_state.get("paddock_current_question", {})
+    record = {
+        "level": st.session_state.get("paddock_current_level", 1),
+        "question_text": current_q.get("question_text", ""),
+        "user_answer": answer,
+        "correct_answer": data.get("correct_answer", ""),
+        "correct": data.get("correct", False),
+        "explanation": data.get("explanation", ""),
+    }
+    answered = st.session_state.get("paddock_answered_questions", [])
+    answered.append(record)
+    st.session_state["paddock_answered_questions"] = answered
 
-    overview = paddock_layer.admin_overview()
+    # Store the answer result for feedback display
+    st.session_state["paddock_answer_result"] = data
+    st.rerun()
 
-    if overview["total_users"] == 0:
-        st.info("No assessments completed yet. Share The Paddock with your team to get started!")
-        if st.button("\u2190 Back"):
-            st.session_state.paddock_step = "welcome"
+
+def _render_answer_feedback(data):
+    """Show correct/wrong feedback with explanation and next action."""
+    is_correct = data.get("correct", False)
+    explanation = data.get("explanation", "")
+    assessment_complete = data.get("assessment_complete", False)
+    result = data.get("result")
+
+    if is_correct and not assessment_complete:
+        # Correct — continue
+        st.success("Correct!")
+        if explanation:
+            st.markdown("**Explanation:** {}".format(explanation))
+
+        next_level = data.get("current_level")
+        next_question = data.get("question")
+
+        st.markdown("")
+        if st.button(
+            "Next Level \u2192",
+            use_container_width=True,
+            type="primary",
+            key="btn_next_lv{}".format(next_level),
+        ):
+            st.session_state["paddock_current_level"] = next_level
+            st.session_state["paddock_current_question"] = next_question
+            st.session_state["paddock_answer_result"] = None
             st.rerun()
-        return
 
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "\U0001f4ca Overview", "\U0001f5fa Heatmap", "\U0001f50d Gap Analysis",
-        "\U0001f9e0 Dunning-Kruger", "\U0001f4ac Feedback", "\U0001f4e5 Export",
-    ])
+    elif is_correct and assessment_complete:
+        # Answered level 10 — Legend!
+        st.markdown(
+            "<div style='text-align:center;padding:24px;background:"
+            "linear-gradient(135deg, #eab308 0%, #f59e0b 100%);"
+            "border-radius:14px;color:white;margin-bottom:16px;'>"
+            "<div style='font-size:3em;'>\U0001f3c6</div>"
+            "<div style='font-size:1.6em;font-weight:800;margin:8px 0;'>"
+            "LEGENDARY!</div>"
+            "<div>You answered every level correctly. Absolute legend.</div>"
+            "</div>",
+            unsafe_allow_html=True,
+        )
+        if explanation:
+            st.markdown("**Explanation:** {}".format(explanation))
+        _show_result_button(result)
 
-    with tab1:
-        _admin_overview(overview)
+    else:
+        # Wrong answer — game over
+        correct_answer = data.get("correct_answer", "")
+        st.error("Incorrect! The correct answer was: **{}**".format(correct_answer))
+        if explanation:
+            st.markdown("**Explanation:** {}".format(explanation))
+        _show_result_button(result)
 
-    with tab2:
-        _admin_heatmap()
 
-    with tab3:
-        _admin_gaps()
+def _show_result_button(result):
+    """Store result and show 'See Results' button."""
+    if result:
+        st.session_state["paddock_result"] = result
 
-    with tab4:
-        _admin_dk()
-
-    with tab5:
-        _admin_feedback()
-
-    with tab6:
-        _admin_export()
-
-    st.markdown("---")
-    if st.button("\u2190 Back to Welcome"):
-        st.session_state.paddock_step = "welcome"
+    st.markdown("")
+    if st.button(
+        "See Results",
+        use_container_width=True,
+        type="primary",
+        key="btn_see_results",
+    ):
+        st.session_state["paddock_state"] = "result"
+        st.session_state["paddock_answer_result"] = None
         st.rerun()
 
 
-def _admin_overview(overview):
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Total Users", overview["total_users"])
-    c2.metric("Completed", overview["completed"])
-    c3.metric("Completion Rate", f"{overview['completion_rate']}%")
-    c4.metric("Avg Score", f"{overview['avg_score']}/100")
+# ===================================================================
+# RESULT SCREEN
+# ===================================================================
 
-    # Maturity distribution
-    mat_names = {m["level"]: f"{m['icon']} {m['name']}" for m in MATURITY_LEVELS}
-    dist = overview["maturity_distribution"]
-    if dist:
-        st.markdown("#### Maturity Distribution")
-        df = pd.DataFrame([
-            {"Level": mat_names.get(k, str(k)), "Count": v}
-            for k, v in sorted(dist.items())
-        ])
-        st.bar_chart(df.set_index("Level"))
+def render_result():
+    """Post-attempt result screen with tier badge, stats, and review."""
+    result = st.session_state.get("paddock_result")
+    attempt_id = st.session_state.get("paddock_attempt_id")
 
-    # Module completion
-    mod_comp = overview["module_completion"]
-    if mod_comp:
-        st.markdown("#### Module Completion")
-        for mod in MODULE_IDS:
-            cnt = mod_comp.get(mod, 0)
-            pct = cnt / overview["total_users"] * 100 if overview["total_users"] > 0 else 0
-            st.markdown(f"**{MODULE_META[mod]['title']}** — {cnt} users ({pct:.0f}%)")
-            st.progress(pct / 100)
+    # If we don't have a result cached, fetch from API
+    if not result and attempt_id:
+        detail = _api_get("/attempt/{}".format(attempt_id))
+        if detail:
+            result = {
+                "attempt_id": attempt_id,
+                "max_level_reached": detail.get("max_level_reached", 0),
+                "tier_name": detail.get("tier_name", "Unranked"),
+                "tier_icon": _icon_for_tier(detail.get("tier_name", "Unranked")),
+                "total_correct": detail.get("total_correct", 0),
+                "total_questions": detail.get("total_questions", 0),
+                "time_seconds": detail.get("time_seconds", 0),
+            }
 
-
-def _admin_heatmap():
-    heatmap = paddock_layer.admin_heatmap()
-    if not heatmap:
-        st.info("No data yet.")
+    if not result:
+        st.error("Could not load results. Returning to welcome.")
+        st.session_state["paddock_state"] = "welcome"
+        _reset_playing_state()
+        st.rerun()
         return
 
-    st.markdown("#### Store x Maturity Heatmap")
-    mat_names = {m["level"]: m["name"] for m in MATURITY_LEVELS}
+    max_level = result.get("max_level_reached", 0)
+    tier_name = result.get("tier_name", _tier_for_level(max_level))
+    tier_icon = _icon_for_tier(tier_name)
+    total_correct = result.get("total_correct", 0)
+    total_questions = result.get("total_questions", 0)
+    time_seconds = result.get("time_seconds", 0)
+
+    # Calculate elapsed from session if API time is 0
+    if time_seconds == 0:
+        start_t = st.session_state.get("paddock_start_time")
+        if start_t:
+            time_seconds = int(time.time() - start_t)
+
+    # --- Hero card ---
+    tier_bg = _tier_colour(tier_name)
+    st.markdown(
+        "<div style='text-align:center;padding:40px 24px;"
+        "background:linear-gradient(135deg, {} 0%, {} 80%);"
+        "color:white;border-radius:14px;margin-bottom:24px;'>"
+        "<div style='font-size:4em;'>{}</div>"
+        "<div style='font-size:2em;font-weight:800;margin:8px 0;'>"
+        "You reached Level {} &mdash; {}!</div>"
+        "<div style='font-size:1.05em;opacity:0.9;'>Well played.</div>"
+        "</div>".format(BRAND_GREEN, tier_bg, tier_icon, max_level, tier_name),
+        unsafe_allow_html=True,
+    )
+
+    # --- Stats ---
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Correct Answers", "{} / {}".format(total_correct, total_questions))
+    c2.metric("Level Reached", str(max_level))
+    c3.metric("Time Taken", _format_time(time_seconds))
+
+    # --- Personal best comparison ---
+    if user_email:
+        best = _api_get("/user/{}/best".format(user_email))
+        if best:
+            best_level = best.get("max_level_reached", 0)
+            if max_level > best_level:
+                st.success(
+                    "New personal best! You beat your previous best of Level {} ({}).".format(
+                        best_level, _tier_for_level(best_level)
+                    )
+                )
+            elif max_level == best_level:
+                st.info("You matched your personal best: Level {}.".format(best_level))
+            else:
+                best_tier = _tier_for_level(best_level)
+                st.info(
+                    "Your personal best is still Level {} ({} {}).".format(
+                        best_level, _icon_for_tier(best_tier), best_tier
+                    )
+                )
+
+    # --- Question review ---
+    st.markdown("---")
+    st.markdown("### Question Review")
+
+    answered = st.session_state.get("paddock_answered_questions", [])
+
+    if answered:
+        for i, q in enumerate(answered):
+            level_num = q.get("level", i + 1)
+            q_text = q.get("question_text", "")
+            was_correct = q.get("correct", False)
+            status_icon = "\u2705" if was_correct else "\u274c"
+            tier_at_level = _tier_for_level(level_num)
+            summary = "Level {} ({}) {} {}".format(
+                level_num, tier_at_level, status_icon,
+                "Correct" if was_correct else "Incorrect"
+            )
+            with st.expander(summary, expanded=not was_correct):
+                st.markdown("**Q:** {}".format(q_text))
+                user_ans = q.get("user_answer", "")
+                correct_ans = q.get("correct_answer", "")
+                st.markdown("**Your answer:** {}".format(user_ans))
+                if not was_correct:
+                    st.markdown("**Correct answer:** {}".format(correct_ans))
+                expl = q.get("explanation", "")
+                if expl:
+                    st.markdown("**Explanation:** {}".format(expl))
+    else:
+        # Fallback: fetch from API
+        if attempt_id:
+            detail = _api_get("/attempt/{}".format(attempt_id))
+            if detail and detail.get("responses"):
+                for resp in detail["responses"]:
+                    level_num = resp.get("difficulty_level", 0)
+                    was_correct = bool(resp.get("is_correct", 0))
+                    status_icon = "\u2705" if was_correct else "\u274c"
+                    tier_at_level = _tier_for_level(level_num)
+                    summary = "Level {} ({}) {} {}".format(
+                        level_num, tier_at_level, status_icon,
+                        "Correct" if was_correct else "Incorrect"
+                    )
+                    with st.expander(summary, expanded=not was_correct):
+                        st.markdown("**Q:** {}".format(resp.get("question_text", "")))
+                        st.markdown("**Your answer:** {}".format(resp.get("answer", "")))
+                        if not was_correct:
+                            st.markdown("**Correct answer:** {}".format(
+                                resp.get("correct_answer", "")
+                            ))
+                        expl = resp.get("explanation", "")
+                        if expl:
+                            st.markdown("**Explanation:** {}".format(expl))
+
+    # --- Action buttons ---
+    st.markdown("---")
+    col_a, col_b = st.columns(2)
+    with col_a:
+        if st.button(
+            "\U0001f504 Try Again",
+            use_container_width=True,
+            key="btn_try_again",
+        ):
+            st.session_state["paddock_state"] = "welcome"
+            _reset_playing_state()
+            st.rerun()
+    with col_b:
+        if st.button(
+            "\U0001f3c6 View Leaderboard",
+            use_container_width=True,
+            key="btn_view_lb_result",
+        ):
+            st.session_state["paddock_show_result_lb"] = True
+            st.rerun()
+
+    # --- Inline leaderboard on result page ---
+    if st.session_state.get("paddock_show_result_lb"):
+        st.markdown("---")
+        _render_leaderboard()
+
+
+# ===================================================================
+# LEADERBOARD
+# ===================================================================
+
+def _render_leaderboard():
+    """Show the Jedi Council (top 5) + full ranked table."""
+    lb_data = _api_get("/leaderboard")
+    if not lb_data:
+        st.info("No leaderboard data yet. Be the first to take the challenge!")
+        return
+
+    st.markdown("### \U0001f3c6 Leaderboard")
+
+    # --- Jedi Council: Top 5 ---
+    top5 = lb_data[:5]
+    if top5:
+        st.markdown(
+            "<div style='text-align:center;margin-bottom:8px;'>"
+            "<span style='font-size:1.1em;font-weight:700;color:{};"
+            "'>The Jedi Council</span></div>".format(BRAND_GREEN),
+            unsafe_allow_html=True,
+        )
+        cols = st.columns(len(top5))
+        for i, entry in enumerate(top5):
+            with cols[i]:
+                rank = entry.get("rank", i + 1)
+                name = entry.get("display_name", "Unknown")
+                t_icon = entry.get("tier_icon", "\u2753")
+                t_name = entry.get("tier_name", "Unranked")
+                level = entry.get("best_level", 0)
+                medal = {1: "\U0001f947", 2: "\U0001f948", 3: "\U0001f949"}.get(rank, "")
+
+                border_col = BRAND_GREEN if rank <= 3 else "#ddd"
+                st.markdown(
+                    "<div style='text-align:center;padding:16px 8px;"
+                    "border:2px solid {};border-radius:12px;"
+                    "background:#fafafa;'>"
+                    "<div style='font-size:0.8em;color:#888;'>#{}{}</div>"
+                    "<div style='font-size:2.2em;margin:4px 0;'>{}</div>"
+                    "<div style='font-weight:700;font-size:0.95em;'>{}</div>"
+                    "<div style='color:#666;font-size:0.8em;'>{} &bull; Lv {}</div>"
+                    "</div>".format(
+                        border_col, rank,
+                        " " + medal if medal else "",
+                        t_icon, name, t_name, level
+                    ),
+                    unsafe_allow_html=True,
+                )
+
+    # --- Full table ---
+    if lb_data:
+        st.markdown("")
+        rows = []
+        for entry in lb_data:
+            t_icon = entry.get("tier_icon", "")
+            t_name = entry.get("tier_name", "Unranked")
+            rows.append({
+                "Rank": entry.get("rank", 0),
+                "Name": entry.get("display_name", ""),
+                "Tier": "{} {}".format(t_icon, t_name),
+                "Level": entry.get("best_level", 0),
+                "Attempts": entry.get("total_attempts", 0),
+                "Time": _format_time(entry.get("time_seconds")),
+            })
+        df = pd.DataFrame(rows)
+        st.dataframe(
+            df,
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Rank": st.column_config.NumberColumn(width="small"),
+                "Level": st.column_config.NumberColumn(width="small"),
+                "Attempts": st.column_config.NumberColumn(width="small"),
+            },
+        )
+
+
+# ===================================================================
+# HISTORY TAB
+# ===================================================================
+
+def _render_history_tab():
+    """Show the user's past attempts with expandable detail."""
+    if not user_email:
+        st.info("Log in to see your history.")
+        return
+
+    data = _api_get("/user/{}/history".format(user_email))
+    history = data.get("history", []) if isinstance(data, dict) else (data or [])
+    if not history:
+        st.info("You haven't attempted The Paddock yet. Give it a go!")
+        return
+
+    st.markdown("### My Attempts")
+
     rows = []
-    for store, levels in sorted(heatmap.items()):
-        row = {"Store": store}
-        for level in range(1, 6):
-            row[mat_names.get(level, str(level))] = levels.get(level, 0)
-        rows.append(row)
-    df = pd.DataFrame(rows).set_index("Store")
-    st.dataframe(df, use_container_width=True)
+    for h in history:
+        created = h.get("created_at", "")
+        # Parse ISO date for display
+        try:
+            dt = datetime.fromisoformat(created)
+            date_str = dt.strftime("%d %b %Y %H:%M")
+        except (ValueError, TypeError):
+            date_str = created[:16] if created else "--"
+
+        tier_name = h.get("tier_name", "Unranked")
+        t_icon = _icon_for_tier(tier_name)
+        rows.append({
+            "Date": date_str,
+            "Tier": "{} {}".format(t_icon, tier_name),
+            "Level": h.get("max_level_reached", 0),
+            "Questions": "{}/{}".format(
+                h.get("total_correct", 0), h.get("total_questions", 0)
+            ),
+            "Time": _format_time(h.get("time_seconds")),
+            "Status": h.get("status", ""),
+            "_attempt_id": h.get("id"),
+        })
+
+    df = pd.DataFrame(rows)
+    display_df = df.drop(columns=["_attempt_id"])
+    st.dataframe(display_df, use_container_width=True, hide_index=True)
+
+    # Expandable detail per attempt
+    st.markdown("#### Attempt Detail")
+    for i, row in enumerate(rows):
+        a_id = row.get("_attempt_id")
+        if not a_id:
+            continue
+        label = "{} | {} | Level {}".format(row["Date"], row["Tier"], row["Level"])
+        with st.expander(label, key="hist_expand_{}".format(i)):
+            detail = _api_get("/attempt/{}".format(a_id))
+            if detail and detail.get("responses"):
+                for resp in detail["responses"]:
+                    lv = resp.get("difficulty_level", 0)
+                    was_correct = bool(resp.get("is_correct", 0))
+                    icon = "\u2705" if was_correct else "\u274c"
+                    q_text = resp.get("question_text", "")
+                    st.markdown(
+                        "**Lv {}** {} {} &mdash; {}".format(
+                            lv, icon,
+                            "Correct" if was_correct else "Incorrect",
+                            q_text
+                        ),
+                        unsafe_allow_html=True,
+                    )
+                    if not was_correct:
+                        st.caption("Correct answer: {}".format(
+                            resp.get("correct_answer", "")
+                        ))
+            else:
+                st.caption("No detail available for this attempt.")
 
 
-def _admin_gaps():
-    gaps = paddock_layer.admin_gaps()
-
-    st.markdown("#### By Department")
-    if gaps["by_department"]:
-        df = pd.DataFrame(gaps["by_department"])
-        st.dataframe(df, use_container_width=True)
-
-    st.markdown("#### By Role Tier")
-    if gaps["by_tier"]:
-        df = pd.DataFrame(gaps["by_tier"])
-        df["role_tier"] = df["role_tier"].map(ROLE_TIER_LABELS)
-        st.dataframe(df, use_container_width=True)
-
-
-def _admin_dk():
-    gaps = paddock_layer.admin_gaps()
-    dk = gaps.get("dunning_kruger", [])
-    if not dk:
-        st.info("Not enough data yet.")
-        return
-
-    st.markdown("#### Confidence vs Ability")
-    st.caption("Points above the diagonal = overconfident, below = underconfident")
-
-    df = pd.DataFrame(dk)
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=df["overall_score"], y=df["confidence_score"],
-        mode="markers+text", text=df["name"],
-        textposition="top center", textfont=dict(size=9),
-        marker=dict(
-            size=10,
-            color=df["gap"].apply(lambda g: "#ef4444" if g > 15 else ("#3b82f6" if g < -15 else "#94a3b8")),
-        ),
-    ))
-    fig.add_trace(go.Scatter(
-        x=[0, 100], y=[0, 100], mode="lines",
-        line=dict(color="#ccc", dash="dash"), showlegend=False,
-    ))
-    fig.update_layout(
-        xaxis_title="Overall Score", yaxis_title="Confidence Score",
-        xaxis=dict(range=[0, 100]), yaxis=dict(range=[0, 100]),
-        height=450, showlegend=False,
-    )
-    st.plotly_chart(fig, use_container_width=True)
-
-
-def _admin_feedback():
-    fb = paddock_layer.admin_feedback_summary()
-    c1, c2 = st.columns(2)
-    c1.metric("Avg Rating", f"{fb['avg_rating']}/5")
-    c2.metric("Total Feedback", fb["total_feedback"])
-
-    if fb["verbatims"]:
-        st.markdown("#### Recent Feedback")
-        df = pd.DataFrame(fb["verbatims"])
-        st.dataframe(df, use_container_width=True)
-
-    if fb["free_text"]:
-        st.markdown("#### Free-Text Responses")
-        df = pd.DataFrame(fb["free_text"])
-        st.dataframe(df, use_container_width=True)
-
-
-def _admin_export():
-    data = paddock_layer.admin_export()
-    if not data:
-        st.info("No data to export.")
-        return
-
-    df = pd.DataFrame(data)
-    csv = df.to_csv(index=False)
-    st.download_button(
-        "\U0001f4e5 Download CSV",
-        csv, "paddock_export.csv", "text/csv",
-        use_container_width=True,
-    )
-    st.markdown(f"**{len(data)} records**")
-    st.dataframe(df, use_container_width=True)
-
-
-# ============================================================================
+# ===================================================================
 # MAIN ROUTER
-# ============================================================================
+# ===================================================================
 
 render_header(
     "The Paddock",
-    "**AI Skills Assessment** | Grow your AI confidence",
+    "**AI Skills Challenge** | How far can you go?",
     goals=["G3"],
     strategy_context="Building AI literacy across all roles (Pillar 3 & 5)",
 )
 
-step = st.session_state.get("paddock_step", "welcome")
+state = st.session_state.get("paddock_state", "welcome")
 
-if step == "welcome":
-    render_welcome()
-elif step == "register":
-    render_register()
-elif step == "assess":
-    render_assessment()
-elif step == "results":
-    render_results()
-elif step == "admin":
-    render_admin()
+if state == "playing":
+    render_playing()
+elif state == "result":
+    render_result()
 else:
     render_welcome()
 

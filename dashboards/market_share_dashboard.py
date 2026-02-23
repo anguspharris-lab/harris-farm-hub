@@ -151,7 +151,7 @@ with tab_overview:
         fig_st = px.line(
             stdf, x="period_date", y="share", color="state",
             labels={"period_date": "", "share": "Market Share %", "state": "State"},
-            color_discrete_map={"NSW": "#4ba021", "QLD": "#7c3aed", "ACT": "#d97706"},
+            color_discrete_map={"NSW": "#2ECC71", "QLD": "#7c3aed", "ACT": "#d97706"},
         )
         fig_st.update_layout(height=400, legend=dict(orientation="h", y=-0.15))
         st.plotly_chart(fig_st, use_container_width=True, key="overview_state_trend")
@@ -171,7 +171,7 @@ with tab_overview:
                     top.sort_values("market_share_pct"),
                     x="market_share_pct", y="region_name", orientation="h",
                     labels={"market_share_pct": "Share %", "region_name": ""},
-                    color_discrete_sequence=["#4ba021"],
+                    color_discrete_sequence=["#2ECC71"],
                     hover_data={"nearest_store": True, "distance_km": True},
                 )
                 fig_top.update_layout(height=450)
@@ -264,7 +264,7 @@ with tab_map:
 
             # Health indicator colour map (based on annualised trend slope)
             _HEALTH_COLOURS = {
-                "Accelerating": "#16a34a",
+                "Accelerating": "#2ECC71",
                 "Growing": "#65a30d",
                 "Stable": "#d97706",
                 "Softening": "#ea580c",
@@ -451,7 +451,7 @@ with tab_store:
                     cum_with_data, x="label", y="avg_share",
                     labels={"label": "Cumulative Radius", "avg_share": "Avg Market Share %"},
                     color="avg_share",
-                    color_continuous_scale=["#dc2626", "#d97706", "#4ba021"],
+                    color_continuous_scale=["#dc2626", "#d97706", "#2ECC71"],
                     text="avg_share",
                 )
                 fig_decay.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
@@ -557,7 +557,7 @@ with tab_store:
                         all_trends, x="period_date", y="avg_share", color="radius",
                         labels={"period_date": "", "avg_share": "Avg Market Share %",
                                 "radius": "Radius"},
-                        color_discrete_sequence=["#16a34a", "#2563eb", "#d97706",
+                        color_discrete_sequence=["#2ECC71", "#2563eb", "#d97706",
                                                  "#9333ea", "#6b7280"],
                     )
                     fig_tt.update_layout(
@@ -597,7 +597,7 @@ with tab_health:
             scorecard = [s for s in scorecard if s["state"] == state_filter]
 
         # Grade colour mapping
-        _GRADE_COLOURS = {"A": "#16a34a", "B": "#65a30d", "C": "#d97706", "D": "#ea580c", "F": "#dc2626"}
+        _GRADE_COLOURS = {"A": "#2ECC71", "B": "#65a30d", "C": "#d97706", "D": "#ea580c", "F": "#dc2626"}
 
         # Summary KPIs
         grades = [s["grade"] for s in scorecard]
@@ -676,7 +676,7 @@ with tab_health:
                 fig_chan = go.Figure()
                 fig_chan.add_trace(go.Bar(
                     name="Instore", x=top_chan["region_name"], y=top_chan["instore_share"],
-                    marker_color="#4ba021",
+                    marker_color="#2ECC71",
                     hovertemplate="%{x}<br>Instore: %{y:.1f}%<extra></extra>",
                 ))
                 fig_chan.add_trace(go.Bar(
@@ -739,7 +739,7 @@ with tab_health:
             # Cluster comparison bar chart
             fig_macro = go.Figure()
             colours = [
-                "#16a34a" if (r["share_change"] or 0) >= 0 else "#dc2626"
+                "#2ECC71" if (r["share_change"] or 0) >= 0 else "#dc2626"
                 for _, r in macro_df.iterrows()
             ]
             fig_macro.add_trace(go.Bar(
@@ -903,7 +903,7 @@ with tab_trends:
                     top_gain.sort_values("share_change"),
                     x="share_change", y="region_name", orientation="h",
                     labels={"share_change": "Share Change (pp)", "region_name": ""},
-                    color_discrete_sequence=["#16a34a"],
+                    color_discrete_sequence=["#2ECC71"],
                     hover_data={"nearest_store": True, "distance_tier": True},
                 )
                 fig_gain.update_layout(height=450)
@@ -1027,7 +1027,7 @@ with tab_opps:
                     "opportunity_type": "Type",
                 },
                 color_discrete_map={
-                    "Stronghold": "#16a34a",
+                    "Stronghold": "#2ECC71",
                     "Growth Opportunity": "#2563eb",
                     "Basket Opportunity": "#d97706",
                     "Retention Risk": "#dc2626",
@@ -1146,7 +1146,7 @@ with tab_issues:
                 fig_pc_share = px.line(
                     pcdf, x="period_date", y="market_share_pct",
                     labels={"period_date": "", "market_share_pct": "Market Share %"},
-                    color_discrete_sequence=["#4ba021"],
+                    color_discrete_sequence=["#2ECC71"],
                     title="Market Share Trend",
                 )
                 fig_pc_share.update_layout(height=300)

@@ -190,7 +190,7 @@ def goal_badge_html(goal_id: str) -> str:
     if not goal:
         return ""
     return (
-        f"<span style='display:inline-block;background:{goal['color']}20;"
+        f"<span style='display:inline-block;background:{goal['color']}30;"
         f"color:{goal['color']};border:1px solid {goal['color']}50;"
         f"border-radius:12px;padding:2px 10px;font-size:0.75em;"
         f"font-weight:600;margin:0 2px;'>"

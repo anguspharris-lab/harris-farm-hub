@@ -131,7 +131,7 @@ with k3:
             labels=list(platform_split.keys()),
             values=list(platform_split.values()),
             hole=0.55,
-            marker_colors=["#7c3aed", "#16a34a"] if "Claude" in platform_split else ["#16a34a", "#7c3aed"],
+            marker_colors=["#7c3aed", "#2ECC71"] if "Claude" in platform_split else ["#2ECC71", "#7c3aed"],
             textinfo="label+percent",
             textfont_size=12,
         )])

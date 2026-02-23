@@ -4,6 +4,64 @@
 
 ---
 
+## [3.7.0] - 2026-02-23
+
+### Added
+- **Usage Analytics Engine** — page-view tracking across every Hub page with adoption dashboard
+  - `backend/analytics_engine.py`: Page view logging, aggregate stats, role breakdowns, user activity
+  - `page_views` table with indexes on user, slug, and date
+  - 4 API endpoints: `POST /api/analytics/pageview`, `GET /api/analytics/summary`, `GET /api/analytics/users`, `GET /api/analytics/by-role`
+  - Fire-and-forget page-view logging in `app.py` (timeout=1, never blocks rendering)
+- **Adoption Dashboard** (`dashboards/adoption_dashboard.py`) — proves value to board
+  - 4 KPI cards: Unique Users, Total Page Views, Avg Pages/User, Top Page
+  - Daily activity line+bar chart, Top 10 pages, Usage by role pie chart, User activity table
+  - Time range selector (7/14/30/90 days), cached API calls (TTL 60s)
+  - Registered under P5 Digital & AI navigation
+- **Role-Based Navigation** — reduces 33 pages to 5-10 per role
+  - `dashboards/shared/role_config.py`: 9 roles (admin, user, executive, store_manager, buyer, marketing, people_culture, finance, viewer)
+  - Each role sees only relevant pages; admin and user see all
+  - `hub_role` column added to users table (safe ALTER TABLE migration)
+  - Sidebar role selector for new users with default "user" role
+  - 2 API endpoints: `PUT /api/auth/role`, `GET /api/auth/roles`
+  - Navigation dynamically filters pillars, sub-pages, and utility pages
+- **Home Page Search Bar** — unblocks users who can't find what they need
+  - Dual-source search: fuzzy page title/slug matching + Knowledge Base FTS5 via existing `/api/knowledge/search`
+  - Page matches shown as `st.page_link()` buttons, KB results as expandable cards with snippets
+  - Inline results below search bar, clean homepage when empty
+
+### Changed
+- Pages: 32 → 33 (added Adoption Dashboard under P5)
+- API endpoints: ~147 → ~153 (4 analytics + 2 role management)
+- Database tables: ~56 → ~57 (page_views table)
+- `shared/auth_gate.py`: Dev bypass now returns `hub_role: "admin"`
+- `backend/auth.py`: `authenticate_user()` and `verify_session()` now return `hub_role`
+- Navigation header: only shows pillars and sub-pages visible to current role
+
+### Scores
+- P0 Fixes: H:9 R:9 S:9 C:8 D:8 U:9 X:8 = 8.6 (SHIP)
+
+---
+
+## [3.6.0] - 2026-02-22
+
+### Added
+- **Strategic Hub Rebuild** — 12 new files transforming Hub from dashboard collection to strategic platform
+  - 4 Pillar intro pages: Greater Goodness, Growing Legends, Operations HQ, Digital & AI HQ
+  - Way of Working page with Monday.com integration (live board embedding)
+  - Marketing Assets page with 19 files across 6 categories (brand, amazon, ecomm, weekend-specials, ooh, butcher)
+  - Customer Hub rebuild with customer intelligence tabs
+  - AI Adoption dashboard
+- **"First Day at The Hub" Simulation** — 9-document evaluation suite in `docs/simulation/`
+  - 10 personas tested across all Hub pages, scored 6.4/10 overall
+  - Executive summary, persona cards, journey simulations, scoring matrix, panel commentary
+  - Golden paths, improvement backlog, rollout plan, marketing deep-dive
+
+### Changed
+- Navigation restructured with pillar-based grouping and two-row header
+- Pages: 26 → 32 (6 new pages added)
+
+---
+
 ## [3.5.0] - 2026-02-22
 
 ### Added

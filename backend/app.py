@@ -807,8 +807,110 @@ def init_hub_database():
     c.execute("CREATE INDEX IF NOT EXISTS idx_abadge_user ON academy_badges(user_id)")
     c.execute("CREATE INDEX IF NOT EXISTS idx_abadge_code ON academy_badges(badge_code)")
 
+    # ---- Analytics (page-view tracking) ----
+    from analytics_engine import init_analytics_tables
+    init_analytics_tables(conn)
+
+    # ---- Skills Academy ----
+    from skills_engine import init_skills_tables
+    init_skills_tables(conn)
+
+    # ---- Paddock Progressive Assessment ----
+    from paddock_engine import init_paddock_tables
+    init_paddock_tables(conn)
+
+    # ---- Flag System ----
+    from flag_engine import init_flag_tables
+    init_flag_tables(conn)
+
+    # ---- v3: Placement Challenge ----
+    from placement_engine import init_placement_tables
+    init_placement_tables(conn)
+
+    # ---- v3: HiPo Signal Detection ----
+    from hipo_engine import init_hipo_tables
+    init_hipo_tables(conn)
+
     conn.commit()
     conn.close()
+
+    # Seed Skills Academy modules (idempotent)
+    try:
+        import sys as _sys
+        _sys.path.insert(0, str(Path(__file__).parent.parent / "dashboards"))
+        from shared.skills_content import SKILLS_MODULES
+        from skills_engine import seed_skills_modules
+        _seeded = seed_skills_modules(config.HUB_DB, SKILLS_MODULES)
+        if _seeded:
+            print(f"Seeded {_seeded} Skills Academy modules")
+    except Exception as e:
+        print(f"Skills module seeding skipped: {e}")
+
+    # Seed Paddock question pool (idempotent)
+    try:
+        from shared.paddock_pool import SEED_QUESTIONS
+        from paddock_engine import seed_question_pool
+        _qseeded = seed_question_pool(config.HUB_DB, SEED_QUESTIONS)
+        if _qseeded:
+            print(f"Seeded {_qseeded} Paddock questions")
+    except Exception as e:
+        print(f"Paddock question seeding skipped: {e}")
+
+    # Seed daily micro-challenges (idempotent)
+    try:
+        from shared.skills_content import DAILY_MICRO_POOL
+        from skills_engine import seed_daily_micro
+        _mseeded = seed_daily_micro(config.HUB_DB, DAILY_MICRO_POOL)
+        if _mseeded:
+            print(f"Seeded {_mseeded} daily micro-challenges")
+    except Exception as e:
+        print(f"Micro-challenge seeding skipped: {e}")
+
+    # ---- Skills Academy v4 ----
+    try:
+        from sa_v4_schema import seed_all_v4, seed_v4_exercises, seed_v4_daily_challenges
+        _v4 = seed_all_v4(config.HUB_DB)
+        _v4_seeded = sum(v for v in _v4.values() if isinstance(v, int))
+        if _v4_seeded:
+            print(f"SA v4: seeded {_v4_seeded} reference rows ({_v4})")
+
+        # Seed exercises from content files
+        import sys as _sys2
+        _sys2.path.insert(0, str(Path(__file__).parent.parent / "dashboards"))
+        _ex_total = 0
+        _ch_total = 0
+        try:
+            from shared.sa_v4_content import get_all_exercises_for_seeding
+            _v4_conn = sqlite3.connect(config.HUB_DB)
+            _ex_total = seed_v4_exercises(_v4_conn, get_all_exercises_for_seeding())
+            _v4_conn.close()
+        except Exception as _e:
+            print(f"SA v4 exercise seeding skipped: {_e}")
+        try:
+            from shared.sa_v4_curveballs import get_curveballs_for_seeding
+            _v4_conn2 = sqlite3.connect(config.HUB_DB)
+            _ex_total += seed_v4_exercises(_v4_conn2, get_curveballs_for_seeding())
+            _v4_conn2.close()
+        except Exception as _e:
+            print(f"SA v4 curveball seeding skipped: {_e}")
+        try:
+            from shared.sa_v4_foundation_checks import get_foundation_checks_for_seeding
+            _v4_conn3 = sqlite3.connect(config.HUB_DB)
+            _ex_total += seed_v4_exercises(_v4_conn3, get_foundation_checks_for_seeding())
+            _v4_conn3.close()
+        except Exception as _e:
+            print(f"SA v4 foundation check seeding skipped: {_e}")
+        try:
+            from shared.sa_v4_live_problems import get_daily_challenges_for_seeding
+            _v4_conn4 = sqlite3.connect(config.HUB_DB)
+            _ch_total = seed_v4_daily_challenges(_v4_conn4, get_daily_challenges_for_seeding())
+            _v4_conn4.close()
+        except Exception as _e:
+            print(f"SA v4 daily challenge seeding skipped: {_e}")
+        if _ex_total or _ch_total:
+            print(f"SA v4: seeded {_ex_total} exercises, {_ch_total} daily challenges")
+    except Exception as e:
+        print(f"SA v4 init skipped: {e}")
 
 def seed_arena_data():
     """Seed arena tables with sample proposals and insights. Idempotent."""
@@ -1295,6 +1397,9 @@ async def lifespan(app: FastAPI):
             print(f"  Seeded {_seeded} Academy daily challenges")
     except Exception as e:
         print(f"  Academy challenge seeding skipped: {e}")
+    # Record startup time for health check
+    import time as _time
+    app.state.start_time = _time.time()
     # Initialize auth database
     import auth as auth_module
     auth_module.init_auth_db()
@@ -1809,6 +1914,35 @@ async def root():
             "knowledge_search": "/api/knowledge/search",
             "knowledge_stats": "/api/knowledge/stats"
         }
+    }
+
+
+@app.get("/api/health")
+async def health_check():
+    """Health check endpoint for Render monitoring and uptime checks."""
+    import time
+    checks = {"api": "ok"}
+    # Check hub_data.db
+    try:
+        conn = sqlite3.connect(config.HUB_DB)
+        conn.execute("SELECT 1").fetchone()
+        conn.close()
+        checks["hub_db"] = "ok"
+    except Exception as e:
+        checks["hub_db"] = str(e)
+    # Check DuckDB / transactions
+    try:
+        if hasattr(app.state, "txn_store") and app.state.txn_store:
+            checks["transactions"] = "ok"
+        else:
+            checks["transactions"] = "not_loaded"
+    except Exception:
+        checks["transactions"] = "not_loaded"
+    all_ok = all(v == "ok" for v in checks.values())
+    return {
+        "status": "healthy" if all_ok else "degraded",
+        "checks": checks,
+        "uptime_seconds": int(time.time() - app.state.start_time) if hasattr(app.state, "start_time") else None,
     }
 
 @app.post("/api/query")
@@ -3301,6 +3435,39 @@ async def auth_reset_password(req: ResetPasswordRequest, request: Request):
     auth_module.log_auth_event("password_reset", req.email, ip, "Password reset via site code")
     return {"ok": True, "message": "Password has been reset. You can now sign in."}
 
+
+class SetHubRoleRequest(BaseModel):
+    email: str
+    hub_role: str
+
+
+@app.put("/api/auth/role")
+async def auth_set_hub_role(req: SetHubRoleRequest):
+    """Update a user's hub_role for role-based navigation."""
+    import auth as auth_module
+    conn = auth_module._get_conn()
+    row = conn.execute("SELECT id FROM users WHERE email = ?", (req.email,)).fetchone()
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=404, detail="User not found")
+    conn.execute(
+        "UPDATE users SET hub_role = ?, updated_at = datetime('now') WHERE email = ?",
+        (req.hub_role, req.email),
+    )
+    conn.commit()
+    conn.close()
+    return {"ok": True, "email": req.email, "hub_role": req.hub_role}
+
+
+@app.get("/api/auth/roles")
+async def auth_list_roles():
+    """List available hub_roles for the role selector."""
+    import sys, os
+    _dash = os.path.join(os.path.dirname(__file__), "..", "dashboards")
+    if _dash not in sys.path:
+        sys.path.insert(0, _dash)
+    from shared.role_config import get_all_roles
+    return {"roles": [{"key": k, "name": n} for k, n in get_all_roles()]}
 
 
 @app.get("/api/auth/me")
@@ -6619,6 +6786,1542 @@ async def academy_check_badges(user_id: str):
     from academy_engine import check_and_award_badges
     newly = check_and_award_badges(config.HUB_DB, user_id)
     return {"newly_awarded": [b["name"] for b in newly], "count": len(newly)}
+
+
+# ── Analytics (page-view tracking) ─────────────────────────────────────────
+
+class PageViewRequest(BaseModel):
+    user_id: str
+    user_email: str = ""
+    page_slug: str
+    user_role: str = "user"
+
+
+@app.post("/api/analytics/pageview")
+async def analytics_log_pageview(req: PageViewRequest):
+    """Log a single page view. Fire-and-forget from frontend."""
+    from analytics_engine import log_page_view
+    log_page_view(config.HUB_DB, req.user_id, req.user_email,
+                  req.page_slug, req.user_role)
+    return {"ok": True}
+
+
+@app.get("/api/analytics/summary")
+async def analytics_summary(days: int = 30):
+    """Aggregate analytics for the last N days."""
+    from analytics_engine import get_analytics_summary
+    return get_analytics_summary(config.HUB_DB, days=days)
+
+
+@app.get("/api/analytics/users")
+async def analytics_users(days: int = 30):
+    """Per-user activity for the last N days."""
+    from analytics_engine import get_user_activity
+    return {"users": get_user_activity(config.HUB_DB, days=days)}
+
+
+@app.get("/api/analytics/by-role")
+async def analytics_by_role(days: int = 30):
+    """Usage broken down by hub_role."""
+    from analytics_engine import get_analytics_by_role
+    return {"roles": get_analytics_by_role(config.HUB_DB, days=days)}
+
+
+# ==========================================================================
+# SKILLS ACADEMY API
+# ==========================================================================
+
+class SkillsAssessmentRequest(BaseModel):
+    user_id: str
+    module_code: str
+    prompt_text: str
+
+
+@app.get("/api/skills/modules")
+async def skills_list_modules():
+    """List all 10 Skills Academy modules."""
+    from skills_engine import get_all_modules
+    return {"modules": get_all_modules(config.HUB_DB)}
+
+
+@app.get("/api/skills/modules/{code}")
+async def skills_get_module(code: str):
+    """Get a single module with full content."""
+    from skills_engine import get_module
+    m = get_module(config.HUB_DB, code.upper())
+    if not m:
+        raise HTTPException(status_code=404, detail="Module not found")
+    return m
+
+
+@app.get("/api/skills/progress/{user_id}")
+async def skills_get_progress(user_id: str):
+    """Get user progress across all modules."""
+    from skills_engine import get_user_skills_progress
+    return {"progress": get_user_skills_progress(config.HUB_DB, user_id)}
+
+
+@app.post("/api/skills/assessment/submit")
+async def skills_submit_assessment(req: SkillsAssessmentRequest):
+    """Submit a prompt for assessment scoring."""
+    from skills_engine import submit_assessment, score_assessment
+    assessment_id = submit_assessment(
+        config.HUB_DB, req.user_id, req.module_code.upper(), req.prompt_text
+    )
+    # Score immediately
+    result = score_assessment(config.HUB_DB, assessment_id, config.ANTHROPIC_API_KEY)
+    if result.get("error"):
+        return {"assessment_id": assessment_id, "status": "scoring_failed",
+                "error": result["error"]}
+
+    # Award XP
+    try:
+        from academy_engine import award_xp
+        award_xp(config.HUB_DB, req.user_id, "skills_assessment_submit",
+                  description=f"Submitted {req.module_code} assessment")
+        if result.get("passed"):
+            award_xp(config.HUB_DB, req.user_id, "skills_assessment_pass",
+                      description=f"Passed {req.module_code} assessment ({result['total']}/25)")
+    except Exception:
+        pass
+
+    return result
+
+
+@app.get("/api/skills/assessment/{user_id}/{module_code}")
+async def skills_get_assessment_results(user_id: str, module_code: str):
+    """Get all assessment results for a user on a module."""
+    from skills_engine import get_assessment_results
+    return {"results": get_assessment_results(config.HUB_DB, user_id, module_code.upper())}
+
+
+# ==========================================================================
+# PADDOCK PROGRESSIVE ASSESSMENT API
+# ==========================================================================
+
+class PaddockStartRequest(BaseModel):
+    user_id: str
+
+
+class PaddockAnswerRequest(BaseModel):
+    answer: str
+
+
+@app.post("/api/paddock/attempt/start")
+async def paddock_start_attempt(req: PaddockStartRequest):
+    """Start a new Paddock progressive assessment attempt."""
+    from paddock_engine import start_attempt
+    return start_attempt(config.HUB_DB, req.user_id)
+
+
+@app.post("/api/paddock/attempt/{attempt_id}/answer")
+async def paddock_submit_answer(attempt_id: int, req: PaddockAnswerRequest):
+    """Submit an answer to the current question. Returns next question or assessment result."""
+    # Get question_id from the attempt's current state
+    conn = sqlite3.connect(config.HUB_DB)
+    # Find the last response to determine which question was being answered
+    last_resp = conn.execute(
+        "SELECT question_id, difficulty_level FROM paddock_attempt_responses "
+        "WHERE attempt_id = ? ORDER BY id DESC LIMIT 1",
+        (attempt_id,),
+    ).fetchone()
+
+    # If no responses yet, this is the first question — get it from attempt start
+    if not last_resp:
+        # The question was served by start_attempt; find it
+        attempt = conn.execute(
+            "SELECT * FROM paddock_attempts WHERE id = ?", (attempt_id,)
+        ).fetchone()
+        if not attempt:
+            conn.close()
+            raise HTTPException(status_code=404, detail="Attempt not found")
+        # Get a level-1 question (same as start would have returned)
+        q = conn.execute(
+            "SELECT id FROM paddock_question_pool "
+            "WHERE difficulty_level = 1 AND suspended = 0 "
+            "ORDER BY RANDOM() LIMIT 1"
+        ).fetchone()
+        question_id = q[0] if q else None
+    else:
+        # They already answered some questions — need the NEXT question they were shown
+        # The question_id should be passed from the frontend
+        question_id = None
+
+    conn.close()
+
+    # The frontend should include question_id — let's check the request body
+    # For simplicity, we'll accept question_id as a query param
+    return {"error": "Use /api/paddock/attempt/{id}/answer/{question_id} instead"}
+
+
+@app.post("/api/paddock/attempt/{attempt_id}/answer/{question_id}")
+async def paddock_submit_answer_with_qid(attempt_id: int, question_id: int,
+                                          req: PaddockAnswerRequest):
+    """Submit answer to a specific question in the Paddock attempt."""
+    from paddock_engine import submit_answer
+    result = submit_answer(config.HUB_DB, attempt_id, question_id, req.answer)
+
+    if result.get("error"):
+        raise HTTPException(status_code=400, detail=result["error"])
+
+    # Award XP on completion
+    if result.get("assessment_complete") and result.get("result"):
+        attempt_result = result["result"]
+        try:
+            # Get user_id from attempt
+            conn = sqlite3.connect(config.HUB_DB)
+            attempt = conn.execute(
+                "SELECT user_id FROM paddock_attempts WHERE id = ?",
+                (attempt_id,),
+            ).fetchone()
+            conn.close()
+
+            if attempt:
+                user_id = attempt[0]
+                from academy_engine import award_xp
+                award_xp(config.HUB_DB, user_id, "paddock_attempt",
+                          description=f"Completed Paddock attempt — {attempt_result.get('tier_name', 'Unranked')}")
+
+                # Check for tier-up (new personal best)
+                from paddock_engine import get_user_best
+                best = get_user_best(config.HUB_DB, user_id)
+                if best and best.get("max_level_reached") == attempt_result.get("max_level_reached"):
+                    # This IS the new best — award tier-up XP
+                    award_xp(config.HUB_DB, user_id, "paddock_tier_up",
+                              description=f"New personal best — {attempt_result.get('tier_name', '')}")
+        except Exception:
+            pass
+
+    return result
+
+
+@app.get("/api/paddock/attempt/{attempt_id}")
+async def paddock_get_attempt(attempt_id: int):
+    """Get full attempt detail including all responses."""
+    from paddock_engine import get_attempt_detail
+    detail = get_attempt_detail(config.HUB_DB, attempt_id)
+    if not detail:
+        raise HTTPException(status_code=404, detail="Attempt not found")
+    return detail
+
+
+@app.get("/api/paddock/user/{user_id}/best")
+async def paddock_get_user_best(user_id: str):
+    """Get user's best Paddock attempt."""
+    from paddock_engine import get_user_best
+    best = get_user_best(config.HUB_DB, user_id)
+    return {"best": best}
+
+
+@app.get("/api/paddock/user/{user_id}/history")
+async def paddock_get_user_history(user_id: str, limit: int = 20):
+    """Get all Paddock attempts for a user."""
+    from paddock_engine import get_attempt_history
+    return {"history": get_attempt_history(config.HUB_DB, user_id, limit)}
+
+
+@app.get("/api/paddock/leaderboard")
+async def paddock_get_leaderboard(limit: int = 100):
+    """Get the Paddock leaderboard ranked by tier."""
+    from paddock_engine import get_leaderboard
+    return {"leaderboard": get_leaderboard(config.HUB_DB, limit)}
+
+
+# ==========================================================================
+# AI ADOPTION API (C1/T2 — aggregated from existing data sources)
+# ==========================================================================
+
+@app.get("/api/ai-adoption/summary")
+async def ai_adoption_summary():
+    """Org-wide AI adoption summary aggregated from page views, PtA, SA, KB."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        # Total unique users from page_views
+        total_users = conn.execute(
+            "SELECT COUNT(DISTINCT user_id) as c FROM page_views WHERE user_id IS NOT NULL"
+        ).fetchone()["c"]
+        total_views = conn.execute("SELECT COUNT(*) as c FROM page_views").fetchone()["c"]
+        # PtA submissions
+        pta_users = conn.execute(
+            "SELECT COUNT(DISTINCT user_id) as c FROM pta_submissions"
+        ).fetchone()["c"]
+        pta_count = conn.execute("SELECT COUNT(*) as c FROM pta_submissions").fetchone()["c"]
+        # SA users (v4)
+        sa_users = conn.execute(
+            "SELECT COUNT(DISTINCT user_id) as c FROM sa_user_xp"
+        ).fetchone()["c"]
+        # KB searches (from chat_history if exists)
+        kb_searches = 0
+        try:
+            kb_searches = conn.execute(
+                "SELECT COUNT(*) as c FROM chat_history"
+            ).fetchone()["c"]
+        except Exception:
+            pass
+        # Academy gamification
+        academy_users = conn.execute(
+            "SELECT COUNT(DISTINCT user_id) as c FROM academy_xp_log"
+        ).fetchone()["c"]
+        return {
+            "total_active_users": total_users,
+            "total_page_views": total_views,
+            "pta_submissions": pta_count,
+            "pta_active_users": pta_users,
+            "sa_active_users": sa_users,
+            "kb_searches": kb_searches,
+            "academy_active_users": academy_users,
+            "adoption_rate": round(total_users / 211 * 100, 1) if total_users else 0,
+            "org_headcount": 211,
+        }
+    finally:
+        conn.close()
+
+
+@app.get("/api/ai-adoption/by-department")
+async def ai_adoption_by_department():
+    """AI adoption metrics broken down by department from page views."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        # Page views by user, then map to roles if possible
+        rows = conn.execute("""
+            SELECT user_id, COUNT(*) as views,
+                   COUNT(DISTINCT page_slug) as pages_used,
+                   MIN(created_at) as first_seen,
+                   MAX(created_at) as last_seen
+            FROM page_views
+            WHERE user_id IS NOT NULL
+            GROUP BY user_id
+            ORDER BY views DESC
+        """).fetchall()
+        users = [dict(r) for r in rows]
+        # Get department breakdown from employee_roles
+        dept_rows = conn.execute("""
+            SELECT department, COUNT(*) as headcount
+            FROM employee_roles
+            GROUP BY department
+            ORDER BY headcount DESC
+        """).fetchall()
+        departments = [dict(r) for r in dept_rows]
+        return {"users": users, "departments": departments}
+    finally:
+        conn.close()
+
+
+@app.get("/api/ai-adoption/by-role")
+async def ai_adoption_by_role():
+    """AI adoption metrics by job role."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = conn.execute("""
+            SELECT function, department, job, COUNT(*) as headcount
+            FROM employee_roles
+            GROUP BY function, department, job
+            ORDER BY function, department, job
+        """).fetchall()
+        return {"roles": [dict(r) for r in rows], "total": sum(r["headcount"] for r in rows)}
+    finally:
+        conn.close()
+
+
+@app.get("/api/ai-adoption/timeline")
+async def ai_adoption_timeline():
+    """Daily adoption timeline from page views."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = conn.execute("""
+            SELECT DATE(created_at) as date,
+                   COUNT(*) as views,
+                   COUNT(DISTINCT user_id) as unique_users
+            FROM page_views
+            WHERE created_at IS NOT NULL
+            GROUP BY DATE(created_at)
+            ORDER BY date
+        """).fetchall()
+        return {"timeline": [dict(r) for r in rows]}
+    finally:
+        conn.close()
+
+
+# ==========================================================================
+# MISSION CONTROL / GOALS API (D1/T2)
+# ==========================================================================
+
+def _init_goals_table():
+    """Create goals table if not exists."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS hub_goals (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            description TEXT,
+            pillar TEXT,
+            metric_key TEXT,
+            target_value REAL,
+            current_value REAL DEFAULT 0,
+            unit TEXT DEFAULT '',
+            status TEXT DEFAULT 'active',
+            owner TEXT,
+            due_date TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    # Seed default goals if empty
+    count = conn.execute("SELECT COUNT(*) FROM hub_goals").fetchone()[0]
+    if count == 0:
+        goals = [
+            ("Reach 50% AI adoption across org", "Percentage of employees actively using Hub AI features weekly", "P5", "adoption_rate", 50.0, 0, "%", "active", "Gus Harris", "2026-06-30"),
+            ("100 PtA submissions approved", "Total prompt-to-approval submissions with SHIP verdict", "P3", "pta_approved", 100.0, 0, "submissions", "active", "Laura Durkan", "2026-06-30"),
+            ("All store managers complete SA L3", "Store managers reach Level 3 in Skills Academy", "P3", "sa_l3_managers", 100.0, 0, "%", "active", "Laura Durkan", "2026-09-30"),
+            ("$2M identified savings from AI insights", "Cumulative value of AI-identified operational improvements", "P5", "ai_savings", 2000000.0, 0, "$", "active", "Phil Cribb", "2026-12-31"),
+            ("Market share growth in core trade areas", "Average YoY share gain in 0-5km postcodes", "P2", "ms_core_growth", 1.0, 0, "pp", "active", "Luke Harris", "2026-06-30"),
+        ]
+        conn.executemany(
+            "INSERT INTO hub_goals (title, description, pillar, metric_key, target_value, current_value, unit, status, owner, due_date) VALUES (?,?,?,?,?,?,?,?,?,?)",
+            goals,
+        )
+        conn.commit()
+    conn.close()
+
+
+@app.get("/api/goals")
+async def get_goals():
+    """Get all Hub goals."""
+    _init_goals_table()
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = conn.execute("SELECT * FROM hub_goals ORDER BY pillar, id").fetchall()
+        goals = [dict(r) for r in rows]
+        # Auto-compute current values from live data
+        for g in goals:
+            if g["metric_key"] == "adoption_rate":
+                users = conn.execute(
+                    "SELECT COUNT(DISTINCT user_id) FROM page_views WHERE user_id IS NOT NULL"
+                ).fetchone()[0]
+                g["current_value"] = round(users / 211 * 100, 1) if users else 0
+            elif g["metric_key"] == "pta_approved":
+                approved = conn.execute(
+                    "SELECT COUNT(*) FROM pta_submissions WHERE status = 'approved'"
+                ).fetchone()[0]
+                g["current_value"] = approved
+        return {"goals": goals, "count": len(goals)}
+    finally:
+        conn.close()
+
+
+@app.get("/api/goals/active")
+async def get_active_goals():
+    """Get only active goals with progress percentage."""
+    _init_goals_table()
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = conn.execute("SELECT * FROM hub_goals WHERE status = 'active' ORDER BY due_date").fetchall()
+        goals = []
+        for r in rows:
+            g = dict(r)
+            if g["target_value"] and g["target_value"] > 0:
+                g["progress_pct"] = min(100, round(g["current_value"] / g["target_value"] * 100, 1))
+            else:
+                g["progress_pct"] = 0
+            goals.append(g)
+        return {"goals": goals, "count": len(goals)}
+    finally:
+        conn.close()
+
+
+@app.get("/api/growth-engine/status")
+async def growth_engine_status():
+    """Growth engine metrics — aggregated platform health and growth indicators."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        # Page views trend (last 7 days vs prior 7 days)
+        recent = conn.execute(
+            "SELECT COUNT(*) FROM page_views WHERE created_at >= datetime('now', '-7 days')"
+        ).fetchone()[0]
+        prior = conn.execute(
+            "SELECT COUNT(*) FROM page_views WHERE created_at >= datetime('now', '-14 days') AND created_at < datetime('now', '-7 days')"
+        ).fetchone()[0]
+        view_growth = round((recent - prior) / max(prior, 1) * 100, 1)
+        # SA engagement
+        sa_exercises = conn.execute(
+            "SELECT COUNT(*) FROM sa_exercise_results"
+        ).fetchone()[0]
+        # PtA engagement
+        pta_total = conn.execute("SELECT COUNT(*) FROM pta_submissions").fetchone()[0]
+        # KB usage
+        kb_articles = conn.execute("SELECT COUNT(*) FROM knowledge_base").fetchone()[0]
+        return {
+            "page_views_7d": recent,
+            "page_views_growth_pct": view_growth,
+            "sa_exercises_completed": sa_exercises,
+            "pta_submissions_total": pta_total,
+            "kb_articles": kb_articles,
+            "platform_health": "green" if recent > 0 else "amber",
+        }
+    finally:
+        conn.close()
+
+
+# ==========================================================================
+# WAY OF WORKING / INITIATIVES API (O1/T2)
+# ==========================================================================
+
+def _init_initiatives_table():
+    """Create initiatives table if not exists."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS hub_initiatives (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            description TEXT,
+            pillar TEXT,
+            status TEXT DEFAULT 'planned',
+            priority TEXT DEFAULT 'medium',
+            owner TEXT,
+            start_date TEXT,
+            target_date TEXT,
+            completion_pct INTEGER DEFAULT 0,
+            tags TEXT DEFAULT '',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    count = conn.execute("SELECT COUNT(*) FROM hub_initiatives").fetchone()[0]
+    if count == 0:
+        initiatives = [
+            ("Skills Academy v4 Launch", "Woven Verification, adaptive exercises, curveball injection", "P3", "completed", "high", "Laura Durkan", "2026-02-20", "2026-02-23", 100, "learning,ai"),
+            ("Hub Assistant KB Expansion", "Expand knowledge base from 543 to 1000+ articles", "P3", "in_progress", "medium", "Laura Durkan", "2026-02-15", "2026-04-30", 54, "knowledge"),
+            ("Transaction Analytics Rollout", "383M row DuckDB layer powering Customer Hub and Operations", "P4", "completed", "high", "Phil Cribb", "2026-01-15", "2026-02-15", 100, "data,analytics"),
+            ("Market Share Integration", "CBAS postcode-level market share data into Customer Hub", "P2", "completed", "high", "Luke Harris", "2026-01-20", "2026-02-10", 100, "data,strategy"),
+            ("WATCHDOG Governance System", "7 Laws, audit trail, safety reviews, scheduler", "P5", "completed", "critical", "Phil Cribb", "2026-02-01", "2026-02-20", 100, "safety,governance"),
+            ("Agent Arena Competition", "5-team agent competition for operational insights", "P5", "in_progress", "medium", "Phil Cribb", "2026-02-10", "2026-03-31", 40, "ai,agents"),
+            ("AI Adoption Tracking", "Org-wide adoption metrics dashboard", "P5", "in_progress", "high", "Gus Harris", "2026-02-23", "2026-03-15", 20, "adoption,metrics"),
+            ("Frontline AI Training Program", "Store-level AI readiness for all 211 roles", "P3", "planned", "high", "Laura Durkan", "2026-03-01", "2026-06-30", 0, "training,frontline"),
+            ("Sustainability KPI Dashboard", "B-Corp metrics, carbon tracking, community impact", "P1", "in_progress", "medium", "Tristan Harris", "2026-02-01", "2026-04-30", 30, "sustainability"),
+            ("Executive Decision Support", "AI-powered strategic briefings for C-Suite", "P5", "planned", "high", "Gus Harris", "2026-03-15", "2026-06-30", 0, "strategy,ai"),
+        ]
+        conn.executemany(
+            "INSERT INTO hub_initiatives (title, description, pillar, status, priority, owner, start_date, target_date, completion_pct, tags) VALUES (?,?,?,?,?,?,?,?,?,?)",
+            initiatives,
+        )
+        conn.commit()
+    conn.close()
+
+
+@app.get("/api/initiatives")
+async def get_initiatives():
+    """Get all initiatives."""
+    _init_initiatives_table()
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = conn.execute("SELECT * FROM hub_initiatives ORDER BY priority DESC, target_date").fetchall()
+        return {"initiatives": [dict(r) for r in rows], "count": len(rows)}
+    finally:
+        conn.close()
+
+
+@app.get("/api/initiatives/by-pillar")
+async def get_initiatives_by_pillar():
+    """Get initiatives grouped by strategic pillar."""
+    _init_initiatives_table()
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = conn.execute("SELECT * FROM hub_initiatives ORDER BY pillar, priority DESC").fetchall()
+        pillars = {}
+        for r in rows:
+            d = dict(r)
+            p = d["pillar"]
+            if p not in pillars:
+                pillars[p] = []
+            pillars[p].append(d)
+        summary = {}
+        for p, items in pillars.items():
+            summary[p] = {
+                "initiatives": items,
+                "count": len(items),
+                "completed": sum(1 for i in items if i["status"] == "completed"),
+                "in_progress": sum(1 for i in items if i["status"] == "in_progress"),
+                "planned": sum(1 for i in items if i["status"] == "planned"),
+                "avg_completion": round(sum(i["completion_pct"] for i in items) / len(items), 1),
+            }
+        return {"pillars": summary, "total_count": len(rows)}
+    finally:
+        conn.close()
+
+
+# ==========================================================================
+# FLAG SYSTEM API
+# ==========================================================================
+
+class FlagSubmitRequest(BaseModel):
+    user_id: str
+    page_slug: str
+    category: str
+    description: Optional[str] = ""
+    element_id: Optional[str] = None
+
+
+class FlagResolveRequest(BaseModel):
+    resolution_notes: str
+    resolved_by: str
+
+
+@app.post("/api/flags/submit")
+async def flags_submit(req: FlagSubmitRequest):
+    """Submit a flag for any Hub page."""
+    from flag_engine import submit_flag
+    result = submit_flag(
+        config.HUB_DB, req.user_id, req.page_slug,
+        req.category, req.description, req.element_id
+    )
+
+    # Award XP for contributing feedback
+    try:
+        from academy_engine import award_xp
+        award_xp(config.HUB_DB, req.user_id, "flag_submit",
+                  description=f"Flagged issue on {req.page_slug}")
+    except Exception:
+        pass
+
+    return result
+
+
+@app.get("/api/flags")
+async def flags_list(status: Optional[str] = None, page_slug: Optional[str] = None,
+                     limit: int = 100):
+    """List flags (admin). Optional filters: status, page_slug."""
+    from flag_engine import get_flags
+    return {"flags": get_flags(config.HUB_DB, status, page_slug, limit)}
+
+
+@app.put("/api/flags/{flag_id}/resolve")
+async def flags_resolve(flag_id: int, req: FlagResolveRequest):
+    """Resolve a flag (admin)."""
+    from flag_engine import resolve_flag
+    return resolve_flag(config.HUB_DB, flag_id, req.resolution_notes, req.resolved_by)
+
+
+@app.get("/api/flags/metrics")
+async def flags_metrics():
+    """Get flag system metrics."""
+    from flag_engine import get_flag_metrics
+    return get_flag_metrics(config.HUB_DB)
+
+
+# ==========================================================================
+# SKILLS ACADEMY v3 — PLACEMENT, ADAPTIVE, MINDSET, SOCIAL, HIPO
+# ==========================================================================
+
+# --- Pydantic models ---
+
+class PlacementSubmitRequest(BaseModel):
+    user_id: str
+    responses: list  # [{scenario_id, response, score, time_seconds}]
+
+
+class AdaptiveUpdateRequest(BaseModel):
+    user_id: str
+    module_code: str
+    score_pct: float
+
+
+class SkipAheadRequest(BaseModel):
+    user_id: str
+    from_module: str
+    to_module: str
+    response: str
+
+
+class MindsetSubmitRequest(BaseModel):
+    user_id: str
+    level_number: int
+    responses: dict  # {first_instinct, scope, ambition, breadth}
+
+
+class DailyMicroSubmitRequest(BaseModel):
+    user_id: str
+    challenge_id: int
+    answer: str
+    time_seconds: int = 0
+
+
+class PeerBattleCreateRequest(BaseModel):
+    challenger_id: str
+    scenario_text: str
+    prompt: str
+
+
+class PeerBattleJoinRequest(BaseModel):
+    opponent_id: str
+    prompt: str
+
+
+# --- Placement endpoints ---
+
+@app.get("/api/skills/placement/scenarios")
+async def skills_placement_scenarios():
+    """Get the 5 placement challenge scenarios."""
+    import sys as _sys
+    _sys.path.insert(0, str(Path(__file__).parent.parent / "dashboards"))
+    from shared.placement_content import get_all_scenarios
+    return {"scenarios": get_all_scenarios()}
+
+
+@app.get("/api/skills/placement/{user_id}")
+async def skills_placement_get(user_id: str):
+    """Get user's placement result (404 if not yet placed)."""
+    from placement_engine import get_user_placement
+    result = get_user_placement(config.HUB_DB, user_id)
+    if not result:
+        from fastapi.responses import JSONResponse
+        return JSONResponse(status_code=404, content={"detail": "Not placed yet"})
+    return result
+
+
+@app.post("/api/skills/placement/submit")
+async def skills_placement_submit(req: PlacementSubmitRequest):
+    """Submit placement challenge responses and get level assignment."""
+    from placement_engine import submit_placement
+    result = submit_placement(config.HUB_DB, req.user_id, req.responses)
+
+    # Award XP for completing placement
+    try:
+        from academy_engine import award_xp
+        award_xp(config.HUB_DB, req.user_id, "placement_complete",
+                  description="Completed Placement Challenge")
+    except Exception:
+        pass
+
+    return result
+
+
+# --- Adaptive difficulty endpoints ---
+
+@app.get("/api/skills/adaptive/{user_id}/{module_code}")
+async def skills_adaptive_get(user_id: str, module_code: str):
+    """Get current adaptive tier for a user on a module."""
+    from skills_engine import get_exercise_tier
+    return get_exercise_tier(config.HUB_DB, user_id, module_code)
+
+
+@app.post("/api/skills/adaptive/update")
+async def skills_adaptive_update(req: AdaptiveUpdateRequest):
+    """Update adaptive tier based on exercise score."""
+    from skills_engine import update_exercise_tier
+    result = update_exercise_tier(
+        config.HUB_DB, req.user_id, req.module_code, req.score_pct
+    )
+
+    # Award XP for stretch/elite tier completions
+    if result.get("current_tier") == "stretch" and req.score_pct >= 60:
+        try:
+            from academy_engine import award_xp
+            award_xp(config.HUB_DB, req.user_id, "exercise_stretch",
+                      description="Stretch exercise on {}".format(req.module_code))
+        except Exception:
+            pass
+    elif result.get("current_tier") == "elite" and req.score_pct >= 60:
+        try:
+            from academy_engine import award_xp
+            award_xp(config.HUB_DB, req.user_id, "exercise_elite",
+                      description="Elite exercise on {}".format(req.module_code))
+        except Exception:
+            pass
+
+    return result
+
+
+@app.post("/api/skills/skip-ahead")
+async def skills_skip_ahead(req: SkipAheadRequest):
+    """Attempt a skip-ahead challenge."""
+    from skills_engine import attempt_skip_ahead
+    result = attempt_skip_ahead(
+        config.HUB_DB, req.user_id, req.from_module, req.to_module,
+        req.response, config.ANTHROPIC_API_KEY
+    )
+
+    if result.get("passed"):
+        try:
+            from academy_engine import award_xp
+            award_xp(config.HUB_DB, req.user_id, "skip_ahead_pass",
+                      description="Skip ahead from {} to {}".format(
+                          req.from_module, req.to_module))
+        except Exception:
+            pass
+
+    return result
+
+
+# --- Mindset assessment endpoints ---
+
+@app.post("/api/skills/mindset/submit")
+async def skills_mindset_submit(req: MindsetSubmitRequest):
+    """Submit a mindset assessment."""
+    from skills_engine import submit_mindset_assessment
+    result = submit_mindset_assessment(
+        config.HUB_DB, req.user_id, req.level_number, req.responses
+    )
+
+    # Award XP
+    try:
+        from academy_engine import award_xp
+        award_xp(config.HUB_DB, req.user_id, "mindset_assessment",
+                  description="Mindset assessment at level {}".format(req.level_number))
+    except Exception:
+        pass
+
+    return result
+
+
+@app.get("/api/skills/mindset/{user_id}")
+async def skills_mindset_get(user_id: str):
+    """Get all mindset assessments for a user."""
+    from skills_engine import get_mindset_history
+    return {"assessments": get_mindset_history(config.HUB_DB, user_id)}
+
+
+# --- Daily micro-challenge endpoints ---
+
+@app.get("/api/skills/daily-micro")
+async def skills_daily_micro_get():
+    """Get today's daily micro-challenge."""
+    from skills_engine import get_daily_micro
+    challenge = get_daily_micro(config.HUB_DB)
+    if not challenge:
+        return {"challenge": None}
+    # Don't send correct answer to frontend
+    safe = {k: v for k, v in challenge.items() if k != "correct_answer"}
+    return {"challenge": safe}
+
+
+@app.post("/api/skills/daily-micro/submit")
+async def skills_daily_micro_submit(req: DailyMicroSubmitRequest):
+    """Submit answer for daily micro-challenge."""
+    from skills_engine import submit_daily_micro
+    result = submit_daily_micro(
+        config.HUB_DB, req.user_id, req.challenge_id,
+        req.answer, req.time_seconds
+    )
+
+    # Award XP if correct
+    if result.get("is_correct") and not result.get("already_completed"):
+        try:
+            from academy_engine import award_xp
+            award_xp(config.HUB_DB, req.user_id, "micro_challenge",
+                      description="Daily micro-challenge completed")
+        except Exception:
+            pass
+
+    return result
+
+
+# --- Peer battle endpoints ---
+
+@app.post("/api/skills/battle/create")
+async def skills_battle_create(req: PeerBattleCreateRequest):
+    """Create an open peer battle."""
+    from skills_engine import create_peer_battle
+    result = create_peer_battle(
+        config.HUB_DB, req.challenger_id, req.scenario_text, req.prompt
+    )
+
+    # Award XP for submitting
+    try:
+        from academy_engine import award_xp
+        award_xp(config.HUB_DB, req.challenger_id, "peer_battle_submit",
+                  description="Created peer battle")
+    except Exception:
+        pass
+
+    return result
+
+
+@app.post("/api/skills/battle/{battle_id}/join")
+async def skills_battle_join(battle_id: int, req: PeerBattleJoinRequest):
+    """Join an open peer battle and submit prompt."""
+    from skills_engine import join_peer_battle, score_peer_battle
+    join_result = join_peer_battle(
+        config.HUB_DB, battle_id, req.opponent_id, req.prompt
+    )
+    if "error" in join_result:
+        return join_result
+
+    # Award XP for joining
+    try:
+        from academy_engine import award_xp
+        award_xp(config.HUB_DB, req.opponent_id, "peer_battle_submit",
+                  description="Joined peer battle")
+    except Exception:
+        pass
+
+    # Auto-score the battle
+    score_result = score_peer_battle(
+        config.HUB_DB, battle_id, config.ANTHROPIC_API_KEY
+    )
+
+    # Award XP to winner
+    if score_result.get("winner_id"):
+        try:
+            from academy_engine import award_xp
+            award_xp(config.HUB_DB, score_result["winner_id"], "peer_battle_win",
+                      description="Won peer battle")
+        except Exception:
+            pass
+
+    return score_result
+
+
+@app.get("/api/skills/battle/open")
+async def skills_battle_open(limit: int = 20):
+    """List open peer battles available to join."""
+    from skills_engine import get_open_battles
+    return {"battles": get_open_battles(config.HUB_DB, limit)}
+
+
+# --- HiPo admin endpoints ---
+
+@app.get("/api/skills/hipo/{user_id}")
+async def skills_hipo_get(user_id: str):
+    """Get HiPo signals for a user."""
+    from hipo_engine import get_user_hipo
+    return get_user_hipo(config.HUB_DB, user_id)
+
+
+@app.get("/api/skills/hipo/matrix")
+async def skills_hipo_matrix():
+    """Admin: Get the 2x2 HiPo matrix data."""
+    from hipo_engine import get_hipo_matrix
+    return get_hipo_matrix(config.HUB_DB)
+
+
+@app.post("/api/skills/hipo/{user_id}/calculate")
+async def skills_hipo_calculate(user_id: str):
+    """Calculate/refresh all HiPo signals for a user."""
+    from hipo_engine import calculate_all_signals
+    signals = calculate_all_signals(config.HUB_DB, user_id)
+    return {"user_id": user_id, "signals": signals}
+
+
+# ==========================================================================
+# SKILLS ACADEMY v4 API
+# ==========================================================================
+
+# ---- v4 Pydantic models ----
+
+class SAv4PlacementRequest(BaseModel):
+    user_id: str
+    responses: list  # [{scenario_id, response, time_seconds}]
+
+class SAv4ExerciseSubmitRequest(BaseModel):
+    user_id: str
+    exercise_id: int
+    response: str
+
+class SAv4AdaptiveUpdateRequest(BaseModel):
+    user_id: str
+    module_code: str
+    score_pct: float
+
+class SAv4MindsetRequest(BaseModel):
+    user_id: str
+    level: int
+    responses: dict
+
+class SAv4DailyCompleteRequest(BaseModel):
+    user_id: str
+    challenge_id: int
+    answer: str
+    time_seconds: int = 0
+
+class SAv4BattleCreateRequest(BaseModel):
+    challenger_id: str
+    scenario_text: str
+    response: str
+
+class SAv4BattleJoinRequest(BaseModel):
+    opponent_id: str
+    response: str
+
+class SAv4PromptSubmitRequest(BaseModel):
+    user_id: str
+    title: str
+    prompt_text: str
+    description: str = ""
+    department: str = ""
+    tags: str = ""
+
+class SAv4MentoringRequest(BaseModel):
+    mentor_id: str
+    mentee_id: str
+    mentee_start_level: int
+    mentee_target_level: int
+
+class SAv4LiveProblemSubmitRequest(BaseModel):
+    user_id: str
+    problem_id: int
+    response: str
+
+class SAv4VerificationCheckRequest(BaseModel):
+    user_id: str
+    level: int
+
+# ---- v4 Modules & Content ----
+
+@app.get("/api/skills-academy/modules")
+async def sa_v4_modules():
+    """List all v4 modules."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = conn.execute(
+            "SELECT m.*, s.series_code, s.series_name "
+            "FROM sa_modules m JOIN sa_series s ON m.series_id = s.series_id "
+            "WHERE m.is_active = 1 ORDER BY s.series_code, m.display_order"
+        ).fetchall()
+        return {"modules": [dict(r) for r in rows]}
+    finally:
+        conn.close()
+
+
+@app.get("/api/skills-academy/modules/{code}")
+async def sa_v4_module_detail(code: str):
+    """Get a module with lessons."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        mod = conn.execute(
+            "SELECT m.*, s.series_code FROM sa_modules m "
+            "JOIN sa_series s ON m.series_id = s.series_id "
+            "WHERE m.module_code = ?", (code,)
+        ).fetchone()
+        if not mod:
+            return {"error": "Module not found"}, 404
+        lessons = conn.execute(
+            "SELECT * FROM sa_lessons WHERE module_id = ? AND is_active = 1 "
+            "ORDER BY display_order", (mod["module_id"],)
+        ).fetchall()
+        return {"module": dict(mod), "lessons": [dict(l) for l in lessons]}
+    finally:
+        conn.close()
+
+
+@app.get("/api/skills-academy/modules/{code}/lessons")
+async def sa_v4_lessons(code: str):
+    """Get lessons for a module."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        mod = conn.execute(
+            "SELECT module_id FROM sa_modules WHERE module_code = ?", (code,)
+        ).fetchone()
+        if not mod:
+            return {"error": "Module not found"}
+        lessons = conn.execute(
+            "SELECT * FROM sa_lessons WHERE module_id = ? ORDER BY display_order",
+            (mod["module_id"],)
+        ).fetchall()
+        return {"lessons": [dict(l) for l in lessons]}
+    finally:
+        conn.close()
+
+
+@app.get("/api/skills-academy/levels")
+async def sa_v4_levels():
+    """Get all level definitions."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = conn.execute("SELECT * FROM sa_levels ORDER BY level_number").fetchall()
+        return {"levels": [dict(r) for r in rows]}
+    finally:
+        conn.close()
+
+
+@app.get("/api/skills-academy/progress/{user_id}")
+async def sa_v4_progress(user_id: str):
+    """Get user's module progress."""
+    from sa_v4_exercise_engine import get_all_module_progress
+    return {"progress": get_all_module_progress(config.HUB_DB, user_id)}
+
+
+@app.get("/api/skills-academy/role-pathways")
+async def sa_v4_role_pathways():
+    """Get all role pathways."""
+    from sa_v4_social import get_role_pathways
+    return {"pathways": get_role_pathways(config.HUB_DB)}
+
+@app.get("/api/skills-academy/my-pathway")
+async def sa_v4_my_pathway(role: str = ""):
+    """Get a specific role pathway."""
+    from sa_v4_social import get_user_pathway
+    result = get_user_pathway(config.HUB_DB, role)
+    return result if result else {"error": "Role not found"}
+
+# ---- v4 Placement ----
+
+@app.get("/api/skills-academy/placement/scenarios")
+async def sa_v4_placement_scenarios():
+    """Get 5 placement scenario definitions."""
+    from sa_v4_placement import get_scenarios
+    return {"scenarios": get_scenarios()}
+
+
+@app.get("/api/skills-academy/placement/{user_id}")
+async def sa_v4_placement_result(user_id: str):
+    """Get placement result (or 404)."""
+    from sa_v4_placement import get_result
+    result = get_result(config.HUB_DB, user_id)
+    if not result:
+        from fastapi.responses import JSONResponse
+        return JSONResponse(status_code=404, content={"error": "Not placed yet"})
+    return result
+
+
+@app.post("/api/skills-academy/placement/submit")
+async def sa_v4_placement_submit(req: SAv4PlacementRequest):
+    """Submit placement responses and get level assignment."""
+    from sa_v4_placement import submit_placement
+    result = submit_placement(config.HUB_DB, req.user_id, req.responses,
+                              os.getenv("ANTHROPIC_API_KEY"))
+    try:
+        from sa_v4_xp_engine import award_xp
+        award_xp(config.HUB_DB, req.user_id, "placement_complete")
+    except Exception:
+        pass
+    return result
+
+
+@app.post("/api/skills-academy/placement/{user_id}/reset")
+async def sa_v4_placement_reset(user_id: str):
+    """Admin: reset placement."""
+    from sa_v4_placement import reset_placement
+    reset_placement(config.HUB_DB, user_id)
+    return {"reset": True}
+
+# ---- v4 Exercises & Scoring ----
+
+@app.get("/api/skills-academy/exercise/{user_id}/{module_code}")
+async def sa_v4_next_exercise(user_id: str, module_code: str):
+    """Get next exercise (with curveball/foundation injection)."""
+    from sa_v4_exercise_engine import get_next_exercise
+    return get_next_exercise(config.HUB_DB, user_id, module_code)
+
+
+@app.post("/api/skills-academy/exercise/submit")
+async def sa_v4_exercise_submit(req: SAv4ExerciseSubmitRequest):
+    """Submit exercise response for scoring."""
+    from sa_v4_rubric_engine import evaluate_exercise
+    result = evaluate_exercise(config.HUB_DB, req.user_id, req.exercise_id,
+                               req.response, os.getenv("ANTHROPIC_API_KEY"))
+    if "error" not in result:
+        # Process verification evidence
+        try:
+            from sa_v4_verification import process_exercise_result
+            process_exercise_result(config.HUB_DB, req.user_id, result)
+        except Exception:
+            pass
+        # Award XP
+        try:
+            from sa_v4_xp_engine import award_xp
+            if result.get("is_curveball") and result.get("passed"):
+                award_xp(config.HUB_DB, req.user_id, "curveball_pass")
+            elif result.get("passed"):
+                tier = result.get("tier", "standard")
+                xp_type = "exercise_{}".format(tier) if tier in ("stretch", "elite") else "exercise_standard"
+                award_xp(config.HUB_DB, req.user_id, xp_type)
+        except Exception:
+            pass
+    return result
+
+
+@app.get("/api/skills-academy/exercise/history/{user_id}/{module_code}")
+async def sa_v4_exercise_history(user_id: str, module_code: str):
+    """Get exercise history."""
+    from sa_v4_exercise_engine import get_exercise_history
+    return {"history": get_exercise_history(config.HUB_DB, user_id, module_code)}
+
+
+@app.get("/api/skills-academy/adaptive/{user_id}/{module_code}")
+async def sa_v4_adaptive_tier(user_id: str, module_code: str):
+    """Get adaptive tier."""
+    from sa_v4_exercise_engine import get_adaptive_tier
+    return get_adaptive_tier(config.HUB_DB, user_id, module_code)
+
+
+@app.post("/api/skills-academy/adaptive/update")
+async def sa_v4_adaptive_update(req: SAv4AdaptiveUpdateRequest):
+    """Update adaptive tier after exercise score."""
+    from sa_v4_exercise_engine import update_adaptive_tier
+    return update_adaptive_tier(config.HUB_DB, req.user_id, req.module_code, req.score_pct)
+
+
+@app.post("/api/skills-academy/assessment/submit")
+async def sa_v4_assessment_submit(req: SAv4ExerciseSubmitRequest):
+    """Submit module assessment."""
+    from sa_v4_rubric_engine import evaluate_exercise
+    result = evaluate_exercise(config.HUB_DB, req.user_id, req.exercise_id,
+                               req.response, os.getenv("ANTHROPIC_API_KEY"))
+    if "error" not in result and result.get("passed"):
+        try:
+            from sa_v4_xp_engine import award_xp
+            score = result.get("percentage", 0)
+            if score >= 0.8:
+                award_xp(config.HUB_DB, req.user_id, "assessment_high")
+            else:
+                award_xp(config.HUB_DB, req.user_id, "assessment_pass")
+        except Exception:
+            pass
+    return result
+
+
+@app.get("/api/skills-academy/assessment/{user_id}/{module_code}")
+async def sa_v4_assessment_history(user_id: str, module_code: str):
+    """Get assessment results."""
+    from sa_v4_rubric_engine import get_user_evaluations
+    return {"evaluations": get_user_evaluations(config.HUB_DB, user_id, module_code)}
+
+# ---- v4 Verification ----
+# Static path segments MUST come before {level} to avoid FastAPI matching "status"/"gaps"/"evidence" as int
+
+@app.get("/api/skills-academy/verification/{user_id}/status")
+async def sa_v4_verification_status(user_id: str):
+    """Get all verification statuses."""
+    from sa_v4_verification import get_verification_status
+    return get_verification_status(config.HUB_DB, user_id)
+
+
+@app.get("/api/skills-academy/verification/{user_id}/gaps")
+async def sa_v4_verification_gaps(user_id: str, level: int = 1):
+    """Gap detection."""
+    from sa_v4_verification import detect_gaps
+    return {"gaps": detect_gaps(config.HUB_DB, user_id, level)}
+
+
+@app.get("/api/skills-academy/verification/{user_id}/evidence")
+async def sa_v4_verification_evidence(user_id: str, level: int = 0):
+    """Get detailed evidence log."""
+    from sa_v4_verification import get_evidence_log
+    lv = level if level > 0 else None
+    return {"evidence": get_evidence_log(config.HUB_DB, user_id, lv)}
+
+
+@app.post("/api/skills-academy/verification/check")
+async def sa_v4_verification_check(req: SAv4VerificationCheckRequest):
+    """Trigger promotion check."""
+    from sa_v4_verification import check_and_promote
+    result = check_and_promote(config.HUB_DB, req.user_id, req.level)
+    if result:
+        try:
+            from sa_v4_xp_engine import award_xp
+            award_xp(config.HUB_DB, req.user_id, "level_confirmation",
+                      description="Level {} confirmed".format(req.level))
+        except Exception:
+            pass
+    return result if result else {"status": "not_yet", "level": req.level}
+
+
+@app.get("/api/skills-academy/verification/{user_id}/{level}")
+async def sa_v4_verification_rings(user_id: str, level: int):
+    """Get verification ring data for frontend."""
+    from sa_v4_verification import get_ring_data
+    return get_ring_data(config.HUB_DB, user_id, level)
+
+
+@app.get("/api/skills-academy/dormancy/{user_id}")
+async def sa_v4_dormancy(user_id: str):
+    """Check dormancy status."""
+    from sa_v4_verification import check_dormancy
+    result = check_dormancy(config.HUB_DB, user_id)
+    return result if result else {"dormant": False}
+
+# ---- v4 XP & Badges ----
+
+@app.get("/api/skills-academy/xp/{user_id}")
+async def sa_v4_xp(user_id: str):
+    """Get user XP summary."""
+    from sa_v4_xp_engine import get_xp
+    return get_xp(config.HUB_DB, user_id)
+
+
+@app.get("/api/skills-academy/xp/{user_id}/history")
+async def sa_v4_xp_history(user_id: str, limit: int = 50):
+    """Get XP log."""
+    from sa_v4_xp_engine import get_xp_history
+    return {"history": get_xp_history(config.HUB_DB, user_id, limit)}
+
+
+@app.get("/api/skills-academy/badges/{user_id}")
+async def sa_v4_badges(user_id: str):
+    """Get badges."""
+    from sa_v4_xp_engine import get_badges
+    return get_badges(config.HUB_DB, user_id)
+
+
+@app.get("/api/skills-academy/leaderboard")
+async def sa_v4_leaderboard(period: str = "all", limit: int = 50):
+    """Get leaderboard."""
+    from sa_v4_xp_engine import get_leaderboard
+    return {"leaderboard": get_leaderboard(config.HUB_DB, period, limit)}
+
+
+@app.post("/api/skills-academy/badges/{user_id}/check")
+async def sa_v4_badge_check(user_id: str):
+    """Trigger badge check."""
+    from sa_v4_xp_engine import check_triggers
+    return {"new_badges": check_triggers(config.HUB_DB, user_id)}
+
+# ---- v4 Rubrics ----
+
+@app.get("/api/skills-academy/rubrics")
+async def sa_v4_rubrics():
+    """Get all rubric definitions."""
+    from sa_v4_rubric_engine import get_all_rubrics
+    return {"rubrics": get_all_rubrics(config.HUB_DB)}
+
+
+@app.get("/api/skills-academy/rubrics/{code}")
+async def sa_v4_rubric_detail(code: str):
+    """Get a specific rubric."""
+    from sa_v4_rubric_engine import get_rubric
+    result = get_rubric(config.HUB_DB, code)
+    return result if result else {"error": "Rubric not found"}
+
+# ---- v4 Mindset ----
+
+@app.get("/api/skills-academy/mindset/scenario")
+async def sa_v4_mindset_scenario(level: int = 2):
+    """Get a mindset scenario for the level."""
+    from sa_v4_social import get_mindset_scenario
+    result = get_mindset_scenario(config.HUB_DB, level)
+    return result if result else {"error": "No scenario for this level"}
+
+
+@app.post("/api/skills-academy/mindset/evaluate")
+async def sa_v4_mindset_evaluate(req: SAv4MindsetRequest):
+    """Submit mindset assessment."""
+    # Use existing mindset content scoring
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent / "dashboards"))
+        from shared.mindset_content import score_mindset_responses
+        result = score_mindset_responses(req.level, req.responses)
+        try:
+            from sa_v4_xp_engine import award_xp
+            award_xp(config.HUB_DB, req.user_id, "mindset_assessment")
+        except Exception:
+            pass
+        return {"user_id": req.user_id, "level": req.level, **result}
+    except Exception as e:
+        return {"error": str(e)}
+
+# ---- v4 Social: Prompt Library ----
+
+@app.post("/api/skills-academy/prompt-library/submit")
+async def sa_v4_prompt_submit(req: SAv4PromptSubmitRequest):
+    """Submit prompt to library."""
+    from sa_v4_social import submit_prompt
+    result = submit_prompt(config.HUB_DB, req.user_id, req.title, req.prompt_text,
+                           req.description, department=req.department, tags=req.tags)
+    try:
+        from sa_v4_xp_engine import award_xp
+        award_xp(config.HUB_DB, req.user_id, "library_contribution")
+    except Exception:
+        pass
+    return result
+
+
+@app.get("/api/skills-academy/prompt-library")
+async def sa_v4_prompt_list(status: str = "approved", department: str = "", limit: int = 50):
+    """Browse prompt library."""
+    from sa_v4_social import get_prompts
+    return {"prompts": get_prompts(config.HUB_DB, status, department, limit)}
+
+
+@app.post("/api/skills-academy/prompt-library/{prompt_id}/review")
+async def sa_v4_prompt_review(prompt_id: int, reviewer_id: str = "", approved: bool = True):
+    """Review a prompt."""
+    from sa_v4_social import review_prompt
+    return review_prompt(config.HUB_DB, reviewer_id, prompt_id, approved)
+
+# ---- v4 Social: Mentoring ----
+
+@app.post("/api/skills-academy/mentoring/create")
+async def sa_v4_mentoring_create(req: SAv4MentoringRequest):
+    """Create mentor pair."""
+    from sa_v4_social import create_mentoring_pair
+    return create_mentoring_pair(config.HUB_DB, req.mentor_id, req.mentee_id,
+                                 req.mentee_start_level, req.mentee_target_level)
+
+
+@app.get("/api/skills-academy/mentoring/{user_id}")
+async def sa_v4_mentoring_list(user_id: str):
+    """Get mentoring relationships."""
+    from sa_v4_social import get_mentoring_relationships
+    return get_mentoring_relationships(config.HUB_DB, user_id)
+
+# ---- v4 Social: Peer Battles ----
+
+@app.post("/api/skills-academy/battle/create")
+async def sa_v4_battle_create(req: SAv4BattleCreateRequest):
+    """Create open battle."""
+    from sa_v4_social import create_peer_battle
+    result = create_peer_battle(config.HUB_DB, req.challenger_id, req.scenario_text,
+                                req.response)
+    try:
+        from sa_v4_xp_engine import award_xp
+        award_xp(config.HUB_DB, req.challenger_id, "peer_battle_submit")
+    except Exception:
+        pass
+    return result
+
+
+@app.post("/api/skills-academy/battle/{battle_id}/join")
+async def sa_v4_battle_join(battle_id: int, req: SAv4BattleJoinRequest):
+    """Join and score battle."""
+    from sa_v4_social import join_peer_battle
+    result = join_peer_battle(config.HUB_DB, battle_id, req.opponent_id,
+                              req.response, os.getenv("ANTHROPIC_API_KEY"))
+    try:
+        from sa_v4_xp_engine import award_xp
+        award_xp(config.HUB_DB, req.opponent_id, "peer_battle_submit")
+        if result.get("winner"):
+            award_xp(config.HUB_DB, result["winner"], "peer_battle_win")
+    except Exception:
+        pass
+    return result
+
+
+@app.get("/api/skills-academy/battle/open")
+async def sa_v4_battle_open(limit: int = 20):
+    """List open battles."""
+    from sa_v4_social import get_open_battles
+    return {"battles": get_open_battles(config.HUB_DB, limit)}
+
+# ---- v4 Live Problems & Daily ----
+
+@app.get("/api/skills-academy/live-problems")
+async def sa_v4_live_problems(level: int = 0, limit: int = 20):
+    """List live problems."""
+    from sa_v4_social import get_live_problems
+    lv = level if level > 0 else None
+    return {"problems": get_live_problems(config.HUB_DB, lv, limit)}
+
+
+@app.post("/api/skills-academy/live-problems/{problem_id}/submit")
+async def sa_v4_live_problem_submit(problem_id: int, req: SAv4LiveProblemSubmitRequest):
+    """Submit live problem solution."""
+    from sa_v4_social import submit_live_problem_solution
+    result = submit_live_problem_solution(config.HUB_DB, req.user_id, problem_id,
+                                          req.response, os.getenv("ANTHROPIC_API_KEY"))
+    if result.get("passed"):
+        try:
+            from sa_v4_verification import record_application_evidence
+            record_application_evidence(config.HUB_DB, req.user_id,
+                                        result.get("level", 1),
+                                        result.get("score", 0), True,
+                                        problem_id=problem_id)
+        except Exception:
+            pass
+        try:
+            from sa_v4_xp_engine import award_xp
+            award_xp(config.HUB_DB, req.user_id, "assessment_pass",
+                      description="Live problem: {}".format(problem_id))
+        except Exception:
+            pass
+    return result
+
+
+@app.get("/api/skills-academy/daily/{user_id}")
+async def sa_v4_daily(user_id: str):
+    """Get today's daily challenge."""
+    from sa_v4_social import get_daily_challenge
+    return get_daily_challenge(config.HUB_DB, user_id)
+
+
+@app.post("/api/skills-academy/daily/{challenge_id}/complete")
+async def sa_v4_daily_complete(challenge_id: int, req: SAv4DailyCompleteRequest):
+    """Complete daily challenge."""
+    from sa_v4_social import complete_daily_challenge
+    result = complete_daily_challenge(config.HUB_DB, req.user_id, challenge_id,
+                                      req.answer, req.time_seconds)
+    if result.get("correct") and not result.get("already_completed"):
+        try:
+            from sa_v4_xp_engine import award_xp
+            award_xp(config.HUB_DB, req.user_id, "daily_challenge")
+        except Exception:
+            pass
+    return result
+
+# ---- v4 HiPo ----
+
+@app.get("/api/skills-academy/hipo/{user_id}")
+async def sa_v4_hipo(user_id: str):
+    """Get v4 HiPo signals (9 signals)."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        row = conn.execute(
+            "SELECT * FROM sa_hipo_signals_v4 WHERE user_id = ?", (user_id,)
+        ).fetchone()
+        if not row:
+            return {"user_id": user_id, "signals": {}, "composite_score": 0, "quadrant": "early_stage"}
+        return dict(row)
+    finally:
+        conn.close()
+
+
+@app.post("/api/skills-academy/hipo/{user_id}/calculate")
+async def sa_v4_hipo_calculate(user_id: str):
+    """Recalculate HiPo signals including verification_strength."""
+    from hipo_engine import calculate_all_signals
+    signals = calculate_all_signals(config.HUB_DB, user_id)
+    # Also calculate verification_strength
+    try:
+        from sa_v4_verification import check_all_dimensions
+        from sa_v4_placement import get_result
+        placement = get_result(config.HUB_DB, user_id)
+        if placement:
+            level = placement["placed_level"]
+            dims = check_all_dimensions(config.HUB_DB, user_id, level)
+            # Score 0-10 based on how many dimensions are met
+            met = sum(1 for k in ["foundation", "breadth", "depth", "application"]
+                      if dims.get(k, {}).get("met", dims.get(k, {}).get("passed", False)))
+            v_score = min(10.0, met * 2.5)
+            conn = sqlite3.connect(config.HUB_DB)
+            conn.execute(
+                "INSERT OR REPLACE INTO sa_hipo_signals_v4 "
+                "(user_id, verification_strength_score, last_calculated_at) "
+                "VALUES (?, ?, ?)",
+                (user_id, v_score, datetime.utcnow().isoformat()),
+            )
+            conn.commit()
+            conn.close()
+    except Exception:
+        pass
+    return {"user_id": user_id, "signals": signals}
+
+
+@app.get("/api/skills-academy/admin/hipo")
+async def sa_v4_admin_hipo():
+    """Admin: HiPo matrix."""
+    conn = sqlite3.connect(config.HUB_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = conn.execute(
+            "SELECT * FROM sa_hipo_signals_v4 ORDER BY composite_score DESC"
+        ).fetchall()
+        return {"users": [dict(r) for r in rows]}
+    finally:
+        conn.close()
 
 
 if __name__ == "__main__":

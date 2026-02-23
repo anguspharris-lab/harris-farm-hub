@@ -13,8 +13,9 @@ import pandas as pd
 import plotly.graph_objects as go
 import requests
 
-from shared.styles import render_header, render_footer
+from shared.styles import render_header, render_footer, HFM_GREEN, HFM_DARK
 from shared.voice_realtime import render_voice_data_box
+from shared.goals_config import fetch_recent_activity, goal_badge_html
 from shared.portal_content import (
     load_doc, load_procedure, load_learning,
     get_doc_index, get_procedure_index, get_learning_index,
@@ -110,8 +111,8 @@ st.markdown("")
 # TABS
 # ---------------------------------------------------------------------------
 
-tab1, tab2, tab3, tab4 = st.tabs([
-    "Documentation", "Data Catalog", "Showcase", "Self-Improvement",
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    "Documentation", "Data Catalog", "Showcase", "Self-Improvement", "Activity",
 ])
 
 
@@ -596,6 +597,93 @@ with tab4:
             except Exception as e:
                 st.error("Error: {}".format(e))
 
+
+# ============================================================================
+# TAB 5: ACTIVITY FEED
+# ============================================================================
+
+with tab5:
+    st.subheader("What's Happening Now")
+    st.caption(
+        "Recent reports, proposals, and improvements across The Hub."
+    )
+
+    activity = fetch_recent_activity(limit=20)
+
+    if activity:
+        def _detail_color(detail, item_type):
+            d = (detail or "").strip().upper()
+            if d in ("COMPLETED", "APPROVED"):
+                return "#22c55e"
+            if d in ("PENDING",):
+                return "#f59e0b"
+            if d in ("FAILED", "REJECTED"):
+                return "#ef4444"
+            if "GRADE:" in d:
+                return "#3b82f6"
+            if "RISK: HIGH" in d or "RISK: CRITICAL" in d:
+                return "#ef4444"
+            if "RISK:" in d:
+                return "#f59e0b"
+            if item_type == "improvement":
+                return "#a855f7"
+            return "#8899AA"
+
+        feed_html = "<div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;'>"
+        for item in activity:
+            goal_badges = " ".join(
+                goal_badge_html(g) for g in item.get("goal_ids", [])
+            )
+            detail = item.get("detail") or ""
+            detail_color = _detail_color(detail, item.get("type", ""))
+            ts = item.get("timestamp", "")[:16]
+
+            feed_html += (
+                "<div style='background:rgba(255,255,255,0.05);border-radius:8px;padding:12px 14px;"
+                "border:1px solid rgba(255,255,255,0.08);'>"
+                "<div style='display:flex;align-items:center;gap:8px;'>"
+                "<span style='font-size:1.2em;'>{icon}</span>"
+                "<span style='font-size:0.85em;font-weight:600;color:{dark};"
+                "flex:1;'>{title}</span>"
+                "</div>"
+                "<div style='display:flex;justify-content:space-between;"
+                "align-items:center;margin-top:6px;'>"
+                "<span style='font-size:0.75em;color:{dc};font-weight:500;'>"
+                "{det}</span>"
+                "<span style='font-size:0.7em;color:#8899AA;'>{ts}</span>"
+                "</div>"
+                "<div style='margin-top:4px;'>{badges}</div>"
+                "</div>"
+            ).format(
+                icon=item["icon"],
+                dark=HFM_DARK,
+                title=item["title"][:60],
+                dc=detail_color,
+                det=detail,
+                ts=ts,
+                badges=goal_badges,
+            )
+        feed_html += "</div>"
+        st.markdown(feed_html, unsafe_allow_html=True)
+    else:
+        st.info(
+            "No recent activity yet. Start by running an analysis "
+            "or submitting a prompt."
+        )
+
+
+# ============================================================================
+# SYSTEM HEALTH
+# ============================================================================
+
+with st.expander("System Health"):
+    _sh_pages = st.session_state.get("_pages", {})
+    _sh_page_count = len(_sh_pages) + 1  # +1 for home
+    _sh1, _sh2, _sh3, _sh4 = st.columns(4)
+    _sh1.metric("Dashboards", str(_sh_page_count))
+    _sh2.metric("API Endpoints", "243")
+    _sh3.metric("DB Tables", "98")
+    _sh4.metric("Transaction Rows", "383.6M")
 
 # ============================================================================
 # FOOTER
