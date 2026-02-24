@@ -36,8 +36,9 @@ render_header(
     "Buying Hub",
     "**Category & buyer intelligence** | 72,911 products across 9 departments",
     goals=["G2", "G4"],
-    strategy_context="Smarter buying decisions start here — the supply chain from pay to purchase.",
+    strategy_context="Prompt the whole buying process. Demand signals, weather patterns, pricing — AI builds the picture, buyers make the call.",
 )
+st.caption("💡 Step 5: Review this data. Add your judgment. Your experience makes this useful.")
 
 
 # ============================================================================

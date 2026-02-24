@@ -268,8 +268,9 @@ render_header(
     "Sales Performance",
     "**Harris Farm Markets** | Weekly sales, GP, budget & shrinkage analytics",
     goals=["G1", "G2", "G4"],
-    strategy_context="Tracking revenue against budget validates 'Bigger' — are we growing where it matters?",
+    strategy_context="Revenue is the scoreboard. AI reads the pattern — where growth is real, where it's seasonal, where we need to act.",
 )
+st.caption("💡 Step 5: Review this data. Add your judgment. Your experience makes this useful.")
 
 # ============================================================================
 # FILTERS

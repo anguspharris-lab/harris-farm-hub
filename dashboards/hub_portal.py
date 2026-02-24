@@ -89,6 +89,7 @@ render_header(
     strategy_context="The Hub's control centre — strategy visibility, "
     "governance, and continuous improvement.",
 )
+st.caption("The builders' view. How the Hub works under the hood.")
 
 # Navigation hints to promoted pages
 _pages = st.session_state.get("_pages", {})

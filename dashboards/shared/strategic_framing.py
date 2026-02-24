@@ -145,6 +145,32 @@ def initiative_summary_card(summary):
     )
 
 
+def growing_legends_banner():
+    """Render a compact manifesto-aligned banner for Growing Legends pages.
+
+    Used by Skills Academy, The Paddock, Prompt Engine, Learning Centre
+    to create visual unity under the AI-First Manifesto.
+    """
+    st.markdown(
+        "<div style='background:linear-gradient(135deg, #1A2D50, #132240);"
+        "border:1px solid rgba(139,92,246,0.25);"
+        "border-radius:12px;padding:20px 24px;margin-bottom:20px;'>"
+        "<div style='font-size:0.75em;text-transform:uppercase;"
+        "letter-spacing:0.15em;color:#8B5CF6;font-weight:700;"
+        "margin-bottom:8px;'>"
+        "\U0001f331 Growing Legends</div>"
+        "<div style='font-size:1.15em;font-weight:700;color:white;"
+        "font-family:Georgia,serif;margin-bottom:6px;'>"
+        "AI is our brain partner. The prompt is our unlock.</div>"
+        "<div style='font-size:0.9em;color:#B0BEC5;'>"
+        "Every Harris Farmer who masters these tools doesn't just use AI "
+        "&mdash; they lead with it. Same family. Same values. "
+        "Radically better tools.</div>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+
 def sub_page_links(slugs, labels=None):
     """Render a grid of st.page_link() buttons for sub-pages within a pillar.
 

@@ -24,8 +24,9 @@ render_header(
     "PLU Intelligence",
     "**Weekly product-level performance** | 43 stores \u00b7 Wastage \u00b7 Shrinkage \u00b7 Margins",
     goals=["G2", "G4"],
-    strategy_context="Every dollar saved on wastage goes to the bottom line \u2014 PLU-level visibility for 'Better' operations.",
+    strategy_context="Wastage is the silent margin killer. AI spots the patterns at PLU level \u2014 43 stores, 26K products, every dollar traceable.",
 )
+st.caption("💡 Step 5: Review this data. Add your judgment. Your experience makes this useful.")
 
 if not db_available():
     st.error("PLU database not found. Place `harris_farm_plu.db` in the `data/` directory.")

@@ -24,6 +24,7 @@ render_header(
         "most in the places that matter."
     ),
 )
+st.caption("💡 Step 5: Review this data. Add your judgment. Your experience makes this useful.")
 
 # ── Section selector ─────────────────────────────────────────────────────────
 

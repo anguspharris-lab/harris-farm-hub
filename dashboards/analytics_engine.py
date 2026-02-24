@@ -82,11 +82,12 @@ user = st.session_state.get("auth_user")
 render_header(
     "Analytics Engine",
     "**Data Intelligence Command Center** | "
-    "Run analyses, review reports, export evidence-based insights",
+    "This is Harris Farming It. Ask the question. Get the answer.",
     goals=["G2", "G4"],
-    strategy_context="Real-time analysis of 383M+ POS transactions "
-    "driving operational and strategic decisions.",
+    strategy_context="The more context you give, the better the answer. "
+    "AI reads 383M+ transactions so you don't have to.",
 )
+st.caption("This is Harris Farming It. Ask the question. Get the answer.")
 
 
 # ---------------------------------------------------------------------------
@@ -105,7 +106,7 @@ di_sub1, di_sub2, di_sub3, di_sub4 = st.tabs([
 with di_sub1:
     st.subheader("Run Analysis")
     st.caption(
-        "Real-time analysis of 383M+ POS transactions. "
+        "Step 2: The more context you give, the better the answer. "
         "Select an analysis type, pick a store, and run."
     )
 
@@ -207,6 +208,7 @@ with di_sub1:
 
                     # Executive summary
                     st.markdown("### Executive Summary")
+                    st.caption("Step 5: Review this. Add your judgment. Your expertise matters most.")
                     st.info(result.get("executive_summary", ""))
 
                     # Evidence tables
@@ -353,12 +355,14 @@ with di_sub2:
 with di_sub3:
     st.subheader("On-Demand Agent Tasks")
     st.caption(
+        "Step 2: The more context you give, the better the answer. "
         "Describe what you want to analyse in plain English. "
         "The system routes your request to the right analysis, "
         "executes it against real transaction data, scores the "
         "report, and runs a WATCHDOG safety review."
     )
 
+    st.caption("\U0001f4a1 Step 2: Flood it with context. Who is this for? What decision does it drive? What format do you need?")
     at_query = st.text_area(
         "What do you want to analyse?",
         height=100,

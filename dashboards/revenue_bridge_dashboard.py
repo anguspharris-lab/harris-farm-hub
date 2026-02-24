@@ -32,8 +32,9 @@ render_header(
     "Revenue Bridge",
     "**Revenue decomposition & financial trends** | Network and store-level analysis",
     goals=["G1", "G2"],
-    strategy_context="Decomposing what's driving growth or decline — the financial story behind 'Bigger'.",
+    strategy_context="The bridge tells the whole story end-to-end. AI decomposes growth vs decline so we act on evidence, not hunches.",
 )
+st.caption("💡 Step 5: Review this data. Add your judgment. Your experience makes this useful.")
 
 
 # ============================================================================

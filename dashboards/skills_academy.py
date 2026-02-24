@@ -11,9 +11,9 @@ Two learning series:
   L-Series (L1-L5): Core AI Skills
   D-Series (D1-D5): Applied Data + AI
 
-8 tabs:
-  My Progress | Placement Challenge | L-Series | D-Series |
-  Live Problems | Community | Daily & Micro | Leaderboard
+10 tabs:
+  My Progress | My Journey | AI-First Method | Placement Challenge |
+  L-Series | D-Series | Live Problems | Community | Daily & Micro | Leaderboard
 
 Python 3.9 compatible.
 """
@@ -26,6 +26,7 @@ import requests
 import streamlit as st
 
 from shared.styles import render_header, render_footer, HFM_GREEN
+from shared.strategic_framing import growing_legends_banner
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -69,15 +70,17 @@ uid = user_email if user_email else "anonymous"
 is_admin = (user or {}).get("is_admin", False)
 
 render_header(
-    "Skills Academy",
-    "**Harris Farm Markets** | AI Skills Training Programme",
+    "Growing Legends Academy",
+    "**Your AI Capability Journey** | Prove what you can ship",
     goals=["G3"],
     strategy_context=(
-        "Train every Harris Farmer to use AI effectively "
-        "-- from first prompt to advanced analysis."
+        "You are the architect. AI is the builder. "
+        "Every Harris Farmer grows from Seed to Legend "
+        "\u2014 prove what you can ship at each level."
     ),
 )
 
+st.caption("You are the architect. AI is the builder. Prove what you can ship.")
 
 # ---------------------------------------------------------------------------
 # Hero banner
@@ -90,7 +93,8 @@ st.markdown(
     "<div style='font-size:2.2em;font-weight:800;margin-bottom:8px;'>"
     "Skills Academy v4</div>"
     "<div style='font-size:1.15em;opacity:0.95;max-width:800px;line-height:1.6;'>"
-    "Woven Verification -- your mastery builds naturally as you learn. "
+    "You are the architect. AI is the builder. "
+    "Woven Verification tracks what you can ship, not what you memorise. "
     "Complete exercises, tackle curveballs, apply skills to real problems, "
     "and watch your verification ring fill up.</div>"
     "<div style='margin-top:16px;font-size:0.9em;opacity:0.8;'>"
@@ -335,12 +339,44 @@ def _render_tier_badge(tier):
     ).format(color, color, color, tier.title())
 
 
+# ---------------------------------------------------------------------------
+# Progress bar + Current Challenge
+# ---------------------------------------------------------------------------
+
+_xp_top = _load_xp()
+if _xp_top and _xp_top.get("total_xp") is not None:
+    _top_xp = _xp_top.get("total_xp", 0)
+    _top_level = _xp_top.get("name", "Seed")
+    _top_icon = _xp_top.get("icon", "🌱")
+    _top_pct = _xp_top.get("progress_pct", 0) / 100
+    _top_next = _xp_top.get("xp_to_next", 0)
+    st.progress(min(_top_pct, 1.0))
+    st.markdown("**{} {}** — {} XP — {} XP to next level".format(
+        _top_icon, _top_level, _top_xp, _top_next))
+
+try:
+    from shared.challenge_bank import get_challenge_for_user
+    _cb_role = (user or {}).get("hub_role", "user")
+    _cb_level = (_xp_top.get("name", "Seed") if _xp_top else "Seed").lower()
+    _cb_challenge = get_challenge_for_user(_cb_level, _cb_role)
+    if _cb_challenge:
+        with st.container(border=True):
+            st.markdown("### 🎯 Your Current Challenge")
+            st.markdown("**{}**".format(_cb_challenge["title"]))
+            st.markdown(_cb_challenge["description"])
+            st.caption("Reward: {} XP · Estimated: {} min".format(
+                _cb_challenge["xp_reward"], _cb_challenge["estimated_minutes"]))
+except ImportError:
+    pass
+
 # ============================================================================
-# 8 TABS
+# 10 TABS
 # ============================================================================
 
 tabs = st.tabs([
     "My Progress",
+    "My Journey",
+    "AI-First Method",
     "Placement Challenge",
     "L-Series (Core AI)",
     "D-Series (Data + AI)",
@@ -403,7 +439,7 @@ with tabs[0]:
         # --- Verification Rings ---
         st.markdown("### Verification Progress")
         st.caption(
-            "Your mastery builds naturally as you learn. "
+            "Your mastery builds naturally as you ship real work. "
             "Complete all 4 dimensions to confirm your level."
         )
 
@@ -492,14 +528,115 @@ with tabs[0]:
                     unsafe_allow_html=True,
                 )
         else:
-            st.caption("No activity yet. Start learning to earn XP!")
+            st.caption("No activity yet. Start shipping work to earn XP!")
 
 
 # ============================================================================
-# TAB 1: PLACEMENT CHALLENGE
+# TAB 1: MY JOURNEY
 # ============================================================================
 
 with tabs[1]:
+    st.markdown("### Your Growing Legends Journey")
+    st.markdown("Every challenge you complete builds your profile. Here's your story so far.")
+
+    # Fetch XP activity history
+    _journey_history = []
+    if uid:
+        try:
+            _j_resp = _get("/xp/{}/history".format(uid))
+            if _j_resp and isinstance(_j_resp, list):
+                _journey_history = _j_resp
+            elif _j_resp and isinstance(_j_resp, dict):
+                _journey_history = _j_resp.get("history", [])
+        except Exception:
+            pass
+
+    if _journey_history:
+        import pandas as pd
+        _j_rows = []
+        for entry in _journey_history[:20]:
+            _j_rows.append({
+                "Activity": entry.get("action", ""),
+                "XP": "+{}".format(entry.get("xp", 0)),
+                "Date": entry.get("created_at", "")[:10],
+            })
+        if _j_rows:
+            st.dataframe(pd.DataFrame(_j_rows), use_container_width=True, hide_index=True)
+    else:
+        st.info("No activity yet. Complete your first challenge to start your journey!")
+
+
+# ============================================================================
+# TAB 2: AI-FIRST METHOD
+# ============================================================================
+
+with tabs[2]:
+    st.markdown("### The AI-First Method")
+    st.markdown("Six steps. One prompt. The whole process. This is how every Harris Farmer becomes 10x more effective.")
+
+    _method_content = [
+        (
+            "Step 1: Define the Whole Outcome",
+            "Don't ask 'what's my next task?' Ask 'what is the entire end-to-end outcome I need?' The prompt IS the work.",
+            "Why: When you define the whole outcome upfront, AI can build the complete solution in one pass instead of piece by piece.",
+            "Build a complete weekly performance review that compares to budget, flags problems, recommends actions, and is ready for my manager to approve.",
+        ),
+        (
+            "Step 2: Flood It With Context",
+            "AI knows everything but it needs YOUR data. The more specific context you give — role, audience, format, constraints — the better the output.",
+            "Why: Context is what separates a generic answer from a Harris Farm answer. Your data, your store, your customers.",
+            "Include: who it's for, what decisions it drives, what data sources to use, what format the output needs to be in.",
+        ),
+        (
+            "Step 3: Run It Through The Rubric",
+            "Every output gets scored. Our 5-tier review system catches what humans miss. Nothing ships below an 8.",
+            "Why: Without a rubric, quality is subjective. With one, every output meets the same bar — every time.",
+            "CTO Panel > CLO Panel > Strategic Alignment > Implementation > Presentation Quality. Score >= 8.0 to ship.",
+        ),
+        (
+            "Step 4: Ask AI What's Missing",
+            "After your first draft, ask: 'What additional context would help you improve this?' AI will tell you exactly what it needs.",
+            "Why: AI can identify its own blind spots. One question unlocks the next level of quality.",
+            "What am I missing? What would make this board-ready? What data would strengthen the recommendations?",
+        ),
+        (
+            "Step 5: Review, Add Your Judgment",
+            "AI builds it. You add what only a human can — context, relationships, gut feel, the Harris Farm way. Your expertise matters most.",
+            "Why: Your 20 years of produce knowledge combined with AI's data analysis creates decisions nobody else can make.",
+            "Your 20 years of produce knowledge + AI's data analysis = decisions nobody else can make.",
+        ),
+        (
+            "Step 6: Ship It & Share the Prompt",
+            "Built a great prompt? Save it. Share it. Your colleagues will thank you. This is how we all level up together.",
+            "Why: Every shared prompt is a force multiplier. One person's work benefits the whole team.",
+            "Save > Prompt Library > Tagged by role & use case > Anyone can reuse and improve it.",
+        ),
+    ]
+
+    try:
+        from shared.challenge_bank import get_challenges_by_step
+        _has_bank = True
+    except ImportError:
+        _has_bank = False
+
+    for i, (title, desc, why, example) in enumerate(_method_content):
+        with st.expander(title):
+            st.markdown("**What:** {}".format(desc))
+            st.markdown("**{}**".format(why))
+            st.code(example, language=None)
+            if _has_bank:
+                _step_challenges = get_challenges_by_step(i + 1)
+                if _step_challenges:
+                    st.caption("Challenges that practice this step: {}".format(
+                        ", ".join(c["title"] for c in _step_challenges[:3])
+                    ))
+
+
+# ============================================================================
+# TAB 3: PLACEMENT CHALLENGE
+# ============================================================================
+
+with tabs[3]:
     placement = _load_placement()
 
     if placement:
@@ -556,7 +693,7 @@ with tabs[1]:
         st.markdown("### Placement Challenge")
         st.markdown(
             "5 quick scenarios to find your starting level. "
-            "Takes about 5 minutes. Your answers determine your AI skill level."
+            "Takes about 5 minutes. Show us what you can ship \u2014 your answers determine where you begin."
         )
 
         # Load scenarios
@@ -662,7 +799,7 @@ with tabs[1]:
                     ))
 
                     _render_level_badge(level, "provisional")
-                    st.caption("Your level is **Provisional**. As you learn and complete exercises, "
+                    st.caption("Your level is **Provisional**. As you ship real work and complete exercises, "
                                "your mastery will be verified across 4 dimensions.")
 
                     # Clean up state
@@ -679,7 +816,7 @@ with tabs[1]:
 
 
 # ============================================================================
-# TAB 2 & 3: L-SERIES / D-SERIES (shared renderer)
+# TAB 4 & 5: L-SERIES / D-SERIES (shared renderer)
 # ============================================================================
 
 def _render_series_tab(series_prefix, series_name, tab_idx):
@@ -940,20 +1077,20 @@ def _render_series_tab(series_prefix, series_name, tab_idx):
                         st.error("Assessment submission failed. Please try again.")
 
 
-# TAB 2: L-Series
-with tabs[2]:
-    _render_series_tab("L", "L-Series", 2)
-
-# TAB 3: D-Series
-with tabs[3]:
-    _render_series_tab("D", "D-Series", 3)
-
-
-# ============================================================================
-# TAB 4: LIVE PROBLEMS
-# ============================================================================
-
+# TAB 4: L-Series
 with tabs[4]:
+    _render_series_tab("L", "L-Series", 4)
+
+# TAB 5: D-Series
+with tabs[5]:
+    _render_series_tab("D", "D-Series", 5)
+
+
+# ============================================================================
+# TAB 6: LIVE PROBLEMS
+# ============================================================================
+
+with tabs[6]:
     placement = _load_placement()
     if not placement:
         st.warning("Complete the **Placement Challenge** first.")
@@ -1057,10 +1194,10 @@ with tabs[4]:
 
 
 # ============================================================================
-# TAB 5: COMMUNITY
+# TAB 7: COMMUNITY
 # ============================================================================
 
-with tabs[5]:
+with tabs[7]:
     placement = _load_placement()
     if not placement:
         st.warning("Complete the **Placement Challenge** first.")
@@ -1252,10 +1389,10 @@ with tabs[5]:
 
 
 # ============================================================================
-# TAB 6: DAILY & MICRO
+# TAB 8: DAILY & MICRO
 # ============================================================================
 
-with tabs[6]:
+with tabs[8]:
     placement = _load_placement()
     if not placement:
         st.warning("Complete the **Placement Challenge** first.")
@@ -1378,10 +1515,10 @@ with tabs[6]:
 
 
 # ============================================================================
-# TAB 7: LEADERBOARD
+# TAB 9: LEADERBOARD
 # ============================================================================
 
-with tabs[7]:
+with tabs[9]:
     lb_sub = st.tabs(["XP Leaderboard", "Verification Board", "HiPo Matrix"])
 
     # --- XP Leaderboard ---
@@ -1421,7 +1558,7 @@ with tabs[7]:
                     bg=bg,
                 )
         else:
-            st.info("No leaderboard data yet. Start learning to appear here!")
+            st.info("No leaderboard data yet. Start shipping work to appear here!")
 
     # --- Verification Board ---
     with lb_sub[1]:

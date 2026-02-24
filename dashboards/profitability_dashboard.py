@@ -228,8 +228,9 @@ render_header(
     "Store Profitability",
     "**Finance Team** | Store-level P&L, margins, shrinkage & budget variance",
     goals=["G1", "G2", "G4"],
-    strategy_context="Margin visibility drives 'Better' — understanding true profitability store by store.",
+    strategy_context="Every margin point is earned. AI surfaces the leaks before they become losses — store by store, department by department.",
 )
+st.caption("💡 Step 5: Review this data. Add your judgment. Your experience makes this useful.")
 
 # ============================================================================
 # FILTERS

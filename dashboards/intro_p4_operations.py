@@ -95,6 +95,9 @@ st.markdown(
     "<p style='color:#8899AA;font-size:0.9em;'>"
     "<strong style='color:#B0BEC5;'>Key targets:</strong> OOS reduction 20% by Jun 2026 | "
     "Category buying optimisation | Weather-adjusted demand planning</p>"
+    "<p style='color:#B0BEC5;font-style:italic;font-size:0.9em;'>"
+    "AI doesn't replace operational expertise \u2014 it compounds it. "
+    "Prompt the whole process, not just one report.</p>"
     "</div>",
     unsafe_allow_html=True,
 )

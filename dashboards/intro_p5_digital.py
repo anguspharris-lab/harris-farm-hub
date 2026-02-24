@@ -95,6 +95,9 @@ st.markdown(
     "<strong style='color:#B0BEC5;'>Key initiatives:</strong> Citizen Developer Program | "
     "WATCHDOG governance | Agent marketplace | "
     "Analytics self-service</p>"
+    "<p style='color:#B0BEC5;font-style:italic;font-size:0.9em;'>"
+    "The AI Centre of Excellence isn't a department. It's how Harris Farm operates. "
+    "AI is our brain partner. The prompt is our unlock.</p>"
     "</div>",
     unsafe_allow_html=True,
 )

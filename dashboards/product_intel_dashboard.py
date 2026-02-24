@@ -33,8 +33,9 @@ render_header(
     "Product Intelligence",
     "**Item-level performance analytics** | Top items, basket analysis, PLU deep dive",
     goals=["G2", "G4"],
-    strategy_context="Know which products drive your business — item-level visibility for 'Better' ranging.",
+    strategy_context="Item-level intelligence that compounds. AI identifies winners and underperformers — rubric-driven, not gut feel.",
 )
+st.caption("💡 Step 5: Review this data. Add your judgment. Your experience makes this useful.")
 
 
 # ============================================================================

@@ -22,8 +22,10 @@ render_header(
     "Workflow Engine",
     "**Prompt \u2192 Prove \u2192 Propose \u2192 Progress** | The end-to-end AI workflow for every Harris Farmer",
     goals=["G1", "G2", "G3", "G5"],
-    strategy_context="The operating system for a data-first business \u2014 every prompt tracked, every decision auditable, every talent surfaced.",
+    strategy_context="Every prompt flows through a pipeline. Generate, score, iterate, approve. The method in action. "
+    "The operating system for a data-first business \u2014 every prompt tracked, every decision auditable, every talent surfaced.",
 )
+st.caption("Every prompt flows through a pipeline. Generate, score, iterate, approve.")
 
 # ============================================================================
 # TABS

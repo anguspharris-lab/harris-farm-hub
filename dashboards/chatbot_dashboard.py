@@ -23,8 +23,9 @@ render_header(
     "Hub Assistant",
     "**Knowledge Base Chat** | Ask about procedures, golden rules & operations",
     goals=["G2", "G3"],
-    strategy_context="Data at your fingertips \u2014 any Harris Farmer can get answers without IT help.",
+    strategy_context="This is Harris Farming It in action. Ask the question. Get the answer. Ship the insight. Steps 1-5 of the method happening in real time.",
 )
+st.caption("This is Harris Farming It in action. Ask the question. Get the answer.")
 
 # ============================================================================
 # SIDEBAR

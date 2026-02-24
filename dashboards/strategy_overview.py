@@ -33,6 +33,16 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+st.markdown(
+    "<div style='color:#8899AA;font-style:italic;font-size:0.95em;"
+    "margin-top:-12px;margin-bottom:16px;padding-left:4px;'>"
+    "Now accelerated by the AI-First Method: AI is our brain partner. "
+    "Data is our foundation. The prompt is our unlock."
+    "</div>",
+    unsafe_allow_html=True,
+)
+st.caption("Fewer, Bigger, Better. The Hub exists to help us get there faster.")
+
 PILLAR_CONTEXT = {
     "Pillar 1": {
         "tagline": "We'll do things right, from end-to-end",

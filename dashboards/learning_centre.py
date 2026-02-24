@@ -21,6 +21,7 @@ import requests
 import streamlit as st
 
 from shared.styles import render_header, render_footer
+from shared.strategic_framing import growing_legends_banner
 from shared.voice_realtime import render_voice_data_box
 from shared.learning_content import (
     MODULES,
@@ -44,10 +45,12 @@ from shared.training_content import (
 user = st.session_state.get("auth_user")
 render_header(
     "Learning Centre",
-    "**Prompt Academy** \u2014 AI & Data Skills for Every Harris Farmer",
+    "**The Six-Step Method** | Define, Context, Rubric, Ask, Iterate, Deploy",
     goals=["G3"],
-    strategy_context="Building AI capability across the business \u2014 from Seed to Legend, everyone grows.",
+    strategy_context="Structured learning that mirrors how we actually work. Every lesson connects to the Harris Farm Method.",
 )
+
+st.caption("The Six-Step Method. Every lesson connects to the Harris Farm Method.")
 
 # Cross-link to Academy
 _pages = st.session_state.get("_pages", {})

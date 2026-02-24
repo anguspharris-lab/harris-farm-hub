@@ -11,6 +11,7 @@ import streamlit as st
 from datetime import datetime, timedelta
 
 from shared.styles import render_header, render_footer
+from shared.strategic_framing import growing_legends_banner
 from shared.stores import STORES
 from shared.pta_rubric import (
     STANDARD_RUBRIC,
@@ -26,10 +27,12 @@ user = st.session_state.get("auth_user")
 
 render_header(
     "Prompt Engine",
-    "**Prompt-to-Approval** | Choose your task, add context, let AI analyse",
+    "**Create the Prompt** | Define your goal. Flood with context. Add a rubric. Ship at 8+.",
     goals=["G2", "G3"],
-    strategy_context="The universal AI workflow — prompt the data, add your judgment, submit for approval.",
+    strategy_context="This is Step 1 of the Harris Farm Method. The prompt is the unlock \u2014 think end-to-end, not one step.",
 )
+
+st.caption("The prompt IS the work. Define the whole outcome. Flood it with context.")
 
 # ============================================================================
 # 20 TASK TEMPLATES

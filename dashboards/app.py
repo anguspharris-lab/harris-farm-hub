@@ -59,7 +59,7 @@ _pages = {
     # P2 Customer
     "customers": st.Page(str(_DIR / "customer_hub" / "dashboard.py"), title="Customer Hub", icon="\U0001f465", url_path="customers"),
     # P3 People
-    "skills-academy": st.Page(str(_DIR / "skills_academy.py"), title="Skills Academy", icon="\U0001f4da", url_path="skills-academy"),
+    "skills-academy": st.Page(str(_DIR / "skills_academy.py"), title="Growing Legends Academy", icon="\U0001f4da", url_path="skills-academy"),
     "hub-assistant": st.Page(str(_DIR / "chatbot_dashboard.py"), title="Hub Assistant", icon="\U0001f4ac", url_path="hub-assistant"),
     "the-paddock": st.Page(str(_DIR / "the_paddock.py"), title="The Paddock", icon="\U0001f331", url_path="the-paddock"),
     "prompt-builder": st.Page(str(_DIR / "prompt_builder.py"), title="Prompt Engine", icon="\U0001f680", url_path="prompt-builder"),
@@ -90,7 +90,7 @@ _SECTIONS = [
     {"name": "Strategy", "icon": "\U0001f3af", "color": "#2ECC71",
      "slugs": ["strategy-overview", "greater-goodness", "intro-people",
                "intro-operations", "intro-digital", "way-of-working"]},
-    {"name": "AI Skills", "icon": "\u2b50", "color": "#8B5CF6",
+    {"name": "Growing Legends", "icon": "\U0001f331", "color": "#8B5CF6",
      "slugs": ["skills-academy", "the-paddock", "prompt-builder", "hub-assistant"]},
     {"name": "Operations", "icon": "\U0001f4ca", "color": "#F1C40F",
      "slugs": ["customers", "sales", "profitability", "revenue-bridge",
@@ -131,7 +131,7 @@ _full_nav = {
         "intro-people", "intro-operations", "intro-digital",
         "way-of-working",
     ],
-    "AI Skills": [
+    "Growing Legends": [
         "skills-academy", "the-paddock", "prompt-builder", "hub-assistant",
     ],
     "Operations": [

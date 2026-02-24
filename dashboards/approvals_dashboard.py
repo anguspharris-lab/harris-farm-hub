@@ -21,7 +21,7 @@ render_header(
     "Approvals",
     "**Prompt-to-Approval** | Review and approve team submissions",
     goals=["G2", "G3"],
-    strategy_context="The human sign-off that ensures quality — every output reviewed before it ships.",
+    strategy_context="The final gate in the Harris Farm Method. AI builds it. The Rubric scores it. You approve it.",
 )
 
 # ============================================================================

@@ -13,6 +13,7 @@ import requests
 import streamlit as st
 
 from shared.styles import render_header, render_footer
+from shared.strategic_framing import growing_legends_banner
 
 # ---------------------------------------------------------------------------
 # Config
@@ -148,24 +149,9 @@ def render_welcome():
     """Welcome screen with hero banner, start button, history & leaderboard."""
 
     # --- Hero banner ---
-    st.markdown(
-        "<div style='background:linear-gradient(135deg, {} 0%, #3d8a1b 100%);"
-        "color:white;padding:60px 32px;border-radius:14px;text-align:center;"
-        "margin:0 0 24px;'>".format(BRAND_GREEN)
-        + "<div style='font-size:4em;margin-bottom:12px;'>\U0001f331</div>"
-        "<div style='font-size:2.4em;font-weight:800;margin-bottom:8px;'>"
-        "The Paddock</div>"
-        "<div style='font-size:1.15em;opacity:0.92;max-width:560px;"
-        "margin:0 auto 12px;'>"
-        "G'day! Welcome to The Paddock &mdash; Harris Farm's AI skills "
-        "challenge.</div>"
-        "<div style='font-size:0.95em;opacity:0.75;max-width:520px;"
-        "margin:0 auto;'>"
-        "How far can you go? Answer questions of increasing difficulty. "
-        "One wrong answer and it's game over!</div>"
-        "</div>",
-        unsafe_allow_html=True,
-    )
+    st.markdown("### 🌱 The Paddock")
+    st.markdown("*This isn't a quiz. It's the first step in your Growing Legends journey.*")
+    st.markdown("Show us what you can do with AI — and we'll show you where to go next. One wrong answer and it's game over!")
 
     # --- Tier progression strip ---
     tier_labels = [
@@ -363,6 +349,7 @@ def _submit_answer(attempt_id, question_id, answer):
     record = {
         "level": st.session_state.get("paddock_current_level", 1),
         "question_text": current_q.get("question_text", ""),
+        "topic": current_q.get("topic", ""),
         "user_answer": answer,
         "correct_answer": data.get("correct_answer", ""),
         "correct": data.get("correct", False),
@@ -584,6 +571,99 @@ def render_result():
                         if expl:
                             st.markdown("**Explanation:** {}".format(expl))
 
+    # --- AI-First Method Profile ---
+    st.markdown("---")
+    st.subheader("Your AI-First Method Profile")
+
+    TOPIC_TO_STEPS = {
+        "basics": [1, 5],
+        "prompting": [2, 4],
+        "data": [2],
+        "workflow": [1, 6],
+        "ethics": [5],
+        "rubric": [3],
+    }
+    METHOD_STEPS = [
+        (1, "Define the Whole Outcome"),
+        (2, "Flood It With Context"),
+        (3, "Run It Through The Rubric"),
+        (4, "Ask AI What's Missing"),
+        (5, "Review, Add Your Judgment"),
+        (6, "Ship It & Share the Prompt"),
+    ]
+
+    # Calculate scores per step from answered questions
+    step_correct = {i: 0 for i in range(1, 7)}
+    step_total = {i: 0 for i in range(1, 7)}
+    for q in answered:
+        topic = q.get("topic", "basics")
+        steps = TOPIC_TO_STEPS.get(topic, [1])
+        for s in steps:
+            step_total[s] += 1
+            if q.get("correct", False):
+                step_correct[s] += 1
+
+    for step_num, step_name in METHOD_STEPS:
+        total = step_total.get(step_num, 0)
+        correct = step_correct.get(step_num, 0)
+        pct = correct / total if total > 0 else 0
+        col_label, col_bar = st.columns([2, 3])
+        with col_label:
+            st.markdown("**Step {}:** {}".format(step_num, step_name))
+        with col_bar:
+            st.progress(min(pct, 1.0))
+            if total > 0 and pct < 0.5:
+                st.caption("← This is your growth edge")
+            elif total == 0:
+                st.caption("Not yet tested")
+
+    # --- Role-specific challenge preview ---
+    st.markdown("---")
+    try:
+        from shared.challenge_bank import get_challenge_for_user
+        _user_tier = tier_name.lower() if tier_name else "seed"
+        _user_role = (st.session_state.get("auth_user") or {}).get("hub_role", "user")
+        _challenge = get_challenge_for_user(_user_tier, _user_role)
+        if _challenge:
+            with st.container(border=True):
+                st.markdown("### 🎯 Your First {} Challenge".format(tier_name))
+                st.markdown("**{}**".format(_challenge["title"]))
+                st.markdown(_challenge["description"])
+                st.caption("⏱ {} min · {} XP · Steps {}".format(
+                    _challenge["estimated_minutes"],
+                    _challenge["xp_reward"],
+                    ", ".join(str(s) for s in _challenge["method_steps"]),
+                ))
+    except ImportError:
+        pass
+
+    # --- What Happens Next bridge ---
+    NEXT_TIER = {
+        "Unranked": "Seed",
+        "Seed": "Sprout",
+        "Sprout": "Grower",
+        "Grower": "Harvester",
+        "Harvester": "Cultivator",
+        "Cultivator": "Legend",
+        "Legend": "Legend",
+    }
+    next_tier = NEXT_TIER.get(tier_name, "Sprout")
+
+    st.success("🎯 You're a {}! Here's your path:".format(tier_name))
+    st.markdown(
+        "**Right now:** Try your first challenge above\n\n"
+        "**This week:** Complete 2 more challenges to build your streak\n\n"
+        "**Your goal:** Reach {} by shipping a reusable prompt template\n\n"
+        "**Your superpower:** You already think in systems — AI amplifies that".format(next_tier)
+    )
+    _pages = st.session_state.get("_pages", {})
+    if "skills-academy" in _pages:
+        st.page_link(
+            _pages["skills-academy"],
+            label="→ Go to Growing Legends",
+            use_container_width=True,
+        )
+
     # --- Action buttons ---
     st.markdown("---")
     col_a, col_b = st.columns(2)
@@ -701,7 +781,7 @@ def _render_history_tab():
     data = _api_get("/user/{}/history".format(user_email))
     history = data.get("history", []) if isinstance(data, dict) else (data or [])
     if not history:
-        st.info("You haven't attempted The Paddock yet. Give it a go!")
+        st.info("You haven't attempted The Paddock yet. Show us what you can do!")
         return
 
     st.markdown("### My Attempts")
@@ -741,7 +821,7 @@ def _render_history_tab():
         if not a_id:
             continue
         label = "{} | {} | Level {}".format(row["Date"], row["Tier"], row["Level"])
-        with st.expander(label, key="hist_expand_{}".format(i)):
+        with st.expander(label):
             detail = _api_get("/attempt/{}".format(a_id))
             if detail and detail.get("responses"):
                 for resp in detail["responses"]:
@@ -771,10 +851,12 @@ def _render_history_tab():
 
 render_header(
     "The Paddock",
-    "**AI Skills Challenge** | How far can you go?",
+    "**The AI Challenge Arena** | How far can you go?",
     goals=["G3"],
-    strategy_context="Building AI literacy across all roles (Pillar 3 & 5)",
+    strategy_context="Legends aren't made in training rooms. They're forged in The Paddock \u2014 real questions, real pressure, real growth.",
 )
+
+st.caption("This isn't a quiz — it's the start of your Growing Legends journey.")
 
 state = st.session_state.get("paddock_state", "welcome")
 

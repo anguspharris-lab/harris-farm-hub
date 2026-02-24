@@ -114,9 +114,10 @@ render_header(
     "**Safety review, approval queue & execution** | "
     "Every agent proposal passes through WATCHDOG before any action",
     goals=["G1", "G5"],
-    strategy_context="Governance pipeline: safety analysis, human approval, "
-    "monitored execution. No exceptions.",
+    strategy_context="AI is powerful but not perfect. WATCHDOG makes sure every output is safe, honest, and correct. "
+    "Governance pipeline: safety analysis, human approval, monitored execution. No exceptions.",
 )
+st.caption("Safe. Honest. Correct. AI is powerful but not perfect. WATCHDOG earns our trust.")
 
 
 # ---------------------------------------------------------------------------

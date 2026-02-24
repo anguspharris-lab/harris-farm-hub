@@ -2,9 +2,8 @@
 headless = true
 
 [theme]
-base = "dark"
-primaryColor = "#2ECC71"
-backgroundColor = "#0B1628"
-secondaryBackgroundColor = "#132240"
-textColor = "#FFFFFF"
+primaryColor = "#7CB342"
+backgroundColor = "#0A0F0A"
+secondaryBackgroundColor = "#111A11"
+textColor = "#F1F8E9"
 font = "sans serif"

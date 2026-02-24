@@ -537,7 +537,7 @@ def render_growth_engine(user_level: str = "Seed", user_xp: int = 5, xp_to_next:
         <div class="ge-intro">
             <div class="ge-eyebrow">Growing Legends Academy</div>
             <div class="ge-title">Four lessons that change <em>everything.</em></div>
-            <p class="ge-subtitle">Every Harris Farmer who masters these four ideas doesn't just use AI &mdash; they lead with it. This is the path from Seed to Legend.</p>
+            <p class="ge-subtitle">Every Harris Farmer who masters these four ideas doesn't just use AI &mdash; they become a Legend. This is the Harris Farm Method.</p>
         </div>
 
         <!-- FOUR LESSONS -->
@@ -603,7 +603,7 @@ def render_growth_engine(user_level: str = "Seed", user_xp: int = 5, xp_to_next:
                     </div>
                     <div class="ge-lesson-title">Claude Code.<br>Your Job, at Scale.</div>
                     <div class="ge-lesson-hook">Prompt the whole process, not one step</div>
-                    <div class="ge-lesson-body">Don't ask a question &mdash; prompt the entire end-to-end process. Let autonomous agents build, test, and ship while you lead.</div>
+                    <div class="ge-lesson-body">Don't ask a question &mdash; prompt the entire end-to-end process. Define the goal. Flood with context. Add a rubric. Let AI build it.</div>
                     <div class="ge-lesson-cta">\U0001f680 Open The Paddock</div>
                 </div>
 

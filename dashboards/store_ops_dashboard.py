@@ -39,8 +39,9 @@ render_header(
     "Store Operations Intelligence",
     "**Item-level POS transaction analysis** | 383M transactions across 34 stores (FY24-FY26)",
     goals=["G2", "G4"],
-    strategy_context="Operational efficiency at store level — reducing waste and improving on-shelf availability.",
+    strategy_context="Tighter ops, less waste, better availability. AI watches 383M transactions so store teams can focus on customers.",
 )
+st.caption("💡 Step 5: Review this data. Add your judgment. Your experience makes this useful.")
 
 
 # ============================================================================

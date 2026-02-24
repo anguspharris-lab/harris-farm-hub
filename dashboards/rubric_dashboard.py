@@ -30,8 +30,9 @@ render_header(
     "The Rubric",
     "**AI Training & Prompt Skills** | Learn to write great prompts and evaluate AI responses",
     goals=["G3", "G5"],
-    strategy_context="Building prompt superstars \u2014 compare AI models, learn what works, get better every time.",
+    strategy_context="Step 3 of the Harris Farm Method: Add a Rubric. Every output scored. Nothing ships below an 8.",
 )
+st.caption("Every output gets scored. Nothing ships below an 8.")
 
 # Cross-link to Academy
 _academy_pages = st.session_state.get("_pages", {})

@@ -185,8 +185,9 @@ render_header(
     "Transport & Logistics",
     "**Operations Team** | Delivery costs, route efficiency & fleet analysis",
     goals=["G4"],
-    strategy_context="Tidying up the supply chain — from Sydney Markets to store shelf, every route matters.",
+    strategy_context="Every route, every delivery, every cost — visible. AI optimises the path from Sydney Markets to store shelf.",
 )
+st.caption("💡 Step 5: Review this data. Add your judgment. Your experience makes this useful.")
 
 # ============================================================================
 # LOAD DATA

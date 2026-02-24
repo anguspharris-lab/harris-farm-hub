@@ -105,6 +105,9 @@ st.markdown(
     "<p style='color:#8899AA;font-size:0.9em;'>"
     "<strong style='color:#B0BEC5;'>Prosci ADKAR</strong> change management is active across all P3 initiatives. "
     "We measure adoption, not just availability.</p>"
+    "<p style='color:#B0BEC5;font-style:italic;font-size:0.9em;'>"
+    "The Harris Farm Method gives our people a repeatable system: "
+    "Define your goal. Flood with context. Add a rubric. Nothing ships below an 8.</p>"
     "</div>",
     unsafe_allow_html=True,
 )

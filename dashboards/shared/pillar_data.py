@@ -53,7 +53,8 @@ PILLAR_REGISTRY = {
             "and retaining exceptional people"
         ),
         "strategic_question": (
-            "Are our people growing \u2014 and do they feel it?"
+            "Are our people growing with AI as their brain partner "
+            "\u2014 and do they feel it?"
         ),
         "board_id": 5001476308,
         "nav_slugs": [
@@ -69,7 +70,8 @@ PILLAR_REGISTRY = {
         "color": "#d97706",
         "tagline": "We will tidy up the supply chain, from pay to purchase",
         "strategic_question": (
-            "Are we running tighter, smarter, and faster \u2014 with proof?"
+            "Are we running tighter, smarter, and faster \u2014 "
+            "with AI reading the data before we ask?"
         ),
         "board_id": 5001480788,
         "nav_slugs": [
@@ -88,7 +90,8 @@ PILLAR_REGISTRY = {
             "systems that serve, data we trust"
         ),
         "strategic_question": (
-            "Is the platform accelerating the strategy \u2014 or just existing?"
+            "Is the platform accelerating the strategy through prompts, "
+            "rubrics, and agents \u2014 or just existing?"
         ),
         "board_id": 5001485134,
         "nav_slugs": [

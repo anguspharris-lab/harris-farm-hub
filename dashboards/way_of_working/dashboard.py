@@ -22,6 +22,7 @@ render_header(
         "tracked live from Monday.com."
     ),
 )
+st.caption("The AI-First Method is how we work now. Six steps. End to end.")
 
 if not is_configured():
     st.markdown(

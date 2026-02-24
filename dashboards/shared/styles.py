@@ -11,10 +11,10 @@ from datetime import datetime
 # Dark Navy Palette
 # ═══════════════════════════════════════════════════════════════════════════
 
-NAVY = "#0B1628"
-NAVY_LIGHT = "#132240"
-NAVY_MID = "#1A2D50"
-NAVY_CARD = "#0F1D35"
+NAVY = "#0A0F0A"
+NAVY_LIGHT = "#111A11"
+NAVY_MID = "#1A2A1A"
+NAVY_CARD = "#0D150D"
 
 GREEN = "#2ECC71"
 GREEN_DARK = "#27AE60"
@@ -412,3 +412,6 @@ def render_footer(name: str, extra: str = "", user=None):
                 logout_user()
     else:
         st.caption(" | ".join(parts))
+
+    st.markdown("---")
+    st.caption("The Hub \u00b7 Harris Farm Markets \u00b7 Built with \U0001f49a by Harris Farmers, for Harris Farmers")

@@ -51,6 +51,7 @@ st.markdown(
     "</div>",
     unsafe_allow_html=True,
 )
+st.caption("AI amplifies our ability to live the Greater Goodness — more time for customers, less time on admin.")
 
 # ---------------------------------------------------------------------------
 # WHAT WE'VE ACHIEVED
