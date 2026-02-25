@@ -10,10 +10,16 @@ if [ -d /data ]; then
     # Ensure transactions subdirectory exists on disk
     mkdir -p /data/transactions
 
-    # Copy git-tracked reference files to disk (first deploy only)
-    cp -n data/*.csv /data/ 2>/dev/null || true
-    cp -n data/*.parquet /data/ 2>/dev/null || true
-    cp -rn data/roles /data/ 2>/dev/null || true
+    # Copy ALL git-tracked reference files to disk.
+    # Use cp -u (update) so newer git files overwrite stale disk copies,
+    # but large downloaded files (harris_farm.db etc.) are never clobbered.
+    cp -u data/*.csv /data/ 2>/dev/null || true
+    cp -u data/*.parquet /data/ 2>/dev/null || true
+    cp -u data/*.json /data/ 2>/dev/null || true
+    cp -ru data/roles /data/ 2>/dev/null || true
+    cp -ru data/census /data/ 2>/dev/null || true
+    cp -ru data/outputs /data/ 2>/dev/null || true
+    cp -ru data/hfm_uploads /data/ 2>/dev/null || true
 
     # Replace data/ with symlink to persistent disk
     rm -rf data
