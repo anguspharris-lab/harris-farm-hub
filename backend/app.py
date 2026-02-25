@@ -1373,23 +1373,41 @@ def seed_sustainability_kpis():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
-    init_hub_database()
-    # Auto-ingest audit scores into task_scores (idempotent)
+    # Startup — each step wrapped so one failure doesn't kill the backend
+    import time as _time
+    app.state.start_time = _time.time()
+
+    # 1. Core database
+    try:
+        init_hub_database()
+        print("✅ Hub database initialized")
+    except Exception as e:
+        print(f"❌ Hub database init failed: {e}")
+
+    # 2. Seed data (all non-critical)
+    for seed_name, seed_fn in [
+        ("learning_data", seed_learning_data),
+        ("arena_data", seed_arena_data),
+        ("agent_control", seed_agent_control_data),
+        ("prompt_templates", seed_prompt_templates),
+        ("knowledge_base", seed_knowledge_base),
+        ("sustainability_kpis", seed_sustainability_kpis),
+    ]:
+        try:
+            seed_fn()
+        except Exception as e:
+            print(f"  Seed {seed_name} skipped: {e}")
+
+    # 3. Auto-ingest audit scores (non-critical)
     try:
         from self_improvement import backfill_scores_from_audit
         _backfilled = backfill_scores_from_audit()
         if _backfilled:
             print(f"  Backfilled {_backfilled} score entries from audit.log")
     except Exception:
-        pass  # Non-critical — scores still readable from audit.log
-    seed_learning_data()
-    seed_arena_data()
-    seed_agent_control_data()
-    seed_prompt_templates()
-    seed_knowledge_base()
-    seed_sustainability_kpis()
-    # Seed Academy daily challenges
+        pass
+
+    # 4. Seed Academy daily challenges (non-critical)
     try:
         from academy_engine import seed_daily_challenges
         _seeded = seed_daily_challenges(config.HUB_DB)
@@ -1397,67 +1415,82 @@ async def lifespan(app: FastAPI):
             print(f"  Seeded {_seeded} Academy daily challenges")
     except Exception as e:
         print(f"  Academy challenge seeding skipped: {e}")
-    # Record startup time for health check
-    import time as _time
-    app.state.start_time = _time.time()
-    # Initialize auth database
-    import auth as auth_module
-    auth_module.init_auth_db()
-    auth_module.cleanup_expired_sessions()
-    print(f"✅ Auth database initialized (enabled={auth_module.is_auth_enabled()})")
-    # Initialize transaction store (DuckDB → parquet)
-    from transaction_layer import TransactionStore
-    app.state.txn_store = TransactionStore()
-    avail = list(app.state.txn_store.available_fys.keys())
-    print(f"✅ Hub database initialized")
-    print(f"✅ Transaction store: {len(avail)} fiscal years ({', '.join(avail)})")
-    # Start scheduled analysis cycle
-    import threading
-    schedule_hours = int(os.getenv("ANALYSIS_SCHEDULE_HOURS", "168"))
-    if schedule_hours > 0:
-        def _scheduled_trigger():
-            try:
-                conn = sqlite3.connect(config.HUB_DB)
-                sched_tasks = [
-                    ("StockoutAnalyzer", "ANALYSIS", "Auto-scheduled: Stockout scan", "LOW", "Lost revenue"),
-                    ("BasketAnalyzer", "ANALYSIS", "Auto-scheduled: Cross-sell scan", "LOW", "Revenue growth"),
-                    ("DemandAnalyzer", "ANALYSIS", "Auto-scheduled: Demand pattern scan", "LOW", "Optimisation"),
-                    ("PriceAnalyzer", "ANALYSIS", "Auto-scheduled: Price dispersion scan", "LOW", "Margin recovery"),
-                    ("SlowMoverAnalyzer", "ANALYSIS", "Auto-scheduled: Slow mover review", "LOW", "Range optimisation"),
-                    ("HaloAnalyzer", "ANALYSIS", "Auto-scheduled: Halo effect scan", "LOW", "Basket growth"),
-                    ("SpecialsAnalyzer", "ANALYSIS", "Auto-scheduled: Specials uplift forecast", "LOW", "Ordering"),
-                    ("MarginAnalyzer", "ANALYSIS", "Auto-scheduled: Margin erosion scan", "LOW", "Margin recovery"),
-                    ("CustomerAnalyzer", "ANALYSIS", "Auto-scheduled: Customer segmentation", "LOW", "Retention"),
-                    ("StoreBenchmarkAnalyzer", "ANALYSIS", "Auto-scheduled: Store benchmark", "LOW", "Benchmarking"),
-                ]
-                for agent, ttype, desc, risk, impact in sched_tasks:
-                    conn.execute(
-                        "INSERT INTO agent_proposals (agent_name, task_type, description, "
-                        "risk_level, estimated_impact) VALUES (?,?,?,?,?)",
-                        (agent, ttype, desc, risk, impact),
-                    )
-                conn.commit()
-                conn.close()
-                print("Scheduled analysis cycle: {} proposals created".format(len(sched_tasks)))
-            except Exception as e:
-                print("Scheduled trigger failed: {}".format(e))
-            t = threading.Timer(schedule_hours * 3600, _scheduled_trigger)
-            t.daemon = True
-            t.start()
 
-        _timer = threading.Timer(300, _scheduled_trigger)
-        _timer.daemon = True
-        _timer.start()
-        print("Scheduled analysis: every {} hours (first run in 5 min)".format(schedule_hours))
-    # Start WATCHDOG background scheduler
-    from watchdog_scheduler import WatchdogScheduler
-    watchdog_hours = int(os.getenv("WATCHDOG_INTERVAL_HOURS", "6"))
-    if watchdog_hours > 0:
-        app.state.watchdog = WatchdogScheduler(
-            interval_hours=watchdog_hours, db_path=config.HUB_DB
-        )
-        app.state.watchdog.start(delay=120)
-        print("🐕 WATCHDOG scheduler: every {}h (first run in 2 min)".format(watchdog_hours))
+    # 5. Auth database
+    try:
+        import auth as auth_module
+        auth_module.init_auth_db()
+        auth_module.cleanup_expired_sessions()
+        print(f"✅ Auth database initialized (enabled={auth_module.is_auth_enabled()})")
+    except Exception as e:
+        print(f"❌ Auth init failed: {e}")
+
+    # 6. Transaction store (DuckDB → parquet)
+    try:
+        from transaction_layer import TransactionStore
+        app.state.txn_store = TransactionStore()
+        avail = list(app.state.txn_store.available_fys.keys())
+        print(f"✅ Transaction store: {len(avail)} fiscal years ({', '.join(avail)})")
+    except Exception as e:
+        print(f"⚠️ Transaction store init failed (dashboards needing tx data won't work): {e}")
+        app.state.txn_store = None
+
+    # 7. Scheduled analysis cycle
+    try:
+        import threading
+        schedule_hours = int(os.getenv("ANALYSIS_SCHEDULE_HOURS", "168"))
+        if schedule_hours > 0:
+            def _scheduled_trigger():
+                try:
+                    conn = sqlite3.connect(config.HUB_DB)
+                    sched_tasks = [
+                        ("StockoutAnalyzer", "ANALYSIS", "Auto-scheduled: Stockout scan", "LOW", "Lost revenue"),
+                        ("BasketAnalyzer", "ANALYSIS", "Auto-scheduled: Cross-sell scan", "LOW", "Revenue growth"),
+                        ("DemandAnalyzer", "ANALYSIS", "Auto-scheduled: Demand pattern scan", "LOW", "Optimisation"),
+                        ("PriceAnalyzer", "ANALYSIS", "Auto-scheduled: Price dispersion scan", "LOW", "Margin recovery"),
+                        ("SlowMoverAnalyzer", "ANALYSIS", "Auto-scheduled: Slow mover review", "LOW", "Range optimisation"),
+                        ("HaloAnalyzer", "ANALYSIS", "Auto-scheduled: Halo effect scan", "LOW", "Basket growth"),
+                        ("SpecialsAnalyzer", "ANALYSIS", "Auto-scheduled: Specials uplift forecast", "LOW", "Ordering"),
+                        ("MarginAnalyzer", "ANALYSIS", "Auto-scheduled: Margin erosion scan", "LOW", "Margin recovery"),
+                        ("CustomerAnalyzer", "ANALYSIS", "Auto-scheduled: Customer segmentation", "LOW", "Retention"),
+                        ("StoreBenchmarkAnalyzer", "ANALYSIS", "Auto-scheduled: Store benchmark", "LOW", "Benchmarking"),
+                    ]
+                    for agent, ttype, desc, risk, impact in sched_tasks:
+                        conn.execute(
+                            "INSERT INTO agent_proposals (agent_name, task_type, description, "
+                            "risk_level, estimated_impact) VALUES (?,?,?,?,?)",
+                            (agent, ttype, desc, risk, impact),
+                        )
+                    conn.commit()
+                    conn.close()
+                    print("Scheduled analysis cycle: {} proposals created".format(len(sched_tasks)))
+                except Exception as e:
+                    print("Scheduled trigger failed: {}".format(e))
+                t = threading.Timer(schedule_hours * 3600, _scheduled_trigger)
+                t.daemon = True
+                t.start()
+
+            _timer = threading.Timer(300, _scheduled_trigger)
+            _timer.daemon = True
+            _timer.start()
+            print("Scheduled analysis: every {} hours (first run in 5 min)".format(schedule_hours))
+    except Exception as e:
+        print(f"  Scheduled analysis setup skipped: {e}")
+
+    # 8. WATCHDOG background scheduler
+    try:
+        from watchdog_scheduler import WatchdogScheduler
+        watchdog_hours = int(os.getenv("WATCHDOG_INTERVAL_HOURS", "6"))
+        if watchdog_hours > 0:
+            app.state.watchdog = WatchdogScheduler(
+                interval_hours=watchdog_hours, db_path=config.HUB_DB
+            )
+            app.state.watchdog.start(delay=120)
+            print("🐕 WATCHDOG scheduler: every {}h (first run in 2 min)".format(watchdog_hours))
+    except Exception as e:
+        print(f"  WATCHDOG setup skipped: {e}")
+
+    print("✅ Backend startup complete")
     yield
     # Shutdown
     if hasattr(app.state, "watchdog"):
