@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Gap Report - Property Intelligence Engine</title>
+<style>
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background: #0f0f1a; color: #e0e0e0; line-height: 1.6; padding: 0; }
+.header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3d0f 100%); border-bottom: 3px solid #2ECC71; padding: 40px 60px; }
+.header h1 { font-size: 2.2rem; color: #2ECC71; font-weight: 700; letter-spacing: -0.5px; }
+.header .subtitle { color: #8a8aad; font-size: 1.1rem; margin-top: 6px; }
+.header-meta { display: flex; gap: 40px; margin-top: 20px; flex-wrap: wrap; }
+.header-meta .meta-item { background: rgba(46,204,113,0.08); border: 1px solid rgba(46,204,113,0.2); border-radius: 8px; padding: 12px 20px; }
+.header-meta .meta-label { font-size: 0.75rem; color: #8a8aad; text-transform: uppercase; letter-spacing: 1px; }
+.header-meta .meta-value { font-size: 1.4rem; color: #fff; font-weight: 600; }
+.container { max-width: 1400px; margin: 0 auto; padding: 40px 60px; }
+.section { background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 12px; padding: 36px; margin-bottom: 32px; }
+.section h2 { font-size: 1.5rem; color: #2ECC71; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.section h2 .sn { background: #2ECC71; color: #0f0f1a; font-size: 0.85rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; }
+.section .sd { color: #8a8aad; margin-bottom: 24px; font-size: 0.95rem; }
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+thead th { background: #16213e; color: #2ECC71; padding: 12px 10px; text-align: left; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #2ECC71; position: sticky; top: 0; }
+tbody td { padding: 10px; border-bottom: 1px solid #2a2a4a; vertical-align: middle; }
+tbody tr:hover { background: rgba(46,204,113,0.04); }
+.c { text-align: center; }
+.callout { background: rgba(231,76,60,0.08); border: 1px solid rgba(231,76,60,0.25); border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; font-size: 0.9rem; color: #e0e0e0; }
+.callout strong { color: #e74c3c; }
+.legend { display: flex; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
+.legend-item { font-size: 0.82rem; color: #8a8aad; display: flex; align-items: center; gap: 6px; }
+.pg { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.pc { background: #16213e; border: 1px solid #2a2a4a; border-radius: 10px; padding: 24px; border-left: 4px solid; }
+.pc.p1 { border-left-color: #e74c3c; } .pc.p2 { border-left-color: #f39c12; }
+.pc.p3 { border-left-color: #3498db; } .pc.p4 { border-left-color: #9b59b6; }
+.pt { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.pc.p1 .pt { color: #e74c3c; } .pc.p2 .pt { color: #f39c12; }
+.pc.p3 .pt { color: #3498db; } .pc.p4 .pt { color: #9b59b6; }
+.pc h3 { color: #fff; font-size: 1.15rem; margin-bottom: 10px; }
+.pc p { color: #b0b0cc; font-size: 0.9rem; }
+.pc ul { color: #b0b0cc; font-size: 0.9rem; margin: 10px 0 10px 20px; }
+.pc li { margin-bottom: 4px; }
+.mr { display: flex; gap: 24px; margin-top: 14px; flex-wrap: wrap; }
+.mt { font-size: 0.78rem; color: #8a8aad; }
+.mt strong { color: #ccc; }
+.vg { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.vc { background: rgba(46,204,113,0.05); border: 1px solid rgba(46,204,113,0.15); border-radius: 8px; padding: 20px; }
+.vc h4 { color: #2ECC71; font-size: 0.95rem; margin-bottom: 8px; }
+.vc .it { font-size: 0.72rem; background: rgba(46,204,113,0.15); color: #2ECC71; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
+.vc p { color: #b0b0cc; font-size: 0.88rem; }
+.tl { position: relative; padding-left: 30px; }
+.tl::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #2a2a4a; }
+.ti { position: relative; margin-bottom: 28px; }
+.ti::before { content: ''; position: absolute; left: -26px; top: 6px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #2ECC71; background: #0f0f1a; }
+.ti.done::before { background: #2ECC71; }
+.ti h4 { color: #fff; font-size: 1rem; margin-bottom: 4px; }
+.ti .td { font-size: 0.8rem; color: #2ECC71; font-weight: 600; }
+.ti p { color: #8a8aad; font-size: 0.88rem; margin-top: 4px; }
+.footer { text-align: center; padding: 30px; color: #555; font-size: 0.8rem; border-top: 1px solid #2a2a4a; margin-top: 40px; }
+@media print { body { background: #fff; color: #333; } .section { border-color: #ddd; background: #fff; } .header { background: #fff; } thead th { background: #f5f5f5; color: #333; } }
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Data Gap Report</h1>
+  <div class="subtitle">Property Intelligence Engine &mdash; Phase 6 Data Request</div>
+  <div class="header-meta">
+    <div class="meta-item"><div class="meta-label">CBAS Stores</div><div class="meta-value">31</div></div>
+    <div class="meta-item"><div class="meta-label">POS+CBAS Matched</div><div class="meta-value">23</div></div>
+    <div class="meta-item"><div class="meta-label">ROC Coverage</div><div class="meta-value">29 / 31</div></div>
+    <div class="meta-item"><div class="meta-label">Ramp-Up Stores</div><div class="meta-value">5</div></div>
+    <div class="meta-item"><div class="meta-label">Report Date</div><div class="meta-value">25 February 2026</div></div>
+  </div>
+</div>
+
+<div class="container">
+
+<div class="callout">
+  <strong>Key limitation:</strong> GPM (Gross Profit Margin) from POS data does not equal true Gross Profit &mdash; it excludes transport and packaging costs. Finance-supplied EBITDA and occupancy data is required before any store-level profitability model can be considered reliable.
+</div>
+
+<div class="section">
+  <h2><span class="sn">1</span> Data Availability Matrix</h2>
+  <div class="sd">Current data coverage across all 31 CBAS network stores. Green columns indicate externally-sourced data already ingested; red columns are the gaps this report requests.</div>
+  <div class="legend">
+    <div class="legend-item"><span style="font-size:1rem">&#x2705;</span> Available</div>
+    <div class="legend-item"><span style="font-size:1rem">&#x26A0;&#xFE0F;</span> Partial / Needs Validation</div>
+    <div class="legend-item"><span style="font-size:0.9rem">&#x274C;</span> Missing &mdash; Requested</div>
+    <div class="legend-item"><span style="background:#f39c12;color:#000;font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:4px">RAMP-UP</span> 2025 opening</div>
+    <div class="legend-item"><span style="background:#e74c3c;color:#fff;font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:4px">NAME</span> Name mismatch</div>
+  </div>
+  <div style="overflow-x: auto;">
+  <table>
+    <thead><tr><th>Store</th><th>State</th><th style="text-align:right">SQM</th><th class="c">CBAS</th><th class="c">POS Match</th><th class="c">ROC</th><th class="c">Rent</th><th class="c">Labour</th><th class="c">Fitout</th><th class="c">EBITDA</th><th class="c">Census</th></tr></thead>
+    <tbody>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Majura Park <span style="background:#f39c12;color:#000;font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">RAMP-UP</span></td><td style="color:#8a8aad">ACT</td><td style="text-align:right;color:#aaa">2,500</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x26A0;&#xFE0F;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Albury</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">4,523</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Bondi <span style="background:#e74c3c;color:#fff;font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">NAME</span></td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,020</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Bondi Westfield <span style="background:#e74c3c;color:#fff;font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">NAME</span></td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,795</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Boronia Park</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,154</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Bowral</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,406</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Broadway</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,641</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Cammeray</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">875</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Cooks Hill <span style="background:#e74c3c;color:#fff;font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">NAME</span></td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">2,649</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Drummoyne</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">2,206</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Dural <span style="background:#f39c12;color:#000;font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">RAMP-UP</span></td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,435</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x26A0;&#xFE0F;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Erina</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,325</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Lane Cove</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">2,450</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Leichhardt</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,692</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Lindfield</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,379</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Manly</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,422</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Marrickville <span style="background:#f39c12;color:#000;font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">RAMP-UP</span></td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,800</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x26A0;&#xFE0F;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Miranda <span style="background:#f39c12;color:#000;font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">RAMP-UP</span></td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,116</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x26A0;&#xFE0F;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Mona Vale</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">874</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Mosman</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,674</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Orange</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,114</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x26A0;&#xFE0F;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Pennant Hills</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">839</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Potts Point</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">995</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Randwick</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,107</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Redfern <span style="background:#f39c12;color:#000;font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px">RAMP-UP</span></td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,500</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x26A0;&#xFE0F;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Rose Bay</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,085</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">St Ives</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">1,246</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Willoughby</td><td style="color:#8a8aad">NSW</td><td style="text-align:right;color:#aaa">859</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Clayfield</td><td style="color:#8a8aad">QLD</td><td style="text-align:right;color:#aaa">1,073</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x26A0;&#xFE0F;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">Isle of Capri</td><td style="color:#8a8aad">QLD</td><td style="text-align:right;color:#aaa">1,922</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+<tr><td style="font-weight:600;color:#fff;white-space:nowrap">West End</td><td style="color:#8a8aad">QLD</td><td style="text-align:right;color:#aaa">2,210</td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:1rem">&#x2705;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td><td class="c"><span style="font-size:0.9rem">&#x274C;</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="section">
+  <h2><span class="sn">2</span> Priority Data Requests</h2>
+  <div class="sd">Ranked by impact on the Property Intelligence Engine's analytical capability.</div>
+  <div class="pg">
+
+    <div class="pc p1">
+      <div class="pt">P1 &mdash; Critical</div>
+      <h3>Store-Level Finance Data</h3>
+      <p>Without occupancy, labour, and EBITDA data, the engine cannot model true profitability or generate reliable site-selection scorecards.</p>
+      <ul>
+        <li><strong>Annual occupancy cost</strong> (rent + outgoings) per store</li>
+        <li><strong>Annual labour cost</strong> per store</li>
+        <li><strong>Fitout capital total</strong> (initial build cost)</li>
+        <li><strong>EBITDA FY24</strong> per store</li>
+        <li><strong>Store opening date</strong> and <strong>lease expiry date</strong></li>
+      </ul>
+      <div class="mr"><div class="mt"><strong>Recipient:</strong> Phil Cribb / Finance</div><div class="mt"><strong>Format:</strong> CSV template attached</div><div class="mt"><strong>Deadline:</strong> Week 1</div></div>
+    </div>
+
+    <div class="pc p2">
+      <div class="pt">P2 &mdash; High</div>
+      <h3>Store Name Reconciliation</h3>
+      <p>10 store entries have naming conflicts between POS (Hub) and CBAS systems. Until resolved, affected stores cannot be joined across datasets.</p>
+      <div style="overflow-x:auto; margin-top: 12px;">
+      <table>
+        <thead><tr><th>#</th><th>CBAS Name</th><th>Hub/POS Name</th><th>Type</th><th>Notes</th></tr></thead>
+        <tbody>
+<tr><td>1</td><td>Bondi Westfield</td><td>Bondi Junction</td><td><span style="background:#e74c3c;color:#fff;font-size:0.7rem;font-weight:600;padding:3px 8px;border-radius:4px">Name Mismatch</span></td><td>Same store — Bondi Junction Westfield</td></tr>
+<tr><td>2</td><td>Bondi</td><td>Bondi Beach</td><td><span style="background:#e74c3c;color:#fff;font-size:0.7rem;font-weight:600;padding:3px 8px;border-radius:4px">Name Mismatch</span></td><td>Same store — Bondi Beach location</td></tr>
+<tr><td>3</td><td>Cooks Hill</td><td>Newcastle</td><td><span style="background:#e74c3c;color:#fff;font-size:0.7rem;font-weight:600;padding:3px 8px;border-radius:4px">Name Mismatch</span></td><td>Same region — Cooks Hill is the Newcastle store</td></tr>
+<tr><td>4</td><td>Cooks Hill</td><td>-- (not in Hub POS)</td><td><span style="background:#3498db;color:#fff;font-size:0.7rem;font-weight:600;padding:3px 8px;border-radius:4px">In CBAS Only</span></td><td>Newcastle store — opened 2018, active</td></tr>
+<tr><td>5</td><td>Majura Park</td><td>-- (not in Hub POS)</td><td><span style="background:#3498db;color:#fff;font-size:0.7rem;font-weight:600;padding:3px 8px;border-radius:4px">In CBAS Only</span></td><td>Canberra — opened 2025, active</td></tr>
+<tr><td>6</td><td>Miranda</td><td>-- (not in Hub POS)</td><td><span style="background:#3498db;color:#fff;font-size:0.7rem;font-weight:600;padding:3px 8px;border-radius:4px">In CBAS Only</span></td><td>Sutherland Shire — opened 2025, active</td></tr>
+<tr><td>7</td><td>Redfern</td><td>-- (not in Hub POS)</td><td><span style="background:#3498db;color:#fff;font-size:0.7rem;font-weight:600;padding:3px 8px;border-radius:4px">In CBAS Only</span></td><td>Inner Sydney — new store, active</td></tr>
+<tr><td>8</td><td>Dural</td><td>-- (not in Hub POS)</td><td><span style="background:#3498db;color:#fff;font-size:0.7rem;font-weight:600;padding:3px 8px;border-radius:4px">In CBAS Only</span></td><td>Hills District — opened 2025, active</td></tr>
+<tr><td>9</td><td>Marrickville</td><td>-- (not in Hub POS)</td><td><span style="background:#3498db;color:#fff;font-size:0.7rem;font-weight:600;padding:3px 8px;border-radius:4px">In CBAS Only</span></td><td>Inner West — opened 2025, active</td></tr>
+<tr><td>10</td><td>-- (not in CBAS)</td><td>Baulkham Hills</td><td><span style="background:#f39c12;color:#000;font-size:0.7rem;font-weight:600;padding:3px 8px;border-radius:4px">In Hub POS Only</span></td><td>Closed retail location</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="mr"><div class="mt"><strong>Recipient:</strong> Phil Cribb / Data Team</div><div class="mt"><strong>Format:</strong> Confirmed mapping table</div><div class="mt"><strong>Deadline:</strong> Week 1</div></div>
+    </div>
+
+    <div class="pc p3">
+      <div class="pt">P3 &mdash; Medium</div>
+      <h3>Ramp-Up Store Re-Assessment</h3>
+      <p>Five 2025-opening stores have less than 12 months of trading data. Their CBAS catchment metrics were modelled pre-opening and may not reflect actual performance.</p>
+      <ul>
+        <li><strong>Dural</strong> &mdash; Hills District, NSW</li>
+        <li><strong>Marrickville</strong> &mdash; Inner West, NSW</li>
+        <li><strong>Miranda</strong> &mdash; Sutherland Shire, NSW</li>
+        <li><strong>Redfern</strong> &mdash; Inner Sydney, NSW</li>
+        <li><strong>Majura Park</strong> &mdash; Canberra, ACT</li>
+      </ul>
+      <p style="margin-top:10px;">Request: updated CBAS catchment profiles once each store has 6+ months of transaction data, plus POS sales for the same period.</p>
+      <div class="mr"><div class="mt"><strong>Recipient:</strong> CBAS Analytics Team</div><div class="mt"><strong>Format:</strong> Updated catchment JSON</div><div class="mt"><strong>Deadline:</strong> Week 4&ndash;8 (rolling)</div></div>
+    </div>
+
+    <div class="pc p4">
+      <div class="pt">P4 &mdash; Strategic</div>
+      <h3>Quantium Penetration Data</h3>
+      <p>Shopper penetration data (from loyalty card / credit bureau panels) would enable the engine to distinguish between genuine white-space and travel-loyal customers in low-share postcodes.</p>
+      <ul>
+        <li>Household penetration by postcode</li>
+        <li>Category-level basket composition</li>
+        <li>Cross-shop behaviour (overlap with Woolworths, Coles, Aldi)</li>
+        <li>Online vs. instore channel split by catchment</li>
+      </ul>
+      <p style="margin-top:10px;">This is the final layer required to move opportunity assessment from DIRECTIONAL to VALIDATED.</p>
+      <div class="mr"><div class="mt"><strong>Recipient:</strong> Luke Harris / Quantium relationship</div><div class="mt"><strong>Format:</strong> Postcode-level CSV or API feed</div><div class="mt"><strong>Deadline:</strong> Week 6+</div></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section">
+  <h2><span class="sn">3</span> What We Can Build With Each Data Input</h2>
+  <div class="sd">Each data gap unlocks specific analytical capabilities in the Property Intelligence Engine.</div>
+  <div class="vg">
+    <div class="vc"><span class="it">Rent + Outgoings</span><h4>Occupancy Ratio Model</h4><p>Sales-per-SQM vs. rent-per-SQM efficiency scoring. Identifies over-rented locations and quantifies lease renegotiation opportunity. Feeds directly into the 4-Wall P&amp;L model.</p></div>
+    <div class="vc"><span class="it">Labour Costs</span><h4>Labour Productivity Index</h4><p>Revenue-per-labour-dollar benchmarking across the network. Enables rostering optimisation targeting and highlights stores where headcount does not match throughput.</p></div>
+    <div class="vc"><span class="it">Fitout Capital</span><h4>ROI &amp; Payback Calculator</h4><p>Capital-employed vs. EBITDA payback period per store. Essential for new-site investment cases and refurbishment prioritisation.</p></div>
+    <div class="vc"><span class="it">EBITDA</span><h4>True Profitability Ranking</h4><p>Replaces GPM-based proxy with actual earnings. Powers the Performance x Profitability matrix and validates the CBAS tier assignments.</p></div>
+    <div class="vc"><span class="it">Store Name Reconciliation</span><h4>Unified Store Master</h4><p>Enables automatic joins between POS sales data, CBAS catchment metrics, and ROC competitive landscape. Prerequisite for all cross-dataset analysis.</p></div>
+    <div class="vc"><span class="it">Ramp-Up Re-Assessment</span><h4>New Store Trajectory Model</h4><p>Actual vs. projected performance tracking for 2025 openings. Validates the site-selection model's predictive accuracy and calibrates future projections.</p></div>
+    <div class="vc"><span class="it">Quantium Penetration</span><h4>Validated Opportunity Scoring</h4><p>Upgrades expansion opportunity assessment from 'directional' to 'validated'. Distinguishes true white-space from travel-loyal behaviour in low-share postcodes.</p></div>
+    <div class="vc"><span class="it">ABS Census Demographics</span><h4>Demographic Success Profile</h4><p>Empirically-derived ideal catchment profile (income, household composition, professional/managerial workforce %). Powers automated site-scoring for new locations.</p></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2><span class="sn">4</span> Recommended Timeline</h2>
+  <div class="sd">Suggested sequencing to unblock the Property Intelligence Engine build incrementally.</div>
+  <div class="tl">
+    <div class="ti done"><div class="td">Completed</div><h4>Phase 1-5: CBAS Ingestion, Catchment Modelling, ROC Analysis</h4><p>31 stores ingested, catchment profiles built, competitive landscape mapped. 23 stores fully matched to POS. Whitespace opportunities identified (directional).</p></div>
+    <div class="ti"><div class="td">Week 1 &mdash; March 2026</div><h4>Store Name Reconciliation + Finance CSV Distributed</h4><p>Phil Cribb confirms the 10 name mappings. Finance team receives the pre-populated CSV template for occupancy, labour, fitout, and EBITDA data.</p></div>
+    <div class="ti"><div class="td">Week 2-3 &mdash; March 2026</div><h4>Finance Data Returned + Ingested</h4><p>Completed CSV uploaded to Hub. Backend ingests into hub_data.db. 4-Wall P&amp;L model built for all 31 stores.</p></div>
+    <div class="ti"><div class="td">Week 3-4 &mdash; March 2026</div><h4>ABS Census Demographics Overlaid</h4><p>SA1-level demographic data (2021 Census) joined to store catchment polygons. Demographic success profile v1 generated.</p></div>
+    <div class="ti"><div class="td">Week 4-8 &mdash; April 2026</div><h4>Ramp-Up Store Re-Assessment (Rolling)</h4><p>As each 2025 store hits 6 months trading, request updated CBAS catchment metrics. Compare actual vs. projected to calibrate site-selection model.</p></div>
+    <div class="ti"><div class="td">Week 6+ &mdash; April 2026</div><h4>Quantium Penetration Data Scoping</h4><p>Luke Harris engages Quantium for penetration overlay. Scope: postcode-level household penetration, cross-shop, and basket composition.</p></div>
+    <div class="ti"><div class="td">Week 8-10 &mdash; May 2026</div><h4>Property Intelligence Engine v2 Launch</h4><p>Full-stack model with finance + demographics + penetration. Automated site-scoring for new location evaluation. Board-ready investment case generator.</p></div>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  Harris Farm Hub &mdash; Property Intelligence Engine &mdash; Data Gap Report<br>
+  Generated 25 February 2026 &mdash; Source: Harris Farm Store Network Analysis - Existing store performance - 20 Feb 2026.xlsx<br>
+  Prepared by AI Centre of Excellence &mdash; Confidential
+</div>
+
+</body>
+</html>

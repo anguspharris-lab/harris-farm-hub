@@ -74,6 +74,12 @@ _pages = {
     "product-intel": st.Page(str(_DIR / "product_intel_dashboard.py"), title="Product Intel", icon="\U0001f50d", url_path="product-intel"),
     "plu-intel": st.Page(str(_DIR / "plu_intel_dashboard.py"), title="PLU Intelligence", icon="\U0001f4ca", url_path="plu-intel"),
     "transport": st.Page(str(_DIR / "transport_dashboard.py"), title="Transport", icon="\U0001f69a", url_path="transport"),
+    # Property
+    "store-network": st.Page(str(_DIR / "store_network_page.py"), title="Store Network", icon="\U0001f3ec", url_path="store-network"),
+    "market-share": st.Page(str(_DIR / "market_share_page.py"), title="Market Share", icon="\U0001f4ca", url_path="market-share"),
+    "demographics": st.Page(str(_DIR / "demographics_page.py"), title="Demographics", icon="\U0001f4e8", url_path="demographics"),
+    "whitespace": st.Page(str(_DIR / "whitespace_analysis.py"), title="Whitespace Analysis", icon="\U0001f5fa\ufe0f", url_path="whitespace"),
+    "competitor-map": st.Page(str(_DIR / "competitor_map_page.py"), title="Competitor Map", icon="\U0001f4cd", url_path="competitor-map"),
     # P5 Digital & AI
     "workflow-engine": st.Page(str(_DIR / "workflow_engine.py"), title="Workflow Engine", icon="\u2699\ufe0f", url_path="workflow-engine"),
     "analytics-engine": st.Page(str(_DIR / "analytics_engine.py"), title="Analytics Engine", icon="\U0001f52c", url_path="analytics-engine"),
@@ -96,6 +102,9 @@ _SECTIONS = [
      "slugs": ["customers", "sales", "profitability", "revenue-bridge",
                "store-ops", "buying-hub", "product-intel", "plu-intel",
                "transport", "analytics-engine"]},
+    {"name": "Property", "icon": "\U0001f3d8\ufe0f", "color": "#06B6D4",
+     "slugs": ["store-network", "market-share", "demographics",
+               "whitespace", "competitor-map"]},
     {"name": "Back of House", "icon": "\u2699\ufe0f", "color": "#8899AA",
      "is_muted": True,
      "slugs": ["the-rubric", "approvals", "workflow-engine", "agent-ops",
@@ -138,6 +147,10 @@ _full_nav = {
         "customers", "sales", "profitability", "revenue-bridge",
         "store-ops", "buying-hub", "product-intel", "plu-intel",
         "transport", "analytics-engine",
+    ],
+    "Property": [
+        "store-network", "market-share", "demographics",
+        "whitespace", "competitor-map",
     ],
     "Back of House": [
         "the-rubric", "approvals", "workflow-engine", "agent-ops",

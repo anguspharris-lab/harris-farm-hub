@@ -1,0 +1,206 @@
+{
+  "generated": "2026-02-25T17:38:38.262869",
+  "methodology": {
+    "data_period": "FY24 (July 2023 - June 2024)",
+    "capital_assumption_primary": "$4,000 per total sqm",
+    "capital_sensitivity": "$3,000 (low) / $4,000 (primary) / $5,000 (high)",
+    "total_sqm_formula": "retail_sqm / 0.70 (70:30 retail:BOH)",
+    "gp_definition": "Gross Product Margin -- EXCLUDES transport & packaging",
+    "new_stores_2025": "Annualised from latest 4-week actual transaction run-rate"
+  },
+  "network_totals": {
+    "stores_with_pos_data": 24,
+    "stores_with_cbas_data": 28,
+    "stores_with_full_roc": 23,
+    "new_stores_2025": 5,
+    "total_network_revenue_fy24": 502408116.88000107,
+    "total_network_gp_fy24": 194651034.56670117,
+    "network_avg_gpm_pct": 38.71
+  },
+  "top5_gpm_roc": [
+    {
+      "store": "Cammeray",
+      "gpm_roc_4k": 1.47,
+      "rev_roc_4k": 3.77,
+      "retail_sqm": 875,
+      "gpm_pct": 39.01,
+      "format_segment": "Express"
+    },
+    {
+      "store": "Mona Vale",
+      "gpm_roc_4k": 1.46,
+      "rev_roc_4k": 3.71,
+      "retail_sqm": 874,
+      "gpm_pct": 39.46,
+      "format_segment": "Express"
+    },
+    {
+      "store": "Bondi Beach",
+      "gpm_roc_4k": 1.42,
+      "rev_roc_4k": 3.59,
+      "retail_sqm": 1020,
+      "gpm_pct": 39.48,
+      "format_segment": "Express"
+    },
+    {
+      "store": "Lindfield",
+      "gpm_roc_4k": 1.34,
+      "rev_roc_4k": 3.47,
+      "retail_sqm": 1379,
+      "gpm_pct": 38.76,
+      "format_segment": "Standard"
+    },
+    {
+      "store": "Manly",
+      "gpm_roc_4k": 1.25,
+      "rev_roc_4k": 3.56,
+      "retail_sqm": 1422,
+      "gpm_pct": 34.99,
+      "format_segment": "Standard"
+    }
+  ],
+  "bottom5_gpm_roc": [
+    {
+      "store": "Drummoyne",
+      "gpm_roc_4k": 0.87,
+      "rev_roc_4k": 2.2,
+      "retail_sqm": 2206,
+      "gpm_pct": 39.6,
+      "format_segment": "Large"
+    },
+    {
+      "store": "Broadway",
+      "gpm_roc_4k": 0.86,
+      "rev_roc_4k": 2.24,
+      "retail_sqm": 1641,
+      "gpm_pct": 38.21,
+      "format_segment": "Standard"
+    },
+    {
+      "store": "Newcastle",
+      "gpm_roc_4k": 0.83,
+      "rev_roc_4k": 2.06,
+      "retail_sqm": 2649,
+      "gpm_pct": 40.29,
+      "format_segment": "Large"
+    },
+    {
+      "store": "Lane Cove",
+      "gpm_roc_4k": 0.63,
+      "rev_roc_4k": 1.6,
+      "retail_sqm": 2450,
+      "gpm_pct": 39.5,
+      "format_segment": "Large"
+    },
+    {
+      "store": "Albury",
+      "gpm_roc_4k": 0.32,
+      "rev_roc_4k": 0.79,
+      "retail_sqm": 4523,
+      "gpm_pct": 40.99,
+      "format_segment": "Large"
+    }
+  ],
+  "format_comparison": {
+    "Express": {
+      "count": 11,
+      "avg_retail_sqm": 1003.45,
+      "avg_revenue": 17628986.01,
+      "avg_rev_per_sqm": 17624.27,
+      "avg_gpm_pct": 38.97,
+      "avg_rev_roc_4k": 3.08,
+      "avg_gpm_roc_4k": 1.17
+    },
+    "Large": {
+      "count": 5,
+      "avg_retail_sqm": 2865.6,
+      "avg_revenue": 27183639.0,
+      "avg_rev_per_sqm": 10337.2,
+      "avg_gpm_pct": 40.1,
+      "avg_rev_roc_4k": 1.81,
+      "avg_gpm_roc_4k": 0.66
+    },
+    "Standard": {
+      "count": 12,
+      "avg_retail_sqm": 1526.25,
+      "avg_revenue": 24339333.76,
+      "avg_rev_per_sqm": 16018.75,
+      "avg_gpm_pct": 38.15,
+      "avg_rev_roc_4k": 2.8,
+      "avg_gpm_roc_4k": 1.11
+    }
+  },
+  "centre_type_comparison": {
+    "Mixed Use": {
+      "count": 8,
+      "avg_retail_sqm": 1276.75,
+      "avg_revenue": 20647529.64,
+      "avg_rev_per_sqm": 16820.25,
+      "avg_gpm_pct": 38.43,
+      "avg_rev_roc_4k": 2.94,
+      "avg_gpm_roc_4k": 1.16
+    },
+    "Shopping Centre": {
+      "count": 11,
+      "avg_retail_sqm": 1288.0,
+      "avg_revenue": 21627599.75,
+      "avg_rev_per_sqm": 16985.45,
+      "avg_gpm_pct": 39.04,
+      "avg_rev_roc_4k": 2.97,
+      "avg_gpm_roc_4k": 1.13
+    },
+    "Standalone": {
+      "count": 9,
+      "avg_retail_sqm": 2144.33,
+      "avg_revenue": 24313912.42,
+      "avg_rev_per_sqm": 12930.67,
+      "avg_gpm_pct": 39.03,
+      "avg_rev_roc_4k": 2.26,
+      "avg_gpm_roc_4k": 0.82
+    }
+  },
+  "fix_candidates_count": 2,
+  "lifecycle": {
+    "Legacy (pre-tracking)": {
+      "count": 13,
+      "avg_gpm_roc_4k": 1.157,
+      "avg_rev_roc_4k": 3.01
+    },
+    "New Build": {
+      "count": 12,
+      "avg_gpm_roc_4k": 0.863,
+      "avg_rev_roc_4k": 2.429
+    },
+    "Refurbishment": {
+      "count": 4,
+      "avg_gpm_roc_4k": 1.11,
+      "avg_rev_roc_4k": 2.838
+    }
+  },
+  "data_quality": {
+    "pos_stores_matched_to_cbas": 23,
+    "pos_stores_without_cbas": [
+      "Bathurst Concession"
+    ],
+    "cbas_stores_without_pos": [
+      "Clayfield",
+      "Dural",
+      "Isle of Capri",
+      "Majura Park",
+      "Marrickville",
+      "Miranda",
+      "Redfern",
+      "West End"
+    ],
+    "stores_missing_shrinkage": 5,
+    "notes": [
+      "Shrinkage data only available from ~FY22 onwards for many stores",
+      "Budget data may be zero for some stores (new or non-budgeted)",
+      "2025 new stores have revenue only (no GP breakdown from transactions)",
+      "CBAS sqm is retail area -- total includes 30% BOH estimate",
+      "GPM excludes transport & packaging -- actual net margin is lower",
+      "Bondi Beach POS data mapped to CBAS 'Bondi'",
+      "Newcastle POS data mapped to CBAS 'Cooks Hill'"
+    ]
+  }
+}

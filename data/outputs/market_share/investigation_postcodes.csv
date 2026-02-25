@@ -1,0 +1,4 @@
+postcode,region_name,state,market_share_pct,market_size_dollars,nearest_store,distance_km,distance_tier,trend_direction,trend_pp,status,label
+AUS,AUS,Unknown,0.942,77050213.0,,,,Growing,0.079,UNVALIDATED - requires demographic scoring (Phase 4),Investigation postcode
+QLD,QLD,Unknown,0.526,9580291.0,,,,Growing,0.004,UNVALIDATED - requires demographic scoring (Phase 4),Investigation postcode
+ACT,ACT,Unknown,1.597,2221498.0,,,,Declining,-0.002,UNVALIDATED - requires demographic scoring (Phase 4),Investigation postcode

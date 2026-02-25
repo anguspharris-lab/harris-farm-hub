@@ -29,6 +29,7 @@ ROLE_DEFINITIONS = {
             "intro-digital", "ai-adoption", "mission-control", "adoption",
             "way-of-working",
             "prompt-builder", "hub-assistant",
+            "store-network", "market-share", "whitespace",
         ],
     },
     "store_manager": {
@@ -57,6 +58,7 @@ ROLE_DEFINITIONS = {
             "customers", "marketing-assets",
             "prompt-builder", "trending", "analytics-engine",
             "hub-assistant", "skills-academy", "the-paddock",
+            "market-share", "demographics",
         ],
     },
     "people_culture": {
@@ -75,6 +77,7 @@ ROLE_DEFINITIONS = {
             "sales", "profitability", "revenue-bridge",
             "customers", "analytics-engine",
             "prompt-builder",
+            "store-network", "market-share", "whitespace",
         ],
     },
     "viewer": {

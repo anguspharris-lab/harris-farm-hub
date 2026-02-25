@@ -9,6 +9,23 @@ data/transactions/
 # Allow small reference parquets (needed for deployment)
 !data/fiscal_calendar_daily.parquet
 !data/product_hierarchy.parquet
+!data/census/processed/*.parquet
+
+# Raw census data (large ABS DataPacks — download via scripts/process_census.py)
+data/census/raw/
+data/census/2021_*/
+
+# Separate apps / prototypes (not part of Hub)
+marketing-assets/
+paddock/
+the-paddock/
+
+# Temporary review documents
+CLO_JOINT_IMPROVEMENT_PLAN.md
+DESIGN_IMPLEMENTATION_PLAN.md
+FINAL_SCORECARD.md
+REVIEW_LOG.md
+SITE_DISCOVERY.md
 
 # Secrets
 .env

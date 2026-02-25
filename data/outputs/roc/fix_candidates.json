@@ -1,0 +1,40 @@
+{
+  "generated": "2026-02-25T17:38:38.265437",
+  "methodology": {
+    "description": "Drummoyne pattern: strong customer metrics + weak capital efficiency",
+    "sow_threshold": 0.12,
+    "market_share_threshold": 0.03,
+    "gpm_roc_threshold": 0.7,
+    "capital_assumption": "$4,000/total_sqm"
+  },
+  "candidates": [
+    {
+      "store": "Albury",
+      "share_of_wallet": 0.109,
+      "market_share": 0.0543,
+      "gpm_roc_4k": 0.32,
+      "rev_roc_4k": 0.79,
+      "retail_sqm": 4523,
+      "format_segment": "Large",
+      "centre_type": "Standalone",
+      "gpm_pct": 40.99,
+      "diagnosis": "Oversized -- consider format reduction",
+      "customer_strength": "MODERATE",
+      "capital_efficiency": "WEAK"
+    },
+    {
+      "store": "Lane Cove",
+      "share_of_wallet": 0.154,
+      "market_share": 0.05,
+      "gpm_roc_4k": 0.63,
+      "rev_roc_4k": 1.6,
+      "retail_sqm": 2450,
+      "format_segment": "Large",
+      "centre_type": "Standalone",
+      "gpm_pct": 39.5,
+      "diagnosis": "Oversized -- consider format reduction",
+      "customer_strength": "HIGH",
+      "capital_efficiency": "BELOW_AVG"
+    }
+  ]
+}

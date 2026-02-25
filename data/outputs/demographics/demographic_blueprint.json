@@ -1,0 +1,283 @@
+{
+  "method": "Top quartile stores by GPM ROC (Primary @ $4k/sqm)",
+  "top_quartile_threshold": 1.23,
+  "bottom_quartile_threshold": 0.92,
+  "top_quartile_stores": [
+    "Cammeray",
+    "Lindfield",
+    "Manly",
+    "Mona Vale",
+    "Mosman"
+  ],
+  "bottom_quartile_stores": [
+    "Albury",
+    "Boronia Park",
+    "Broadway",
+    "Drummoyne",
+    "Lane Cove"
+  ],
+  "top_quartile_profile": {
+    "pct_professional_catchment": 57.84,
+    "pct_degree_catchment": 46.78,
+    "median_hh_income_weekly_catchment": 2853.81,
+    "pct_wfh_catchment": 49.77,
+    "pct_high_income_hh_catchment": 48.74,
+    "seifa_irsad_score_catchment": 1082.66,
+    "seifa_irsad_decile_catchment": 9.3,
+    "median_age_catchment": 40.97,
+    "median_rent_weekly_catchment": 700.5,
+    "median_mortgage_monthly_catchment": 3286.23,
+    "avg_household_size_catchment": 2.53,
+    "labour_force_participation_pct_catchment": 66.0,
+    "unemployment_pct_catchment": 3.88
+  },
+  "bottom_quartile_profile": {
+    "pct_professional_catchment": 51.26,
+    "pct_degree_catchment": 42.18,
+    "median_hh_income_weekly_catchment": 2324.98,
+    "pct_wfh_catchment": 41.01,
+    "pct_high_income_hh_catchment": 39.18,
+    "seifa_irsad_score_catchment": 1034.38,
+    "seifa_irsad_decile_catchment": 8.17,
+    "median_age_catchment": 39.11,
+    "median_rent_weekly_catchment": 537.68,
+    "median_mortgage_monthly_catchment": 2664.12,
+    "avg_household_size_catchment": 2.42,
+    "labour_force_participation_pct_catchment": 64.19,
+    "unemployment_pct_catchment": 4.98
+  },
+  "ideal_ranges": {
+    "pct_professional_catchment": {
+      "min": 52.31,
+      "max": 61.7,
+      "top_q_avg": 57.84
+    },
+    "pct_degree_catchment": {
+      "min": 42.22,
+      "max": 51.87,
+      "top_q_avg": 46.78
+    },
+    "median_hh_income_weekly_catchment": {
+      "min": 2490.96,
+      "max": 3083.72,
+      "top_q_avg": 2853.81
+    },
+    "pct_wfh_catchment": {
+      "min": 41.15,
+      "max": 53.13,
+      "top_q_avg": 49.77
+    },
+    "pct_high_income_hh_catchment": {
+      "min": 42.57,
+      "max": 52.01,
+      "top_q_avg": 48.74
+    },
+    "seifa_irsad_score_catchment": {
+      "min": 1055.53,
+      "max": 1095.6,
+      "top_q_avg": 1082.66
+    },
+    "seifa_irsad_decile_catchment": {
+      "min": 8.41,
+      "max": 9.67,
+      "top_q_avg": 9.3
+    },
+    "median_age_catchment": {
+      "min": 40.32,
+      "max": 43.95,
+      "top_q_avg": 40.97
+    },
+    "median_rent_weekly_catchment": {
+      "min": 585.59,
+      "max": 753.32,
+      "top_q_avg": 700.5
+    },
+    "median_mortgage_monthly_catchment": {
+      "min": 2822.62,
+      "max": 3460.85,
+      "top_q_avg": 3286.23
+    },
+    "avg_household_size_catchment": {
+      "min": 2.52,
+      "max": 2.71,
+      "top_q_avg": 2.53
+    },
+    "labour_force_participation_pct_catchment": {
+      "min": 64.22,
+      "max": 67.39,
+      "top_q_avg": 66.0
+    },
+    "unemployment_pct_catchment": {
+      "min": 3.88,
+      "max": 4.4,
+      "top_q_avg": 3.88
+    }
+  },
+  "key_differentiators": [
+    {
+      "metric": "median_rent_weekly_catchment",
+      "top_quartile_avg": 700.5,
+      "bottom_quartile_avg": 537.68,
+      "network_avg": 585.59,
+      "difference_pct": 27.8
+    },
+    {
+      "metric": "unemployment_pct_catchment",
+      "top_quartile_avg": 3.88,
+      "bottom_quartile_avg": 4.98,
+      "network_avg": 4.39,
+      "difference_pct": -25.0
+    },
+    {
+      "metric": "pct_high_income_hh_catchment",
+      "top_quartile_avg": 48.74,
+      "bottom_quartile_avg": 39.18,
+      "network_avg": 42.57,
+      "difference_pct": 22.5
+    },
+    {
+      "metric": "median_mortgage_monthly_catchment",
+      "top_quartile_avg": 3286.23,
+      "bottom_quartile_avg": 2664.12,
+      "network_avg": 2822.62,
+      "difference_pct": 22.0
+    },
+    {
+      "metric": "pct_wfh_catchment",
+      "top_quartile_avg": 49.77,
+      "bottom_quartile_avg": 41.01,
+      "network_avg": 41.15,
+      "difference_pct": 21.3
+    },
+    {
+      "metric": "median_hh_income_weekly_catchment",
+      "top_quartile_avg": 2853.81,
+      "bottom_quartile_avg": 2324.98,
+      "network_avg": 2490.96,
+      "difference_pct": 21.2
+    },
+    {
+      "metric": "seifa_irsad_decile_catchment",
+      "top_quartile_avg": 9.3,
+      "bottom_quartile_avg": 8.17,
+      "network_avg": 8.41,
+      "difference_pct": 13.4
+    },
+    {
+      "metric": "pct_professional_catchment",
+      "top_quartile_avg": 57.84,
+      "bottom_quartile_avg": 51.26,
+      "network_avg": 52.31,
+      "difference_pct": 12.6
+    },
+    {
+      "metric": "pct_degree_catchment",
+      "top_quartile_avg": 46.78,
+      "bottom_quartile_avg": 42.18,
+      "network_avg": 42.22,
+      "difference_pct": 10.9
+    },
+    {
+      "metric": "seifa_irsad_score_catchment",
+      "top_quartile_avg": 1082.66,
+      "bottom_quartile_avg": 1034.38,
+      "network_avg": 1055.53,
+      "difference_pct": 4.6
+    }
+  ],
+  "all_differentiators": [
+    {
+      "metric": "median_rent_weekly_catchment",
+      "top_quartile_avg": 700.5,
+      "bottom_quartile_avg": 537.68,
+      "network_avg": 585.59,
+      "difference_pct": 27.8
+    },
+    {
+      "metric": "unemployment_pct_catchment",
+      "top_quartile_avg": 3.88,
+      "bottom_quartile_avg": 4.98,
+      "network_avg": 4.39,
+      "difference_pct": -25.0
+    },
+    {
+      "metric": "pct_high_income_hh_catchment",
+      "top_quartile_avg": 48.74,
+      "bottom_quartile_avg": 39.18,
+      "network_avg": 42.57,
+      "difference_pct": 22.5
+    },
+    {
+      "metric": "median_mortgage_monthly_catchment",
+      "top_quartile_avg": 3286.23,
+      "bottom_quartile_avg": 2664.12,
+      "network_avg": 2822.62,
+      "difference_pct": 22.0
+    },
+    {
+      "metric": "pct_wfh_catchment",
+      "top_quartile_avg": 49.77,
+      "bottom_quartile_avg": 41.01,
+      "network_avg": 41.15,
+      "difference_pct": 21.3
+    },
+    {
+      "metric": "median_hh_income_weekly_catchment",
+      "top_quartile_avg": 2853.81,
+      "bottom_quartile_avg": 2324.98,
+      "network_avg": 2490.96,
+      "difference_pct": 21.2
+    },
+    {
+      "metric": "seifa_irsad_decile_catchment",
+      "top_quartile_avg": 9.3,
+      "bottom_quartile_avg": 8.17,
+      "network_avg": 8.41,
+      "difference_pct": 13.4
+    },
+    {
+      "metric": "pct_professional_catchment",
+      "top_quartile_avg": 57.84,
+      "bottom_quartile_avg": 51.26,
+      "network_avg": 52.31,
+      "difference_pct": 12.6
+    },
+    {
+      "metric": "pct_degree_catchment",
+      "top_quartile_avg": 46.78,
+      "bottom_quartile_avg": 42.18,
+      "network_avg": 42.22,
+      "difference_pct": 10.9
+    },
+    {
+      "metric": "seifa_irsad_score_catchment",
+      "top_quartile_avg": 1082.66,
+      "bottom_quartile_avg": 1034.38,
+      "network_avg": 1055.53,
+      "difference_pct": 4.6
+    },
+    {
+      "metric": "median_age_catchment",
+      "top_quartile_avg": 40.97,
+      "bottom_quartile_avg": 39.11,
+      "network_avg": 40.32,
+      "difference_pct": 4.6
+    },
+    {
+      "metric": "avg_household_size_catchment",
+      "top_quartile_avg": 2.53,
+      "bottom_quartile_avg": 2.42,
+      "network_avg": 2.52,
+      "difference_pct": 4.5
+    },
+    {
+      "metric": "labour_force_participation_pct_catchment",
+      "top_quartile_avg": 66.0,
+      "bottom_quartile_avg": 64.19,
+      "network_avg": 64.22,
+      "difference_pct": 2.8
+    }
+  ],
+  "n_top_quartile": 5,
+  "n_bottom_quartile": 5
+}
