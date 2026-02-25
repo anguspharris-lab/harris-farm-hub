@@ -593,6 +593,8 @@ with tab_trend:
             height=550,
             xaxis_title="Quarter",
             yaxis_title="ROCE (%)",
+        )
+        fig_trend.update_layout(
             legend=dict(
                 bgcolor="rgba(0,0,0,0)",
                 font=dict(color=TEXT_SECONDARY, size=11),
@@ -743,11 +745,11 @@ with tab_dupont:
             height=420,
             yaxis_title="Value",
             showlegend=True,
-            legend=dict(
-                bgcolor="rgba(0,0,0,0)",
-                font=dict(color=TEXT_SECONDARY),
-            ),
         )
+        fig_dupont.update_layout(legend=dict(
+            bgcolor="rgba(0,0,0,0)",
+            font=dict(color=TEXT_SECONDARY),
+        ))
 
         st.plotly_chart(fig_dupont, use_container_width=True, key="dupont_chart")
 
@@ -870,8 +872,8 @@ with tab_dupont:
             xaxis_title="Capital Turnover (Revenue / CE)",
             yaxis_title="Profit Margin (EBIT / Revenue %)",
             showlegend=False,
-            margin=dict(t=40, r=40, b=40, l=60),
         )
+        fig_scatter.update_layout(margin=dict(t=40, r=40, b=40, l=60))
 
         st.plotly_chart(fig_scatter, use_container_width=True, key="dupont_scatter")
         st.caption(
@@ -1115,11 +1117,11 @@ with tab_simulator:
             height=380,
             xaxis_title="EBIT Margin (%)",
             yaxis_title="ROCE (%)",
-            legend=dict(
-                bgcolor="rgba(0,0,0,0)",
-                font=dict(color=TEXT_SECONDARY),
-            ),
         )
+        fig_sens.update_layout(legend=dict(
+            bgcolor="rgba(0,0,0,0)",
+            font=dict(color=TEXT_SECONDARY),
+        ))
 
         st.plotly_chart(fig_sens, use_container_width=True, key="sens_chart")
         st.caption(
