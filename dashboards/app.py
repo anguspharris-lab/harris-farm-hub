@@ -152,7 +152,7 @@ _full_nav = {
     ],
     "Property": [
         "store-network", "market-share", "demographics",
-        "whitespace", "competitor-map",
+        "whitespace", "competitor-map", "roce", "cannibalisation",
     ],
     "Back of House": [
         "the-rubric", "approvals", "workflow-engine", "agent-ops",
