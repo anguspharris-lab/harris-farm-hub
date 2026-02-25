@@ -778,22 +778,157 @@ render_voice_data_box("profitability")
 render_ask_question("profitability")
 
 # ============================================================================
+# GL P&L — Full Accounting View (from Store P&L History)
+# ============================================================================
+
+st.markdown("---")
+st.subheader("GL P&L — Full Accounting View")
+st.caption("Source: Store P&L History (GL) | Revenue through to Net Profit including all cost lines")
+
+try:
+    import sys as _sys
+    _project_root = Path(__file__).resolve().parent.parent
+    if str(_project_root / "backend") not in _sys.path:
+        _sys.path.insert(0, str(_project_root / "backend"))
+    from store_pl_service import (
+        get_store_pl_annual, get_available_fy_years, get_lfl_comparison,
+        get_network_monthly_trend, get_store_cost_breakdown,
+    )
+
+    gl_fy_years = get_available_fy_years()
+
+    if gl_fy_years:
+        # Default to most recent FY with full 12 months
+        gl_default_fy = max(y for y in gl_fy_years if y <= 2026) if gl_fy_years else 2025
+        gl_fy = st.selectbox("GL Fiscal Year", gl_fy_years, index=gl_fy_years.index(gl_default_fy) if gl_default_fy in gl_fy_years else 0, key="gl_fy_select")
+
+        gl_annual = get_store_pl_annual(gl_fy)
+
+        if not gl_annual.empty:
+            # ── Network totals ──
+            net_rev = gl_annual["revenue"].sum()
+            net_gp = gl_annual["gross_profit"].sum()
+            net_ebitda = gl_annual["ebitda"].sum()
+            net_np = gl_annual["net_profit"].sum()
+            net_gp_pct = net_gp / net_rev * 100 if net_rev else 0
+            net_ebitda_pct = net_ebitda / net_rev * 100 if net_rev else 0
+            net_np_pct = net_np / net_rev * 100 if net_rev else 0
+
+            m1, m2, m3, m4 = st.columns(4)
+            m1.metric("Network Revenue", f"${net_rev / 1e6:.1f}M")
+            m2.metric("Gross Profit", f"${net_gp / 1e6:.1f}M ({net_gp_pct:.1f}%)")
+            m3.metric("EBITDA", f"${net_ebitda / 1e6:.1f}M ({net_ebitda_pct:.1f}%)")
+            m4.metric("Net Profit", f"${net_np / 1e6:.1f}M ({net_np_pct:.1f}%)")
+
+            # ── P&L Waterfall — Revenue to Net Profit ──
+            net_cogs = gl_annual["cogs"].sum()
+            net_empl = gl_annual["employment"].sum()
+            net_occ = gl_annual["occupancy"].sum()
+            net_buy = gl_annual["buying_fees"].sum()
+            net_opex = gl_annual["other_opex"].sum()
+            net_dep = gl_annual["depreciation"].sum()
+
+            wf_labels = ["Revenue", "COGS", "Gross Profit", "Employment", "Occupancy",
+                         "Buying Fees", "Other Opex", "EBITDA", "D&A", "Net Profit"]
+            wf_values = [net_rev, net_cogs, 0, net_empl, net_occ, net_buy, net_opex, 0, net_dep, 0]
+            wf_measures = ["relative", "relative", "total", "relative", "relative",
+                          "relative", "relative", "total", "relative", "total"]
+
+            fig_gl_wf = go.Figure(go.Waterfall(
+                orientation="v",
+                measure=wf_measures,
+                x=wf_labels,
+                y=wf_values,
+                connector={"line": {"color": "rgba(255,255,255,0.2)"}},
+                decreasing={"marker": {"color": "#ef4444"}},
+                increasing={"marker": {"color": "#10b981"}},
+                totals={"marker": {"color": "#3b82f6"}},
+            ))
+            fig_gl_wf.update_layout(
+                title=f"FY{gl_fy} — Revenue to Net Profit (Network)",
+                height=420, template="plotly_dark",
+                paper_bgcolor="#0A0F0A", plot_bgcolor="#0D150D",
+            )
+            st.plotly_chart(fig_gl_wf, key="gl_pnl_waterfall")
+
+            # ── Store P&L table ──
+            gl_tbl = gl_annual[["store_name", "revenue", "gross_profit", "gp_pct",
+                                "ebitda", "ebitda_pct", "net_profit", "net_pct"]].copy()
+            gl_tbl = gl_tbl.sort_values("revenue", ascending=False)
+            gl_tbl["store_name"] = gl_tbl["store_name"].str.replace("HFM ", "", regex=False)
+
+            # Format display
+            fmt_tbl = gl_tbl.copy()
+            fmt_tbl["revenue"] = fmt_tbl["revenue"].apply(lambda x: f"${x / 1e6:.2f}M" if x else "$0")
+            fmt_tbl["gross_profit"] = fmt_tbl["gross_profit"].apply(lambda x: f"${x / 1e6:.2f}M" if x else "$0")
+            fmt_tbl["gp_pct"] = fmt_tbl["gp_pct"].apply(lambda x: f"{x:.1f}%" if x is not None else "-")
+            fmt_tbl["ebitda"] = fmt_tbl["ebitda"].apply(lambda x: f"${x / 1e6:.2f}M" if x else "$0")
+            fmt_tbl["ebitda_pct"] = fmt_tbl["ebitda_pct"].apply(lambda x: f"{x:.1f}%" if x is not None else "-")
+            fmt_tbl["net_profit"] = fmt_tbl["net_profit"].apply(lambda x: f"${x / 1e6:.2f}M" if x else "$0")
+            fmt_tbl["net_pct"] = fmt_tbl["net_pct"].apply(lambda x: f"{x:.1f}%" if x is not None else "-")
+            fmt_tbl.columns = ["Store", "Revenue", "Gross Profit", "GP %",
+                              "EBITDA", "EBITDA %", "Net Profit", "Net %"]
+            st.dataframe(fmt_tbl, hide_index=True, key="gl_store_pnl_table")
+
+            # ── LFL Comparison ──
+            lfl = get_lfl_comparison(gl_fy)
+            if not lfl.empty:
+                st.markdown(f"**Like-for-Like: FY{gl_fy} vs FY{gl_fy - 1}**")
+                lfl_display = lfl[["store_name", "revenue", "revenue_prior",
+                                   "revenue_growth_pct", "gp_pct", "gp_pct_prior",
+                                   "gp_change_pp"]].copy()
+                lfl_display["store_name"] = lfl_display["store_name"].str.replace("HFM ", "", regex=False)
+                lfl_display["revenue"] = lfl_display["revenue"].apply(lambda x: f"${x / 1e6:.1f}M" if x else "-")
+                lfl_display["revenue_prior"] = lfl_display["revenue_prior"].apply(lambda x: f"${x / 1e6:.1f}M" if x else "-")
+                lfl_display["revenue_growth_pct"] = lfl_display["revenue_growth_pct"].apply(lambda x: f"{x:+.1f}%" if x is not None else "-")
+                lfl_display["gp_pct"] = lfl_display["gp_pct"].apply(lambda x: f"{x:.1f}%" if x is not None else "-")
+                lfl_display["gp_pct_prior"] = lfl_display["gp_pct_prior"].apply(lambda x: f"{x:.1f}%" if x is not None else "-")
+                lfl_display["gp_change_pp"] = lfl_display["gp_change_pp"].apply(lambda x: f"{x:+.1f}pp" if x is not None else "-")
+                lfl_display.columns = ["Store", f"Rev FY{gl_fy}", f"Rev FY{gl_fy-1}",
+                                       "Rev Growth", f"GP% FY{gl_fy}", f"GP% FY{gl_fy-1}", "GP Change"]
+                st.dataframe(lfl_display, hide_index=True, key="gl_lfl_table")
+
+            # ── Store cost detail expander ──
+            with st.expander("Drill into store cost breakdown"):
+                gl_store_pick = st.selectbox(
+                    "Select store",
+                    gl_annual["store_name"].tolist(),
+                    key="gl_store_cost_pick",
+                )
+                store_row = gl_annual[gl_annual["store_name"] == gl_store_pick].iloc[0]
+                cost_df = get_store_cost_breakdown(int(store_row["store_id"]), gl_fy)
+                if not cost_df.empty:
+                    cost_df["total"] = cost_df["total"].apply(lambda x: f"${x:,.0f}" if x else "$0")
+                    cost_df.columns = ["GL Level 1", "GL Level 2", "Account", "Total"]
+                    st.dataframe(cost_df, hide_index=True, key="gl_store_cost_table")
+        else:
+            st.info(f"No GL data for FY{gl_fy}.")
+    else:
+        st.info("Store P&L data not loaded. Run the ingestion pipeline first.")
+except ImportError:
+    st.info("Store P&L service not available. GL P&L view requires backend/store_pl_service.py.")
+except Exception as _gl_err:
+    st.warning(f"GL P&L section encountered an error: {_gl_err}")
+
+# ============================================================================
 # CROSS-DASHBOARD LINKS
 # ============================================================================
 
 st.markdown("---")
 st.markdown("**Dig Deeper**")
 _pages = st.session_state.get("_pages", {})
-c1, c2, c3 = st.columns(3)
+c1, c2, c3, c4 = st.columns(4)
 if "plu-intel" in _pages:
     c1.page_link(_pages["plu-intel"], label="PLU Wastage Hotspots", icon="📊")
 if "sales" in _pages:
     c2.page_link(_pages["sales"], label="Sales Trends", icon="📈")
 if "buying-hub" in _pages:
     c3.page_link(_pages["buying-hub"], label="Buying Hub", icon="🛒")
+if "roce" in _pages:
+    c4.page_link(_pages["roce"], label="ROCE Analysis", icon="💹")
 
 # ============================================================================
 # FOOTER
 # ============================================================================
 
-render_footer("Store Profitability", f"Data: {data_min} to {data_max}", user=user)
+render_footer("Store Profitability", f"POS Data: {data_min} to {data_max} | GL P&L: Store P&L History", user=user)

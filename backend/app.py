@@ -1435,6 +1435,17 @@ async def lifespan(app: FastAPI):
         print(f"⚠️ Transaction store init failed (dashboards needing tx data won't work): {e}")
         app.state.txn_store = None
 
+    # 6b. Store P&L history (GL data)
+    try:
+        from store_pl_service import ingest_to_sqlite as _pl_ingest, _CSV_PATH as _pl_csv
+        if _pl_csv.exists():
+            result = _pl_ingest()
+            print(f"✅ Store P&L: {result['detail_rows']:,} detail, {result['summary_rows']:,} summary rows")
+        else:
+            print("  Store P&L CSV not found — skipping")
+    except Exception as e:
+        print(f"  Store P&L ingest skipped: {e}")
+
     # 7. Scheduled analysis cycle
     try:
         import threading
@@ -1955,6 +1966,92 @@ async def health_simple():
     """Minimal health check — returns 200 instantly. Used by render_start.sh
     to detect backend readiness without doing DB queries."""
     return {"status": "ok"}
+
+
+# ─── Store P&L API ───────────────────────────────────────────────────────────
+
+@app.get("/api/store-pl/stores")
+async def store_pl_stores():
+    """List all stores with P&L data."""
+    from store_pl_service import get_stores_list
+    return get_stores_list()
+
+
+@app.get("/api/store-pl/fy-years")
+async def store_pl_fy_years():
+    """List available fiscal years."""
+    from store_pl_service import get_available_fy_years
+    return get_available_fy_years()
+
+
+@app.get("/api/store-pl/annual")
+async def store_pl_annual(fy_year: Optional[int] = None, channel: str = "Retail"):
+    """Annual P&L by store for a given FY."""
+    from store_pl_service import get_store_pl_annual
+    df = get_store_pl_annual(fy_year, channel)
+    return df.to_dict(orient="records") if not df.empty else []
+
+
+@app.get("/api/store-pl/network-trend")
+async def store_pl_network_trend(channel: str = "Retail"):
+    """Monthly network-level P&L trend."""
+    from store_pl_service import get_network_monthly_trend
+    df = get_network_monthly_trend(channel)
+    if not df.empty and "date" in df.columns:
+        df["date"] = df["date"].astype(str)
+    return df.to_dict(orient="records") if not df.empty else []
+
+
+@app.get("/api/store-pl/store-trend/{store_id}")
+async def store_pl_store_trend(store_id: int):
+    """Monthly P&L trend for a specific store."""
+    from store_pl_service import get_store_monthly_trend
+    df = get_store_monthly_trend(store_id)
+    if not df.empty and "date" in df.columns:
+        df["date"] = df["date"].astype(str)
+    return df.to_dict(orient="records") if not df.empty else []
+
+
+@app.get("/api/store-pl/cost-breakdown/{store_id}")
+async def store_pl_cost_breakdown(store_id: int, fy_year: Optional[int] = None):
+    """Detailed cost breakdown for a store."""
+    from store_pl_service import get_store_cost_breakdown
+    df = get_store_cost_breakdown(store_id, fy_year)
+    return df.to_dict(orient="records") if not df.empty else []
+
+
+@app.get("/api/store-pl/lfl")
+async def store_pl_lfl(fy_year: int = 2025, channel: str = "Retail"):
+    """Like-for-like comparison between FY and prior FY."""
+    from store_pl_service import get_lfl_comparison
+    df = get_lfl_comparison(fy_year, channel=channel)
+    return df.to_dict(orient="records") if not df.empty else []
+
+
+@app.get("/api/store-pl/ebit")
+async def store_pl_ebit(fy_year: Optional[int] = None, channel: str = "Retail"):
+    """EBIT by store — feeds ROCE calculations."""
+    from store_pl_service import get_ebit_by_store
+    df = get_ebit_by_store(fy_year, channel)
+    return df.to_dict(orient="records") if not df.empty else []
+
+
+@app.post("/api/store-pl/refresh")
+async def store_pl_refresh():
+    """Re-ingest the Store P&L CSV into SQLite."""
+    from store_pl_service import ingest_to_sqlite
+    try:
+        result = ingest_to_sqlite()
+        return {"status": "ok", **result}
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}
+
+
+@app.get("/api/store-pl/quality")
+async def store_pl_quality():
+    """Run data quality checks on Store P&L data."""
+    from store_pl_service import get_data_quality_report
+    return get_data_quality_report()
 
 
 @app.get("/api/health")

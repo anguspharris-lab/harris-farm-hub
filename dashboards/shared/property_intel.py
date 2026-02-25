@@ -195,6 +195,56 @@ def get_network_scorecard():
     return _cache["scorecard"]
 
 
+# ── Real P&L Integration ──────────────────────────────────────────────────────
+
+def get_real_pl_by_store(fy_year=None):
+    """Load actual GL P&L data per store from store_pl_service.
+    Returns DataFrame with: store_id, store_name, revenue, gross_profit,
+    gp_pct, ebitda, ebitda_pct, net_profit, net_pct.
+    Returns empty DataFrame if service not available."""
+    if "real_pl" not in _cache:
+        try:
+            import sys
+            backend_path = str(Path(__file__).resolve().parent.parent.parent / "backend")
+            if backend_path not in sys.path:
+                sys.path.insert(0, backend_path)
+            from store_pl_service import get_store_pl_annual
+            _cache["real_pl"] = get_store_pl_annual(fy_year)
+        except Exception:
+            _cache["real_pl"] = pd.DataFrame()
+    return _cache["real_pl"]
+
+
+def get_enriched_scorecard(fy_year=None):
+    """Scorecard merged with actual GL P&L data where available.
+    Adds: actual_revenue, actual_gp_pct, actual_ebitda_pct, actual_net_pct."""
+    sc = get_network_scorecard()
+    if sc.empty:
+        return sc
+
+    pl = get_real_pl_by_store(fy_year)
+    if pl.empty:
+        return sc
+
+    # Build name-matching: strip "HFM " from P&L names to match short_name
+    pl_slim = pl[["store_name", "revenue", "gross_profit", "gp_pct",
+                   "ebitda", "ebitda_pct", "net_profit", "net_pct"]].copy()
+    pl_slim["match_name"] = pl_slim["store_name"].str.replace("HFM ", "", regex=False)
+    pl_slim = pl_slim.rename(columns={
+        "revenue": "actual_revenue",
+        "gross_profit": "actual_gp",
+        "gp_pct": "actual_gp_pct",
+        "ebitda": "actual_ebitda",
+        "ebitda_pct": "actual_ebitda_pct",
+        "net_profit": "actual_net_profit",
+        "net_pct": "actual_net_pct",
+    })
+
+    enriched = sc.merge(pl_slim, left_on="short_name", right_on="match_name", how="left")
+    enriched.drop(columns=["match_name", "store_name"], errors="ignore", inplace=True)
+    return enriched
+
+
 # ── Colour Constants ──────────────────────────────────────────────────────────
 
 CLASSIFICATION_COLOURS = {

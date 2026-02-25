@@ -80,6 +80,8 @@ _pages = {
     "demographics": st.Page(str(_DIR / "demographics_page.py"), title="Demographics", icon="\U0001f4e8", url_path="demographics"),
     "whitespace": st.Page(str(_DIR / "whitespace_analysis.py"), title="Whitespace Analysis", icon="\U0001f5fa\ufe0f", url_path="whitespace"),
     "competitor-map": st.Page(str(_DIR / "competitor_map_page.py"), title="Competitor Map", icon="\U0001f4cd", url_path="competitor-map"),
+    "roce": st.Page(str(_DIR / "roce_dashboard.py"), title="ROCE Analysis", icon="\U0001f4b9", url_path="roce"),
+    "cannibalisation": st.Page(str(_DIR / "cannibalisation_dashboard.py"), title="Cannibalisation", icon="\U0001f50d", url_path="cannibalisation"),
     # P5 Digital & AI
     "workflow-engine": st.Page(str(_DIR / "workflow_engine.py"), title="Workflow Engine", icon="\u2699\ufe0f", url_path="workflow-engine"),
     "analytics-engine": st.Page(str(_DIR / "analytics_engine.py"), title="Analytics Engine", icon="\U0001f52c", url_path="analytics-engine"),
@@ -104,7 +106,7 @@ _SECTIONS = [
                "transport", "analytics-engine"]},
     {"name": "Property", "icon": "\U0001f3d8\ufe0f", "color": "#06B6D4",
      "slugs": ["store-network", "market-share", "demographics",
-               "whitespace", "competitor-map"]},
+               "whitespace", "competitor-map", "roce", "cannibalisation"]},
     {"name": "Back of House", "icon": "\u2699\ufe0f", "color": "#8899AA",
      "is_muted": True,
      "slugs": ["the-rubric", "approvals", "workflow-engine", "agent-ops",

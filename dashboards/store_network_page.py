@@ -27,6 +27,7 @@ from shared.property_intel import (
     get_quadrant_matrix,
     get_cannibalisation,
     get_network_scorecard,
+    get_enriched_scorecard,
     CLASSIFICATION_COLOURS,
     FORMAT_COLOURS,
     QUADRANT_COLOURS,
@@ -904,35 +905,46 @@ with tab_score:
     st.subheader("Unified Network Scorecard")
     st.caption(
         "All stores classified by strategic priority. "
-        "Combines ROC (ESTIMATED), catchment share (CBAS modelled), and CBAS performance data."
+        "Combines ROC (ESTIMATED), catchment share (CBAS modelled), CBAS performance data, "
+        "and actual GL P&L where available."
     )
 
     if not has_scorecard:
         _placeholder("Network scorecard not available. Requires ROC + catchment data.")
     else:
+        # Try to enrich with real GL P&L data
+        enriched_sc = get_enriched_scorecard()
+        working_sc = enriched_sc if not enriched_sc.empty else scorecard_df
+        has_gl = "actual_revenue" in working_sc.columns
+
+        if has_gl:
+            st.success("GL P&L data linked — actual revenue, GP%, EBITDA%, and net profit columns available.")
+        else:
+            st.info("GL P&L data not available. Showing CBAS-estimated financials only.")
+
         # ── Filters ──────────────────────────────────────────────────────
         f1, f2, f3 = st.columns(3)
 
-        classifications = sorted(scorecard_df["classification"].dropna().unique().tolist())
+        classifications = sorted(working_sc["classification"].dropna().unique().tolist())
         cls_filter = f1.selectbox(
             "Classification", ["All"] + classifications, key="sc_cls"
         )
 
-        formats = sorted(scorecard_df["format_segment"].dropna().unique().tolist()) if "format_segment" in scorecard_df.columns else []
+        formats = sorted(working_sc["format_segment"].dropna().unique().tolist()) if "format_segment" in working_sc.columns else []
         fmt_filter = f2.selectbox(
             "Format", ["All"] + formats, key="sc_fmt"
         )
 
         # State filter: try to infer from CBAS data
-        if "state" in scorecard_df.columns:
-            states = sorted(scorecard_df["state"].dropna().unique().tolist())
+        if "state" in working_sc.columns:
+            states = sorted(working_sc["state"].dropna().unique().tolist())
         else:
             states = []
         state_filter = f3.selectbox(
             "State", ["All"] + states, key="sc_state"
         )
 
-        filtered_sc = scorecard_df.copy()
+        filtered_sc = working_sc.copy()
         if cls_filter != "All":
             filtered_sc = filtered_sc[filtered_sc["classification"] == cls_filter]
         if fmt_filter != "All" and "format_segment" in filtered_sc.columns:
@@ -947,13 +959,19 @@ with tab_score:
             "retail_sqm", "format_segment", "centre_type",
             "performance_tier", "profitability_tier", "quadrant",
         ]
+        # Add GL P&L columns if available
+        if has_gl:
+            desired_cols.extend([
+                "actual_revenue", "actual_gp_pct", "actual_ebitda_pct", "actual_net_pct",
+            ])
+
         available_display = [c for c in desired_cols if c in filtered_sc.columns]
         display_sc = filtered_sc[available_display].copy()
 
         col_labels = {
             "short_name": "Store",
             "classification": "Classification",
-            "revenue": "Revenue ($M)",
+            "revenue": "CBAS Revenue ($M)",
             "gpm_roc_primary_4k": "GPM ROC (est.)",
             "gpm_pct": "GPM %",
             "weighted_avg_share_pct": "Catchment Share %",
@@ -964,18 +982,25 @@ with tab_score:
             "performance_tier": "Perf. Tier",
             "profitability_tier": "Profit. Tier",
             "quadrant": "Quadrant",
+            "actual_revenue": "GL Revenue ($M)",
+            "actual_gp_pct": "GL GP %",
+            "actual_ebitda_pct": "GL EBITDA %",
+            "actual_net_pct": "GL Net %",
         }
         rename_available = {k: v for k, v in col_labels.items() if k in display_sc.columns}
         display_sc = display_sc.rename(columns=rename_available)
 
-        # Format revenue as $M
-        if "Revenue ($M)" in display_sc.columns:
-            display_sc["Revenue ($M)"] = display_sc["Revenue ($M)"].apply(
-                lambda x: round(x / 1_000_000, 1) if pd.notna(x) and isinstance(x, (int, float)) and x > 1000 else x
-            )
+        # Format revenue columns as $M
+        for rev_col in ["CBAS Revenue ($M)", "GL Revenue ($M)"]:
+            if rev_col in display_sc.columns:
+                display_sc[rev_col] = display_sc[rev_col].apply(
+                    lambda x: round(x / 1_000_000, 1) if pd.notna(x) and isinstance(x, (int, float)) and x > 1000 else x
+                )
 
         # Round numeric columns
-        for col in ["GPM ROC (est.)", "GPM %", "Catchment Share %", "Share Trend (pp)"]:
+        round_cols = ["GPM ROC (est.)", "GPM %", "Catchment Share %", "Share Trend (pp)",
+                      "GL GP %", "GL EBITDA %", "GL Net %"]
+        for col in round_cols:
             if col in display_sc.columns:
                 display_sc[col] = pd.to_numeric(display_sc[col], errors="coerce").round(2)
 
@@ -1100,9 +1125,11 @@ with tab_gaps:
     data_items = [
         {"Category": "Store Financials", "Item": "Annual Revenue", "Status": "ACTUAL", "Source": "Internal POS/ERP", "Available": True},
         {"Category": "Store Financials", "Item": "Gross Product Margin %", "Status": "ESTIMATED", "Source": "Industry benchmarks", "Available": True},
-        {"Category": "Store Financials", "Item": "Net Profit by Store", "Status": "MISSING", "Source": "Finance team", "Available": False},
-        {"Category": "Store Financials", "Item": "Rent & Occupancy Costs", "Status": "MISSING", "Source": "Property team", "Available": False},
-        {"Category": "Store Financials", "Item": "Labour Cost by Store", "Status": "MISSING", "Source": "HR/Finance", "Available": False},
+        {"Category": "Store Financials", "Item": "GL P&L (full accounting)", "Status": "ACTUAL", "Source": "GL Data Dump — Jul 2016 to Jan 2026", "Available": True},
+        {"Category": "Store Financials", "Item": "Net Profit by Store", "Status": "ACTUAL", "Source": "GL P&L History", "Available": True},
+        {"Category": "Store Financials", "Item": "Rent & Occupancy Costs", "Status": "ACTUAL", "Source": "GL P&L History", "Available": True},
+        {"Category": "Store Financials", "Item": "Labour Cost by Store", "Status": "ACTUAL", "Source": "GL P&L History", "Available": True},
+        {"Category": "Store Financials", "Item": "EBITDA by Store", "Status": "ACTUAL", "Source": "GL P&L History", "Available": True},
         {"Category": "Capital", "Item": "Capital per SQM", "Status": "ESTIMATED", "Source": "Industry benchmark ($4K/sqm)", "Available": True},
         {"Category": "Capital", "Item": "Actual Fitout Cost", "Status": "MISSING", "Source": "Property/Finance", "Available": False},
         {"Category": "Capital", "Item": "Lease Terms & Expiry", "Status": "MISSING", "Source": "Property team", "Available": False},
@@ -1195,10 +1222,10 @@ with tab_gaps:
 
     priorities = [
         {
-            "Priority": "P1 -- Critical",
+            "Priority": "P1 -- DONE",
             "Data": "Store-level P&L (revenue, COGS, rent, labour, net profit)",
             "Owner": "Finance",
-            "Impact": "Replaces estimated GPM with actual; enables true ROC calculation",
+            "Impact": "GL P&L loaded — Jul 2016 to Jan 2026, 35 stores, 144 accounts",
         },
         {
             "Priority": "P1 -- Critical",
@@ -1255,18 +1282,23 @@ with tab_gaps:
 st.markdown("---")
 st.markdown("**Related Dashboards**")
 _pages = st.session_state.get("_pages", {})
-c1, c2, c3, c4 = st.columns(4)
+c1, c2, c3 = st.columns(3)
 if "whitespace" in _pages:
     c1.page_link(_pages["whitespace"], label="Whitespace Analysis", icon="\U0001f5fa\ufe0f")
 if "market-share" in _pages:
     c2.page_link(_pages["market-share"], label="Market Share", icon="\U0001f4ca")
 if "customers" in _pages:
     c3.page_link(_pages["customers"], label="Customer Hub", icon="\U0001f465")
-if "demographics" in _pages:
-    c4.page_link(_pages["demographics"], label="Demographics", icon="\U0001f4e8")
+c4, c5, c6 = st.columns(3)
+if "profitability" in _pages:
+    c4.page_link(_pages["profitability"], label="Profitability", icon="\U0001f4b0")
+if "roce" in _pages:
+    c5.page_link(_pages["roce"], label="ROCE Analysis", icon="\U0001f4b9")
+if "cannibalisation" in _pages:
+    c6.page_link(_pages["cannibalisation"], label="Cannibalisation", icon="\U0001f50d")
 
 render_footer(
     "Store Network",
-    "CBAS Network Analysis (Feb 2026) | ROC Analysis (ESTIMATED) | CBAS Market Share (modelled)",
+    "CBAS Network Analysis (Feb 2026) | ROC Analysis (ESTIMATED) | CBAS Market Share (modelled) | GL P&L History (Jul 2016 \u2013 Jan 2026)",
     user=user,
 )
