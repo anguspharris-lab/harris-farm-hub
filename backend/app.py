@@ -1950,9 +1950,16 @@ async def root():
     }
 
 
+@app.get("/health")
+async def health_simple():
+    """Minimal health check — returns 200 instantly. Used by render_start.sh
+    to detect backend readiness without doing DB queries."""
+    return {"status": "ok"}
+
+
 @app.get("/api/health")
 async def health_check():
-    """Health check endpoint for Render monitoring and uptime checks."""
+    """Detailed health check endpoint for monitoring and uptime checks."""
     import time
     checks = {"api": "ok"}
     # Check hub_data.db

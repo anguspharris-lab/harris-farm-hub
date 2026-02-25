@@ -36,7 +36,7 @@ fi
 
 # ---------------------------------------------------------------------------
 # Start FastAPI backend on internal port 8000
-# Run in background with output captured; restart if it crashes
+# Run in background — Streamlit starts immediately (no blocking wait)
 # ---------------------------------------------------------------------------
 start_backend() {
     echo "[backend] Starting FastAPI on port 8000..."
@@ -47,30 +47,32 @@ start_backend() {
 
 start_backend
 
-# Wait for backend to be ready (up to 60 seconds)
-echo "Waiting for backend API..."
-BACKEND_READY=false
-for i in $(seq 1 60); do
-    # Check if process is still alive
-    if ! kill -0 $BACKEND_PID 2>/dev/null; then
-        echo "[backend] Process died (exit). Restarting..."
-        sleep 2
-        start_backend
-    fi
-    if curl -s http://127.0.0.1:8000/ > /dev/null 2>&1; then
-        echo "[backend] Ready after ${i}s"
-        BACKEND_READY=true
-        break
-    fi
-    sleep 1
-done
-
-if [ "$BACKEND_READY" = false ]; then
-    echo "[backend] WARNING: Backend not ready after 60s. Streamlit will start anyway."
+# Brief wait for backend process to stabilise (not full readiness)
+sleep 3
+if ! kill -0 $BACKEND_PID 2>/dev/null; then
+    echo "[backend] Process died on first attempt. Retrying..."
+    sleep 2
+    start_backend
+    sleep 3
 fi
 
-# Background monitor: restart backend if it crashes
+# Background monitor: restart backend if it crashes, log readiness
 (
+    # Wait for backend readiness (non-blocking — Streamlit starts in parallel)
+    for i in $(seq 1 90); do
+        if curl -s http://127.0.0.1:8000/health > /dev/null 2>&1; then
+            echo "[backend] Ready after ${i}s"
+            break
+        fi
+        if ! kill -0 $BACKEND_PID 2>/dev/null; then
+            echo "[backend] Process died. Restarting..."
+            sleep 2
+            start_backend
+        fi
+        sleep 1
+    done
+
+    # Ongoing crash monitor
     while true; do
         sleep 30
         if ! kill -0 $BACKEND_PID 2>/dev/null; then
@@ -81,5 +83,10 @@ fi
     done
 ) &
 
-# Start single multi-page Streamlit app on Render's PORT
+# ---------------------------------------------------------------------------
+# Start Streamlit IMMEDIATELY — don't wait for backend
+# Streamlit pages handle missing backend gracefully (show loading states).
+# This ensures Render's health check sees the service port open quickly.
+# ---------------------------------------------------------------------------
+echo "[frontend] Starting Streamlit on port ${PORT:-10000}..."
 streamlit run dashboards/app.py --server.port ${PORT:-10000} --server.address 0.0.0.0 --server.headless true --server.enableCORS false --server.enableXsrfProtection false --server.fileWatcherType none
