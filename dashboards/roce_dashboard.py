@@ -399,8 +399,8 @@ with tab_by_store:
         xaxis_title="ROCE (%)",
         yaxis_title="",
         showlegend=False,
-        margin=dict(l=200, r=40, t=40, b=40),
     )
+    fig_bar.update_layout(margin=dict(l=200, r=40, t=40, b=40))
 
     st.plotly_chart(fig_bar, use_container_width=True, key="roce_bar_chart")
 
@@ -1045,7 +1045,6 @@ with tab_simulator:
         height=380,
         yaxis_title="ROCE (%)",
         showlegend=False,
-        margin=dict(t=40, r=40, b=40, l=60),
     )
 
     st.plotly_chart(fig_sim, use_container_width=True, key="sim_roce_chart")
