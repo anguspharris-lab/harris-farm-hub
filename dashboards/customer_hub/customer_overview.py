@@ -81,7 +81,7 @@ def _get_filters():
         show_store=True,
         show_comparison=False,
         store_names=STORE_NAMES,
-        allowed_fys=[2025, 2026],
+        allowed_fys=[2024, 2025, 2026],
     )
     if not filters["start_date"]:
         st.stop()

@@ -12,6 +12,7 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import sqlite3
 from pathlib import Path
+from shared.fiscal_selector import render_fiscal_selector
 
 # ============================================================================
 # STYLING
@@ -59,68 +60,6 @@ def compute_period_delta(current_val, previous_val):
         return None
     pct = (current_val - previous_val) / abs(previous_val) * 100
     return f"{pct:+.1f}%"
-
-
-# ============================================================================
-# 5/4/4 RETAIL FISCAL CALENDAR
-# ============================================================================
-
-def _fy_anchor(year, fy_start_month=7):
-    """Monday closest to 1st of fy_start_month in given year."""
-    anchor = datetime(year, fy_start_month, 1)
-    dow = anchor.weekday()
-    if dow <= 3:
-        return anchor - timedelta(days=dow)
-    else:
-        return anchor + timedelta(days=(7 - dow))
-
-
-def build_454_calendar(reference_date=None):
-    """Build 5/4/4 retail calendar for the FY containing reference_date."""
-    if reference_date is None:
-        reference_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    anchor = _fy_anchor(reference_date.year)
-    if reference_date < anchor:
-        anchor = _fy_anchor(reference_date.year - 1)
-    pattern = [5, 4, 4] * 4
-    periods = []
-    current = anchor
-    for i, weeks in enumerate(pattern):
-        period_end = current + timedelta(weeks=weeks) - timedelta(days=1)
-        periods.append({
-            'quarter': i // 3 + 1,
-            'period': i + 1,
-            'weeks': weeks,
-            'start': current,
-            'end': period_end,
-            'label': f"P{i+1} (Q{i//3+1}) {current.strftime('%d %b')}\u2013{period_end.strftime('%d %b')}",
-        })
-        current = period_end + timedelta(days=1)
-    return anchor, periods
-
-
-def get_454_period(reference_date=None):
-    """Return the 454 period dict containing reference_date."""
-    if reference_date is None:
-        reference_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    _, periods = build_454_calendar(reference_date)
-    for p in periods:
-        if p['start'] <= reference_date <= p['end']:
-            return p
-    return periods[-1]
-
-
-def get_454_quarter(reference_date=None):
-    """Return (start, end) for the 454 quarter containing reference_date."""
-    if reference_date is None:
-        reference_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    _, periods = build_454_calendar(reference_date)
-    for p in periods:
-        if p['start'] <= reference_date <= p['end']:
-            q = p['quarter']
-            q_periods = [pp for pp in periods if pp['quarter'] == q]
-            return q_periods[0]['start'], q_periods[-1]['end']
-    return periods[0]['start'], periods[-1]['end']
 
 
 # ============================================================================
@@ -238,22 +177,31 @@ st.caption("💡 Step 5: Review this data. Add your judgment. Your experience ma
 
 stores_list = load_stores()
 data_min, data_max = get_date_range()
-latest_date = pd.Timestamp(data_max)
 
-col1, col2, col3 = st.columns(3)
+# --- Fiscal Period Selector ---
+filters = render_fiscal_selector(
+    key_prefix="profit",
+    show_comparison=True,
+    show_store=False,
+    allowed_fys=[2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+)
 
-with col1:
-    period_options = [
-        "Last 13 Weeks",
-        "Last 4 Weeks",
-        "Last 26 Weeks",
-        "Last 52 Weeks",
-        "This Period (454)",
-        "This Quarter (454)",
-        "FY2024 (Jul 23 - Jun 24)",
-        "FY2023 (Jul 22 - Jun 23)",
-    ]
-    date_range_sel = st.selectbox("Analysis Period", period_options, index=0)
+if not filters["start_date"]:
+    st.stop()
+
+date_from = filters["start_date"]
+date_to = filters["end_date"]
+
+# Comparison period
+if filters["comparison"]:
+    prev_from = filters["comparison"]["start"]
+    prev_to = filters["comparison"]["end"]
+else:
+    prev_from = None
+    prev_to = None
+
+# --- Store + View filters ---
+col2, col3 = st.columns(2)
 
 with col2:
     store_filter = st.multiselect(
@@ -269,57 +217,6 @@ with col3:
         horizontal=True
     )
 
-# Resolve date range
-if date_range_sel == "Last 4 Weeks":
-    date_from = (latest_date - pd.Timedelta(weeks=4)).strftime('%Y-%m-%d')
-    date_to = data_max
-    prev_from = (latest_date - pd.Timedelta(weeks=8)).strftime('%Y-%m-%d')
-    prev_to = (latest_date - pd.Timedelta(weeks=4) - pd.Timedelta(days=1)).strftime('%Y-%m-%d')
-elif date_range_sel == "Last 13 Weeks":
-    date_from = (latest_date - pd.Timedelta(weeks=13)).strftime('%Y-%m-%d')
-    date_to = data_max
-    prev_from = (latest_date - pd.Timedelta(weeks=26)).strftime('%Y-%m-%d')
-    prev_to = (latest_date - pd.Timedelta(weeks=13) - pd.Timedelta(days=1)).strftime('%Y-%m-%d')
-elif date_range_sel == "Last 26 Weeks":
-    date_from = (latest_date - pd.Timedelta(weeks=26)).strftime('%Y-%m-%d')
-    date_to = data_max
-    prev_from = (latest_date - pd.Timedelta(weeks=52)).strftime('%Y-%m-%d')
-    prev_to = (latest_date - pd.Timedelta(weeks=26) - pd.Timedelta(days=1)).strftime('%Y-%m-%d')
-elif date_range_sel == "Last 52 Weeks":
-    date_from = (latest_date - pd.Timedelta(weeks=52)).strftime('%Y-%m-%d')
-    date_to = data_max
-    prev_from = (latest_date - pd.Timedelta(weeks=104)).strftime('%Y-%m-%d')
-    prev_to = (latest_date - pd.Timedelta(weeks=52) - pd.Timedelta(days=1)).strftime('%Y-%m-%d')
-elif date_range_sel == "This Period (454)":
-    current_period = get_454_period(latest_date.to_pydatetime())
-    date_from = current_period['start'].strftime('%Y-%m-%d')
-    date_to = current_period['end'].strftime('%Y-%m-%d')
-    prev_period = get_454_period(current_period['start'] - timedelta(days=1))
-    prev_from = prev_period['start'].strftime('%Y-%m-%d')
-    prev_to = prev_period['end'].strftime('%Y-%m-%d')
-elif date_range_sel == "This Quarter (454)":
-    q_start, q_end = get_454_quarter(latest_date.to_pydatetime())
-    date_from = q_start.strftime('%Y-%m-%d')
-    date_to = q_end.strftime('%Y-%m-%d')
-    prev_q_start, prev_q_end = get_454_quarter(q_start - timedelta(days=1))
-    prev_from = prev_q_start.strftime('%Y-%m-%d')
-    prev_to = prev_q_end.strftime('%Y-%m-%d')
-elif date_range_sel == "FY2024 (Jul 23 - Jun 24)":
-    date_from = "2023-07-02"
-    date_to = "2024-06-30"
-    prev_from = "2022-07-03"
-    prev_to = "2023-07-01"
-elif date_range_sel == "FY2023 (Jul 22 - Jun 23)":
-    date_from = "2022-07-03"
-    date_to = "2023-07-01"
-    prev_from = "2021-07-04"
-    prev_to = "2022-07-02"
-else:
-    date_from = (latest_date - pd.Timedelta(weeks=13)).strftime('%Y-%m-%d')
-    date_to = data_max
-    prev_from = (latest_date - pd.Timedelta(weeks=26)).strftime('%Y-%m-%d')
-    prev_to = (latest_date - pd.Timedelta(weeks=13) - pd.Timedelta(days=1)).strftime('%Y-%m-%d')
-
 # Resolve store filter
 selected_stores = None
 if "All Stores" not in store_filter and store_filter:
@@ -331,20 +228,21 @@ if "All Stores" not in store_filter and store_filter:
                 selected_stores.append(s)
                 break
 
-# Show calendar context
-current_454 = get_454_period(latest_date.to_pydatetime())
-st.caption(
-    f"454 Calendar: {current_454['label']} | "
-    f"Viewing: {date_from} to {date_to} | "
-    f"Data range: {data_min} to {data_max}"
-)
+# Coverage indicator
+if filters.get("caveats"):
+    for c in filters["caveats"]:
+        st.caption(f"Note: {c}")
+st.caption(f"Data range: {data_min} to {data_max}")
 
 # ============================================================================
 # LOAD DATA
 # ============================================================================
 
 df = load_profitability_data(date_from, date_to, selected_stores)
-prev_df = load_profitability_data(prev_from, prev_to, selected_stores)
+if prev_from and prev_to:
+    prev_df = load_profitability_data(prev_from, prev_to, selected_stores)
+else:
+    prev_df = pd.DataFrame()
 
 if df.empty:
     st.warning("No data found for the selected filters. Try broadening your selection.")

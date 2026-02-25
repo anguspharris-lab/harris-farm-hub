@@ -81,7 +81,7 @@ def render():
     st.subheader("Customer Segmentation (RFM)")
 
     seg_summary = df_rfm.groupby("segment").agg(
-        customers=("CustomerCode", "count"),
+        customers=("customercode", "count"),
         avg_spend=("monetary", "mean"),
         avg_frequency=("frequency", "mean"),
         avg_recency=("recency_days", "mean"),
@@ -184,7 +184,7 @@ def render():
     st.markdown("---")
     st.subheader("Top 20 Customers by Spend")
     top_20 = df_rfm.head(20)[
-        ["CustomerCode", "segment", "monetary", "frequency",
+        ["customercode", "segment", "monetary", "frequency",
          "stores_visited", "first_purchase", "last_purchase"]
     ].copy()
     top_20.columns = [

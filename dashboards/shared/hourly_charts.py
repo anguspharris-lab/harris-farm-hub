@@ -52,24 +52,24 @@ def render_hourly_analysis(query_fn, store_id, start, end,
             dow_data = query_fn("fiscal_day_of_week", **base_kwargs)
             if dow_data:
                 df_dow = pd.DataFrame(dow_data)
-                df_dow["day_type"] = df_dow["BusinessDay"].apply(
+                df_dow["day_type"] = df_dow["businessday"].apply(
                     lambda x: "Business Day" if x == "Y" else "Weekend")
 
                 # Force Mon-Sun ordering via Categorical dtype
-                df_dow["DayOfWeekName"] = pd.Categorical(
-                    df_dow["DayOfWeekName"], categories=DAY_ORDER, ordered=True)
-                df_dow = df_dow.sort_values("DayOfWeekName")
+                df_dow["dayofweekname"] = pd.Categorical(
+                    df_dow["dayofweekname"], categories=DAY_ORDER, ordered=True)
+                df_dow = df_dow.sort_values("dayofweekname")
 
                 fig_dow = px.bar(
-                    df_dow, x="DayOfWeekName", y="revenue",
+                    df_dow, x="dayofweekname", y="revenue",
                     color="day_type",
-                    category_orders={"DayOfWeekName": DAY_ORDER},
+                    category_orders={"dayofweekname": DAY_ORDER},
                     color_discrete_map={
                         "Business Day": "#0d9488",
                         "Weekend": "#7c3aed",
                     },
                     labels={
-                        "DayOfWeekName": "Day",
+                        "dayofweekname": "Day",
                         "revenue": "Revenue ($)",
                         "day_type": "",
                     },
@@ -81,7 +81,7 @@ def render_hourly_analysis(query_fn, store_id, start, end,
                                 key=f"{key_prefix}_dow_chart")
 
                 # Data coverage indicator
-                day_names = set(df_dow["DayOfWeekName"].tolist())
+                day_names = set(df_dow["dayofweekname"].tolist())
                 has_sat = "Saturday" in day_names
                 has_sun = "Sunday" in day_names
                 n_days = len(day_names)
@@ -91,10 +91,10 @@ def render_hourly_analysis(query_fn, store_id, start, end,
                                f"Missing: {', '.join(missing)}")
                 if has_sat and has_sun:
                     sat_rev = df_dow.loc[
-                        df_dow["DayOfWeekName"] == "Saturday", "revenue"
+                        df_dow["dayofweekname"] == "Saturday", "revenue"
                     ].sum()
                     sun_rev = df_dow.loc[
-                        df_dow["DayOfWeekName"] == "Sunday", "revenue"
+                        df_dow["dayofweekname"] == "Sunday", "revenue"
                     ].sum()
                     st.caption(f"Weekend included: Sat ${sat_rev:,.0f} | "
                                f"Sun ${sun_rev:,.0f}")
@@ -149,7 +149,7 @@ def render_hourly_analysis(query_fn, store_id, start, end,
         if heatmap_data:
             df_hm = pd.DataFrame(heatmap_data)
             pivot = df_hm.pivot_table(
-                index="DayOfWeekName", columns="hour_of_day",
+                index="dayofweekname", columns="hour_of_day",
                 values="revenue", aggfunc="sum", fill_value=0,
             )
             # Order days Mon-Sun
@@ -185,13 +185,13 @@ def render_hourly_analysis(query_fn, store_id, start, end,
                 st.markdown(f"**Query returned {len(df_raw)} day(s)** "
                             f"for store {store_id}, {start} to {end}")
                 st.dataframe(
-                    df_raw[["DayOfWeekNo", "DayOfWeekName", "BusinessDay",
-                            "Weekend", "revenue", "transactions"]].style.format({
+                    df_raw[["dayofweekno", "dayofweekname", "businessday",
+                            "weekend", "revenue", "transactions"]].style.format({
                         "revenue": "${:,.0f}",
                         "transactions": "{:,.0f}",
                     }),
                 )
-                day_names = set(df_raw["DayOfWeekName"])
+                day_names = set(df_raw["dayofweekname"])
                 if "Saturday" in day_names and "Sunday" in day_names:
                     st.success("Weekend data confirmed: Saturday and Sunday included.")
                 else:

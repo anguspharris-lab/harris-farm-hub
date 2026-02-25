@@ -164,7 +164,7 @@ filters = render_fiscal_selector(
     show_store=True,
     show_comparison=False,
     store_names=STORE_NAMES,
-    allowed_fys=[2025, 2026],
+    allowed_fys=[2024, 2025, 2026],
 )
 
 if not filters["start_date"]:
@@ -416,7 +416,7 @@ with tab2:
         st.subheader("Customer Segmentation (RFM)")
 
         seg_summary = df_rfm.groupby("segment").agg(
-            customers=("CustomerCode", "count"),
+            customers=("customercode", "count"),
             avg_spend=("monetary", "mean"),
             avg_frequency=("frequency", "mean"),
             avg_recency=("recency_days", "mean"),
@@ -540,7 +540,7 @@ with tab2:
         st.subheader("Top 20 Customers by Spend")
 
         top_20 = df_rfm.head(20)[
-            ["CustomerCode", "segment", "monetary", "frequency",
+            ["customercode", "segment", "monetary", "frequency",
              "stores_visited", "first_purchase", "last_purchase"]
         ].copy()
         top_20.columns = [
@@ -806,8 +806,8 @@ with tab3:
                                       start=txn_start, end=txn_end)
             if basket_data:
                 df_basket = pd.DataFrame(basket_data)
-                df_basket["Store"] = df_basket["Store_ID"].map(
-                    STORE_NAMES).fillna(df_basket["Store_ID"].astype(str))
+                df_basket["Store"] = df_basket["store_id"].map(
+                    STORE_NAMES).fillna(df_basket["store_id"].astype(str))
 
                 fig_basket = px.scatter(
                     df_basket, x="avg_items", y="avg_basket_value",

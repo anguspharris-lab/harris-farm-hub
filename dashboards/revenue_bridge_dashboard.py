@@ -297,7 +297,7 @@ with tab3:
             if store_id:
                 dept_kwargs["store_id"] = store_id
             dept_data = query_named("minor_group_revenue", **dept_kwargs)
-            name_col = "MinorGroupDesc"
+            name_col = "minorgroupdesc"
         except Exception as e:
             st.error(f"Sub-category breakdown failed: {e}")
             dept_data = []
@@ -312,7 +312,7 @@ with tab3:
             if store_id:
                 dept_kwargs["store_id"] = store_id
             dept_data = query_named("major_group_revenue", **dept_kwargs)
-            name_col = "MajorGroupDesc"
+            name_col = "majorgroupdesc"
         except Exception as e:
             st.error(f"Category breakdown failed: {e}")
             dept_data = []
@@ -324,7 +324,7 @@ with tab3:
             if store_id:
                 dept_kwargs["store_id"] = store_id
             dept_data = query_named("department_revenue", **dept_kwargs)
-            name_col = "DepartmentDesc"
+            name_col = "departmentdesc"
         except Exception as e:
             st.error(f"Department breakdown failed: {e}")
             dept_data = []
@@ -355,9 +355,9 @@ with tab3:
                     df_dt = pd.DataFrame(dept_trend)
                     df_dt["period"] = pd.to_datetime(df_dt["period"])
                     fig_dt = px.area(
-                        df_dt, x="period", y="revenue", color="DepartmentDesc",
+                        df_dt, x="period", y="revenue", color="departmentdesc",
                         labels={"period": "Month", "revenue": "Revenue ($)",
-                                "DepartmentDesc": "Department"},
+                                "departmentdesc": "Department"},
                     )
                     fig_dt.update_layout(height=400)
                     st.plotly_chart(fig_dt, key="revbridge_dept_monthly_trend")
@@ -449,13 +449,13 @@ with tab5:
                           store_id=yoy_store_id)
         if yoy:
             df_yoy = pd.DataFrame(yoy)
-            df_yoy["FinYear"] = df_yoy["FinYear"].astype(str)
+            df_yoy["finyear"] = df_yoy["finyear"].astype(str)
 
             fig_yoy = px.bar(
-                df_yoy, x="month_name", y="revenue", color="FinYear",
+                df_yoy, x="month_name", y="revenue", color="finyear",
                 barmode="group",
                 labels={"month_name": "Fiscal Month", "revenue": "Revenue ($)",
-                        "FinYear": "Fiscal Year"},
+                        "finyear": "Fiscal Year"},
                 color_discrete_sequence=["#94a3b8", "#0d9488"],
             )
             fig_yoy.update_layout(height=450)
@@ -463,7 +463,7 @@ with tab5:
 
             # Pivot table
             pivot = df_yoy.pivot_table(
-                index="month_name", columns="FinYear",
+                index="month_name", columns="finyear",
                 values="revenue", aggfunc="sum"
             )
             with st.expander("View YoY data table"):

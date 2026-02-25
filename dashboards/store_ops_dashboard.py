@@ -216,7 +216,7 @@ if comparison:
                     start_str, end_str,
                     comparison["start"], comparison["end"],
                 )
-                lfl_stores = [r["Store_ID"] for r in lfl_data] if lfl_data else []
+                lfl_stores = [r["store_id"] for r in lfl_data] if lfl_data else []
                 total_stores = len(STORE_NAMES)
                 st.caption(
                     f"Like-for-like: {len(lfl_stores)} of {total_stores} stores "
@@ -444,7 +444,7 @@ with tab3:
                                    dept_code=selected_dept_code,
                                    major_code=selected_major_code,
                                    **_time_kw)
-            cat_name_col = "MinorGroupDesc"
+            cat_name_col = "minorgroupdesc"
         except Exception as e:
             st.error(f"Sub-category breakdown failed: {e}")
             cat_data = None
@@ -456,7 +456,7 @@ with tab3:
             cat_data = query_named("major_group_revenue",
                                    dept_code=selected_dept_code,
                                    **_time_kw)
-            cat_name_col = "MajorGroupDesc"
+            cat_name_col = "majorgroupdesc"
         except Exception as e:
             st.error(f"Category breakdown failed: {e}")
             cat_data = None
@@ -466,7 +466,7 @@ with tab3:
         st.markdown("**Revenue by Department**")
         try:
             cat_data = query_named("department_revenue", **_time_kw)
-            cat_name_col = "DepartmentDesc"
+            cat_name_col = "departmentdesc"
         except Exception as e:
             st.error(f"Department breakdown failed: {e}")
             cat_data = None
@@ -811,7 +811,7 @@ with tab5:
                 (1 - df_top["oos_days"] / df_top["total_days"]) * 100
             )
             display_top = df_top[[
-                "PLUItem_ID", "product_name", "department",
+                "pluitem_id", "product_name", "department",
                 "category", "oos_days", "total_days",
                 "missed_revenue", "avail_pct",
             ]].copy()

@@ -142,14 +142,29 @@ def _render_auth_page(api_url):
     st.markdown(_LOGIN_CSS, unsafe_allow_html=True)
 
     # Check API connectivity and site password requirement
+    # Retry up to 3 times with backoff — covers Render cold-start (backend
+    # may need 30-60s to initialize after sleep/deploy).
     site_pw_required = False
-    api_ok = True
-    try:
-        resp = requests.get(f"{api_url}/api/auth/site-password-required", timeout=5)
-        if resp.status_code == 200:
-            site_pw_required = resp.json().get("required", False)
-    except requests.RequestException:
-        api_ok = False
+    api_ok = False
+    import time as _time
+    for _attempt in range(3):
+        try:
+            resp = requests.get(f"{api_url}/api/auth/site-password-required", timeout=8)
+            if resp.status_code == 200:
+                site_pw_required = resp.json().get("required", False)
+                api_ok = True
+                break
+        except requests.RequestException:
+            if _attempt < 2:
+                _time.sleep(3)
+    # If still not reachable, try the bare health endpoint as a last-ditch check
+    if not api_ok:
+        try:
+            resp = requests.get(f"{api_url}/health", timeout=5)
+            if resp.status_code == 200:
+                api_ok = True
+        except requests.RequestException:
+            pass
 
     # Determine which form to show
     if "auth_mode" not in st.session_state:
@@ -171,7 +186,9 @@ def _render_auth_page(api_url):
     )
 
     if not api_ok:
-        st.error("Cannot connect to the Hub API. The backend may still be starting — please refresh in 30 seconds.")
+        st.error("Cannot connect to the Hub API. The backend may still be starting — page will auto-refresh.")
+        _time.sleep(10)
+        st.rerun()
         return
 
     mode = st.session_state.get("auth_mode", "login")

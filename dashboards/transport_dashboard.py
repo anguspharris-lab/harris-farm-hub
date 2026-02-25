@@ -8,13 +8,14 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from datetime import datetime, timedelta
+from datetime import datetime
 import numpy as np
 
 from shared.stores import STORES, REGIONS
 from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
 from shared.voice_realtime import render_voice_data_box
+from shared.fiscal_selector import render_fiscal_selector
 
 # Approximate km from Sydney Markets (Flemington) to each store
 STORE_DISTANCE_KM = {
@@ -26,68 +27,6 @@ STORE_DISTANCE_KM = {
     "Neutral Bay": 9, "North Sydney": 8, "Parramatta": 25,
     "Richmond": 65, "Rozelle": 7, "Willoughby": 12,
 }
-
-# ============================================================================
-# 5/4/4 RETAIL FISCAL CALENDAR (same as sales dashboard)
-# ============================================================================
-
-def _fy_anchor(year, fy_start_month=7):
-    """Monday closest to 1st of fy_start_month in given year."""
-    anchor = datetime(year, fy_start_month, 1)
-    dow = anchor.weekday()
-    if dow <= 3:
-        return anchor - timedelta(days=dow)
-    else:
-        return anchor + timedelta(days=(7 - dow))
-
-
-def build_454_calendar(reference_date=None):
-    """Build 5/4/4 retail calendar for the FY containing reference_date."""
-    if reference_date is None:
-        reference_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    anchor = _fy_anchor(reference_date.year)
-    if reference_date < anchor:
-        anchor = _fy_anchor(reference_date.year - 1)
-    pattern = [5, 4, 4] * 4
-    periods = []
-    current = anchor
-    for i, weeks in enumerate(pattern):
-        period_end = current + timedelta(weeks=weeks) - timedelta(days=1)
-        periods.append({
-            'quarter': i // 3 + 1,
-            'period': i + 1,
-            'weeks': weeks,
-            'start': current,
-            'end': period_end,
-            'label': f"P{i+1} (Q{i//3+1}) {current.strftime('%d %b')}\u2013{period_end.strftime('%d %b')}",
-        })
-        current = period_end + timedelta(days=1)
-    return anchor, periods
-
-
-def get_454_period(reference_date=None):
-    """Return the 454 period dict containing reference_date."""
-    if reference_date is None:
-        reference_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    _, periods = build_454_calendar(reference_date)
-    for p in periods:
-        if p['start'] <= reference_date <= p['end']:
-            return p
-    return periods[-1]
-
-
-def get_454_quarter(reference_date=None):
-    """Return (start, end) for the 454 quarter containing reference_date."""
-    if reference_date is None:
-        reference_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    _, periods = build_454_calendar(reference_date)
-    for p in periods:
-        if p['start'] <= reference_date <= p['end']:
-            q = p['quarter']
-            q_periods = [pp for pp in periods if pp['quarter'] == q]
-            return q_periods[0]['start'], q_periods[-1]['end']
-    return periods[0]['start'], periods[-1]['end']
-
 
 def compute_period_delta(current_val, previous_val):
     """Return percentage change string for metric deltas."""
@@ -187,7 +126,8 @@ render_header(
     goals=["G4"],
     strategy_context="Every route, every delivery, every cost — visible. AI optimises the path from Sydney Markets to store shelf.",
 )
-st.caption("💡 Step 5: Review this data. Add your judgment. Your experience makes this useful.")
+st.caption("Step 5: Review this data. Add your judgment. Your experience makes this useful.")
+st.info("Transport data is simulated (seed 42). Connect to real logistics system for production use.")
 
 # ============================================================================
 # LOAD DATA
@@ -196,80 +136,67 @@ st.caption("💡 Step 5: Review this data. Add your judgment. Your experience ma
 raw_df = generate_transport_data()
 
 # ============================================================================
-# FILTERS — 454 retail calendar
+# FILTERS — Fiscal Period Selector
 # ============================================================================
 
-col1, col2, col3, col4 = st.columns(4)
+filters = render_fiscal_selector(
+    key_prefix="transport",
+    show_comparison=True,
+    show_store=False,
+)
 
-with col1:
-    period_options = [
-        "This Period (454)",
-        "This Quarter (454)",
-        "WTD (Week-to-Date)",
-        "Last 7 Days",
-        "Last 30 Days",
-        "Last 90 Days",
-    ]
-    date_range = st.selectbox("Time Period", period_options, index=0)
+if not filters["start_date"]:
+    st.stop()
 
-with col2:
+col_store, col_vehicle = st.columns(2)
+
+with col_store:
     store_filter = st.multiselect(
         "Stores",
         ["All Stores"] + sorted(STORES),
         default=["All Stores"]
     )
 
-with col3:
-    supplier_type = st.selectbox(
-        "Supplier Type",
-        ["All Suppliers", "Fresh Produce", "Dairy", "Meat", "Dry Goods"]
-    )
-
-with col4:
+with col_vehicle:
     vehicle_filter = st.selectbox(
         "Vehicle Type",
         ["All Vehicles", "Small Van", "Medium Truck", "Large Truck"]
     )
 
-# Apply date filter
+# Apply date filter — map fiscal selector dates to mock data range
 df = raw_df.copy()
 latest_date = df['date'].max()
 
-if date_range == "WTD (Week-to-Date)":
-    week_start = latest_date - pd.Timedelta(days=latest_date.dayofweek)
-    cutoff = week_start
-    days_into_week = (latest_date - week_start).days + 1
-    prev_start = week_start - pd.Timedelta(days=7)
-    prev_end = prev_start + pd.Timedelta(days=days_into_week - 1)
-elif date_range == "This Period (454)":
-    current_period = get_454_period(latest_date.to_pydatetime())
-    cutoff = pd.Timestamp(current_period['start'])
-    prev_period = get_454_period(current_period['start'] - timedelta(days=1))
-    prev_start = pd.Timestamp(prev_period['start'])
-    prev_end = pd.Timestamp(prev_period['end'])
-elif date_range == "This Quarter (454)":
-    q_start, q_end = get_454_quarter(latest_date.to_pydatetime())
-    cutoff = pd.Timestamp(q_start)
-    prev_q_start, prev_q_end = get_454_quarter(q_start - timedelta(days=1))
-    prev_start = pd.Timestamp(prev_q_start)
-    prev_end = pd.Timestamp(prev_q_end)
+fs_start = pd.Timestamp(filters["start_date"])
+fs_end = pd.Timestamp(filters["end_date"])
+
+# Mock data only covers 90 days — clip to available range
+if fs_start < df['date'].min():
+    fs_start = df['date'].min()
+if fs_end > latest_date:
+    fs_end = latest_date
+
+df = df[(df['date'] >= fs_start) & (df['date'] <= fs_end)]
+
+# Comparison period
+if filters["comparison"]:
+    comp_start = pd.Timestamp(filters["comparison"]["start"])
+    comp_end = pd.Timestamp(filters["comparison"]["end"])
+    if comp_start < raw_df['date'].min():
+        comp_start = raw_df['date'].min()
+    prev_df = raw_df[(raw_df['date'] >= comp_start) & (raw_df['date'] <= comp_end)]
 else:
-    period_days = {"Last 7 Days": 7, "Last 30 Days": 30, "Last 90 Days": 90}
-    n_days = period_days[date_range]
-    cutoff = latest_date - pd.Timedelta(days=n_days - 1)
-    prev_start = cutoff - pd.Timedelta(days=n_days)
-    prev_end = cutoff - pd.Timedelta(days=1)
+    period_days = (fs_end - fs_start).days
+    prev_start = fs_start - pd.Timedelta(days=period_days + 1)
+    prev_end = fs_start - pd.Timedelta(days=1)
+    prev_df = raw_df[(raw_df['date'] >= prev_start) & (raw_df['date'] <= prev_end)]
 
-df = df[df['date'] >= cutoff]
-prev_df = raw_df[(raw_df['date'] >= prev_start) & (raw_df['date'] <= prev_end)]
-
-# Show active 454 calendar context
-current_454 = get_454_period(latest_date.to_pydatetime())
-st.caption(
-    f"454 Calendar: {current_454['label']} | "
-    f"{current_454['weeks']}-week period | "
-    f"Viewing: {cutoff.strftime('%d %b')}\u2013{latest_date.strftime('%d %b %Y')}"
-)
+# Coverage indicator
+if filters.get("caveats"):
+    for c in filters["caveats"]:
+        st.caption(f"Note: {c}")
+n_days = (fs_end - fs_start).days + 1
+st.caption(f"Showing {n_days} days | {len(df)} delivery records | Mock data (seed 42)")
 
 # Apply store filter
 if "All Stores" not in store_filter and store_filter:

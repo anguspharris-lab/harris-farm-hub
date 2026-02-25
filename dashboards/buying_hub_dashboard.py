@@ -77,6 +77,7 @@ qp_start, qp_end, qp_label = render_quick_period(key_prefix="bh")
 
 filters = render_fiscal_selector(
     key_prefix="buying_hub",
+    show_comparison=True,
     show_store=True,
     store_names=STORE_NAMES,
     allowed_fys=[2024, 2025, 2026],
@@ -92,6 +93,11 @@ end_str = filters["end_date"]
 if qp_start and qp_end:
     start_str = qp_start
     end_str = qp_end
+
+# Coverage indicator
+if filters.get("caveats"):
+    for c in filters["caveats"]:
+        st.caption(f"Note: {c}")
 
 store_id = filters["store_id"]
 store_label = STORE_NAMES.get(store_id, "All Network") if store_id else "All Network"
@@ -136,7 +142,7 @@ with tab1:
             if store_id:
                 dept_kwargs["store_id"] = store_id
             dept_data = query_named("minor_group_revenue", **dept_kwargs)
-            dept_name_col = "MinorGroupDesc"
+            dept_name_col = "minorgroupdesc"
         except Exception as e:
             st.error(f"Failed to load sub-category data: {e}")
             dept_data = []
@@ -151,14 +157,14 @@ with tab1:
             if store_id:
                 dept_kwargs["store_id"] = store_id
             dept_data = query_named("major_group_revenue", **dept_kwargs)
-            dept_name_col = "MajorGroupDesc"
+            dept_name_col = "majorgroupdesc"
         except Exception as e:
             st.error(f"Failed to load category data: {e}")
             dept_data = []
             dept_name_col = None
     else:
         st.subheader("Revenue by Department")
-        dept_name_col = "DepartmentDesc"
+        dept_name_col = "departmentdesc"
         try:
             dept_kwargs = {"start": start_str, "end": end_str}
             if store_id:
@@ -207,7 +213,7 @@ with tab1:
             st.plotly_chart(fig_tree, key="buying_revenue_treemap")
 
         with col_bar:
-            st.markdown(f"**Revenue by {dept_name_col.replace('Desc', '')}**")
+            st.markdown(f"**Revenue by {dept_name_col.replace('desc', '')}**")
             fig_bar = px.bar(
                 df_dept.sort_values("revenue"),
                 x="revenue", y=dept_name_col,
@@ -279,16 +285,16 @@ with tab2:
     if mg_data:
         df_mg = pd.DataFrame(mg_data)
         fig_mg = px.bar(
-            df_mg, x="MajorGroupDesc", y="revenue",
+            df_mg, x="majorgroupdesc", y="revenue",
             color="revenue",
             color_continuous_scale=["#ccfbf1", "#0d9488"],
-            labels={"MajorGroupDesc": "Major Group", "revenue": "Revenue ($)"},
+            labels={"majorgroupdesc": "Major Group", "revenue": "Revenue ($)"},
         )
         fig_mg.update_layout(height=350, coloraxis_showscale=False)
         st.plotly_chart(fig_mg, key="buying_major_group_bar")
 
         # Select major group for minor drill-down
-        mg_options = {r["MajorGroupCode"]: r["MajorGroupDesc"] for r in mg_data}
+        mg_options = {r["majorgroupcode"]: r["majorgroupdesc"] for r in mg_data}
         selected_mg = st.selectbox(
             "Select Major Group to drill into",
             options=list(mg_options.keys()),
@@ -339,8 +345,8 @@ with tab2:
         if items_data:
             df_items = pd.DataFrame(items_data)
             st.dataframe(
-                df_items[["PLUItem_ID", "ProductName", "MajorGroupDesc",
-                           "MinorGroupDesc", "revenue", "total_qty",
+                df_items[["pluitem_id", "productname", "majorgroupdesc",
+                           "minorgroupdesc", "revenue", "total_qty",
                            "transaction_count"]]
                 .style.format({
                     "revenue": "${:,.0f}",
@@ -385,18 +391,18 @@ with tab3:
             top_buyers = df_buyer.head(15)
             fig_buyer = px.bar(
                 top_buyers.sort_values("revenue"),
-                x="revenue", y="BuyerId",
+                x="revenue", y="buyerid",
                 orientation="h",
                 color="revenue",
                 color_continuous_scale=["#dbeafe", "#1e3a8a"],
-                labels={"revenue": "Revenue ($)", "BuyerId": "Buyer"},
+                labels={"revenue": "Revenue ($)", "buyerid": "Buyer"},
             )
             fig_buyer.update_layout(height=450, coloraxis_showscale=False)
             st.plotly_chart(fig_buyer, key="buying_buyer_bar")
 
         with col_table:
             st.dataframe(
-                df_buyer[["BuyerId", "departments", "unique_skus",
+                df_buyer[["buyerid", "departments", "unique_skus",
                            "revenue", "gp", "transactions"]]
                 .style.format({
                     "revenue": "${:,.0f}",

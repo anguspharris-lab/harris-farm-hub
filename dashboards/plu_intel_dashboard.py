@@ -36,9 +36,15 @@ if not db_available():
 fiscal_years = get_fiscal_years()
 departments = get_departments()
 
-col_fy, col_dept, col_view = st.columns([1, 2, 2])
+col_fy, col_compare, col_dept, col_view = st.columns([1, 1, 2, 2])
 with col_fy:
     fy = st.selectbox("Fiscal Year", fiscal_years, index=len(fiscal_years) - 1)
+with col_compare:
+    compare_fy_options = ["None"] + [f"vs FY{y}" for y in fiscal_years if y != fy]
+    compare_sel = st.selectbox("Compare", compare_fy_options)
+    compare_fy = None
+    if compare_sel != "None":
+        compare_fy = int(compare_sel.replace("vs FY", ""))
 with col_dept:
     dept_options = ["All Departments"] + departments
     dept_sel = st.selectbox("Department", dept_options)
@@ -53,6 +59,7 @@ with col_view:
         "PLU Lookup",
     ])
 
+st.caption(f"PLU data: {len(fiscal_years)} fiscal years | 43 stores | 26K+ PLUs")
 st.markdown("---")
 
 # ── Department Summary ────────────────────────────────────────────────────────
@@ -76,12 +83,32 @@ if view == "Department Summary":
         total_waste = df["wastage"].sum()
         total_stock = df["stocktake"].sum()
 
+        # Comparison data
+        comp_sales_delta = None
+        comp_gm_delta = None
+        comp_waste_delta = None
+        if compare_fy:
+            comp_data = department_summary(fiscal_year=compare_fy)
+            if comp_data:
+                cdf = pd.DataFrame(comp_data)
+                cdf = cdf[cdf["sales"] > 0]
+                if not cdf.empty:
+                    c_sales = cdf["sales"].sum()
+                    c_gm = cdf["gm"].sum()
+                    c_waste = cdf["wastage"].sum()
+                    if c_sales > 0:
+                        comp_sales_delta = f"{(total_sales - c_sales) / c_sales * 100:+.1f}%"
+                    if c_gm > 0:
+                        comp_gm_delta = f"{(total_gm - c_gm) / c_gm * 100:+.1f}%"
+                    if c_waste > 0:
+                        comp_waste_delta = f"{(total_waste - c_waste) / c_waste * 100:+.1f}%"
+
         k1, k2, k3, k4 = st.columns(4)
-        k1.metric("Total Sales", f"${total_sales / 1e6:,.1f}M")
+        k1.metric("Total Sales", f"${total_sales / 1e6:,.1f}M", delta=comp_sales_delta)
         gm_pct = f"{total_gm / total_sales * 100:.1f}%" if total_sales > 0 else "—"
-        k2.metric("Gross Margin", f"${total_gm / 1e6:,.1f}M", gm_pct)
+        k2.metric("Gross Margin", f"${total_gm / 1e6:,.1f}M ({gm_pct})", delta=comp_gm_delta)
         waste_pct = f"{total_waste / total_sales * 100:.1f}%" if total_sales > 0 else "—"
-        k3.metric("Wastage", f"${total_waste / 1e6:,.1f}M", waste_pct)
+        k3.metric("Wastage", f"${total_waste / 1e6:,.1f}M ({waste_pct})", delta=comp_waste_delta, delta_color="inverse")
         k4.metric("Stocktake Adj", f"${total_stock / 1e6:,.1f}M")
 
         st.markdown("")

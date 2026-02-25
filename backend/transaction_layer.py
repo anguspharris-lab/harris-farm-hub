@@ -185,7 +185,7 @@ class TransactionStore:
         conn = self._get_connection()
         try:
             result = conn.execute(sql, params or [])
-            columns = [desc[0] for desc in result.description]
+            columns = [desc[0].lower() for desc in result.description]
             rows = result.fetchmany(max_rows)
             return [dict(zip(columns, row)) for row in rows]
         finally:

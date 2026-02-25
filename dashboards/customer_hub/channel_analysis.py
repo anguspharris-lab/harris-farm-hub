@@ -190,8 +190,8 @@ def render():
                              start=txn_start, end=txn_end)
         if basket_data:
             df_basket = pd.DataFrame(basket_data)
-            df_basket["Store"] = df_basket["Store_ID"].map(
-                STORE_NAMES).fillna(df_basket["Store_ID"].astype(str))
+            df_basket["Store"] = df_basket["store_id"].map(
+                STORE_NAMES).fillna(df_basket["store_id"].astype(str))
             fig_basket = px.scatter(
                 df_basket, x="avg_items", y="avg_basket_value",
                 size="total_baskets", hover_name="Store",

@@ -11,7 +11,6 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
-import requests
 import sqlite3
 from pathlib import Path
 
@@ -22,6 +21,7 @@ from pathlib import Path
 from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
 from shared.voice_realtime import render_voice_data_box
+from shared.fiscal_selector import render_fiscal_selector
 
 user = st.session_state.get("auth_user")
 
@@ -180,78 +180,6 @@ def get_date_range():
         return row[0], row[1]
 
 
-# ============================================================================
-# 5/4/4 RETAIL FISCAL CALENDAR
-# FY starts Monday closest to 1 July (Australian retail convention).
-# Each quarter = 13 weeks: Period 1 (5 wks) + Period 2 (4 wks) + Period 3 (4 wks).
-# ============================================================================
-
-def _fy_anchor(year, fy_start_month=7):
-    """Monday closest to the 1st of fy_start_month in the given year."""
-    anchor = datetime(year, fy_start_month, 1)
-    dow = anchor.weekday()  # 0=Mon
-    if dow <= 3:  # Mon-Thu -> go back to this week's Monday
-        return anchor - timedelta(days=dow)
-    else:  # Fri-Sun -> go forward to next Monday
-        return anchor + timedelta(days=(7 - dow))
-
-
-def build_454_calendar(reference_date=None):
-    """
-    Build the 5/4/4 retail calendar for the FY containing reference_date.
-    Returns (fy_start, periods) where periods is a list of 12 dicts:
-      quarter, period, weeks, start, end
-    """
-    if reference_date is None:
-        reference_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-
-    anchor = _fy_anchor(reference_date.year)
-    if reference_date < anchor:
-        anchor = _fy_anchor(reference_date.year - 1)
-
-    pattern = [5, 4, 4] * 4  # 12 periods across 4 quarters
-    periods = []
-    current = anchor
-    for i, weeks in enumerate(pattern):
-        period_end = current + timedelta(weeks=weeks) - timedelta(days=1)
-        periods.append({
-            'quarter': i // 3 + 1,
-            'period': i + 1,
-            'month_in_quarter': i % 3 + 1,
-            'weeks': weeks,
-            'start': current,
-            'end': period_end,
-            'label': f"P{i+1} (Q{i//3+1}) {current.strftime('%d %b')}\u2013{period_end.strftime('%d %b')}",
-        })
-        current = period_end + timedelta(days=1)
-
-    return anchor, periods
-
-
-def get_454_period(reference_date=None):
-    """Return the 454 period dict that contains reference_date."""
-    if reference_date is None:
-        reference_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    _, periods = build_454_calendar(reference_date)
-    for p in periods:
-        if p['start'] <= reference_date <= p['end']:
-            return p
-    return periods[-1]  # fallback to last period
-
-
-def get_454_quarter(reference_date=None):
-    """Return (start, end) for the 454 quarter containing reference_date."""
-    if reference_date is None:
-        reference_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    _, periods = build_454_calendar(reference_date)
-    for p in periods:
-        if p['start'] <= reference_date <= p['end']:
-            q = p['quarter']
-            q_periods = [pp for pp in periods if pp['quarter'] == q]
-            return q_periods[0]['start'], q_periods[-1]['end']
-    return periods[0]['start'], periods[-1]['end']
-
-
 def compute_period_delta(current_val, previous_val):
     """Return percentage change string for metric deltas."""
     if previous_val == 0:
@@ -268,9 +196,9 @@ render_header(
     "Sales Performance",
     "**Harris Farm Markets** | Weekly sales, GP, budget & shrinkage analytics",
     goals=["G1", "G2", "G4"],
-    strategy_context="Revenue is the scoreboard. AI reads the pattern — where growth is real, where it's seasonal, where we need to act.",
+    strategy_context="Revenue is the scoreboard. AI reads the pattern \u2014 where growth is real, where it\u2019s seasonal, where we need to act.",
 )
-st.caption("💡 Step 5: Review this data. Add your judgment. Your experience makes this useful.")
+st.caption("\U0001f4a1 Step 5: Review this data. Add your judgment. Your experience makes this useful.")
 
 # ============================================================================
 # FILTERS
@@ -280,21 +208,30 @@ stores_list = load_stores()
 departments_list = load_departments()
 data_min, data_max = get_date_range()
 
-col1, col2, col3, col4 = st.columns(4)
+# --- Fiscal Period Selector ---
+filters = render_fiscal_selector(
+    key_prefix="sales",
+    show_comparison=True,
+    show_store=False,
+    allowed_fys=[2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+)
 
-with col1:
-    period_options = [
-        "Last 13 Weeks",
-        "Last 4 Weeks",
-        "Last 26 Weeks",
-        "Last 52 Weeks",
-        "This Period (454)",
-        "This Quarter (454)",
-        "FY2024 (Jul 23 - Jun 24)",
-        "FY2023 (Jul 22 - Jun 23)",
-    ]
-    date_range_sel = st.selectbox("Time Period", period_options, index=0,
-                                  key="sales_period")
+if not filters["start_date"]:
+    st.stop()
+
+date_from = filters["start_date"]
+date_to = filters["end_date"]
+
+# Comparison period
+if filters["comparison"]:
+    prev_from = filters["comparison"]["start"]
+    prev_to = filters["comparison"]["end"]
+else:
+    prev_from = None
+    prev_to = None
+
+# --- Store / Department / Major Group Filters ---
+col2, col3, col4 = st.columns(3)
 
 with col2:
     store_options = ["All Stores"] + [
@@ -335,59 +272,6 @@ with col4:
         key=mg_key,
     )
 
-# Resolve date range
-latest_date = pd.Timestamp(data_max)
-
-if date_range_sel == "Last 4 Weeks":
-    date_from = (latest_date - pd.Timedelta(weeks=4)).strftime('%Y-%m-%d')
-    date_to = data_max
-    prev_from = (latest_date - pd.Timedelta(weeks=8)).strftime('%Y-%m-%d')
-    prev_to = (latest_date - pd.Timedelta(weeks=4) - pd.Timedelta(days=1)).strftime('%Y-%m-%d')
-elif date_range_sel == "Last 13 Weeks":
-    date_from = (latest_date - pd.Timedelta(weeks=13)).strftime('%Y-%m-%d')
-    date_to = data_max
-    prev_from = (latest_date - pd.Timedelta(weeks=26)).strftime('%Y-%m-%d')
-    prev_to = (latest_date - pd.Timedelta(weeks=13) - pd.Timedelta(days=1)).strftime('%Y-%m-%d')
-elif date_range_sel == "Last 26 Weeks":
-    date_from = (latest_date - pd.Timedelta(weeks=26)).strftime('%Y-%m-%d')
-    date_to = data_max
-    prev_from = (latest_date - pd.Timedelta(weeks=52)).strftime('%Y-%m-%d')
-    prev_to = (latest_date - pd.Timedelta(weeks=26) - pd.Timedelta(days=1)).strftime('%Y-%m-%d')
-elif date_range_sel == "Last 52 Weeks":
-    date_from = (latest_date - pd.Timedelta(weeks=52)).strftime('%Y-%m-%d')
-    date_to = data_max
-    prev_from = (latest_date - pd.Timedelta(weeks=104)).strftime('%Y-%m-%d')
-    prev_to = (latest_date - pd.Timedelta(weeks=52) - pd.Timedelta(days=1)).strftime('%Y-%m-%d')
-elif date_range_sel == "This Period (454)":
-    current_period = get_454_period(latest_date.to_pydatetime())
-    date_from = current_period['start'].strftime('%Y-%m-%d')
-    date_to = current_period['end'].strftime('%Y-%m-%d')
-    prev_period = get_454_period(current_period['start'] - timedelta(days=1))
-    prev_from = prev_period['start'].strftime('%Y-%m-%d')
-    prev_to = prev_period['end'].strftime('%Y-%m-%d')
-elif date_range_sel == "This Quarter (454)":
-    q_start, q_end = get_454_quarter(latest_date.to_pydatetime())
-    date_from = q_start.strftime('%Y-%m-%d')
-    date_to = q_end.strftime('%Y-%m-%d')
-    prev_q_start, prev_q_end = get_454_quarter(q_start - timedelta(days=1))
-    prev_from = prev_q_start.strftime('%Y-%m-%d')
-    prev_to = prev_q_end.strftime('%Y-%m-%d')
-elif date_range_sel == "FY2024 (Jul 23 - Jun 24)":
-    date_from = "2023-07-02"  # FY2024 start (Mon closest to 1 Jul 2023)
-    date_to = "2024-06-30"
-    prev_from = "2022-07-03"
-    prev_to = "2023-07-01"
-elif date_range_sel == "FY2023 (Jul 22 - Jun 23)":
-    date_from = "2022-07-03"
-    date_to = "2023-07-01"
-    prev_from = "2021-07-04"
-    prev_to = "2022-07-02"
-else:
-    date_from = (latest_date - pd.Timedelta(weeks=13)).strftime('%Y-%m-%d')
-    date_to = data_max
-    prev_from = (latest_date - pd.Timedelta(weeks=26)).strftime('%Y-%m-%d')
-    prev_to = (latest_date - pd.Timedelta(weeks=13) - pd.Timedelta(days=1)).strftime('%Y-%m-%d')
-
 # Resolve store filter to DB store names
 selected_stores = None
 if "All Stores" not in store_filter and store_filter:
@@ -408,13 +292,11 @@ selected_mgs = None
 if "All Major Groups" not in mg_filter and mg_filter:
     selected_mgs = mg_filter
 
-# Show active calendar context
-current_454 = get_454_period(latest_date.to_pydatetime())
-st.caption(
-    f"454 Calendar: {current_454['label']} | "
-    f"Viewing: {date_from} to {date_to} | "
-    f"Data range: {data_min} to {data_max}"
-)
+# Coverage indicator
+if filters.get("caveats"):
+    for c in filters["caveats"]:
+        st.caption(f"Note: {c}")
+st.caption(f"Data range: {data_min} to {data_max}")
 
 # ============================================================================
 # LOAD DATA
@@ -422,8 +304,11 @@ st.caption(
 
 df = load_sales_data(date_from, date_to, selected_stores, selected_depts,
                      selected_mgs)
-prev_df = load_sales_data(prev_from, prev_to, selected_stores, selected_depts,
-                          selected_mgs)
+if prev_from and prev_to:
+    prev_df = load_sales_data(prev_from, prev_to, selected_stores, selected_depts,
+                              selected_mgs)
+else:
+    prev_df = pd.DataFrame()
 
 if df.empty:
     st.warning("No data found for the selected filters. Try broadening your selection.")
@@ -743,11 +628,11 @@ st.markdown("**Dig Deeper**")
 _pages = st.session_state.get("_pages", {})
 c1, c2, c3 = st.columns(3)
 if "profitability" in _pages:
-    c1.page_link(_pages["profitability"], label="Margin Deep-Dive", icon="💰")
+    c1.page_link(_pages["profitability"], label="Margin Deep-Dive", icon="\U0001f4b0")
 if "plu-intel" in _pages:
-    c2.page_link(_pages["plu-intel"], label="PLU Wastage Detail", icon="📊")
+    c2.page_link(_pages["plu-intel"], label="PLU Wastage Detail", icon="\U0001f4ca")
 if "revenue-bridge" in _pages:
-    c3.page_link(_pages["revenue-bridge"], label="Revenue Bridge", icon="🌉")
+    c3.page_link(_pages["revenue-bridge"], label="Revenue Bridge", icon="\U0001f309")
 
 # ============================================================================
 # FOOTER
