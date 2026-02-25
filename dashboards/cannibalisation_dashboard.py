@@ -60,25 +60,30 @@ _DARK_LAYOUT = dict(
 
 _MAPBOX_TOKEN = ""  # carto-darkmatter needs no token
 
-# Store ID -> (suburb, postcode) mapping
+# Store ID -> (suburb, postcode, state) mapping
 _STORE_POSTCODES = {
-    10: ("Pennant Hills", "2120"), 24: ("St Ives", "2075"),
-    28: ("Mosman", "2088"), 32: ("Willoughby", "2068"),
-    37: ("Broadway", "2007"), 40: ("Erina", "2250"),
-    44: ("Orange", "2800"), 48: ("Manly", "2095"),
-    49: ("Mona Vale", "2103"), 51: ("Bowral", "2576"),
-    52: ("Cammeray", "2062"), 54: ("Potts Point", "2011"),
-    56: ("Boronia Park", "2111"), 57: ("Bondi Beach", "2026"),
-    58: ("Drummoyne", "2047"), 63: ("Randwick", "2031"),
-    64: ("Leichhardt", "2040"), 65: ("Bondi Westfield", "2022"),
-    66: ("Newcastle", "2300"), 67: ("Lindfield", "2070"),
-    68: ("Albury", "2640"), 69: ("Rose Bay", "2029"),
-    70: ("West End QLD", "4101"), 74: ("Isle of Capri QLD", "4217"),
-    75: ("Clayfield QLD", "4011"), 76: ("Lane Cove", "2066"),
-    77: ("Dural", "2158"), 80: ("Majura Park ACT", "2609"),
-    84: ("Redfern", "2016"), 85: ("Marrickville", "2204"),
-    86: ("Miranda", "2228"), 87: ("Maroubra", "2035"),
+    10: ("Pennant Hills", "2120", "NSW"), 24: ("St Ives", "2075", "NSW"),
+    28: ("Mosman", "2088", "NSW"), 32: ("Willoughby", "2068", "NSW"),
+    37: ("Broadway", "2007", "NSW"), 40: ("Erina", "2250", "NSW"),
+    44: ("Orange", "2800", "NSW"), 48: ("Manly", "2095", "NSW"),
+    49: ("Mona Vale", "2103", "NSW"), 51: ("Bowral", "2576", "NSW"),
+    52: ("Cammeray", "2062", "NSW"), 54: ("Potts Point", "2011", "NSW"),
+    56: ("Boronia Park", "2111", "NSW"), 57: ("Bondi Beach", "2026", "NSW"),
+    58: ("Drummoyne", "2047", "NSW"), 63: ("Randwick", "2031", "NSW"),
+    64: ("Leichhardt", "2040", "NSW"), 65: ("Bondi Westfield", "2022", "NSW"),
+    66: ("Newcastle", "2300", "NSW"), 67: ("Lindfield", "2070", "NSW"),
+    68: ("Albury", "2640", "NSW"), 69: ("Rose Bay", "2029", "NSW"),
+    70: ("West End", "4101", "QLD"), 74: ("Isle of Capri", "4217", "QLD"),
+    75: ("Clayfield", "4011", "QLD"), 76: ("Lane Cove", "2066", "NSW"),
+    77: ("Dural", "2158", "NSW"), 80: ("Majura Park", "2609", "ACT"),
+    84: ("Redfern", "2016", "NSW"), 85: ("Marrickville", "2204", "NSW"),
+    86: ("Miranda", "2228", "NSW"), 87: ("Maroubra", "2035", "NSW"),
 }
+
+def _store_state(sid: int) -> str:
+    """Get state for a store ID."""
+    entry = _STORE_POSTCODES.get(sid)
+    return entry[2] if entry and len(entry) >= 3 else "NSW"
 
 
 # ---------------------------------------------------------------------------
@@ -100,7 +105,8 @@ def _build_store_coords() -> Dict[int, Tuple[float, float]]:
     """Build store_id -> (lat, lon) using postcode coordinates."""
     pc = _load_postcode_coords()
     coords = {}
-    for sid, (suburb, postcode) in _STORE_POSTCODES.items():
+    for sid, entry in _STORE_POSTCODES.items():
+        postcode = entry[1]
         if postcode in pc:
             coords[sid] = (pc[postcode]["lat"], pc[postcode]["lon"])
     return coords
@@ -287,7 +293,13 @@ new_stores = {sid: dt for sid, dt in openings.items() if dt > new_store_cutoff}
 
 # Store name helper
 def _sname(sid: int) -> str:
-    return names.get(sid, _STORE_POSTCODES.get(sid, (str(sid),))[0])
+    base = names.get(sid, _STORE_POSTCODES.get(sid, (str(sid),))[0])
+    state = _store_state(sid)
+    if state != "NSW":
+        # Append state tag if not already in name
+        if state not in base:
+            return f"{base} ({state})"
+    return base
 
 
 # ---------------------------------------------------------------------------
@@ -312,58 +324,91 @@ with tab1:
     if not coords:
         st.warning("No store coordinates available.")
     else:
-        # Calculate nearest-neighbour distance for each store
+        # State filter
+        all_states = sorted(set(_store_state(sid) for sid in coords))
+        state_filter = st.selectbox(
+            "Region", ["All States"] + all_states, key="overview_state"
+        )
+
+        # Filter coords for display
+        if state_filter == "All States":
+            display_coords = coords
+        else:
+            display_coords = {sid: c for sid, c in coords.items() if _store_state(sid) == state_filter}
+
+        # Calculate nearest-neighbour distance for each store (within filtered set)
+        filtered_matrix = dist_matrix.loc[
+            [s for s in display_coords if s in dist_matrix.index],
+            [s for s in display_coords if s in dist_matrix.columns],
+        ]
         nn_distances = {}
-        for sid in coords:
-            if sid in dist_matrix.index:
-                row = dist_matrix.loc[sid].drop(sid, errors="ignore")
+        for sid in display_coords:
+            if sid in filtered_matrix.index:
+                row = filtered_matrix.loc[sid].drop(sid, errors="ignore")
                 row_positive = row[row > 0]
                 if not row_positive.empty:
                     nn_distances[sid] = row_positive.min()
 
         # Classify stores
         map_rows = []
-        for sid, (lat, lon) in coords.items():
+        for sid, (lat, lon) in display_coords.items():
             nn_dist = nn_distances.get(sid, 999)
             if nn_dist < 2:
                 zone = "Heavy overlap (<2km)"
-                colour = RED
             elif nn_dist < 5:
                 zone = "Mild overlap (2-5km)"
-                colour = ORANGE
             else:
                 zone = "Isolated (>5km)"
-                colour = GREEN
 
             map_rows.append({
                 "store_id": sid,
                 "store_name": _sname(sid),
+                "state": _store_state(sid),
                 "lat": lat,
                 "lon": lon,
                 "nearest_km": round(nn_dist, 1),
                 "zone": zone,
-                "colour": colour,
+                "size_display": max(8, min(18, 20 - nn_dist)) if nn_dist < 20 else 8,
             })
 
         map_df = pd.DataFrame(map_rows)
+        # Ensure size is numeric and safe for scatter_mapbox
+        map_df["size_display"] = pd.to_numeric(map_df["size_display"], errors="coerce").fillna(8).clip(lower=1)
 
         # Metric cards
-        c1, c2, c3 = st.columns(3)
+        c1, c2, c3, c4 = st.columns(4)
         with c1:
-            st.metric("Total Stores (with coords)", len(coords))
+            st.metric("Stores Shown", len(display_coords))
         with c2:
             avg_nn = np.mean(list(nn_distances.values())) if nn_distances else 0
             st.metric("Avg Nearest-Store Distance", f"{avg_nn:.1f} km")
         with c3:
             close_count = sum(1 for d in nn_distances.values() if d < 3)
             st.metric("Stores with <3km Neighbour", close_count)
+        with c4:
+            state_counts = map_df["state"].value_counts().to_dict()
+            state_str = ", ".join(f"{s}: {c}" for s, c in sorted(state_counts.items()))
+            st.metric("By State", state_str)
 
-        # Map
+        # Map — auto-center on the stores being shown
         colour_map = {
             "Heavy overlap (<2km)": RED,
             "Mild overlap (2-5km)": ORANGE,
             "Isolated (>5km)": GREEN,
         }
+
+        center_lat = map_df["lat"].mean()
+        center_lon = map_df["lon"].mean()
+        # Zoom based on geographic spread
+        lat_range = map_df["lat"].max() - map_df["lat"].min()
+        if lat_range < 0.5:
+            auto_zoom = 10
+        elif lat_range < 2:
+            auto_zoom = 8
+        elif lat_range < 5:
+            auto_zoom = 6
+        else:
+            auto_zoom = 4
 
         fig_map = px.scatter_mapbox(
             map_df,
@@ -371,12 +416,12 @@ with tab1:
             lon="lon",
             color="zone",
             color_discrete_map=colour_map,
-            size="nearest_km",
+            size="size_display",
             size_max=18,
             hover_name="store_name",
-            hover_data={"nearest_km": ":.1f", "zone": True, "lat": False, "lon": False},
-            zoom=5,
-            center={"lat": -33.8, "lon": 151.0},
+            hover_data={"nearest_km": ":.1f", "zone": True, "state": True, "lat": False, "lon": False, "size_display": False},
+            zoom=auto_zoom,
+            center={"lat": center_lat, "lon": center_lon},
         )
         fig_map.update_layout(
             mapbox_style="carto-darkmatter",
@@ -388,8 +433,8 @@ with tab1:
 
         # Summary table
         with st.expander("Store Proximity Details"):
-            display_df = map_df[["store_id", "store_name", "nearest_km", "zone"]].sort_values("nearest_km")
-            display_df.columns = ["Store ID", "Store Name", "Nearest (km)", "Zone"]
+            display_df = map_df[["store_id", "store_name", "state", "nearest_km", "zone"]].sort_values("nearest_km")
+            display_df.columns = ["Store ID", "Store Name", "State", "Nearest (km)", "Zone"]
             st.dataframe(display_df, use_container_width=True, hide_index=True)
 
 
@@ -413,6 +458,9 @@ with tab2:
         if not relevant_ids:
             st.info("No store pairs found within 10km of each other.")
         else:
+            # Sort by state then store name so regions cluster together in heatmap
+            relevant_ids = sorted(relevant_ids, key=lambda s: (_store_state(s), _sname(s)))
+
             sub = dist_matrix.loc[relevant_ids, relevant_ids].copy()
 
             # Replace diagonal and >10km with NaN for cleaner display
@@ -420,8 +468,16 @@ with tab2:
                 sub.loc[sid, sid] = np.nan
             sub = sub.where(sub <= 10)
 
-            # Build labels
-            labels = [f"{_sname(sid)} ({sid})" for sid in relevant_ids]
+            # Build labels with state tag for non-NSW stores
+            labels = [_sname(sid) for sid in relevant_ids]
+
+            # Show state breakdown
+            heatmap_states = {}
+            for sid in relevant_ids:
+                st_name = _store_state(sid)
+                heatmap_states[st_name] = heatmap_states.get(st_name, 0) + 1
+            state_summary = ", ".join(f"{s}: {c}" for s, c in sorted(heatmap_states.items()))
+            st.info(f"**{len(relevant_ids)} stores** with <10km neighbour ({state_summary})")
 
             # Custom colour scale: red (<3), amber (3-5), pale (5-10)
             colorscale = [
@@ -438,7 +494,7 @@ with tab2:
                 colorscale=colorscale,
                 zmin=0,
                 zmax=10,
-                hovertemplate="<b>%{x}</b> ↔ <b>%{y}</b><br>Distance: %{z:.1f} km<extra></extra>",
+                hovertemplate="<b>%{x}</b> \u2194 <b>%{y}</b><br>Distance: %{z:.1f} km<extra></extra>",
                 colorbar=dict(title="km", tickfont=dict(color=TEXT_SECONDARY)),
             ))
             fig_heat.update_layout(
@@ -466,6 +522,7 @@ with tab2:
                         pairs.append({
                             "Store A": _sname(i),
                             "Store B": _sname(j),
+                            "State": _store_state(i) if _store_state(i) == _store_state(j) else f"{_store_state(i)}/{_store_state(j)}",
                             "Distance (km)": round(d, 2),
                         })
 
