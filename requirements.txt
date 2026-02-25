@@ -8,6 +8,7 @@ requests
 httpx
 uvicorn[standard]
 fastapi
+python-multipart
 pydantic<2
 python-dotenv
 anthropic
