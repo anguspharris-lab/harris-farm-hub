@@ -82,6 +82,10 @@ _pages = {
     "competitor-map": st.Page(str(_DIR / "competitor_map_page.py"), title="Competitor Map", icon="\U0001f4cd", url_path="competitor-map"),
     "roce": st.Page(str(_DIR / "roce_dashboard.py"), title="ROCE Analysis", icon="\U0001f4b9", url_path="roce"),
     "cannibalisation": st.Page(str(_DIR / "cannibalisation_dashboard.py"), title="Cannibalisation", icon="\U0001f50d", url_path="cannibalisation"),
+    # MDHE — Master Data Health Engine
+    "mdhe-dashboard": st.Page(str(_DIR / "mdhe" / "dashboard.py"), title="MDHE Dashboard", icon="\U0001f3e5", url_path="mdhe-dashboard"),
+    "mdhe-upload": st.Page(str(_DIR / "mdhe" / "upload.py"), title="MDHE Upload", icon="\U0001f4e4", url_path="mdhe-upload"),
+    "mdhe-issues": st.Page(str(_DIR / "mdhe" / "issues.py"), title="MDHE Issues", icon="\U0001f4cb", url_path="mdhe-issues"),
     # P5 Digital & AI
     "workflow-engine": st.Page(str(_DIR / "workflow_engine.py"), title="Workflow Engine", icon="\u2699\ufe0f", url_path="workflow-engine"),
     "analytics-engine": st.Page(str(_DIR / "analytics_engine.py"), title="Analytics Engine", icon="\U0001f52c", url_path="analytics-engine"),
@@ -91,6 +95,8 @@ _pages = {
     "trending": st.Page(str(_DIR / "trending_dashboard.py"), title="Trending", icon="\U0001f4c8", url_path="trending"),
     "mission-control": st.Page(str(_DIR / "hub_portal.py"), title="Mission Control", icon="\U0001f3af", url_path="mission-control"),
     "adoption": st.Page(str(_DIR / "adoption_dashboard.py"), title="Adoption", icon="\U0001f4c8", url_path="adoption"),
+    # Admin
+    "user-management": st.Page(str(_DIR / "mdhe" / "user_management.py"), title="User Management", icon="\U0001f465", url_path="user-management"),
 }
 
 # Section groupings for navigation (purpose-based, not pillar-based)
@@ -107,11 +113,13 @@ _SECTIONS = [
     {"name": "Property", "icon": "\U0001f3d8\ufe0f", "color": "#06B6D4",
      "slugs": ["store-network", "market-share", "demographics",
                "whitespace", "competitor-map", "roce", "cannibalisation"]},
+    {"name": "MDHE", "icon": "\U0001f3e5", "color": "#E74C3C",
+     "slugs": ["mdhe-dashboard", "mdhe-upload", "mdhe-issues"]},
     {"name": "Back of House", "icon": "\u2699\ufe0f", "color": "#8899AA",
      "is_muted": True,
      "slugs": ["the-rubric", "approvals", "workflow-engine", "agent-ops",
                "mission-control", "ai-adoption", "adoption", "trending",
-               "agent-hub", "marketing-assets"]},
+               "agent-hub", "marketing-assets", "user-management"]},
 ]
 
 # Store page objects and sections in session_state so landing.py can use them
@@ -154,10 +162,13 @@ _full_nav = {
         "store-network", "market-share", "demographics",
         "whitespace", "competitor-map", "roce", "cannibalisation",
     ],
+    "MDHE": [
+        "mdhe-dashboard", "mdhe-upload", "mdhe-issues",
+    ],
     "Back of House": [
         "the-rubric", "approvals", "workflow-engine", "agent-ops",
         "mission-control", "ai-adoption", "adoption", "trending",
-        "agent-hub", "marketing-assets",
+        "agent-hub", "marketing-assets", "user-management",
     ],
 }
 

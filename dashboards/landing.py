@@ -47,11 +47,17 @@ def render_home_page():
     st.divider()
 
     # ── Stats ─────────────────────────────────────────────────────────
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("73%", "of retail AI leaders outperform peers")
-    c2.metric("40%", "time saved on reporting & analysis")
-    c3.metric("$2.4M", "annualised value from AI initiatives")
-    c4.metric("30+", "stores powering the data engine")
+    _stats = [
+        ("73%", "of retail AI leaders outperform peers"),
+        ("40%", "time saved on reporting & analysis"),
+        ("$2.4M", "annualised value from AI initiatives"),
+        ("30+", "stores powering the data engine"),
+    ]
+    for col, (num, desc) in zip(st.columns(4), _stats):
+        with col:
+            with st.container(border=True):
+                st.subheader(num)
+                st.caption(desc)
 
     st.divider()
 

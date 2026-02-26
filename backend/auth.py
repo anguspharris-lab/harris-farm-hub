@@ -277,7 +277,7 @@ def list_users():
     """List all users (without password hashes)."""
     conn = _get_conn()
     rows = conn.execute(
-        "SELECT id, email, name, role, active, created_at, updated_at FROM users ORDER BY id"
+        "SELECT id, email, name, role, hub_role, active, created_at, updated_at FROM users ORDER BY id"
     ).fetchall()
     conn.close()
     return [dict(r) for r in rows]
@@ -289,7 +289,7 @@ def update_user(user_id, **kwargs):
     Password is hashed before storage.
     """
     conn = _get_conn()
-    allowed = {"name", "role", "active"}
+    allowed = {"name", "role", "active", "hub_role"}
 
     updates = []
     values = []

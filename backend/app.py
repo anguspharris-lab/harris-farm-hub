@@ -1425,6 +1425,14 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"❌ Auth init failed: {e}")
 
+    # 5b. MDHE database tables
+    try:
+        from mdhe_db import init_mdhe_db
+        init_mdhe_db()
+        print("✅ MDHE database initialized")
+    except Exception as e:
+        print(f"  MDHE init skipped: {e}")
+
     # 6. Transaction store (DuckDB → parquet)
     try:
         from transaction_layer import TransactionStore
@@ -1537,6 +1545,14 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Content-Type", "X-Auth-Token"],
 )
+
+# MDHE API router
+try:
+    from mdhe_api import router as mdhe_router
+    app.include_router(mdhe_router)
+    print("✅ MDHE API router mounted")
+except Exception as _mdhe_err:
+    print(f"⚠️ MDHE API router failed: {_mdhe_err}")
 
 # ============================================================================
 # DATA MODELS
@@ -3446,6 +3462,7 @@ class CreateUserRequest(BaseModel):
 class UpdateUserRequest(BaseModel):
     name: Optional[str] = None
     role: Optional[str] = None
+    hub_role: Optional[str] = None
     active: Optional[int] = None
     password: Optional[str] = None
 
@@ -3666,6 +3683,8 @@ async def admin_update_user(user_id: int, req: UpdateUserRequest, request: Reque
         updates["name"] = req.name
     if req.role is not None:
         updates["role"] = req.role
+    if req.hub_role is not None:
+        updates["hub_role"] = req.hub_role
     if req.active is not None:
         updates["active"] = req.active
     if req.password is not None:

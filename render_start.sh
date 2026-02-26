@@ -7,8 +7,9 @@
 if [ -d /data ]; then
     echo "Persistent disk found at /data"
 
-    # Ensure transactions subdirectory exists on disk
+    # Ensure subdirectories exist on disk
     mkdir -p /data/transactions
+    mkdir -p /data/mdhe_uploads
 
     # Copy ALL git-tracked reference files to disk.
     # Use cp -u (update) so newer git files overwrite stale disk copies,
@@ -20,6 +21,7 @@ if [ -d /data ]; then
     cp -ru data/census /data/ 2>/dev/null || true
     cp -ru data/outputs /data/ 2>/dev/null || true
     cp -ru data/hfm_uploads /data/ 2>/dev/null || true
+    cp -ru data/mdhe_uploads /data/ 2>/dev/null || true
 
     # Replace data/ with symlink to persistent disk
     rm -rf data

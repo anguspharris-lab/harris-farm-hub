@@ -7,58 +7,76 @@ Defines which pages each role can see.
 # "admin" and "user" (default) see ALL pages — no filtering.
 # Home page (_home) is always accessible — it's handled separately in app.py.
 
+# Restricted pages — only admin and executive roles can see these.
+# Sales, Profitability, and Property data is SLT + Grant Enders only.
+_RESTRICTED_SLUGS = {
+    "sales", "profitability", "revenue-bridge",
+    "store-network", "market-share", "demographics",
+    "whitespace", "competitor-map", "roce", "cannibalisation",
+}
+
 ROLE_DEFINITIONS = {
     "admin": {
         "display_name": "Administrator",
-        "description": "Full access to all Hub pages",
+        "description": "Full access to all Hub pages including User Management",
         "allowed_slugs": "all",
     },
     "user": {
         "display_name": "General",
-        "description": "Full access (default — set a role to personalise)",
-        "allowed_slugs": "all",
+        "description": "General access — excludes financial and property data",
+        "allowed_slugs": [
+            "strategy-overview", "greater-goodness",
+            "intro-people", "intro-operations", "intro-digital",
+            "way-of-working",
+            "skills-academy", "the-paddock", "prompt-builder", "hub-assistant",
+            "customers", "store-ops", "buying-hub", "product-intel", "plu-intel",
+            "transport", "analytics-engine",
+            "the-rubric", "approvals", "trending",
+        ],
     },
     "executive": {
-        "display_name": "Executive",
-        "description": "Strategy, initiatives, adoption, and high-level dashboards",
+        "display_name": "Executive / SLT",
+        "description": "Full strategic access — sales, profitability, property, and all dashboards",
         "allowed_slugs": [
-            "intro-goodness", "greater-goodness",
-            "customers",
-            "intro-people",
-            "intro-operations", "sales", "profitability", "revenue-bridge",
-            "intro-digital", "ai-adoption", "mission-control", "adoption",
+            "strategy-overview", "greater-goodness",
+            "intro-people", "intro-operations", "intro-digital",
             "way-of-working",
-            "prompt-builder", "hub-assistant",
-            "store-network", "market-share", "whitespace",
+            "skills-academy", "the-paddock", "prompt-builder", "hub-assistant",
+            "customers", "sales", "profitability", "revenue-bridge",
+            "store-ops", "buying-hub", "product-intel", "plu-intel",
+            "transport", "analytics-engine",
+            "store-network", "market-share", "demographics",
+            "whitespace", "competitor-map", "roce", "cannibalisation",
+            "ai-adoption", "mission-control", "adoption",
         ],
     },
     "store_manager": {
         "display_name": "Store Manager",
-        "description": "Store sales, operations, staff training, and AI tools",
+        "description": "Store operations, staff training, and AI tools",
         "allowed_slugs": [
-            "sales", "store-ops", "profitability", "plu-intel",
+            "store-ops", "plu-intel",
             "prompt-builder", "hub-assistant", "skills-academy", "the-paddock",
             "the-rubric",
         ],
     },
     "buyer": {
         "display_name": "Buyer / Procurement",
-        "description": "Buying, PLU intelligence, product trends, and supply chain",
+        "description": "Buying, PLU intelligence, product trends, supply chain, and data quality",
         "allowed_slugs": [
             "buying-hub", "plu-intel", "product-intel", "transport",
-            "sales", "trending",
+            "trending",
             "prompt-builder", "analytics-engine",
             "skills-academy", "the-paddock",
+            "mdhe-dashboard", "mdhe-issues",
         ],
     },
     "marketing": {
         "display_name": "Marketing",
-        "description": "Customer insights, market share, content tools, and assets",
+        "description": "Customer insights, content tools, and assets",
         "allowed_slugs": [
             "customers", "marketing-assets",
             "prompt-builder", "trending", "analytics-engine",
             "hub-assistant", "skills-academy", "the-paddock",
-            "market-share", "demographics",
         ],
     },
     "people_culture": {
@@ -72,12 +90,22 @@ ROLE_DEFINITIONS = {
     },
     "finance": {
         "display_name": "Finance / Analyst",
-        "description": "Sales, profitability, revenue bridge, and data analysis",
+        "description": "Customers, analytics, and data quality (financial data via SLT access only)",
         "allowed_slugs": [
-            "sales", "profitability", "revenue-bridge",
             "customers", "analytics-engine",
-            "prompt-builder",
-            "store-network", "market-share", "whitespace",
+            "prompt-builder", "hub-assistant",
+            "mdhe-dashboard",
+        ],
+    },
+    "data_quality": {
+        "display_name": "Data / IT",
+        "description": "Master data health, product intel, PLU intel, and data quality",
+        "allowed_slugs": [
+            "mdhe-dashboard", "mdhe-upload", "mdhe-issues",
+            "product-intel", "plu-intel",
+            "analytics-engine",
+            "prompt-builder", "hub-assistant",
+            "skills-academy", "the-paddock",
         ],
     },
     "viewer": {
