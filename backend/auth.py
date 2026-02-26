@@ -176,6 +176,17 @@ def init_auth_db(db_path=None):
             )
             log_auth_event("admin_seeded", admin_email, "", "Admin created from env", conn=conn)
 
+    # Auto-promote SLT members to admin on every startup
+    # Matches by email domain pattern — add specific emails as needed
+    _slt_emails = os.getenv("AUTH_SLT_EMAILS", "").split(",")
+    _slt_emails = [e.strip().lower() for e in _slt_emails if e.strip()]
+    for slt_email in _slt_emails:
+        c.execute(
+            "UPDATE users SET role = 'admin', hub_role = 'admin' "
+            "WHERE lower(email) = ? AND role != 'admin'",
+            (slt_email,),
+        )
+
     conn.commit()
     conn.close()
 
