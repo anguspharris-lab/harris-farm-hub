@@ -86,6 +86,7 @@ _pages = {
     "mdhe-dashboard": st.Page(str(_DIR / "mdhe" / "dashboard.py"), title="MDHE Dashboard", icon="\U0001f3e5", url_path="mdhe-dashboard"),
     "mdhe-upload": st.Page(str(_DIR / "mdhe" / "upload.py"), title="MDHE Upload", icon="\U0001f4e4", url_path="mdhe-upload"),
     "mdhe-issues": st.Page(str(_DIR / "mdhe" / "issues.py"), title="MDHE Issues", icon="\U0001f4cb", url_path="mdhe-issues"),
+    "mdhe-guide": st.Page(str(_DIR / "mdhe" / "guide.py"), title="MDHE Guide", icon="\U0001f4d6", url_path="mdhe-guide"),
     # P5 Digital & AI
     "workflow-engine": st.Page(str(_DIR / "workflow_engine.py"), title="Workflow Engine", icon="\u2699\ufe0f", url_path="workflow-engine"),
     "analytics-engine": st.Page(str(_DIR / "analytics_engine.py"), title="Analytics Engine", icon="\U0001f52c", url_path="analytics-engine"),
@@ -114,7 +115,7 @@ _SECTIONS = [
      "slugs": ["store-network", "market-share", "demographics",
                "whitespace", "competitor-map", "roce", "cannibalisation"]},
     {"name": "MDHE", "icon": "\U0001f3e5", "color": "#E74C3C",
-     "slugs": ["mdhe-dashboard", "mdhe-upload", "mdhe-issues"]},
+     "slugs": ["mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide"]},
     {"name": "Back of House", "icon": "\u2699\ufe0f", "color": "#8899AA",
      "is_muted": True,
      "slugs": ["the-rubric", "approvals", "workflow-engine", "agent-ops",
@@ -163,7 +164,7 @@ _full_nav = {
         "whitespace", "competitor-map", "roce", "cannibalisation",
     ],
     "MDHE": [
-        "mdhe-dashboard", "mdhe-upload", "mdhe-issues",
+        "mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide",
     ],
     "Back of House": [
         "the-rubric", "approvals", "workflow-engine", "agent-ops",

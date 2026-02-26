@@ -32,6 +32,7 @@ ROLE_DEFINITIONS = {
             "customers", "store-ops", "buying-hub", "product-intel", "plu-intel",
             "transport", "analytics-engine",
             "the-rubric", "approvals", "trending",
+            "mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide",
         ],
     },
     "executive": {
@@ -48,6 +49,7 @@ ROLE_DEFINITIONS = {
             "store-network", "market-share", "demographics",
             "whitespace", "competitor-map", "roce", "cannibalisation",
             "ai-adoption", "mission-control", "adoption",
+            "mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide",
         ],
     },
     "store_manager": {
@@ -67,7 +69,7 @@ ROLE_DEFINITIONS = {
             "trending",
             "prompt-builder", "analytics-engine",
             "skills-academy", "the-paddock",
-            "mdhe-dashboard", "mdhe-issues",
+            "mdhe-dashboard", "mdhe-issues", "mdhe-guide",
         ],
     },
     "marketing": {
@@ -94,14 +96,14 @@ ROLE_DEFINITIONS = {
         "allowed_slugs": [
             "customers", "analytics-engine",
             "prompt-builder", "hub-assistant",
-            "mdhe-dashboard",
+            "mdhe-dashboard", "mdhe-guide",
         ],
     },
     "data_quality": {
         "display_name": "Data / IT",
         "description": "Master data health, product intel, PLU intel, and data quality",
         "allowed_slugs": [
-            "mdhe-dashboard", "mdhe-upload", "mdhe-issues",
+            "mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide",
             "product-intel", "plu-intel",
             "analytics-engine",
             "prompt-builder", "hub-assistant",
