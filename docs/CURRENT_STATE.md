@@ -1,91 +1,100 @@
 # Harris Farm Hub -- Current State
 
-**Last Updated:** 2026-02-22
+**Last Updated:** 2026-02-27
 
 ---
 
 ## Architecture
 
 - **Frontend:** Streamlit (single multi-page app via `st.navigation()`)
-- **Backend:** FastAPI on port 8000 (`backend/app.py`, ~103 endpoints)
-- **Entry Point:** `dashboards/app.py` -- runs all 24 pages in one process
-- **Auth:** `shared/auth_gate.py` -- bcrypt + session tokens, site password option
-- **Deployment:** Render (persistent disk, GitHub Releases data loader)
+- **Backend:** FastAPI on port 8000 (`backend/app.py`, ~264 endpoints)
+- **Entry Point:** `dashboards/app.py` -- runs all 43 pages (including Home) in one process
+- **Auth:** `shared/auth_gate.py` → `backend/auth.py` -- bcrypt + session tokens, site password, role-based access
+- **Deployment:** Render (persistent disk, GitHub Releases data loader, non-blocking startup)
 - **Governance:** WATCHDOG 7 Laws, CLAUDE.md SHA-256 verified, `watchdog/audit.log`
+- **Database Tables:** ~105 in `hub_data.db`
 
 ---
 
-## Navigation Structure
+## Navigation Structure -- 6 Purpose-Based Sections (43 pages)
 
 ```
 Home (landing.py)
 |
-+-- For The Greater Goodness (1 page)
-|   +-- Greater Goodness
++-- Strategy (6 pages)
+|   +-- Strategy Overview, Greater Goodness, Growing Legends (intro),
+|   +-- Operations HQ (intro), Digital & AI HQ (intro), Way of Working
 |
-+-- Smashing It for the Customer (2 pages)
-|   +-- Customers
-|   +-- Market Share
++-- Growing Legends (4 pages)
+|   +-- Skills Academy, The Paddock, Prompt Engine, Hub Assistant
 |
-+-- Growing Legendary Leadership (7 pages)
-|   +-- Learning Centre
-|   +-- The Paddock
-|   +-- Academy
-|   +-- Prompt Engine
-|   +-- Approvals
-|   +-- The Rubric
-|   +-- Hub Assistant
++-- Operations (10 pages)
+|   +-- Customer Hub, Sales, Profitability, Revenue Bridge,
+|   +-- Store Ops, Buying Hub, Product Intel, PLU Intelligence,
+|   +-- Transport, Analytics Engine
 |
-+-- Today's Business, Done Better (8 pages)
-|   +-- Sales
-|   +-- Profitability
-|   +-- Revenue Bridge
-|   +-- Store Ops
-|   +-- Buying Hub
-|   +-- Product Intel
-|   +-- PLU Intelligence
-|   +-- Transport
++-- Property (7 pages)
+|   +-- Store Network, Market Share, Demographics,
+|   +-- Whitespace Analysis, Competitor Map, ROCE Analysis, Cannibalisation
 |
-+-- Tomorrow's Business, Built Better (6 pages)
-    +-- Analytics Engine
-    +-- Agent Hub
-    +-- Agent Operations
-    +-- AI Adoption
-    +-- Trending
-    +-- Mission Control
++-- MDHE (4 pages)
+|   +-- MDHE Dashboard, MDHE Upload, MDHE Issues, MDHE Guide
+|
++-- Back of House (11 pages)
+    +-- The Rubric, Approvals, Workflow Engine, Agent Ops,
+    +-- Mission Control, AI Adoption, Adoption, Trending,
+    +-- Agent Hub, Marketing Assets, User Management
 ```
 
 ---
 
 ## Page Inventory
 
-| Page | File | Goals | Status |
-|------|------|-------|--------|
-| Home | `landing.py` | All | LIVE |
-| Greater Goodness | `greater_goodness.py` | G1 | LIVE |
-| Customers | `customer_dashboard.py` | G1, G2 | LIVE |
-| Market Share | `market_share_dashboard.py` | G1, G2 | LIVE |
-| Learning Centre | `learning_centre.py` | G3 | LIVE |
-| The Paddock | `the_paddock.py` | G3 | LIVE |
-| Academy | `growing_legends_academy.py` | G3 | LIVE |
-| Prompt Engine | `prompt_builder.py` | G2, G3 | LIVE |
-| Approvals | `approvals_dashboard.py` | G2, G3 | LIVE |
-| The Rubric | `rubric_dashboard.py` | G3, G5 | LIVE |
-| Hub Assistant | `chatbot_dashboard.py` | G2, G3 | LIVE |
-| Sales | `sales_dashboard.py` | G1, G2, G4 | LIVE |
-| Profitability | `profitability_dashboard.py` | G1, G2, G4 | LIVE |
-| Revenue Bridge | `revenue_bridge_dashboard.py` | G1, G2 | LIVE |
-| Store Ops | `store_ops_dashboard.py` | G2, G4 | LIVE |
-| Buying Hub | `buying_hub_dashboard.py` | G2, G4 | LIVE |
-| Product Intel | `product_intel_dashboard.py` | G2, G4 | LIVE |
-| PLU Intelligence | `plu_intel_dashboard.py` | G2, G4 | LIVE |
-| Transport | `transport_dashboard.py` | G4 | LIVE |
-| Analytics Engine | `analytics_engine.py` | G2, G4 | LIVE |
-| Agent Hub | `agent_hub.py` | G1, G5 | LIVE |
-| Agent Operations | `agent_operations.py` | G1, G5 | LIVE |
-| AI Adoption | `ai_adoption/dashboard.py` | G3, G5 | LIVE |
-| Trending | `trending_dashboard.py` | G5 | LIVE |
-| Mission Control | `hub_portal.py` | G1, G5 | LIVE |
+| Page | File | Section | Status |
+|------|------|---------|--------|
+| Home | `landing.py` | -- | LIVE |
+| Strategy Overview | `strategy_overview.py` | Strategy | LIVE |
+| Greater Goodness | `greater_goodness.py` | Strategy | LIVE |
+| Growing Legends (intro) | `intro_p3_people.py` | Strategy | LIVE |
+| Operations HQ (intro) | `intro_p4_operations.py` | Strategy | LIVE |
+| Digital & AI HQ (intro) | `intro_p5_digital.py` | Strategy | LIVE |
+| Way of Working | `way_of_working/dashboard.py` | Strategy | LIVE |
+| Skills Academy | `skills_academy.py` | Growing Legends | LIVE |
+| The Paddock | `the_paddock.py` | Growing Legends | LIVE |
+| Prompt Engine | `prompt_builder.py` | Growing Legends | LIVE |
+| Hub Assistant | `chatbot_dashboard.py` | Growing Legends | LIVE |
+| Customer Hub | `customer_hub/dashboard.py` | Operations | LIVE |
+| Sales | `sales_dashboard.py` | Operations | LIVE |
+| Profitability | `profitability_dashboard.py` | Operations | LIVE |
+| Revenue Bridge | `revenue_bridge_dashboard.py` | Operations | LIVE |
+| Store Ops | `store_ops_dashboard.py` | Operations | LIVE |
+| Buying Hub | `buying_hub_dashboard.py` | Operations | LIVE |
+| Product Intel | `product_intel_dashboard.py` | Operations | LIVE |
+| PLU Intelligence | `plu_intel_dashboard.py` | Operations | LIVE |
+| Transport | `transport_dashboard.py` | Operations | LIVE |
+| Analytics Engine | `analytics_engine.py` | Operations | LIVE |
+| Store Network | `store_network_page.py` | Property | LIVE |
+| Market Share | `market_share_dashboard.py` | Property | LIVE |
+| Demographics | `demographics_page.py` | Property | LIVE |
+| Whitespace Analysis | `whitespace_analysis.py` | Property | LIVE |
+| Competitor Map | `competitor_map_page.py` | Property | PLACEHOLDER |
+| ROCE Analysis | `roce_dashboard.py` | Property | LIVE |
+| Cannibalisation | `cannibalisation_dashboard.py` | Property | LIVE |
+| MDHE Dashboard | `mdhe/dashboard.py` | MDHE | LIVE |
+| MDHE Upload | `mdhe/upload.py` | MDHE | LIVE |
+| MDHE Issues | `mdhe/issues.py` | MDHE | LIVE |
+| MDHE Guide | `mdhe/guide.py` | MDHE | LIVE |
+| The Rubric | `rubric_dashboard.py` | Back of House | LIVE |
+| Approvals | `approvals_dashboard.py` | Back of House | LIVE |
+| Workflow Engine | `workflow_engine.py` | Back of House | LIVE |
+| Agent Ops | `agent_operations.py` | Back of House | LIVE |
+| Mission Control | `hub_portal.py` | Back of House | LIVE |
+| AI Adoption | `ai_adoption/dashboard.py` | Back of House | LIVE |
+| Adoption | `adoption_dashboard.py` | Back of House | LIVE |
+| Trending | `trending_dashboard.py` | Back of House | LIVE |
+| Agent Hub | `agent_hub.py` | Back of House | LIVE |
+| Marketing Assets | `marketing_assets.py` | Back of House | LIVE |
+| User Management | `mdhe/user_management.py` | Back of House | LIVE |
 
 ---
 
@@ -100,7 +109,34 @@ Home (landing.py)
 | Market Share | `harris_farm.db` | 77K | SQLite |
 | Customers | `harris_farm.db` | 17K | SQLite |
 | PLU Results | `harris_farm_plu.db` | 27.3M | SQLite |
-| Hub State | `hub_data.db` | 38 tables | SQLite |
+| Hub State | `hub_data.db` | ~105 tables | SQLite |
+| Census | `data/census/processed/` | -- | ABS SA1-to-postcode demographic data |
+| CBAS Network | `data/cbas_network.json` | 31 stores, 16 whitespace | JSON |
+| Property Intel | `data/outputs/roc/`, `market_share/`, `demographics/` | -- | CSV/Parquet |
+
+---
+
+## Role-Based Access Control
+
+- **10 roles:** admin, user, executive, store_manager, buyer, marketing, people_culture, finance, data_quality, viewer
+- **Defined in:** `dashboards/shared/role_config.py`
+- **SLT auto-promotion:** Members listed in `AUTH_SLT_EMAILS` env var are auto-promoted to admin on login
+- **Enforcement:** Role checks applied at navigation level -- pages are shown/hidden based on user role
+
+### Access Matrix
+
+| Section | admin | executive | user | store_manager | buyer | finance | data_quality | viewer |
+|---------|-------|-----------|------|---------------|-------|---------|--------------|--------|
+| Strategy | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| Growing Legends | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| Operations (general) | Yes | Yes | Yes | Yes | Yes | Partial | Partial | Partial |
+| Operations (financial) | Yes | Yes | No | No | No | No | No | No |
+| Property | Yes | Yes | No | No | No | No | No | No |
+| MDHE | Yes | Yes | Yes | Partial | Partial | Partial | Yes | No |
+| Back of House | Yes | Yes | Partial | Partial | Partial | Partial | Partial | No |
+| User Management | Yes | No | No | No | No | No | No | No |
+
+Financial data (Sales, Profitability, Revenue Bridge) and Property data (Store Network, Market Share, Demographics, Whitespace, ROCE, Cannibalisation) are restricted to admin and executive roles only.
 
 ---
 
@@ -121,16 +157,62 @@ The landing page (`dashboards/landing.py`) serves as Mission Control with 7 sect
 Every dashboard shows its goal alignment in the header via `render_header(goals=, strategy_context=)`:
 - Coloured goal badges (G1 green, G2 blue, G3 purple, G4 amber, G5 red)
 - One-line strategy context connecting the data to "Fewer, Bigger, Better"
-- 23 pages tagged with relevant goals
+- 43 pages tagged with relevant goals
 - Function in `shared/styles.py`, backward compatible (goals param optional)
+
+---
+
+## MDHE -- Master Data Health Engine
+
+The MDHE is a 4-page data quality system with a backend validation engine.
+
+### Pages
+
+- **MDHE Dashboard** (`mdhe/dashboard.py`): 5-tab health score overview across all data domains
+- **MDHE Upload** (`mdhe/upload.py`): Data upload and ingestion pipeline
+- **MDHE Issues** (`mdhe/issues.py`): Issue tracker for data quality problems
+- **MDHE Guide** (`mdhe/guide.py`): Team documentation and onboarding
+
+### Architecture
+
+- **4-layer validation:** Rules (35%), Standards (30%), AI (20%), Reconciliation (15%)
+- **5 domains scored:** PLU, Barcode, Pricing, Hierarchy, Supplier
+- **Frontend:** `dashboards/mdhe/` (dashboard.py, upload.py, issues.py, guide.py, engine.py, user_management.py)
+- **Backend:** `backend/mdhe_db.py`, `backend/mdhe_api.py`
+- **Database:** 6 tables in `hub_data.db` (mdhe_data_sources, mdhe_validations, mdhe_scores, mdhe_issues, mdhe_scan_results, mdhe_plu_master)
+
+---
+
+## Property Intelligence Engine
+
+The Property Intelligence Engine provides location analytics, demographic profiling, and expansion planning across 7 pages.
+
+### Pages
+
+- **Store Network** (`store_network_page.py`): 8 tabs -- network overview, individual store profiles, trade area analysis
+- **Market Share** (`market_share_dashboard.py`): Postcode-level CBAS market share analysis
+- **Demographics** (`demographics_page.py`): 6 tabs -- ABS census demographic profiling by postcode
+- **Whitespace Analysis** (`whitespace_analysis.py`): 6 tabs -- expansion opportunity identification
+- **Competitor Map** (`competitor_map_page.py`): Placeholder -- competitive landscape mapping
+- **ROCE Analysis** (`roce_dashboard.py`): Return on capital employed by store
+- **Cannibalisation** (`cannibalisation_dashboard.py`): Store overlap and cannibalisation risk
+
+### Data Pipeline
+
+- **Data modules:** `shared/property_intel.py`, `shared/demographic_intel.py`, `shared/whitespace_data.py`
+- **Census processing:** `scripts/process_census.py` (ABS SA1 to postcode), `scripts/demographic_scoring.py`
+- **Data outputs:** `data/outputs/roc/`, `data/outputs/market_share/`, `data/outputs/demographics/`
+- **Census data:** `data/census/processed/` (4 parquet/csv files, 2.8MB) -- raw zips in gitignore
+- **CBAS network:** `data/cbas_network.json` (31 stores, 16 whitespace opportunities)
+- **ROC analysis:** Ring of Confidence scoring for store trade areas
 
 ---
 
 ## Learning Features
 
-- **Learning Centre** (`learning_centre.py`): 12 modules (L1-L4, D1-D4, K1-K4), 5 tabs
-- **Academy** (`growing_legends_academy.py`): 6 maturity levels (Seed to Legend), 7 prompt patterns, 6 learning paths, 5 arena challenges, 10 tabs, site quality rubrics. **Gamification Engine:** XP system (13 action types, 6 levels), streak tracking (1.0-2.0x multiplier), 60 daily challenges, 21 badges, leaderboard. Backend: `academy_engine.py`, 5 tables, 10 `/api/academy/` endpoints.
-- **Prompt Engine** (`prompt_builder.py`): 20 role-filtered task templates, PtA workflow (generate → score → iterate → annotate → submit → approve)
+- **Skills Academy** (`skills_academy.py`): 6 maturity levels (Seed to Legend), 7 prompt patterns, 6 learning paths, 5 arena challenges, 10 tabs, site quality rubrics. **Gamification Engine:** XP system (13 action types, 6 levels), streak tracking (1.0-2.0x multiplier), 60 daily challenges, 21 badges, leaderboard. Backend: `academy_engine.py`, 5 tables, 10 `/api/academy/` endpoints.
+- **The Paddock** (`the_paddock.py`): AI practice conversations -- structured prompt practice environment
+- **Prompt Engine** (`prompt_builder.py`): 20 role-filtered task templates, PtA workflow (generate, score, iterate, annotate, submit, approve)
 - **Approvals** (`approvals_dashboard.py`): Managers review, approve, or request changes on PtA submissions
 - **Hub Assistant** (`chatbot_dashboard.py`): 545 knowledge base articles, full-text search + RAG chat
 
@@ -146,16 +228,26 @@ Every dashboard shows its goal alignment in the header via `render_header(goals=
 
 ---
 
-## Supply Chain (Pillar 4)
+## Supply Chain (Operations)
 
-Seven dashboards serve operations and supply chain:
-- Sales, Profitability, Transport -- weekly aggregated data
+Ten dashboards serve operations and supply chain:
+- Customer Hub, Sales, Profitability, Revenue Bridge -- customer and financial intelligence
 - Store Ops, Buying Hub, Product Intel -- 383M transaction-level intelligence
 - PLU Intelligence -- 27.3M PLU-level wastage, shrinkage, margins
+- Transport -- logistics and delivery operations
+- Analytics Engine -- natural language query interface
 
 Grant Enders engaged for supply chain transformation. OOS reduction target 20% by Jun 2026.
 
 Agent system runs 11 analysis types including basket, stockout, demand, slow_movers, halo_effect, specials_uplift, margin_analysis.
+
+---
+
+## Workflow Engine
+
+- **Workflow Engine** (`workflow_engine.py`): 4P state machine for proposal lifecycle management
+- Supports multi-stage approval workflows with role-based routing
+- Integrates with PtA system and agent proposals
 
 ---
 
@@ -187,8 +279,8 @@ The PtA system is the core workflow for making Harris Farm a data-first business
 - **20 task templates** across 11 roles (store performance, waste analysis, board paper, category review, etc.)
 - **8-criteria rubric**: Audience Fit, Storytelling, Actionability, Visual Quality, Completeness, Brevity, Data Integrity, Honesty
 - **5-tier advanced rubric**: CTO Panel, CLO Panel, Strategic Alignment, Implementation Readiness, Presentation Quality
-- **Approval routing**: L1 Team → L2 Department → L3 Executive → L4 Board (mapped by role)
-- **AI Ninja gamification**: Prompt Apprentice (0-100pts) → Specialist (101-500) → Master (501-2000) → AI Ninja (2001+)
+- **Approval routing**: L1 Team, L2 Department, L3 Executive, L4 Board (mapped by role)
+- **AI Ninja gamification**: Prompt Apprentice (0-100pts), Specialist (101-500), Master (501-2000), AI Ninja (2001+)
 - **10 API endpoints**: generate, score, submit, list/get submissions, approve, request-changes, user-stats, leaderboard
 - **3 database tables**: pta_submissions, pta_audit_log, pta_points_log
 - **Auto-save**: Prompts scoring 9.0+ auto-saved to library with 200 bonus points
@@ -199,8 +291,9 @@ The PtA system is the core workflow for making Harris Farm a data-first business
 
 - WATCHDOG Safety LLM analysis built but not integrated into approval flow
 - Risk level auto-assessment field exists but not auto-populated
-- Role-Based Access Control designed but not enforced on endpoints
+- Competitor Map page is placeholder only -- no data integration yet
 - Arena UI is minimal (tables + API exist, 12 proposals)
-- PtA data validation layer is directional (confidence badges) — not yet cross-source validated
+- PtA data validation layer is directional (confidence badges) -- not yet cross-source validated
 - PtA email notifications on approval not yet implemented
 - PtA escalation workflow placeholder only ("Coming soon")
+- Market Share page uses CBAS modelled estimates -- dollar values are directional, not actual revenue

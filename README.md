@@ -1,8 +1,8 @@
 # Harris Farm Hub — AI Centre of Excellence
 
-> **19 dashboards. One platform. Zero complexity.**
+> **43 pages. One platform. Zero complexity.**
 
-The Hub is Harris Farm Markets' centralized AI platform — Sales, Profitability, Customer Analytics, Market Share, Transport, Store Ops, Product Intel, and more — all powered by 383M POS transactions, wrapped in a single Streamlit app with shared authentication.
+The Hub is Harris Farm Markets' centralized AI platform — Sales, Profitability, Customer Analytics, Market Share, Property Intelligence, MDHE, Transport, Store Ops, Product Intel, and more — all powered by 383M POS transactions, wrapped in a single Streamlit app with shared authentication.
 
 **Live:** https://harris-farm-hub.onrender.com
 
@@ -33,34 +33,37 @@ Browser (any device)
     v
 Streamlit Multi-Page App (port 8500)
     dashboards/app.py
-    |-- Auth gate (shared login)
-    |-- 17 page modules (sales, profitability, customers, etc.)
+    |-- Auth gate (shared login + role-based access)
+    |-- 43 page modules (sales, profitability, customers, property, MDHE, etc.)
     |-- Shared styles, filters, components
     |
     v
 FastAPI Backend (port 8000)
     backend/app.py
-    |-- 80+ API endpoints
-    |-- Auth (bcrypt, session tokens)
+    |-- ~264 API endpoints
+    |-- Auth (bcrypt, session tokens, role management)
     |-- Natural language query engine
     |-- Multi-LLM orchestration (Claude, GPT, Grok)
+    |-- MDHE validation engine
     |
     v
 Data Layer
-    |-- harris_farm.db (SQLite, 399MB) — weekly sales, customers, market share
+    |-- harris_farm.db (SQLite, 418MB) — weekly sales, customers, market share
+    |-- harris_farm_plu.db (SQLite, 3.1GB) — PLU weekly results (27.3M rows)
     |-- FY24/25/26.parquet (DuckDB) — 383M POS transactions
-    |-- hub_data.db (SQLite) — app state, knowledge base, chat history
+    |-- hub_data.db (SQLite, ~105 tables) — app state, auth, MDHE, gamification, agents
 ```
 
-### Dashboards (19 pages, 5 pillars)
+### Pages (43 pages, 6 sections)
 
-| Pillar | Pages |
-|--------|-------|
-| For The Greater Goodness | Greater Goodness |
-| Smashing It for the Customer | Customers, Market Share |
-| Growing Legendary Leadership | Learning Centre, Hub Assistant |
-| Today's Business, Done Better | Sales, Profitability, Transport, Store Ops, Buying Hub, Product Intel |
-| Tomorrow's Business, Built Better | Prompt Builder, The Rubric, Trending, Revenue Bridge, Hub Portal |
+| Section | Pages |
+|---------|-------|
+| Strategy | Strategy Overview, Greater Goodness, Growing Legends, Operations HQ, Digital & AI HQ, Way of Working |
+| Growing Legends | Skills Academy, The Paddock, Prompt Engine, Hub Assistant |
+| Operations | Customer Hub, Sales, Profitability, Revenue Bridge, Store Ops, Buying Hub, Product Intel, PLU Intelligence, Transport, Analytics Engine |
+| Property | Store Network, Market Share, Demographics, Whitespace Analysis, Competitor Map, ROCE Analysis, Cannibalisation |
+| MDHE | MDHE Dashboard, MDHE Upload, MDHE Issues, MDHE Guide |
+| Back of House | The Rubric, Approvals, Workflow Engine, Agent Ops, Mission Control, AI Adoption, Adoption, Trending, Agent Hub, Marketing Assets, User Management |
 
 ---
 
@@ -74,8 +77,8 @@ The Hub is deployed to Render at https://harris-farm-hub.onrender.com. Everythin
 2. **Start step:** `bash render_start.sh` which:
    - Links persistent disk at `/data`
    - Downloads data files from GitHub Releases (first deploy only, ~7.2GB)
-   - Starts FastAPI backend on port 8000
-   - Starts Streamlit on Render's PORT
+   - Starts Streamlit immediately on Render's PORT
+   - Starts FastAPI backend on port 8000 (polls for readiness in background)
 
 ### Render service config
 
@@ -101,6 +104,8 @@ The Hub is deployed to Render at https://harris-farm-hub.onrender.com. Everythin
 | `AUTH_SITE_PASSWORD` | Shared access code for the team |
 | `AUTH_ADMIN_EMAIL` | Admin user email |
 | `AUTH_ADMIN_PASSWORD` | Admin user password |
+| `AUTH_SLT_EMAILS` | Comma-separated SLT emails for auto-admin promotion |
+| `AUTH_SESSION_TIMEOUT` | Session timeout in seconds (default: 86400) |
 
 ### Data files
 
@@ -108,7 +113,8 @@ Data is stored in a GitHub Release (`data-v1`) and auto-downloaded on first depl
 
 | File | Size | Contents |
 |------|------|----------|
-| `harris_farm.db` | 399MB | Weekly sales, customers, market share |
+| `harris_farm.db` | 418MB | Weekly sales, customers, market share |
+| `harris_farm_plu.db` | 3.1GB | PLU weekly results (27.3M rows, 3 fiscal years, 43 stores) |
 | `FY24.parquet` | 2.3GB | POS transactions Jul 2023 - Jun 2024 (134M rows) |
 | `FY25.parquet` | 2.7GB | POS transactions Jul 2024 - Jun 2025 (149M rows) |
 | `FY26.parquet` | 1.7GB | POS transactions Jul 2025 - Feb 2026 (99M rows) |
@@ -184,9 +190,10 @@ With `AUTH_ENABLED=false`, the auth gate is bypassed and you go straight to the 
 The following must be in `data/` for data-dependent dashboards:
 
 - `harris_farm.db` — required for Sales, Profitability, Market Share, Landing
+- `harris_farm_plu.db` — required for PLU Intelligence
 - `data/transactions/FY*.parquet` — required for Customer, Store Ops, Product Intel, Buying Hub, Revenue Bridge
 
-AI dashboards (Prompt Builder, Rubric, Hub Assistant, Learning Centre) work without data files.
+AI dashboards (Prompt Engine, Rubric, Hub Assistant, Skills Academy) work without data files.
 
 ---
 
@@ -204,19 +211,42 @@ harris-farm-hub/
     transport_dashboard.py      # Transport costs
     store_ops_dashboard.py      # Store operations
     product_intel_dashboard.py  # Product-level analytics
+    plu_intel_dashboard.py      # PLU intelligence
     buying_hub_dashboard.py     # Buying analysis
     revenue_bridge_dashboard.py # Revenue bridge
+    analytics_engine.py         # Analytics engine
     chatbot_dashboard.py        # Hub Assistant (RAG chatbot)
-    learning_centre.py          # Training content
-    prompt_builder.py           # Custom prompt designer
+    skills_academy.py           # Skills Academy (Growing Legends)
+    the_paddock.py              # The Paddock
+    prompt_engine.py            # Prompt Engine
     rubric_dashboard.py         # Multi-LLM evaluation
     trending_dashboard.py       # Usage analytics
     hub_portal.py               # Documentation portal
     greater_goodness.py         # Sustainability
+    strategy_overview.py        # Strategy Overview
+    way_of_working.py           # Way of Working
+    store_network.py            # Store Network (Property)
+    whitespace_analysis.py      # Whitespace Analysis (Property)
+    demographics.py             # Demographics (Property)
+    competitor_map.py           # Competitor Map (Property)
+    approvals.py                # Approvals workflow
+    workflow_engine.py          # Workflow Engine
+    agent_ops.py                # Agent Ops
+    mission_control.py          # Mission Control
+    ai_adoption.py              # AI Adoption
+    marketing_assets.py         # Marketing Assets
+    user_management.py          # User Management
+    mdhe/
+      mdhe_dashboard.py         # MDHE Dashboard
+      mdhe_upload.py            # MDHE Upload
+      mdhe_issues.py            # MDHE Issues
+      mdhe_guide.py             # MDHE Guide
+      mdhe_engine.py            # MDHE validation engine
     nav.py                      # Legacy nav data (used by landing)
     shared/
       auth_gate.py              # Login/register UI + session management
       styles.py                 # Shared CSS + header/footer
+      role_config.py            # Role definitions + page permissions
       fiscal_selector.py        # 5-4-4 fiscal calendar picker
       hierarchy_filter.py       # Product hierarchy drill-down
       time_filter.py            # Time/hour range filter
@@ -224,17 +254,36 @@ harris-farm-hub/
       stores.py                 # Store list constants
       data_access.py            # SQLite helpers
   backend/
-    app.py                      # FastAPI server (112 endpoints)
+    app.py                      # FastAPI server (~264 endpoints)
     auth.py                     # Authentication (bcrypt, sessions)
     fiscal_calendar.py          # 5-4-4 fiscal calendar logic
     transaction_layer.py        # DuckDB parquet query engine
     transaction_queries.py      # Pre-built transaction queries
     product_hierarchy.py        # Product hierarchy lookups
-    hub_data.db                 # App state database
+    mdhe_db.py                  # MDHE database schema
+    mdhe_api.py                 # MDHE API endpoints
+    hub_data.db                 # App state database (~105 tables)
   data/
-    harris_farm.db              # Main analytics database
+    harris_farm.db              # Main analytics database (418MB)
+    harris_farm_plu.db          # PLU analytics database (3.1GB)
     transactions/               # POS transaction parquets
+    census/                     # ABS census data (processed)
+    outputs/                    # Generated analysis outputs
+    cbas_network.json           # CBAS store network data
     *.csv                       # Reference data files
+  shared/
+    property_intel.py           # Property intelligence data module
+    demographic_intel.py        # Demographic intelligence
+    whitespace_data.py          # Whitespace analysis data
+  scripts/
+    process_census.py           # ABS SA1 to postcode processing
+    demographic_scoring.py      # Demographic scoring engine
+  docs/
+    RUNBOOK.md                  # Operations runbook
+    USER_GUIDE.md               # Team user guide
+    API_REFERENCE.md            # API documentation
+    DIMENSION_MAPPING.md        # Data pipeline mapping
+    MDHE_GUIDE.md               # MDHE team guide
   data_loader.py                # Downloads data from GitHub Releases
   render_start.sh               # Render startup script
   render.yaml                   # Render service config
@@ -249,11 +298,11 @@ harris-farm-hub/
 The Hub uses a two-layer auth system:
 
 1. **Site access code** — shared password you give the team (set via `AUTH_SITE_PASSWORD`)
-2. **Individual accounts** — email + password per user
+2. **Individual accounts** — email + password per user, with role-based access
 
-On first deploy, an admin account is created from `AUTH_ADMIN_EMAIL` / `AUTH_ADMIN_PASSWORD` env vars.
+On first deploy, an admin account is created from `AUTH_ADMIN_EMAIL` / `AUTH_ADMIN_PASSWORD` env vars. Users listed in `AUTH_SLT_EMAILS` are automatically promoted to admin on login.
 
-Users can create their own accounts (requires the site access code).
+Users can create their own accounts (requires the site access code). Role-based access controls which pages each user can see.
 
 Set `AUTH_ENABLED=false` to bypass all auth (local dev).
 

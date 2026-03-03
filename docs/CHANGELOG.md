@@ -4,6 +4,81 @@
 
 ---
 
+## [3.9.0] - 2026-02-27
+
+### Added
+- **Master Data Health Engine (MDHE)** — 4-layer validation system for product master data quality
+  - `dashboards/mdhe/dashboard.py`: 5-tab health dashboard (Health Overview, Validation Detail, Scan Verification, Trends & History, AI Insights)
+  - `dashboards/mdhe/upload.py`: CSV/Excel data upload with preview, column mapping, auto-validation
+  - `dashboards/mdhe/issues.py`: Issue tracker with open/in-progress/resolved workflow
+  - `dashboards/mdhe/guide.py`: Team documentation page rendering docs/MDHE_GUIDE.md
+  - `dashboards/mdhe/engine.py`: 4-layer validation engine — Rules (35%), Standards (30%), AI heuristic (20%), Reconciliation (15%)
+  - `backend/mdhe_db.py`: Database schema & CRUD — 6 tables (mdhe_data_sources, mdhe_validations, mdhe_scores, mdhe_issues, mdhe_scan_results, mdhe_plu_master)
+  - `backend/mdhe_api.py`: 10 API endpoints under /api/mdhe/ (scores, history, validations, issues, scan-results, plu-records, sources, seed-demo, clear-demo)
+  - 5 domain scoring: PLU, Barcode, Pricing, Hierarchy, Supplier — each scored 0-100
+  - EAN-13 barcode check digit validation, price reasonableness, hierarchy integrity checks
+  - Demo data seeding for testing (10 PLUs with deliberate quality issues, is_dummy=1 flag for cleanup)
+  - MDHE as dedicated nav section with red (#E74C3C) colour
+- **User Management page** (`dashboards/mdhe/user_management.py`) — admin-only page for managing Hub users
+  - View all registered users with role, status, last login
+  - Change user hub_role via dropdown (selects from role_config.py definitions)
+  - Deactivate users (skip for current admin)
+  - Role Summary tab showing user counts per role
+  - Accessible only to admin role users
+- **Role-Based Access Control hardening** — restricted financial and property data
+  - `user` role changed from "all pages" to explicit allowed list excluding sales, profitability, property data
+  - Added `_RESTRICTED_SLUGS` constant: sales, profitability, revenue-bridge, store-network, market-share, demographics, whitespace, competitor-map, roce, cannibalisation
+  - Only admin and executive roles can see restricted pages
+  - New `data_quality` role for Data/IT team (all MDHE pages + product-intel, plu-intel)
+- **SLT auto-promotion** — `AUTH_SLT_EMAILS` env var processed on every backend startup
+  - Comma-separated list of emails auto-promoted to admin role
+  - Ensures key leadership always has full access regardless of registration flow
+- **MDHE Guide** (`docs/MDHE_GUIDE.md`) — comprehensive team documentation for data requests, upload instructions, score interpretation
+
+### Changed
+- Pages: 36 → 43 (added 4 MDHE pages + User Management + ROCE + Cannibalisation)
+- Navigation sections: 5 → 6 (added MDHE section)
+- API endpoints: ~243 → ~264 (added 10 MDHE + admin auth endpoints)
+- Database tables: ~98 → ~105 (6 MDHE tables + auth migrations)
+- `dashboards/shared/role_config.py`: Major rewrite — user role now explicit list, added data_quality role, MDHE slugs added to relevant roles
+- `backend/auth.py`: Added hub_role to list_users(), update_user(); added SLT auto-promotion in init_auth_db()
+- `backend/app.py`: Mounted MDHE API router, added MDHE db init to lifespan
+- `render_start.sh`: Creates mdhe_uploads directory on persistent disk
+- All MDHE files consolidated into `dashboards/mdhe/` subfolder
+
+---
+
+## [3.8.0] - 2026-02-25
+
+### Added
+- **Property Intelligence Engine** — 6-phase build for store network analysis and expansion planning
+  - `dashboards/store_network_page.py`: Store Network dashboard with 8 tabs (Overview, Performance, Geography, Trade Areas, Competition, Demographics, Trends, Data Quality)
+  - `dashboards/whitespace_analysis.py`: Whitespace Analysis dashboard with 6 tabs (Opportunity Map, Scoring, Demographics, Cannibalisation Risk, Financial Model, Summary)
+  - `dashboards/demographics_page.py`: Demographics dashboard with 6 tabs (Overview, Income, Occupation, Age, Household, Comparison)
+  - `dashboards/market_share_page.py`: Market Share placeholder page
+  - `dashboards/competitor_map_page.py`: Competitor Map placeholder page
+  - `dashboards/roce_dashboard.py`: ROCE Analysis dashboard
+  - `dashboards/cannibalisation_dashboard.py`: Cannibalisation risk analysis
+  - `shared/property_intel.py`: Property intelligence data module — ROC scoring, store profiles, trade area analysis
+  - `shared/demographic_intel.py`: Demographic intelligence module — ABS census integration, occupation/income/age profiles
+  - `shared/whitespace_data.py`: Whitespace opportunity data — 16 identified expansion sites
+  - `scripts/process_census.py`: ABS SA1→postcode census data processing
+  - `scripts/demographic_scoring.py`: Demographic similarity scoring for expansion targets
+- **Census data integration** — processed ABS 2021 Census data
+  - 4 output files in data/census/processed/ (parquet + csv, 2.8MB)
+  - Occupation, income, age, household composition at postcode level
+  - G60B person-level occupation totals for workforce profiling
+- **CBAS network data** — data/cbas_network.json with 31 stores and 16 whitespace opportunities
+- **Property as dedicated nav section** — 7 pages with cyan (#06B6D4) colour
+
+### Changed
+- Pages: 33 → 36 (added 7 property pages, some overlap with existing Market Share)
+- Navigation: Added "Property" section between Operations and Back of House
+- Dark theme improvements: Swept light colours across all pages for brand consistency
+- Render startup: Non-blocking — Streamlit starts immediately, backend polls in background (was blocking 60s+)
+
+---
+
 ## [3.7.0] - 2026-02-23
 
 ### Added

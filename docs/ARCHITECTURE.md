@@ -1,6 +1,6 @@
 # Harris Farm Hub — Architecture
 
-*Last Updated: 2026-02-22 (v3.5 — Academy Gamification Engine)*
+*Last Updated: 2026-02-27 (v3.8 — MDHE + Property Intelligence + Role-Based Access)*
 
 ---
 
@@ -22,8 +22,13 @@
          │  └─────────────────────────────┘    │
          │                                     │
          │  ┌─────────────────────────────┐    │
+         │  │ Role-Based Page Filtering   │    │
+         │  │ hub_role → allowed_slugs    │    │
+         │  └─────────────────────────────┘    │
+         │                                     │
+         │  ┌─────────────────────────────┐    │
          │  │ st.navigation() router      │    │
-         │  │ 24 pages across 5 pillars   │    │
+         │  │ 43 pages across 6 sections  │    │
          │  └─────────────────────────────┘    │
          │                                     │
          │  Shared: styles, fiscal selector,   │
@@ -33,21 +38,28 @@
                         v
          ┌─────────────────────────────────────┐
          │     FastAPI Backend                 │
-         │     backend/app.py (~103 endpoints)   │
+         │     backend/app.py (~264 endpoints) │
          │                                     │
          │  Auth    NL Query   Multi-LLM       │
          │  Agent Executor   Self-Improvement  │
+         │  MDHE   Property Intel   Roles      │
          └──────┬──────────────┬───────────────┘
                 │              │
        ┌────────┘              └────────┐
        v                                v
-┌──────────────┐              ┌─────────────────┐
-│ SQLite       │              │ DuckDB          │
-│              │              │ (in-process)    │
-│ harris_farm  │              │ 383M txns       │
-│ .db (399MB)  │              │ via parquet     │
-│ hub_data.db  │              │ FY24/25/26      │
-└──────────────┘              └─────────────────┘
+┌──────────────────┐           ┌─────────────────┐
+│ SQLite            │           │ DuckDB          │
+│                   │           │ (in-process)    │
+│ harris_farm.db    │           │ 383M txns       │
+│ (418MB)           │           │ via parquet     │
+│                   │           │ FY24/25/26      │
+│ harris_farm_plu   │           └─────────────────┘
+│ .db (3.1GB)       │
+│                   │           ┌─────────────────┐
+│ hub_data.db       │           │ Census Data     │
+│ (~105 tables)     │           │ ABS demographic │
+│                   │           │ SA1→postcode    │
+└──────────────────┘           └─────────────────┘
 ```
 
 ---
@@ -68,58 +80,83 @@
 
 ---
 
-## Pages by Pillar
+## Pages by Section
 
-### For The Greater Goodness
+### Strategy (6 pages)
 | Page | File | Data Source |
 |------|------|------------|
+| Strategy Overview | `strategy_overview.py` | Static content |
 | Greater Goodness | `greater_goodness.py` | Static content |
+| Growing Legends (intro) | `intro_p3_people.py` | Static content |
+| Operations HQ (intro) | `intro_p4_operations.py` | Static content |
+| Digital & AI HQ (intro) | `intro_p5_digital.py` | Static content |
+| Way of Working | `way_of_working/dashboard.py` | Monday.com API |
 
-### Smashing It for the Customer
+### Growing Legends (4 pages)
 | Page | File | Data Source |
 |------|------|------------|
-| Customers | `customer_dashboard.py` | Transactions (DuckDB) |
-| Market Share | `market_share_dashboard.py` | harris_farm.db |
+| Skills Academy | `skills_academy.py` | XP system, gamification (hub_data.db) |
+| The Paddock | `the_paddock.py` | AI practice conversations |
+| Prompt Engine | `prompt_builder.py` | 20 task templates, PtA workflow (hub_data.db) |
+| Hub Assistant | `chatbot_dashboard.py` | Knowledge base (545 articles) |
 
-### Growing Legendary Leadership
+### Operations (10 pages)
 | Page | File | Data Source |
 |------|------|------------|
-| Learning Centre | `learning_centre.py` | 12 modules, API |
-| The Paddock | `the_paddock.py` | Practice AI conversations |
-| Academy | `growing_legends_academy.py` | Capability journey (hub_data.db) |
-| Prompt Builder | `prompt_builder.py` | API (templates) |
-| The Rubric | `rubric_dashboard.py` | API (multi-LLM) |
-| Hub Assistant | `chatbot_dashboard.py` | Knowledge base (API) |
-
-### Today's Business, Done Better
-| Page | File | Data Source |
-|------|------|------------|
+| Customer Hub | `customer_hub/dashboard.py` | Transactions (DuckDB) |
 | Sales | `sales_dashboard.py` | harris_farm.db |
 | Profitability | `profitability_dashboard.py` | harris_farm.db |
 | Revenue Bridge | `revenue_bridge_dashboard.py` | Transactions (DuckDB) |
 | Store Ops | `store_ops_dashboard.py` | Transactions (DuckDB) |
-| Buying Hub | `buying_hub_dashboard.py` | Transactions (DuckDB) |
-| Product Intel | `product_intel_dashboard.py` | Transactions (DuckDB) |
+| Buying Hub | `buying_hub_dashboard.py` | Transactions + Hierarchy |
+| Product Intel | `product_intel_dashboard.py` | Transactions + Hierarchy |
 | PLU Intelligence | `plu_intel_dashboard.py` | harris_farm_plu.db |
 | Transport | `transport_dashboard.py` | harris_farm.db |
+| Analytics Engine | `analytics_engine.py` | hub_data.db + harris_farm.db |
 
-### Tomorrow's Business, Built Better
+### Property (7 pages)
 | Page | File | Data Source |
 |------|------|------------|
-| Analytics Engine | `analytics_engine.py` | Data Intelligence (hub_data.db + harris_farm.db) |
-| Agent Hub | `agent_hub.py` | Scoreboard, Arena, Agent Network (hub_data.db) |
-| Agent Operations | `agent_operations.py` | WATCHDOG safety & agent control (hub_data.db) |
-| AI Adoption | `ai_adoption/dashboard.py` | Platform usage metrics (hub_data.db) |
-| Trending | `trending_dashboard.py` | API (analytics) |
-| Mission Control | `hub_portal.py` | Docs, data catalog, showcase, self-improvement |
+| Store Network | `store_network_page.py` | Census + CBAS data |
+| Market Share | `market_share_page.py` | harris_farm.db |
+| Demographics | `demographics_page.py` | Census data |
+| Whitespace Analysis | `whitespace_analysis.py` | Census + CBAS data |
+| Competitor Map | `competitor_map_page.py` | Placeholder |
+| ROCE Analysis | `roce_dashboard.py` | harris_farm.db |
+| Cannibalisation | `cannibalisation_dashboard.py` | CBAS data |
+
+### MDHE (4 pages)
+| Page | File | Data Source |
+|------|------|------------|
+| MDHE Dashboard | `mdhe/dashboard.py` | hub_data.db (MDHE tables) |
+| MDHE Upload | `mdhe/upload.py` | hub_data.db + file uploads |
+| MDHE Issues | `mdhe/issues.py` | hub_data.db |
+| MDHE Guide | `mdhe/guide.py` | docs/MDHE_GUIDE.md |
+
+### Back of House (11 pages)
+| Page | File | Data Source |
+|------|------|------------|
+| The Rubric | `rubric_dashboard.py` | Multi-LLM comparison |
+| Approvals | `approvals_dashboard.py` | PtA submissions (hub_data.db) |
+| Workflow Engine | `workflow_engine.py` | 4P state machine (hub_data.db) |
+| Agent Operations | `agent_operations.py` | WATCHDOG safety (hub_data.db) |
+| Mission Control | `hub_portal.py` | Docs, catalog, self-improvement |
+| AI Adoption | `ai_adoption/dashboard.py` | Usage metrics |
+| Adoption | `adoption_dashboard.py` | Page views |
+| Trending | `trending_dashboard.py` | System analytics |
+| Agent Hub | `agent_hub.py` | Scoreboard, Arena |
+| Marketing Assets | `marketing_assets.py` | Brand files |
+| User Management | `mdhe/user_management.py` | Admin user/role mgmt |
 
 ---
 
 ## Data Layer
 
-### harris_farm.db (SQLite, 399MB)
+### harris_farm.db (SQLite, 418MB)
 
-Weekly aggregated data. `sales` table uses a MEASURE-DIMENSION pattern:
+Weekly aggregated data — sales, customers, market share.
+
+`sales` table uses a MEASURE-DIMENSION pattern:
 
 | measure | What `value` means |
 |---------|-------------------|
@@ -131,6 +168,10 @@ Weekly aggregated data. `sales` table uses a MEASURE-DIMENSION pattern:
 
 Also contains: `customers` (17K rows), `market_share` (77K rows).
 
+### harris_farm_plu.db (SQLite, 3.1GB)
+
+27.3M PLU weekly results across 3 fiscal years and 43 stores.
+
 ### Transaction Parquets (DuckDB, 383M rows)
 
 | File | Period | Rows |
@@ -141,9 +182,17 @@ Also contains: `customers` (17K rows), `market_share` (77K rows).
 
 Accessed via `backend/transaction_layer.py` using DuckDB's zero-copy parquet reader.
 
-### hub_data.db (SQLite, app state)
+### hub_data.db (SQLite, ~105 tables)
 
-Queries, responses, evaluations, prompt templates, knowledge base, agent data, auth sessions.
+Application state, auth, MDHE, gamification, agents, KB, PtA workflow, chat history, adoption metrics, and more. Persists all user accounts, learning progress, and MDHE data across deploys.
+
+### Census Data (data/census/processed/)
+
+ABS SA1-to-postcode demographic data. Four processed files (parquet/csv, 2.8MB total). Used by Property Intelligence pages for demographic profiling and whitespace analysis.
+
+### CBAS Network (data/cbas_network.json)
+
+31 stores with coordinates, trade areas, and 16 whitespace opportunities. Source data for Store Network, Whitespace Analysis, and Cannibalisation pages.
 
 ---
 
@@ -151,24 +200,44 @@ Queries, responses, evaluations, prompt templates, knowledge base, agent data, a
 
 ```
 User visits site
-  → app.py calls require_login()
-    → Check st.session_state for auth_token + auth_user
-      → Found? Return immediately (no API call)
-      → Not found? Show login page, call st.stop()
+  -> app.py calls require_login()
+    -> Check st.session_state for auth_token + auth_user
+      -> Found? Return immediately (no API call)
+      -> Not found? Show login page, call st.stop()
 
 User submits login form
-  → POST /api/auth/login (email + password)
-    → bcrypt verify
-    → Generate session token
-    → Store in st.session_state
-    → st.rerun() → require_login() finds token → returns user
+  -> POST /api/auth/login (email + password)
+    -> bcrypt verify
+    -> Generate session token
+    -> Store in st.session_state (including hub_role)
+    -> st.rerun() -> require_login() finds token -> returns user
+
+After login, role-based filtering:
+  -> hub_role determines visible pages
+  -> shared/role_config.py defines 10 roles with allowed_slugs
+  -> _RESTRICTED_SLUGS filtered from navigation for non-privileged roles
+  -> Financial/property data restricted to admin + executive
+  -> SLT auto-promotion via AUTH_SLT_EMAILS env var
 
 User navigates between pages
-  → st.page_link() triggers rerun (no page reload)
-  → require_login() finds token in session_state
-  → Returns cached user immediately
-  → Page renders with user context
+  -> st.page_link() triggers rerun (no page reload)
+  -> require_login() finds token in session_state
+  -> Returns cached user immediately
+  -> Page renders with user context
 ```
+
+---
+
+## Role-Based Access Control
+
+10 roles defined in `shared/role_config.py`. Each role specifies `allowed_slugs` controlling which pages appear in navigation. Enforced in `app.py` during `st.navigation()` page registration.
+
+**Restricted slugs** (`_RESTRICTED_SLUGS`):
+`sales`, `profitability`, `revenue-bridge`, `store-network`, `market-share`, `demographics`, `whitespace`, `competitor-map`, `roce`, `cannibalisation`
+
+Only **admin** and **executive** roles see restricted pages. All other roles see the full set of non-restricted pages appropriate to their access level.
+
+**SLT auto-promotion:** The `AUTH_SLT_EMAILS` environment variable lists email addresses that are automatically promoted to admin on login, ensuring key leadership always has full access.
 
 ---
 
@@ -176,24 +245,30 @@ User navigates between pages
 
 ```
 Render Web Service (Starter plan)
-  ├── Build: pip install -r requirements.txt
-  ├── Start: bash render_start.sh
-  │     ├── Symlink /data → data/
-  │     ├── python data_loader.py (downloads from GitHub Releases)
-  │     ├── uvicorn backend.app:app --host 127.0.0.1 --port 8000 &
-  │     ├── Wait for backend ready (30s timeout)
-  │     └── streamlit run dashboards/app.py --server.port $PORT
-  │
-  └── Persistent Disk (10GB at /data)
-        ├── harris_farm.db (399MB)
-        ├── transactions/FY24.parquet (2.3GB)
-        ├── transactions/FY25.parquet (2.7GB)
-        ├── transactions/FY26.parquet (1.7GB)
-        ├── hub_data.db (app state)
-        └── *.csv (reference files)
+  |-- Build: pip install -r requirements.txt
+  |-- Start: bash render_start.sh (NON-BLOCKING)
+  |     |-- Symlink /data -> data/
+  |     |-- python data_loader.py (downloads from GitHub Releases)
+  |     |-- streamlit run dashboards/app.py --server.port $PORT
+  |     |     (starts IMMEDIATELY — serves pages while backend initializes)
+  |     |-- uvicorn backend.app:app --host 127.0.0.1 --port 8000 &
+  |     |     (backend readiness poll runs in background)
+  |
+  |-- Health check path: / (Streamlit serves this immediately)
+  |-- /health endpoint on backend for internal readiness
+  |
+  +-- Persistent Disk (10GB at /data)
+        |-- harris_farm.db (418MB)
+        |-- harris_farm_plu.db (3.1GB)
+        |-- transactions/FY24.parquet (2.3GB)
+        |-- transactions/FY25.parquet (2.7GB)
+        |-- transactions/FY26.parquet (1.7GB)
+        |-- hub_data.db (~105 tables — persists across deploys)
+        |-- mdhe_uploads/ (MDHE file uploads)
+        +-- *.csv (reference files)
 ```
 
-Data persists across deploys. Only downloaded on first deploy (~10 min).
+Data persists across deploys. Only downloaded on first deploy (~10 min). hub_data.db persists all user accounts, learning progress, and MDHE data across deploys.
 
 ---
 
@@ -204,6 +279,7 @@ Data persists across deploys. Only downloaded on first deploy (~10 min).
 | Anthropic (Claude) | NL queries, Hub Assistant, Rubric | Yes (for AI features) |
 | OpenAI (GPT) | Rubric comparison | Optional |
 | xAI (Grok) | Rubric comparison | Optional |
+| Monday.com | Way of Working | Optional |
 
 ---
 
@@ -216,3 +292,7 @@ Data persists across deploys. Only downloaded on first deploy (~10 min).
 5. **GitHub Releases for data** — large files stored as release assets, auto-downloaded by `data_loader.py`. Split files >2GB into parts.
 6. **DuckDB for transactions** — zero-copy parquet reader, no ETL needed, queries 383M rows in seconds.
 7. **5-4-4 fiscal calendar** — all date logic uses Harris Farm's fiscal calendar (Jul-Jun, 5-4-4 week pattern).
+8. **Role-based page filtering** — hub_role controls which pages appear in navigation, enforced in app.py.
+9. **Non-blocking startup** — Streamlit serves pages immediately while backend initializes in the background.
+10. **MDHE as separate nav section** — dedicated Master Data Health section with its own colour in navigation.
+11. **SLT auto-promotion** — AUTH_SLT_EMAILS env var ensures key people always have admin access.

@@ -6,20 +6,18 @@ Admin-only page for managing Hub users, roles, and access permissions.
 import streamlit as st
 import os
 import requests
-from datetime import datetime
-from shared.styles import (
-    render_header, render_footer,
-    GREEN, BLUE, GOLD, RED, ORANGE,
-    TEXT_PRIMARY, TEXT_SECONDARY, TEXT_MUTED,
-    NAVY_CARD, BORDER,
-)
+from shared.styles import render_header, render_footer
 
 
 def render_user_management():
     user = st.session_state.get("auth_user", {})
 
-    # Admin check
-    if not user or user.get("role") != "admin":
+    # Admin check — allow both role and hub_role to match
+    is_admin = (
+        user.get("role") == "admin"
+        or user.get("hub_role") == "admin"
+    )
+    if not user or not is_admin:
         st.warning("This page is only accessible to administrators.")
         return
 
@@ -30,7 +28,7 @@ def render_user_management():
 
     API_URL = os.getenv("API_URL", "http://localhost:8000")
     token = st.session_state.get("auth_token", "")
-    headers = {"X-Auth-Token": token}
+    headers = {"X-Auth-Token": token} if token else {}
 
     # ------------------------------------------------------------------
     # Fetch users from backend
@@ -67,7 +65,7 @@ def render_user_management():
     # ==================================================================
     with tab_active:
         if not users_list:
-            st.info("No users found.")
+            st.info("No users found. If running locally with AUTH_ENABLED=false, no users are stored in the local database.")
         else:
             st.markdown("### {} registered users".format(len(users_list)))
             st.markdown("")
@@ -75,7 +73,7 @@ def render_user_management():
             # Import role options for the hub_role selector
             try:
                 from shared.role_config import get_all_roles
-                role_options = get_all_roles()  # list of (key, display_name)
+                role_options = get_all_roles()
             except ImportError:
                 role_options = [
                     ("user", "General"),
@@ -90,6 +88,8 @@ def render_user_management():
 
             role_keys = [k for k, _ in role_options]
             role_labels = [v for _, v in role_options]
+            # Build a lookup dict for format_func (avoids closure issues)
+            role_label_map = dict(role_options)
 
             for idx, u in enumerate(users_list):
                 uid = u.get("id", idx)
@@ -121,12 +121,11 @@ def render_user_management():
                         new_role = st.selectbox(
                             "Hub Role",
                             options=role_keys,
-                            format_func=lambda k: role_labels[role_keys.index(k)] if k in role_keys else k,
+                            format_func=lambda k, m=role_label_map: m.get(k, k),
                             index=current_idx,
                             key="role_select_{}".format(uid),
                         )
 
-                        # Update button
                         if st.button("Update Role", key="update_btn_{}".format(uid)):
                             try:
                                 put_resp = requests.put(
@@ -172,10 +171,6 @@ def render_user_management():
             "Approval workflow coming soon. "
             "Currently all signups are auto-approved."
         )
-        st.markdown(
-            "When the `approved` column is added to the users table, "
-            "new signups will require admin approval before they can access the Hub."
-        )
 
     # ==================================================================
     # Tab 3: Role Summary
@@ -185,28 +180,23 @@ def render_user_management():
         st.markdown("")
 
         try:
-            from shared.role_config import ROLE_DEFINITIONS, get_role_pages
+            from shared.role_config import ROLE_DEFINITIONS
         except ImportError:
             st.error("Could not load role_config module.")
             render_footer("User Management", user=user)
             return
 
-        # Count users per role from the fetched users list
         role_counts = {}
         for u in users_list:
             r = u.get("hub_role", u.get("role", "user"))
             role_counts[r] = role_counts.get(r, 0) + 1
 
-        # Build summary data
         rows = []
         for role_key, role_def in ROLE_DEFINITIONS.items():
             display_name = role_def.get("display_name", role_key)
             description = role_def.get("description", "")
             allowed = role_def.get("allowed_slugs", [])
-            if allowed == "all":
-                page_count = "All"
-            else:
-                page_count = str(len(allowed))
+            page_count = "All" if allowed == "all" else str(len(allowed))
             user_count = role_counts.get(role_key, 0)
             rows.append({
                 "Role Key": role_key,
@@ -216,15 +206,10 @@ def render_user_management():
                 "Users": user_count,
             })
 
-        # Display as a table
         if rows:
             import pandas as pd
             df = pd.DataFrame(rows)
-            st.dataframe(
-                df,
-                use_container_width=True,
-                hide_index=True,
-            )
+            st.dataframe(df, use_container_width=True, hide_index=True)
         else:
             st.info("No roles defined.")
 
@@ -234,9 +219,6 @@ def render_user_management():
             "Admin and General (user) roles have access to all pages."
         )
 
-    # ------------------------------------------------------------------
-    # Footer
-    # ------------------------------------------------------------------
     render_footer("User Management", user=user)
 
 

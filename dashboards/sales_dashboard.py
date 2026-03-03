@@ -1,7 +1,8 @@
 """
 Harris Farm Hub - Sales Performance Dashboard
-All KPIs derived from real transactional data in data/harris_farm.db.
-Sales, GP, Budget, Shrinkage: every number traces to source weekly aggregates.
+All KPIs derived from real transactional data.
+Primary source: BigQuery (oval-blend-488902-p2.trading.weekly_sales)
+Fallback: data/harris_farm.db (SQLite)
 Store network: 27 Harris Farm Markets retail stores (real).
 Data: Weekly by store, department, major group (FY2017-FY2024).
 """
@@ -13,6 +14,8 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import sqlite3
 from pathlib import Path
+
+from shared.bigquery_connector import is_bigquery_available, bq_query
 
 # ============================================================================
 # STYLING
@@ -54,7 +57,18 @@ def store_display_name(full_name: str) -> str:
 
 @st.cache_data(ttl=300)
 def load_stores():
-    """Get sorted list of retail store names from DB."""
+    """Get sorted list of retail store names. BigQuery first, SQLite fallback."""
+    if is_bigquery_available():
+        try:
+            df = bq_query("""
+                SELECT DISTINCT store
+                FROM `oval-blend-488902-p2.trading.weekly_sales`
+                WHERE channel = 'Retail'
+                ORDER BY store
+            """)
+            return df["store"].tolist()
+        except Exception:
+            pass
     db = _get_db_path()
     with sqlite3.connect(db) as conn:
         cursor = conn.cursor()
@@ -68,7 +82,17 @@ def load_stores():
 
 @st.cache_data(ttl=300)
 def load_departments():
-    """Get sorted list of department names from sales data."""
+    """Get sorted list of department names. BigQuery first, SQLite fallback."""
+    if is_bigquery_available():
+        try:
+            df = bq_query("""
+                SELECT DISTINCT department
+                FROM `oval-blend-488902-p2.trading.weekly_sales`
+                ORDER BY department
+            """)
+            return df["department"].tolist()
+        except Exception:
+            pass
     db = _get_db_path()
     with sqlite3.connect(db) as conn:
         cursor = conn.cursor()
@@ -80,7 +104,20 @@ def load_departments():
 
 @st.cache_data(ttl=300)
 def load_major_groups(department=None):
-    """Get major groups, optionally filtered by department."""
+    """Get major groups, optionally filtered by department. BigQuery first."""
+    if is_bigquery_available():
+        try:
+            sql = """
+                SELECT DISTINCT major_group
+                FROM `oval-blend-488902-p2.trading.weekly_sales`
+            """
+            if department:
+                sql += f" WHERE department = '{department}'"
+            sql += " ORDER BY major_group"
+            df = bq_query(sql)
+            return df["major_group"].tolist()
+        except Exception:
+            pass
     db = _get_db_path()
     with sqlite3.connect(db) as conn:
         cursor = conn.cursor()
@@ -103,37 +140,62 @@ def load_sales_data(date_from, date_to, stores=None, departments=None,
     Load weekly sales data for all measures, pivoted wide.
     Returns DataFrame with columns: store, department, major_group, week_ending,
     plus one column per measure (sales, gp, initial_gp, budget_sales, budget_gp, shrinkage).
+    BigQuery primary, SQLite fallback.
     """
-    db = _get_db_path()
+    df = pd.DataFrame()
 
-    query = """
-        SELECT
-            store, department, major_group, week_ending, measure, value
-        FROM sales
-        WHERE channel = 'Retail'
-          AND is_promotion = ?
-          AND week_ending >= ?
-          AND week_ending <= ?
-    """
-    params = [promo, date_from, date_to]
+    if is_bigquery_available():
+        try:
+            bq_sql = f"""
+                SELECT store, department, major_group, week_ending, measure, value
+                FROM `oval-blend-488902-p2.trading.weekly_sales`
+                WHERE channel = 'Retail'
+                  AND is_promotion = '{promo}'
+                  AND week_ending >= '{date_from}'
+                  AND week_ending <= '{date_to}'
+            """
+            df = bq_query(bq_sql)
+            # Apply in-memory filters for list params
+            if stores:
+                df = df[df["store"].isin(stores)]
+            if departments:
+                df = df[df["department"].isin(departments)]
+            if major_groups:
+                df = df[df["major_group"].isin(major_groups)]
+        except Exception:
+            df = pd.DataFrame()
 
-    if stores:
-        placeholders = ','.join('?' * len(stores))
-        query += f" AND store IN ({placeholders})"
-        params.extend(stores)
+    if df.empty:
+        # SQLite fallback
+        db = _get_db_path()
+        query = """
+            SELECT
+                store, department, major_group, week_ending, measure, value
+            FROM sales
+            WHERE channel = 'Retail'
+              AND is_promotion = ?
+              AND week_ending >= ?
+              AND week_ending <= ?
+        """
+        params = [promo, date_from, date_to]
 
-    if departments:
-        placeholders = ','.join('?' * len(departments))
-        query += f" AND department IN ({placeholders})"
-        params.extend(departments)
+        if stores:
+            placeholders = ','.join('?' * len(stores))
+            query += f" AND store IN ({placeholders})"
+            params.extend(stores)
 
-    if major_groups:
-        placeholders = ','.join('?' * len(major_groups))
-        query += f" AND major_group IN ({placeholders})"
-        params.extend(major_groups)
+        if departments:
+            placeholders = ','.join('?' * len(departments))
+            query += f" AND department IN ({placeholders})"
+            params.extend(departments)
 
-    with sqlite3.connect(db) as conn:
-        df = pd.read_sql_query(query, conn, params=params)
+        if major_groups:
+            placeholders = ','.join('?' * len(major_groups))
+            query += f" AND major_group IN ({placeholders})"
+            params.extend(major_groups)
+
+        with sqlite3.connect(db) as conn:
+            df = pd.read_sql_query(query, conn, params=params)
 
     if df.empty:
         return pd.DataFrame()
@@ -171,7 +233,16 @@ def load_sales_data(date_from, date_to, stores=None, departments=None,
 
 @st.cache_data(ttl=300)
 def get_date_range():
-    """Get min/max week_ending from sales data."""
+    """Get min/max week_ending from sales data. BigQuery first, SQLite fallback."""
+    if is_bigquery_available():
+        try:
+            df = bq_query("""
+                SELECT MIN(week_ending) as min_date, MAX(week_ending) as max_date
+                FROM `oval-blend-488902-p2.trading.weekly_sales`
+            """)
+            return str(df["min_date"].iloc[0])[:10], str(df["max_date"].iloc[0])[:10]
+        except Exception:
+            pass
     db = _get_db_path()
     with sqlite3.connect(db) as conn:
         cursor = conn.cursor()

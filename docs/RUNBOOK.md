@@ -8,8 +8,8 @@
 
 | Service | Port | Process | What it does |
 |---------|------|---------|-------------|
-| Hub (Streamlit) | 8500 (local) / $PORT (Render) | `streamlit run dashboards/app.py` | All 23 pages, single process |
-| API (FastAPI) | 8000 | `uvicorn backend.app:app` | 112 endpoints, auth, NL queries, LLM |
+| Hub (Streamlit) | 8500 (local) / $PORT (Render) | `streamlit run dashboards/app.py` | All 43 pages, single process |
+| API (FastAPI) | 8000 | `uvicorn backend.app:app` | ~264 endpoints, auth, NL queries, LLM, MDHE |
 
 ---
 
@@ -117,6 +117,9 @@ Set via dashboard: https://dashboard.render.com/web/srv-d6b3lqur433s73aq0u2g/env
 | `AUTH_SITE_PASSWORD` | Shared team access code | Yes |
 | `AUTH_ADMIN_EMAIL` | Admin account email | Yes (first deploy) |
 | `AUTH_ADMIN_PASSWORD` | Admin account password | Yes (first deploy) |
+| `AUTH_SLT_EMAILS` | Comma-separated SLT emails for auto-admin promotion | Optional |
+| `AUTH_SESSION_TIMEOUT` | Session timeout in seconds (default: 86400) | Optional |
+| `MONDAY_API_KEY` | Monday.com API key for integrations | Optional |
 
 ### Render API key
 
@@ -133,11 +136,14 @@ Service ID: `srv-d6b3lqur433s73aq0u2g`
 
 | File | Location | Size | Updates |
 |------|----------|------|---------|
-| `harris_farm.db` | `/data/harris_farm.db` | 399MB | Weekly (manual upload) |
+| `harris_farm.db` | `/data/harris_farm.db` | 418MB | Weekly (manual upload) |
+| `harris_farm_plu.db` | `/data/harris_farm_plu.db` | 3.1GB | Periodic (PLU results) |
 | `FY24.parquet` | `/data/transactions/FY24.parquet` | 2.3GB | Static (closed FY) |
 | `FY25.parquet` | `/data/transactions/FY25.parquet` | 2.7GB | Static (closed FY) |
 | `FY26.parquet` | `/data/transactions/FY26.parquet` | 1.7GB | Periodic (current FY) |
-| `hub_data.db` | `/data/hub_data.db` | <1MB | Auto (app state) |
+| `hub_data.db` | `/data/hub_data.db` | ~105 tables | Auto (app state, auth, MDHE, gamification) |
+
+**Data persistence:** hub_data.db on persistent disk survives deploys — user accounts, learning progress, MDHE data, Academy XP all persist.
 
 ### Updating harris_farm.db
 
@@ -215,6 +221,14 @@ The project has a `watchdog/` directory that shadows the pip `watchdog` package.
 --server.fileWatcherType none
 ```
 
+### MDHE pages not visible
+
+Check that the user's `hub_role` has the appropriate `mdhe-*` slugs assigned in `dashboards/shared/role_config.py`. MDHE pages require specific role permissions to be visible in navigation.
+
+### User Management returns 401
+
+The User Management page requires `role='admin'` on the user account. Check that the user's email is listed in `AUTH_SLT_EMAILS` (auto-promotes to admin on login), or manually set their role to admin via the database.
+
 ---
 
 ## Key Files
@@ -224,9 +238,14 @@ The project has a `watchdog/` directory that shadows the pip `watchdog` package.
 | `dashboards/app.py` | Entry point, navigation, auth gate | Adding/removing pages |
 | `dashboards/shared/auth_gate.py` | Login UI + session management | Changing login flow |
 | `dashboards/shared/styles.py` | Shared CSS, header, footer | Changing look and feel |
+| `dashboards/shared/role_config.py` | Role definitions + page permissions | Adding roles/pages |
+| `dashboards/mdhe/` | MDHE pages (dashboard, upload, issues, guide, engine) | MDHE features |
 | `backend/app.py` | All API endpoints | Adding backend features |
 | `backend/auth.py` | Auth logic, token management | Changing auth rules |
+| `backend/mdhe_db.py` | MDHE database schema | MDHE data model |
+| `backend/mdhe_api.py` | MDHE API endpoints | MDHE backend features |
 | `data_loader.py` | Data download from GitHub | Adding new data files |
-| `render_start.sh` | Render startup sequence | Changing deploy behavior |
+| `render_start.sh` | Non-blocking — Streamlit starts immediately, backend polls in background | Changing deploy behavior |
 | `render.yaml` | Render service config | Changing infra settings |
 | `requirements.txt` | Python dependencies | Adding packages |
+| `docs/MDHE_GUIDE.md` | Team guide for MDHE | Updating team docs |

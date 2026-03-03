@@ -98,6 +98,9 @@ _pages = {
     "adoption": st.Page(str(_DIR / "adoption_dashboard.py"), title="Adoption", icon="\U0001f4c8", url_path="adoption"),
     # Admin
     "user-management": st.Page(str(_DIR / "mdhe" / "user_management.py"), title="User Management", icon="\U0001f465", url_path="user-management"),
+    # Supply Chain
+    "sc-interview": st.Page(str(_DIR / "supply_chain_interview.py"), title="SC Interview", icon="\U0001f4cb", url_path="sc-interview"),
+    "sc-analysis": st.Page(str(_DIR / "supply_chain_analysis.py"), title="SC Analysis", icon="\U0001f4ca", url_path="sc-analysis"),
 }
 
 # Section groupings for navigation (purpose-based, not pillar-based)
@@ -116,6 +119,8 @@ _SECTIONS = [
                "whitespace", "competitor-map", "roce", "cannibalisation"]},
     {"name": "MDHE", "icon": "\U0001f3e5", "color": "#E74C3C",
      "slugs": ["mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide"]},
+    {"name": "Supply Chain", "icon": "\U0001f69b", "color": "#F97316",
+     "slugs": ["sc-interview", "sc-analysis"]},
     {"name": "Back of House", "icon": "\u2699\ufe0f", "color": "#8899AA",
      "is_muted": True,
      "slugs": ["the-rubric", "approvals", "workflow-engine", "agent-ops",
@@ -165,6 +170,9 @@ _full_nav = {
     ],
     "MDHE": [
         "mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide",
+    ],
+    "Supply Chain": [
+        "sc-interview", "sc-analysis",
     ],
     "Back of House": [
         "the-rubric", "approvals", "workflow-engine", "agent-ops",

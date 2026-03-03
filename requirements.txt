@@ -19,3 +19,5 @@ openpyxl
 pyyaml
 folium
 streamlit-folium
+google-cloud-bigquery
+db-dtypes
