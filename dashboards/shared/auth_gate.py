@@ -460,3 +460,50 @@ def logout_user(api_url=None):
 def get_current_user():
     """Get the currently authenticated user from session_state, or None."""
     return st.session_state.get("auth_user")
+
+
+def try_restore_session(api_url=None):
+    """
+    Non-blocking auth check.  Returns user dict if already logged in,
+    or None if not authenticated.  Never shows login UI or calls st.stop().
+    """
+    if api_url is None:
+        api_url = API_URL
+
+    # Dev bypass
+    if os.getenv("AUTH_ENABLED", "true").lower() in ("false", "0", "no"):
+        return {"id": 0, "email": "dev@local", "name": "Developer",
+                "role": "admin", "hub_role": "admin"}
+
+    # Fast path: already logged in
+    if st.session_state.get("auth_token") and st.session_state.get("auth_user"):
+        return st.session_state["auth_user"]
+
+    # Check URL query params (cross-port navigation)
+    token = st.query_params.get("token", None)
+    if token:
+        try:
+            resp = requests.get(
+                f"{api_url}/api/auth/verify",
+                params={"token": token},
+                timeout=5,
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                if data.get("valid"):
+                    st.session_state["auth_token"] = token
+                    st.session_state["auth_user"] = data["user"]
+                    st.query_params.clear()
+                    return data["user"]
+        except requests.RequestException:
+            pass
+
+    return None
+
+
+def render_login_page(api_url=None):
+    """Show the full-screen login/register page and halt execution."""
+    if api_url is None:
+        api_url = API_URL
+    _render_auth_page(api_url)
+    st.stop()

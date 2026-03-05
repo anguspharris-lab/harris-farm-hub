@@ -23,13 +23,13 @@ st.set_page_config(
     layout="wide",
 )
 
-# Auth gate — runs before any page renders (login page has its own dark styling)
-from shared.auth_gate import require_login
+# Auth — non-blocking session restore (login gate runs per-page below)
+from shared.auth_gate import try_restore_session, render_login_page
 
-user = require_login()
+user = try_restore_session()  # Returns user dict or None (guest)
 st.session_state["auth_user"] = user
 
-# Shared styling — applied AFTER login so it doesn't conflict with login page CSS
+# Shared styling
 from shared.styles import apply_styles
 
 apply_styles()
@@ -109,7 +109,7 @@ _SECTIONS = [
      "slugs": ["strategy-overview", "greater-goodness", "intro-people",
                "intro-operations", "intro-digital", "way-of-working"]},
     {"name": "Growing Legends", "icon": "\U0001f331", "color": "#8B5CF6",
-     "slugs": ["skills-academy", "the-paddock", "prompt-builder", "hub-assistant"]},
+     "slugs": ["skills-academy", "the-paddock", "prompt-builder", "hub-assistant", "the-rubric"]},
     {"name": "Operations", "icon": "\U0001f4ca", "color": "#F1C40F",
      "slugs": ["customers", "sales", "profitability", "revenue-bridge",
                "store-ops", "buying-hub", "product-intel", "plu-intel",
@@ -123,7 +123,7 @@ _SECTIONS = [
      "slugs": ["sc-interview", "sc-analysis"]},
     {"name": "Back of House", "icon": "\u2699\ufe0f", "color": "#8899AA",
      "is_muted": True,
-     "slugs": ["the-rubric", "approvals", "workflow-engine", "agent-ops",
+     "slugs": ["approvals", "workflow-engine", "agent-ops",
                "mission-control", "ai-adoption", "adoption", "trending",
                "agent-hub", "marketing-assets", "user-management"]},
 ]
@@ -138,13 +138,15 @@ st.session_state["_sections"] = _SECTIONS
 # ---------------------------------------------------------------------------
 from shared.role_config import get_role_pages
 
-_hub_role = user.get("hub_role", "user") if isinstance(user, dict) else "user"
-
-_allowed_slugs = get_role_pages(_hub_role)  # None means "all"
-
-if _allowed_slugs is not None:
-    _allowed_set = set(_allowed_slugs)
-    _visible_pages = {k: v for k, v in _pages.items() if k in _allowed_set}
+# Role filtering only for logged-in users; guests see all sections in nav
+if user is not None:
+    _hub_role = user.get("hub_role", "user") if isinstance(user, dict) else "user"
+    _allowed_slugs = get_role_pages(_hub_role)  # None means "all"
+    if _allowed_slugs is not None:
+        _allowed_set = set(_allowed_slugs)
+        _visible_pages = {k: v for k, v in _pages.items() if k in _allowed_set}
+    else:
+        _visible_pages = _pages
 else:
     _visible_pages = _pages
 
@@ -157,7 +159,7 @@ _full_nav = {
         "way-of-working",
     ],
     "Growing Legends": [
-        "skills-academy", "the-paddock", "prompt-builder", "hub-assistant",
+        "skills-academy", "the-paddock", "prompt-builder", "hub-assistant", "the-rubric",
     ],
     "Operations": [
         "customers", "sales", "profitability", "revenue-bridge",
@@ -175,7 +177,7 @@ _full_nav = {
         "sc-interview", "sc-analysis",
     ],
     "Back of House": [
-        "the-rubric", "approvals", "workflow-engine", "agent-ops",
+        "approvals", "workflow-engine", "agent-ops",
         "mission-control", "ai-adoption", "adoption", "trending",
         "agent-hub", "marketing-assets", "user-management",
     ],
@@ -193,10 +195,30 @@ for section, slugs_or_pages in _full_nav.items():
 nav = st.navigation(_nav_dict)
 
 # ---------------------------------------------------------------------------
-# Navigation header — uses st.page_link (preserves session, no page reload)
+# Public / Protected page gate
 # ---------------------------------------------------------------------------
 
+PUBLIC_SLUGS = frozenset({
+    "",  # Home
+    # Strategy
+    "strategy-overview", "greater-goodness", "intro-people",
+    "intro-operations", "intro-digital", "way-of-working",
+    # Growing Legends
+    "skills-academy", "the-paddock", "prompt-builder",
+    "hub-assistant", "the-rubric",
+    # Supply Chain
+    "sc-interview", "sc-analysis",
+})
+
 current_slug = nav.url_path
+
+_force_login = st.session_state.pop("_force_login", False)
+if (user is None and current_slug not in PUBLIC_SLUGS) or _force_login:
+    render_login_page()
+
+# ---------------------------------------------------------------------------
+# Navigation header — uses st.page_link (preserves session, no page reload)
+# ---------------------------------------------------------------------------
 
 # Log page view (fire-and-forget — never block rendering)
 _auth_user = st.session_state.get("auth_user")
@@ -298,6 +320,33 @@ st.markdown("---")
 # ---------------------------------------------------------------------------
 
 _auth_user = st.session_state.get("auth_user")
+
+# Sidebar: user info + login/logout
+with st.sidebar:
+    if _auth_user and isinstance(_auth_user, dict) and _auth_user.get("name"):
+        st.markdown(
+            f"<div style='background:rgba(255,255,255,0.05);"
+            f"border:1px solid rgba(255,255,255,0.08);"
+            f"border-radius:8px;padding:10px 12px;margin-bottom:10px;'>"
+            f"<div style='font-weight:600;font-size:0.85em;color:#2ECC71;'>"
+            f"{_auth_user['name']}</div>"
+            f"<div style='font-size:0.78em;color:#8899AA;'>"
+            f"{_auth_user.get('email', '')}</div>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+        from shared.auth_gate import logout_user
+        if st.button("Logout", key="sidebar_logout_btn", use_container_width=True):
+            logout_user()
+    elif _auth_user is None:
+        st.markdown(
+            "<div style='font-size:0.82em;color:#8899AA;margin-bottom:8px;'>"
+            "Sign in to access all dashboards</div>",
+            unsafe_allow_html=True,
+        )
+        if st.button("Sign In", key="sidebar_login_btn", use_container_width=True):
+            st.session_state["_force_login"] = True
+            st.rerun()
 
 # Role selector — shown when user has default role
 if _auth_user and _auth_user.get("hub_role", "user") == "user":

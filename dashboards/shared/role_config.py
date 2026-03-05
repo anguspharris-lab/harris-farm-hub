@@ -24,7 +24,7 @@ ROLE_DEFINITIONS = {
     },
     "user": {
         "display_name": "General",
-        "description": "General access — excludes financial and property data",
+        "description": "General access — includes property data",
         "allowed_slugs": [
             "strategy-overview", "greater-goodness",
             "intro-people", "intro-operations", "intro-digital",
@@ -34,6 +34,8 @@ ROLE_DEFINITIONS = {
             "transport", "analytics-engine",
             "the-rubric", "approvals", "trending",
             "mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide",
+            "store-network", "market-share", "demographics",
+            "whitespace", "competitor-map", "roce", "cannibalisation",
         ],
     },
     "executive": {

@@ -1,6 +1,6 @@
 """
 Harris Farm Hub — Supply Chain Interview Tool
-Embeds the React interview artifact (hfm-interview-v5) via st.components.html().
+Embeds the React interview artifact (hfm-interview-v7) via st.components.html().
 5-section stakeholder interview for supply chain transformation diagnostic.
 """
 
@@ -59,7 +59,7 @@ _INTERVIEW_HTML = """
 <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
 <script type="text/babel">
 """ + open(
-    str(__import__("pathlib").Path(__file__).resolve().parent.parent / "artifacts" / "hfm-interview-v5.jsx")
+    str(__import__("pathlib").Path(__file__).resolve().parent.parent / "artifacts" / "hfm-interview-v7.jsx")
 ).read() + """
 </script>
 </body>

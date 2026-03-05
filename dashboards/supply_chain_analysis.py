@@ -1,6 +1,6 @@
 """
 Harris Farm Hub — Supply Chain Analysis Dashboard
-Embeds the React analysis artifact (hfm-analysis-v5) via st.components.html().
+Embeds the React analysis artifact (hfm-analysis-v7) via st.components.html().
 Claude-powered analysis: upload interview JSONs, get ADKAR diagnostics automatically.
 """
 
@@ -217,7 +217,7 @@ if analyse_btn and n > 0:
 # Embedded React Analysis Artifact
 # ---------------------------------------------------------------------------
 
-_ARTIFACT_PATH = Path(__file__).resolve().parent.parent / "artifacts" / "hfm-analysis-v5.jsx"
+_ARTIFACT_PATH = Path(__file__).resolve().parent.parent / "artifacts" / "hfm-analysis-v7.jsx"
 
 
 def _build_analysis_html(responses, ai_analysis):

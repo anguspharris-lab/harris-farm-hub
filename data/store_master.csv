@@ -39,4 +39,10 @@ store_number,store_name,store_company,state,store_type,fv_store,like_for_like
 74,HFM Isle of Capri,74 - HFM Isle of Capri,QLD,Retail,1,1
 75,HFM Clayfield,75 - HFM Clayfield,QLD,Retail,1,1
 76,HFM Lane Cove,76 - HFM Lane Cove,NSW,Retail,1,1
+77,HFM Dural,77 - HFM Dural,NSW,Retail,1,0
+80,HFM Majura Park,80 - HFM Majura Park,ACT,Retail,1,0
+84,HFM Redfern,84 - HFM Redfern,NSW,Retail,1,0
+85,HFM Marrickville,85 - HFM Marrickville,NSW,Retail,1,0
+86,HFM Miranda,86 - HFM Miranda,NSW,Retail,1,0
+87,HFM Maroubra,87 - HFM Maroubra,NSW,Retail,1,0
 99,Online Unallocated,99 - Online Unallocated,NSW,Online,1,1

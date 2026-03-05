@@ -187,6 +187,24 @@ def init_auth_db(db_path=None):
             (slt_email,),
         )
 
+    # Seed default users (idempotent — skip if email already exists)
+    _default_users = [
+        ("gus@harrisfarm.com.au", "Gus Harris", "changeme", "admin", "admin"),
+        ("luke@harrisfarm.com.au", "Luke Harris", "changeme", "admin", "executive"),
+        ("admin@harrisfarm.com.au", "Hub Admin", "changeme", "admin", "admin"),
+    ]
+    for _email, _name, _pw, _role, _hub_role in _default_users:
+        existing = c.execute(
+            "SELECT id FROM users WHERE email = ?", (_email,)
+        ).fetchone()
+        if not existing:
+            c.execute(
+                "INSERT INTO users (email, name, password_hash, role, hub_role) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (_email, _name, hash_password(_pw), _role, _hub_role),
+            )
+            log_auth_event("user_seeded", _email, "", f"Default user created: {_name}", conn=conn)
+
     conn.commit()
     conn.close()
 
