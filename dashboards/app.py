@@ -101,6 +101,8 @@ _pages = {
     # Supply Chain
     "sc-interview": st.Page(str(_DIR / "supply_chain_interview.py"), title="SC Interview", icon="\U0001f4cb", url_path="sc-interview"),
     "sc-analysis": st.Page(str(_DIR / "supply_chain_analysis.py"), title="SC Analysis", icon="\U0001f4ca", url_path="sc-analysis"),
+    # AI Readiness
+    "arr-interview": st.Page(str(_DIR / "ai_readiness_interview.py"), title="AI Readiness Interview", icon="\U0001f916", url_path="arr-interview"),
 }
 
 # Section groupings for navigation (purpose-based, not pillar-based)
@@ -120,7 +122,7 @@ _SECTIONS = [
     {"name": "MDHE", "icon": "\U0001f3e5", "color": "#E74C3C",
      "slugs": ["mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide"]},
     {"name": "Supply Chain", "icon": "\U0001f69b", "color": "#F97316",
-     "slugs": ["sc-interview", "sc-analysis"]},
+     "slugs": ["sc-interview", "sc-analysis", "arr-interview"]},
     {"name": "Back of House", "icon": "\u2699\ufe0f", "color": "#8899AA",
      "is_muted": True,
      "slugs": ["approvals", "workflow-engine", "agent-ops",
