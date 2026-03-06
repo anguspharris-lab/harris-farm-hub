@@ -125,15 +125,14 @@ _SECTIONS = [
     {"name": "Our Stores", "icon": "\U0001f3ea", "color": "#0891B2",
      "slugs": ["store-network", "market-share", "demographics",
                "whitespace", "competitor-map", "roce", "cannibalisation"]},
-    {"name": "MDHE", "icon": "\U0001f91d", "color": "#DC2626",
-     "slugs": ["mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide"]},
-    {"name": "The Harris Farm Way", "icon": "\U0001f9ed", "color": "#E8B84B",
+    {"name": "Transformation", "icon": "\U0001f680", "color": "#E8B84B",
      "slugs": ["hfw-landing", "sc-interview", "sc-analysis", "arr-interview",
                "hfw-ai-vision", "hfw-strategy-sprint",
                "hfw-dept-one-pager", "hfw-board-prep"]},
     {"name": "Back of House", "icon": "\U0001f527", "color": "#718096",
      "is_muted": True,
-     "slugs": ["approvals", "workflow-engine", "agent-ops",
+     "slugs": ["mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide",
+               "approvals", "workflow-engine", "agent-ops",
                "mission-control", "ai-adoption", "adoption", "trending",
                "agent-hub", "marketing-assets", "user-management"]},
 ]
@@ -180,15 +179,13 @@ _full_nav = {
         "store-network", "market-share", "demographics",
         "whitespace", "competitor-map", "roce", "cannibalisation",
     ],
-    "MDHE": [
-        "mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide",
-    ],
-    "The Harris Farm Way": [
+    "Transformation": [
         "hfw-landing", "sc-interview", "sc-analysis", "arr-interview",
         "hfw-ai-vision", "hfw-strategy-sprint",
         "hfw-dept-one-pager", "hfw-board-prep",
     ],
     "Back of House": [
+        "mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide",
         "approvals", "workflow-engine", "agent-ops",
         "mission-control", "ai-adoption", "adoption", "trending",
         "agent-hub", "marketing-assets", "user-management",

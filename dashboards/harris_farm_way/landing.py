@@ -11,15 +11,15 @@ user = st.session_state.get("auth_user")
 _pages = st.session_state.get("_pages", {})
 
 render_header(
-    "The Harris Farm Way",
-    "Our AI-First Meeting Operating System",
+    "This is how Harris Farm transforms.",
+    "AI First decisions. Supply chain reimagined. Every meeting moves the business forward.",
     goals=["G1", "G5"],
-    strategy_context="How we run meetings that actually move the business forward",
+    strategy_context="Transformation \u2014 Chapter 1 of the Harris Farm AI First story",
 )
 
 # -- Hero text --------------------------------------------------------------
 st.markdown(
-    "Every structured session at Harris Farm starts here. "
+    "Everything that changes how we work lives here. "
     "Six session types, one tool, one place \u2014 "
     "every meeting starts with a question, ends with a decision, "
     "and leaves a trail of intelligence the whole business can use."
@@ -165,4 +165,4 @@ st.markdown(
     "> *\"The best meetings don't just consume time \u2014 they create intelligence.\"*"
 )
 
-render_footer("Harris Farm Way", "AI-First Meeting Operating System", user=user)
+render_footer("Transformation", "AI-First Meeting Operating System", user=user)
