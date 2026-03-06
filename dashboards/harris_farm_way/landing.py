@@ -85,61 +85,22 @@ st.divider()
 # -- Session type selector --------------------------------------------------
 st.markdown("### Choose your session type \u2014 same process, different focus:")
 
-# -- AI Journey: Readiness → Vision (connected pair) -----------------------
-st.markdown(
-    "<div style='background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.15);"
-    "border-radius:10px;padding:12px 18px;margin-bottom:12px;'>"
-    "<span style='font-weight:600;color:#06B6D4;font-size:0.9em;'>"
-    "\U0001f9ed AI Journey</span>"
-    "<span style='color:#718096;font-size:0.85em;margin-left:8px;'>"
-    "Start with Readiness, then Vision \u2014 a two-step journey to AI clarity</span>"
-    "</div>",
-    unsafe_allow_html=True,
-)
-
-j1, j_arrow, j2 = st.columns([5, 1, 5])
-
-with j1:
-    with st.container(border=True):
-        st.markdown("#### \U0001f9e0 Step 1 \u2014 AI Readiness")
-        st.markdown(
-            "Where are we today? Assess your team\u2019s AI capability "
-            "across 8 dimensions \u2014 honest answers build better plans."
-        )
-        st.caption("Use before any AI planning session")
-        if "arr-interview" in _pages:
-            st.page_link(_pages["arr-interview"], label="Start AI Readiness", use_container_width=True)
-
-with j_arrow:
-    st.markdown(
-        "<div style='display:flex;align-items:center;justify-content:center;"
-        "height:100%;min-height:120px;'>"
-        "<div style='text-align:center;'>"
-        "<div style='font-size:1.5em;color:#06B6D4;'>\u2192</div>"
-        "<div style='font-size:0.7em;color:#718096;line-height:1.3;'>"
-        "Start<br>here<br>then</div>"
-        "</div>"
-        "</div>",
-        unsafe_allow_html=True,
-    )
-
-with j2:
-    with st.container(border=True):
-        st.markdown("#### \U0001f680 Step 2 \u2014 AI Vision Session")
-        st.markdown(
-            "Where are we going? Imagine what\u2019s possible \u2014 "
-            "lighthouse opportunities, blockers, and the path forward."
-        )
-        st.caption("Use after completing AI Readiness")
-        if "hfw-ai-vision" in _pages:
-            st.page_link(_pages["hfw-ai-vision"], label="Start AI Vision", use_container_width=True)
-
-st.markdown("")  # spacer
-
-# -- Supply Chain Review (standalone, prominent) ----------------------------
+# -- AI Readiness & Vision + Supply Chain Review ----------------------------
 m1, m2 = st.columns(2)
 
 with m1:
+    with st.container(border=True):
+        st.markdown("#### \U0001f9e0 AI Readiness & Vision")
+        st.markdown(
+            "Where are we today \u2014 and where are we going? "
+            "One 10-minute interview covering AI capability, blockers, "
+            "and your lighthouse vision for the future."
+        )
+        st.caption("Use before any AI planning session")
+        if "hfw-ai-readiness-vision" in _pages:
+            st.page_link(_pages["hfw-ai-readiness-vision"], label="Start Interview", use_container_width=True)
+
+with m2:
     with st.container(border=True):
         st.markdown("#### \U0001f69b Supply Chain Review")
         st.markdown(
