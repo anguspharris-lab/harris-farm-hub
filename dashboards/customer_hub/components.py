@@ -7,7 +7,7 @@ import streamlit as st
 
 # ── Brand palette ────────────────────────────────────────────────────────────
 
-HFM_GREEN = "#2ECC71"
+HFM_GREEN = "#2D6A2D"
 
 PALETTE = {
     "green": "#2d8659",
@@ -28,7 +28,7 @@ SEGMENT_COLORS = {
 }
 
 HEALTH_COLOURS = {
-    "Accelerating": "#2ECC71",
+    "Accelerating": "#2D6A2D",
     "Growing": "#65a30d",
     "Stable": "#d97706",
     "Softening": "#ea580c",
@@ -39,7 +39,7 @@ HEALTH_COLOURS = {
 HEALTH_ORDER = ["Accelerating", "Growing", "Stable", "Softening", "Declining", "New"]
 
 GRADE_COLOURS = {
-    "A": "#2ECC71",
+    "A": "#2D6A2D",
     "B": "#65a30d",
     "C": "#d97706",
     "D": "#ea580c",
@@ -47,14 +47,14 @@ GRADE_COLOURS = {
 }
 
 OPP_COLOURS = {
-    "Stronghold": "#2ECC71",
+    "Stronghold": "#2D6A2D",
     "Growth Opportunity": "#2563eb",
     "Basket Opportunity": "#d97706",
     "Retention Risk": "#dc2626",
     "Monitor": "#9ca3af",
 }
 
-STATE_COLOURS = {"NSW": "#2ECC71", "QLD": "#7c3aed", "ACT": "#d97706"}
+STATE_COLOURS = {"NSW": "#2D6A2D", "QLD": "#7c3aed", "ACT": "#d97706"}
 
 
 # ── Reusable UI components ───────────────────────────────────────────────────
@@ -93,7 +93,7 @@ def one_thing_box(text):
     """Render a 'One Thing to Remember' callout."""
     st.markdown(
         "<div style='background:linear-gradient(135deg,#f0fdf4,#dcfce7);"
-        "border-left:4px solid #2ECC71;padding:14px 18px;border-radius:8px;"
+        "border-left:4px solid #2D6A2D;padding:14px 18px;border-radius:8px;"
         "margin:12px 0;'>"
         "<div style='font-weight:700;color:#166534;margin-bottom:4px;'>"
         "One Thing to Remember</div>"

@@ -22,9 +22,9 @@ user = st.session_state.get("auth_user")
 
 render_header(
     "Supply Chain Analysis",
-    "AI-powered diagnostic from stakeholder interviews",
-    goals=["G5"],
-    strategy_context="Pillar 5 — Tomorrow's Business: AI, innovation, growth",
+    "Supply chain transformation is Chapter 1 \u2014 here's what the data says",
+    goals=["G4", "G5"],
+    strategy_context="The Harris Farm Way \u2014 Supply Chain Intelligence",
 )
 
 # ---------------------------------------------------------------------------
@@ -99,10 +99,10 @@ n = len(st.session_state["sc_responses"])
 if n > 0:
     names = [r.get("respondent", {}).get("name", "?") for r in st.session_state["sc_responses"]]
     st.markdown(
-        f"<div style='background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2);"
+        f"<div style='background:rgba(45,106,45,0.08);border:1px solid rgba(45,106,45,0.2);"
         f"border-radius:10px;padding:12px 16px;margin-bottom:16px;'>"
-        f"<span style='font-weight:600;color:#2ECC71;'>{n} response(s)</span>"
-        f"<span style='color:#B0BEC5;font-size:0.88em;margin-left:12px;'>"
+        f"<span style='font-weight:600;color:#2D6A2D;'>{n} response(s)</span>"
+        f"<span style='color:#4A5568;font-size:0.88em;margin-left:12px;'>"
         f"{', '.join(names)}</span></div>",
         unsafe_allow_html=True,
     )
@@ -239,12 +239,12 @@ def _build_analysis_html(responses, ai_analysis):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-  body {{ background: #0A0F0A; color: #F1F8E9; font-family: 'Trebuchet MS', 'Segoe UI', sans-serif; }}
-  textarea:focus, input:focus {{ outline: none; border-color: rgba(46,204,113,0.5) !important; }}
-  ::selection {{ background: rgba(46,204,113,0.3); }}
+  body {{ background: #FAFAF7; color: #F1F8E9; font-family: 'Trebuchet MS', 'Segoe UI', sans-serif; }}
+  textarea:focus, input:focus {{ outline: none; border-color: rgba(45,106,45,0.5) !important; }}
+  ::selection {{ background: rgba(45,106,45,0.3); }}
   ::-webkit-scrollbar {{ width: 6px; }}
   ::-webkit-scrollbar-track {{ background: transparent; }}
-  ::-webkit-scrollbar-thumb {{ background: rgba(255,255,255,0.15); border-radius: 3px; }}
+  ::-webkit-scrollbar-thumb {{ background: rgba(0,0,0,0.12); border-radius: 3px; }}
 </style>
 </head>
 <body>

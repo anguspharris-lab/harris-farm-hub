@@ -147,7 +147,7 @@ with col_right:
         df_roles = pd.DataFrame(roles)
         fig3 = px.pie(
             df_roles, values="views", names="role",
-            color_discrete_sequence=["#2ECC71", "#059669", "#d97706", "#7c3aed",
+            color_discrete_sequence=["#2D6A2D", "#059669", "#d97706", "#7c3aed",
                                       "#ef4444", "#0ea5e9", "#f59e0b", "#6b7280"],
         )
         fig3.update_layout(height=300, margin=dict(l=10, r=10, t=10, b=10))

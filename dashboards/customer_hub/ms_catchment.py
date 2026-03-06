@@ -85,7 +85,7 @@ def render():
             labels={"label": "Cumulative Radius",
                     "avg_share": "Avg Market Share %"},
             color="avg_share",
-            color_continuous_scale=["#dc2626", "#d97706", "#2ECC71"],
+            color_continuous_scale=["#dc2626", "#d97706", "#2D6A2D"],
             text="avg_share",
         )
         fig_decay.update_traces(texttemplate="%{text:.1f}%",
@@ -193,7 +193,7 @@ def render():
                 all_trends, x="period_date", y="avg_share", color="radius",
                 labels={"period_date": "", "avg_share": "Avg Market Share %",
                         "radius": "Radius"},
-                color_discrete_sequence=["#2ECC71", "#2563eb", "#d97706",
+                color_discrete_sequence=["#2D6A2D", "#2563eb", "#d97706",
                                          "#9333ea", "#6b7280"],
             )
             fig_tt.update_layout(

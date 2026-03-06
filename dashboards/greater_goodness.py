@@ -36,7 +36,7 @@ def _load_sustainability_kpis():
 # ---------------------------------------------------------------------------
 
 st.markdown(
-    "<div style='background:linear-gradient(135deg, #0F1D35 0%, #132240 50%, #1A2D50 100%);border:1px solid rgba(46,204,113,0.2);border-top:3px solid #2ECC71;"
+    "<div style='background:linear-gradient(135deg, #0F1D35 0%, #132240 50%, #E8E8E4 100%);border:1px solid rgba(45,106,45,0.2);border-top:3px solid #2D6A2D;"
     "color:white;padding:36px 32px;border-radius:14px;margin-bottom:24px;'>"
     "<div style='font-size:2.2em;font-weight:800;margin-bottom:8px;'>"
     "For The Greater Goodness</div>"
@@ -68,54 +68,54 @@ achievements = [
         "title": "100% Renewable Energy",
         "desc": "Every Harris Farm store, our warehouse, and our support office "
                 "run on 100% renewable energy. Done.",
-        "color": "#2ECC71",
+        "color": "#2D6A2D",
     },
     {
         "icon": "\U0001f4dc",
         "title": "Modern Slavery Statement",
         "desc": "We've published our Modern Slavery Statement — transparent about "
                 "our supply chain and committed to ethical sourcing.",
-        "color": "#2ECC71",
+        "color": "#2D6A2D",
     },
     {
         "icon": "\U0001f30d",
         "title": "FY25 Climate Disclosure",
         "desc": "Full climate disclosure published. We're honest about our footprint "
                 "and open about our path to reduce it.",
-        "color": "#2ECC71",
+        "color": "#2D6A2D",
     },
     {
         "icon": "\U0001f3d8\ufe0f",
         "title": "Neighbourhood Goodness",
         "desc": "Year-on-year growth in community impact — local partnerships, food rescue, "
                 "and supporting the neighbourhoods we serve.",
-        "color": "#2ECC71",
+        "color": "#2D6A2D",
     },
     {
         "icon": "\U0001f4ca",
         "title": "Sustainability KPIs for ELT",
         "desc": "Our executive leadership team now has sustainability targets baked into "
                 "their scorecards. Purpose isn't optional — it's measured.",
-        "color": "#2ECC71",
+        "color": "#2D6A2D",
     },
     {
         "icon": "\U0001f3af",
         "title": "Purpose Definition Complete",
         "desc": "'For The Greater Goodness' is defined, aligned across Pillars 2 & 3, "
                 "and ready to roll out to every Harris Farmer.",
-        "color": "#2ECC71",
+        "color": "#2D6A2D",
     },
 ]
 
 for i, a in enumerate(achievements):
     with achieved_cols[i % 3]:
         st.markdown(
-            f"<div style='background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2);"
+            f"<div style='background:rgba(45,106,45,0.08);border:1px solid rgba(45,106,45,0.2);"
             f"border-radius:10px;padding:18px;margin-bottom:12px;min-height:180px;'>"
             f"<div style='font-size:1.8em;'>{a['icon']}</div>"
-            f"<div style='font-weight:700;color:#2ECC71;font-size:1.05em;margin:6px 0;'>"
+            f"<div style='font-weight:700;color:#2D6A2D;font-size:1.05em;margin:6px 0;'>"
             f"{a['title']}</div>"
-            f"<div style='font-size:0.88em;color:#B0BEC5;line-height:1.5;'>{a['desc']}</div>"
+            f"<div style='font-size:0.88em;color:#4A5568;line-height:1.5;'>{a['desc']}</div>"
             f"</div>",
             unsafe_allow_html=True,
         )
@@ -200,7 +200,7 @@ wip_items = [
 
 for item in wip_items:
     st.markdown(
-        f"<div style='border-left:4px solid #2ECC71;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-left:4px solid #2ECC71;"
+        f"<div style='border-left:4px solid #2D6A2D;background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);border-left:4px solid #2D6A2D;"
         f"padding:16px 20px;border-radius:0 10px 10px 0;margin-bottom:10px;"
         f"box-shadow:0 1px 3px rgba(0,0,0,0.08);'>"
         f"<div style='display:flex;align-items:center;gap:10px;'>"
@@ -208,10 +208,10 @@ for item in wip_items:
         f"<div>"
         f"<div style='font-weight:700;color:white;font-size:1.05em;'>"
         f"{item['title']}</div>"
-        f"<div style='font-size:0.78em;color:#2ECC71;font-weight:600;'>"
+        f"<div style='font-size:0.78em;color:#2D6A2D;font-weight:600;'>"
         f"{item['status']}</div>"
         f"</div></div>"
-        f"<div style='font-size:0.9em;color:#B0BEC5;margin-top:8px;line-height:1.5;'>"
+        f"<div style='font-size:0.9em;color:#4A5568;margin-top:8px;line-height:1.5;'>"
         f"{item['desc']}</div>"
         f"</div>",
         unsafe_allow_html=True,
@@ -233,8 +233,8 @@ with daily_cols[0]:
         "<div style='background:rgba(241,196,15,0.08);border:1px solid rgba(241,196,15,0.2);"
         "border-radius:10px;padding:20px;min-height:200px;'>"
         "<div style='font-size:1.5em;margin-bottom:8px;'>\U0001f34b</div>"
-        "<div style='font-weight:700;color:#F1C40F;font-size:1.1em;'>Imperfect Picks</div>"
-        "<div style='font-size:0.9em;color:#B0BEC5;margin-top:8px;line-height:1.5;'>"
+        "<div style='font-weight:700;color:#E8B84B;font-size:1.1em;'>Imperfect Picks</div>"
+        "<div style='font-size:0.9em;color:#4A5568;margin-top:8px;line-height:1.5;'>"
         "Ugly fruit and veg deserve love too. Our Imperfect Picks program rescues "
         "produce that doesn't meet cosmetic standards but tastes just as good. "
         "Less waste, more value, greater goodness."
@@ -247,7 +247,7 @@ with daily_cols[0]:
         "border-radius:10px;padding:20px;min-height:200px;'>"
         "<div style='font-size:1.5em;margin-bottom:8px;'>\U0001f33e</div>"
         "<div style='font-weight:700;color:#3B82F6;font-size:1.1em;'>We're for Aussie Farmers</div>"
-        "<div style='font-size:0.9em;color:#B0BEC5;margin-top:8px;line-height:1.5;'>"
+        "<div style='font-size:0.9em;color:#4A5568;margin-top:8px;line-height:1.5;'>"
         "We build real relationships with Australian farmers and producers. "
         "When something's in season, we buy more and pass the savings on. "
         "When times are tough, we back our farmers. That's how a family business works."
@@ -261,7 +261,7 @@ with daily_cols[1]:
         "border-radius:10px;padding:20px;min-height:200px;'>"
         "<div style='font-size:1.5em;margin-bottom:8px;'>\U0001f3e0</div>"
         "<div style='font-weight:700;color:#EC4899;font-size:1.1em;'>Neighbourhood Goodness</div>"
-        "<div style='font-size:0.9em;color:#B0BEC5;margin-top:8px;line-height:1.5;'>"
+        "<div style='font-size:0.9em;color:#4A5568;margin-top:8px;line-height:1.5;'>"
         "Every Harris Farm store is part of its community. Food rescue partnerships, "
         "local sponsorships, and showing up when it matters. "
         "We're not just in the neighbourhood — we're for the neighbourhood."
@@ -270,11 +270,11 @@ with daily_cols[1]:
     )
     st.markdown("")
     st.markdown(
-        "<div style='background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2);"
+        "<div style='background:rgba(45,106,45,0.08);border:1px solid rgba(45,106,45,0.2);"
         "border-radius:10px;padding:20px;min-height:200px;'>"
         "<div style='font-size:1.5em;margin-bottom:8px;'>\U0001f30f</div>"
-        "<div style='font-weight:700;color:#2ECC71;font-size:1.1em;'>If It's In Season, Seize It</div>"
-        "<div style='font-size:0.9em;color:#B0BEC5;margin-top:8px;line-height:1.5;'>"
+        "<div style='font-weight:700;color:#2D6A2D;font-size:1.1em;'>If It's In Season, Seize It</div>"
+        "<div style='font-size:0.9em;color:#4A5568;margin-top:8px;line-height:1.5;'>"
         "Nature knows best. We let seasonal abundance drive our pricing and our range. "
         "When mangoes are at their peak, we fill the stores. When stone fruit is bursting, "
         "everyone benefits. It's fresher, cheaper, and better for the planet."
@@ -299,11 +299,11 @@ framework_cols = st.columns(3)
 
 with framework_cols[0]:
     st.markdown(
-        "<div style='background:rgba(255,255,255,0.05);border:2px solid #2ECC71;border-radius:10px;"
+        "<div style='background:rgba(0,0,0,0.04);border:2px solid #2D6A2D;border-radius:10px;"
         "padding:18px;text-align:center;min-height:140px;'>"
         "<div style='font-size:1.4em;margin-bottom:6px;'>\U0001f9ed</div>"
-        "<div style='font-weight:700;color:#2ECC71;'>Governance Principles</div>"
-        "<div style='font-size:0.85em;color:#8899AA;margin-top:6px;'>"
+        "<div style='font-weight:700;color:#2D6A2D;'>Governance Principles</div>"
+        "<div style='font-size:0.85em;color:#718096;margin-top:6px;'>"
         "Purpose-Led Governance Principles defined. "
         "Board Governance Charter developed. "
         "Board skills matrix complete.</div>"
@@ -313,11 +313,11 @@ with framework_cols[0]:
 
 with framework_cols[1]:
     st.markdown(
-        "<div style='background:rgba(255,255,255,0.05);border:2px solid #2ECC71;border-radius:10px;"
+        "<div style='background:rgba(0,0,0,0.04);border:2px solid #2D6A2D;border-radius:10px;"
         "padding:18px;text-align:center;min-height:140px;'>"
         "<div style='font-size:1.4em;margin-bottom:6px;'>\U0001f4cb</div>"
-        "<div style='font-weight:700;color:#2ECC71;'>Decision Matrix</div>"
-        "<div style='font-size:0.85em;color:#8899AA;margin-top:6px;'>"
+        "<div style='font-weight:700;color:#2D6A2D;'>Decision Matrix</div>"
+        "<div style='font-size:0.85em;color:#718096;margin-top:6px;'>"
         "Decision Matrix Templates developed. "
         "Does this decision serve Greater Goodness? "
         "Framework presenting to ELT Feb 25, Top 100 Mar 12.</div>"
@@ -327,11 +327,11 @@ with framework_cols[1]:
 
 with framework_cols[2]:
     st.markdown(
-        "<div style='background:rgba(255,255,255,0.05);border:2px solid #2ECC71;border-radius:10px;"
+        "<div style='background:rgba(0,0,0,0.04);border:2px solid #2D6A2D;border-radius:10px;"
         "padding:18px;text-align:center;min-height:140px;'>"
         "<div style='font-size:1.4em;margin-bottom:6px;'>\U0001f3c5</div>"
-        "<div style='font-weight:700;color:#2ECC71;'>B Corp</div>"
-        "<div style='font-size:0.85em;color:#8899AA;margin-top:6px;'>"
+        "<div style='font-weight:700;color:#2D6A2D;'>B Corp</div>"
+        "<div style='font-size:0.85em;color:#718096;margin-top:6px;'>"
         "B-Impact Assessment submitted. "
         "Board education session underway. "
         "Targeting certification Feb/Mar 2026.</div>"
@@ -348,11 +348,11 @@ st.markdown("")
 st.markdown("## Innovation for Good")
 
 st.markdown(
-    "<div style='background:linear-gradient(135deg, rgba(46,204,113,0.08) 0%, rgba(46,204,113,0.04) 100%);"
-    "border:1px solid rgba(46,204,113,0.2);border-radius:12px;padding:24px;margin-bottom:16px;'>"
-    "<div style='font-size:1.2em;font-weight:700;color:#2ECC71;margin-bottom:10px;'>"
+    "<div style='background:linear-gradient(135deg, rgba(45,106,45,0.08) 0%, rgba(45,106,45,0.04) 100%);"
+    "border:1px solid rgba(45,106,45,0.2);border-radius:12px;padding:24px;margin-bottom:16px;'>"
+    "<div style='font-size:1.2em;font-weight:700;color:#2D6A2D;margin-bottom:10px;'>"
     "\U0001f4f1 Too Good To Go Partnership</div>"
-    "<div style='font-size:0.95em;color:#B0BEC5;line-height:1.6;'>"
+    "<div style='font-size:0.95em;color:#4A5568;line-height:1.6;'>"
     "We're trialling date-check software in stores through our partnership with "
     "Too Good To Go. Scoping with IT is complete and the enterprise agreement is "
     "under review. This tech helps us rescue food that's still perfectly good "
@@ -366,7 +366,7 @@ st.markdown(
     "border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:24px;margin-bottom:16px;'>"
     "<div style='font-size:1.2em;font-weight:700;color:#3B82F6;margin-bottom:10px;'>"
     "\U0001f916 AI for Waste Reduction</div>"
-    "<div style='font-size:0.95em;color:#B0BEC5;line-height:1.6;'>"
+    "<div style='font-size:0.95em;color:#4A5568;line-height:1.6;'>"
     "The Hub's demand forecasting and weather integration help buyers order "
     "smarter — reducing over-ordering and food waste. When we know a heatwave "
     "is coming, we adjust. When rain is forecast, we scale back outdoor produce. "
@@ -384,11 +384,11 @@ st.markdown("")
 st.markdown("## Our Story")
 
 st.markdown(
-    "<div style='background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:12px;"
+    "<div style='background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);border-radius:12px;"
     "padding:28px;'>"
     "<div style='font-size:1.3em;font-weight:700;color:white;margin-bottom:12px;'>"
     "Family owned since 1971</div>"
-    "<div style='font-size:0.95em;color:#B0BEC5;line-height:1.7;'>"
+    "<div style='font-size:0.95em;color:#4A5568;line-height:1.7;'>"
     "<p>David and Cathy Harris opened our first store in <strong>Villawood in 1971</strong>. "
     "What started with a simple love of fresh food has grown into <strong>30+ stores "
     "across NSW, Queensland, and the ACT</strong>, employing over 3,000 Harris Farmers.</p>"
@@ -403,7 +403,7 @@ st.markdown(
     "<p>The Greater Goodness isn't a marketing slogan. It's how we make decisions. "
     "It's why we back Australian farmers, rescue imperfect produce, run on renewable energy, "
     "and invest in our people. It's the thread that connects everything we do.</p>"
-    "<p style='font-style:italic;color:#2ECC71;font-weight:600;margin-top:16px;'>"
+    "<p style='font-style:italic;color:#2D6A2D;font-weight:600;margin-top:16px;'>"
     "\"We're for good food and the good things it does for people.\" — David Harris</p>"
     "</div></div>",
     unsafe_allow_html=True,
@@ -422,9 +422,9 @@ role_cols = st.columns(3)
 
 with role_cols[0]:
     st.markdown(
-        "<div style='background:rgba(46,204,113,0.08);border-radius:10px;padding:18px;min-height:180px;'>"
-        "<div style='font-weight:700;color:#2ECC71;'>\U0001f3ea In Store</div>"
-        "<ul style='font-size:0.88em;color:#B0BEC5;margin-top:8px;'>"
+        "<div style='background:rgba(45,106,45,0.08);border-radius:10px;padding:18px;min-height:180px;'>"
+        "<div style='font-weight:700;color:#2D6A2D;'>\U0001f3ea In Store</div>"
+        "<ul style='font-size:0.88em;color:#4A5568;margin-top:8px;'>"
         "<li>Reduce waste — check dates, rotate stock, use Imperfect Picks</li>"
         "<li>Save energy — lights off when not needed, doors closed</li>"
         "<li>Be the community — welcome customers, support local events</li>"
@@ -437,7 +437,7 @@ with role_cols[1]:
     st.markdown(
         "<div style='background:rgba(59,130,246,0.08);border-radius:10px;padding:18px;min-height:180px;'>"
         "<div style='font-weight:700;color:#3B82F6;'>\U0001f69a In the Warehouse</div>"
-        "<ul style='font-size:0.88em;color:#B0BEC5;margin-top:8px;'>"
+        "<ul style='font-size:0.88em;color:#4A5568;margin-top:8px;'>"
         "<li>Handle with care — less damage means less waste</li>"
         "<li>Sort smarter — recycling and composting at every step</li>"
         "<li>Report issues — if something's off, flag it early</li>"
@@ -449,8 +449,8 @@ with role_cols[1]:
 with role_cols[2]:
     st.markdown(
         "<div style='background:rgba(241,196,15,0.08);border-radius:10px;padding:18px;min-height:180px;'>"
-        "<div style='font-weight:700;color:#F1C40F;'>\U0001f4bc In Support Office</div>"
-        "<ul style='font-size:0.88em;color:#B0BEC5;margin-top:8px;'>"
+        "<div style='font-weight:700;color:#E8B84B;'>\U0001f4bc In Support Office</div>"
+        "<ul style='font-size:0.88em;color:#4A5568;margin-top:8px;'>"
         "<li>Use the Decision Matrix — does it serve Greater Goodness?</li>"
         "<li>Buy responsibly — consider the full supply chain</li>"
         "<li>Use AI to find waste and efficiency — that's what The Hub is for</li>"
@@ -506,7 +506,7 @@ st.markdown("")
 # ---------------------------------------------------------------------------
 
 st.markdown(
-    "<div style='background:linear-gradient(135deg, #0F1D35 0%, #132240 100%);border:1px solid rgba(46,204,113,0.2);border-top:3px solid #2ECC71;"
+    "<div style='background:linear-gradient(135deg, #0F1D35 0%, #132240 100%);border:1px solid rgba(45,106,45,0.2);border-top:3px solid #2D6A2D;"
     "color:white;padding:20px 24px;border-radius:10px;margin:20px 0;text-align:center;'>"
     "<div style='font-size:1.3em;font-weight:700;'>For The Greater Goodness</div>"
     "<div style='font-size:0.9em;opacity:0.9;margin-top:6px;'>"

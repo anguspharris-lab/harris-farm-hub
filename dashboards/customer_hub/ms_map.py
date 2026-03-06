@@ -157,7 +157,7 @@ def render():
     # ── Catchment rings ──
     if show_rings:
         ring_radii = [3, 5, 10, 20]
-        ring_colors = ["#2ECC71", "#2563eb", "#d97706", "#94a3b8"]
+        ring_colors = ["#2D6A2D", "#2563eb", "#d97706", "#94a3b8"]
 
         stores_to_ring = (
             {ring_store: STORE_LOCATIONS[ring_store]}

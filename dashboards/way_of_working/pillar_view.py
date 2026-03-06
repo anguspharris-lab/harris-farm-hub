@@ -39,16 +39,16 @@ def render():
         return
 
     df = pd.DataFrame(items)
-    color = pillar.get("color", "#2ECC71")
+    color = pillar.get("color", "#2D6A2D")
 
     # ── Pillar header ──
     st.markdown(
         "<div style='border-left:4px solid {};padding:12px 16px;"
-        "background:rgba(255,255,255,0.05);border-radius:0 8px 8px 0;"
+        "background:rgba(0,0,0,0.04);border-radius:0 8px 8px 0;"
         "margin-bottom:16px;'>"
         "<div style='font-size:1.3em;font-weight:700;color:{};'>"
         "{} {}</div>"
-        "<div style='color:#8899AA;font-size:0.9em;font-style:italic;'>"
+        "<div style='color:#718096;font-size:0.9em;font-style:italic;'>"
         "{}</div>"
         "</div>".format(
             color, HFM_DARK,
@@ -83,15 +83,15 @@ def render():
             # Use actual status labels (not categories) for richer view
             status_counts = df["status"].value_counts()
             status_colors = {
-                "Done": "#2ECC71", "Complete": "#2ECC71",
+                "Done": "#2D6A2D", "Complete": "#2D6A2D",
                 "Immediate requirements complete": "#059669",
                 "Working on it": "#2563eb", "In Progress": "#3b82f6",
                 "Stuck": "#dc2626", "Blocked": "#ef4444",
-                "Future steps": "#8899AA", "Not Started": "#d1d5db",
+                "Future steps": "#718096", "Not Started": "#d1d5db",
             }
             labels = status_counts.index.tolist()
             values = status_counts.values.tolist()
-            colors = [status_colors.get(s, "#8899AA") for s in labels]
+            colors = [status_colors.get(s, "#718096") for s in labels]
 
             fig = go.Figure(data=[go.Pie(
                 labels=labels, values=values,
@@ -120,11 +120,11 @@ def render():
                     "<span style='font-size:0.85em;min-width:140px;"
                     "white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'>"
                     "{}</span>"
-                    "<div style='flex:1;background:rgba(255,255,255,0.1);border-radius:4px;"
+                    "<div style='flex:1;background:rgba(0,0,0,0.08);border-radius:4px;"
                     "height:8px;'>"
                     "<div style='background:{};height:8px;border-radius:4px;"
                     "width:{}%;'></div></div>"
-                    "<span style='font-size:0.8em;color:#8899AA;min-width:30px;"
+                    "<span style='font-size:0.8em;color:#718096;min-width:30px;"
                     "text-align:right;'>{}</span>"
                     "</div>".format(owner_name, color, pct_bar, count),
                     unsafe_allow_html=True,

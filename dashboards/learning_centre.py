@@ -268,11 +268,11 @@ adkar_stages = [
 for i, (stage, desc, maps_to) in enumerate(adkar_stages):
     with adkar_cols[i]:
         st.markdown(
-            f"<div style='text-align:center;padding:8px;background:rgba(46,204,113,0.08);"
-            f"border-radius:8px;border:1px solid rgba(255,255,255,0.08);'>"
+            f"<div style='text-align:center;padding:8px;background:rgba(45,106,45,0.08);"
+            f"border-radius:8px;border:1px solid rgba(0,0,0,0.08);'>"
             f"<div style='font-weight:700;color:#059669;font-size:0.9em;'>{stage}</div>"
-            f"<div style='font-size:0.75em;color:#8899AA;'>{desc}</div>"
-            f"<div style='font-size:0.7em;color:#8899AA;'>{maps_to}</div>"
+            f"<div style='font-size:0.75em;color:#718096;'>{desc}</div>"
+            f"<div style='font-size:0.7em;color:#718096;'>{maps_to}</div>"
             f"</div>",
             unsafe_allow_html=True,
         )
@@ -287,8 +287,8 @@ with st.expander("**Start Here: When In Doubt, Ask AI** — the one habit that c
 
     # --- Hero ---
     st.markdown(
-        "<div style='background:linear-gradient(135deg, rgba(46,204,113,0.08) 0%, rgba(46,204,113,0.12) 100%);"
-        "border:2px solid #2ECC71;border-radius:12px;padding:24px;margin-bottom:20px;'>"
+        "<div style='background:linear-gradient(135deg, rgba(45,106,45,0.08) 0%, rgba(45,106,45,0.12) 100%);"
+        "border:2px solid #2D6A2D;border-radius:12px;padding:24px;margin-bottom:20px;'>"
         "<div style='font-size:1.3em;font-weight:700;color:#166534;margin-bottom:8px;'>"
         "The one thing that changes everything</div>"
         "<div style='font-size:1em;color:#15803d;line-height:1.6;'>"
@@ -305,10 +305,10 @@ with st.expander("**Start Here: When In Doubt, Ask AI** — the one habit that c
     col_old, col_new = st.columns(2)
     with col_old:
         st.markdown(
-            "<div style='background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;"
+            "<div style='background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.08);border-radius:10px;"
             "padding:16px;height:100%;'>"
-            "<div style='font-weight:700;color:#8899AA;margin-bottom:10px;'>THE OLD WAY</div>"
-            "<div style='font-size:0.9em;color:#8899AA;line-height:1.7;'>"
+            "<div style='font-weight:700;color:#718096;margin-bottom:10px;'>THE OLD WAY</div>"
+            "<div style='font-size:0.9em;color:#718096;line-height:1.7;'>"
             "1. <em>\"How do I do this?\"</em><br>"
             "2. Google it for 20 minutes<br>"
             "3. Find 6 conflicting answers<br>"
@@ -320,7 +320,7 @@ with st.expander("**Start Here: When In Doubt, Ask AI** — the one habit that c
         )
     with col_new:
         st.markdown(
-            "<div style='background:rgba(46,204,113,0.08);border:2px solid #2ECC71;border-radius:10px;"
+            "<div style='background:rgba(45,106,45,0.08);border:2px solid #2D6A2D;border-radius:10px;"
             "padding:16px;height:100%;'>"
             "<div style='font-weight:700;color:#166534;margin-bottom:10px;'>THE NEW WAY</div>"
             "<div style='font-size:0.9em;color:#15803d;line-height:1.7;'>"
@@ -357,7 +357,7 @@ with st.expander("**Start Here: When In Doubt, Ask AI** — the one habit that c
             "<div style='font-weight:700;color:#1d4ed8;font-size:1.1em;'>ASK</div>"
             "<div style='font-size:0.8em;color:#1e40af;margin-top:4px;'>\"I'm stuck. Help.\"</div>"
             "<hr style='border-color:#bfdbfe;margin:10px 0;'>"
-            "<div style='font-size:0.85em;color:#B0BEC5;text-align:left;line-height:1.6;'>"
+            "<div style='font-size:0.85em;color:#4A5568;text-align:left;line-height:1.6;'>"
             "You ask AI questions and use its answers. "
             "This alone saves hours every week. "
             "<strong>Most people stay here and that's FINE.</strong> "
@@ -367,13 +367,13 @@ with st.expander("**Start Here: When In Doubt, Ask AI** — the one habit that c
         )
     with g2:
         st.markdown(
-            "<div style='background:rgba(46,204,113,0.08);border:2px solid #22c55e;border-radius:10px;"
+            "<div style='background:rgba(45,106,45,0.08);border:2px solid #2D6A2D;border-radius:10px;"
             "padding:16px;text-align:center;'>"
             "<div style='font-size:1.8em;'>2</div>"
             "<div style='font-weight:700;color:#166534;font-size:1.1em;'>REFINE</div>"
             "<div style='font-size:0.8em;color:#15803d;margin-top:4px;'>\"Make it better.\"</div>"
             "<hr style='border-color:#bbf7d0;margin:10px 0;'>"
-            "<div style='font-size:0.85em;color:#B0BEC5;text-align:left;line-height:1.6;'>"
+            "<div style='font-size:0.85em;color:#4A5568;text-align:left;line-height:1.6;'>"
             "You learn that the <strong>quality of AI's output</strong> depends on the "
             "<strong>quality of your input</strong>. Rubrics teach you how to evaluate "
             "and improve both. A 5/10 becomes an 8/10."
@@ -388,7 +388,7 @@ with st.expander("**Start Here: When In Doubt, Ask AI** — the one habit that c
             "<div style='font-weight:700;color:#92400e;font-size:1.1em;'>BUILD</div>"
             "<div style='font-size:0.8em;color:#a16207;margin-top:4px;'>\"Automate it.\"</div>"
             "<hr style='border-color:#fde68a;margin:10px 0;'>"
-            "<div style='font-size:0.85em;color:#B0BEC5;text-align:left;line-height:1.6;'>"
+            "<div style='font-size:0.85em;color:#4A5568;text-align:left;line-height:1.6;'>"
             "Use Claude.ai (the Brain) to <strong>design</strong> what you want. "
             "Use Claude Code (the Hands) to <strong>build</strong> it. "
             "Use Claude.ai again to <strong>review</strong>. "
@@ -459,8 +459,8 @@ with st.expander("**Start Here: When In Doubt, Ask AI** — the one habit that c
 
     st.markdown("")
     st.markdown(
-        "<div style='text-align:center;padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;"
-        "border:1px solid rgba(255,255,255,0.08);font-size:0.9em;color:#B0BEC5;'>"
+        "<div style='text-align:center;padding:12px;background:rgba(0,0,0,0.03);border-radius:8px;"
+        "border:1px solid rgba(0,0,0,0.08);font-size:0.9em;color:#4A5568;'>"
         "AI is not a tool you need to learn. "
         "It's a colleague you need to <strong>remember to ask</strong>."
         "</div>",
@@ -832,7 +832,7 @@ with tab_lab:
                         ]
                         for i, (key, label) in enumerate(criteria_names):
                             score = scores.get(key, 0)
-                            color = "#22c55e" if score >= 4 else "#f59e0b" if score >= 3 else "#ef4444"
+                            color = "#2D6A2D" if score >= 4 else "#f59e0b" if score >= 3 else "#ef4444"
                             score_cols[i].markdown(
                                 f"<div style='text-align:center;padding:8px;background:{color}20;"
                                 f"border-radius:8px;border:2px solid {color};'>"
@@ -911,7 +911,7 @@ with tab_lab:
 
 st.markdown("---")
 st.markdown(
-    "<div style='background:rgba(46,204,113,0.08);border-left:4px solid #059669;"
+    "<div style='background:rgba(45,106,45,0.08);border-left:4px solid #059669;"
     "padding:12px 16px;border-radius:0 8px 8px 0;margin:10px 0;'>"
     "<div style='font-size:0.85em;color:#065f46;'>"
     "<strong>Your Learning Journey:</strong> "

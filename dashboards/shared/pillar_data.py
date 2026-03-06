@@ -19,7 +19,7 @@ PILLAR_REGISTRY = {
         "name": "For The Greater Goodness",
         "short_name": "Greater Goodness",
         "icon": "\U0001f331",
-        "color": "#2ECC71",
+        "color": "#2D6A2D",
         "tagline": "We'll do things right, from end-to-end",
         "strategic_question": (
             "Are we living the Greater Goodness \u2014 measurably, "
@@ -47,7 +47,7 @@ PILLAR_REGISTRY = {
         "name": "Growing Legendary Leadership",
         "short_name": "People",
         "icon": "\U0001f393",
-        "color": "#2ECC71",
+        "color": "#2D6A2D",
         "tagline": (
             "We will be famous for attracting, developing, "
             "and retaining exceptional people"
@@ -84,7 +84,7 @@ PILLAR_REGISTRY = {
         "name": "Tomorrow's Business, Built Better",
         "short_name": "Digital & AI",
         "icon": "\U0001f680",
-        "color": "#2ECC71",
+        "color": "#2D6A2D",
         "tagline": (
             "We'll build a brilliant back-end with tools that talk, "
             "systems that serve, data we trust"

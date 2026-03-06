@@ -20,13 +20,13 @@ _pages = st.session_state.get("_pages", {})
 # ═══════════════════════════════════════════════════════════════════════════
 
 st.markdown(
-    f"<div style='background:linear-gradient(135deg, #0F1D35 0%, #132240 50%, #1A2D50 100%);"
-    f"border:1px solid rgba(46,204,113,0.2);border-top:3px solid #2ECC71;"
+    f"<div style='background:linear-gradient(135deg, #2D6A2D 0%, #245624 50%, #1A3F1A 100%);"
+    f"border:1px solid rgba(45,106,45,0.2);border-top:3px solid #E8B84B;"
     f"color:white;padding:28px 32px;border-radius:14px;margin-bottom:20px;'>"
     f"<div style='font-size:1.8em;font-weight:700;margin-bottom:4px;"
     f"font-family:Georgia,serif;'>"
-    f"Our Strategy: Fewer, Bigger, Better</div>"
-    f"<div style='font-size:1.05em;color:#B0BEC5;max-width:700px;'>"
+    f"Here's where we're going \u2014 and why it's worth the journey</div>"
+    f"<div style='font-size:1.05em;color:rgba(255,255,255,0.85);max-width:700px;'>"
     f"Vision 2030 &mdash; Australia's most loved fresh food retailer, inside and out. "
     f"Everything The Hub does maps back to these five pillars.</div>"
     f"</div>",
@@ -34,7 +34,7 @@ st.markdown(
 )
 
 st.markdown(
-    "<div style='color:#8899AA;font-style:italic;font-size:0.95em;"
+    "<div style='color:#718096;font-style:italic;font-size:0.95em;"
     "margin-top:-12px;margin-bottom:16px;padding-left:4px;'>"
     "Now accelerated by the AI-First Method: AI is our brain partner. "
     "Data is our foundation. The prompt is our unlock."
@@ -104,20 +104,20 @@ for i, hub in enumerate(_pillar_hubs):
         status_html = ""
         for item in status_items:
             status_html += (
-                f"<div style='font-size:0.78em;color:#8899AA;margin:2px 0;'>"
+                f"<div style='font-size:0.78em;color:#718096;margin:2px 0;'>"
                 f"&bull; {item}</div>"
             )
 
         st.markdown(
             f"<div style='border-left:3px solid {color};"
-            f"background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);"
+            f"background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);"
             f"border-left:3px solid {color};"
             f"border-radius:0 8px 8px 0;padding:14px;min-height:160px;'>"
             f"<div style='font-size:0.7em;color:{color};font-weight:700;"
             f"text-transform:uppercase;letter-spacing:0.5px;'>{pillar}</div>"
             f"<div style='font-size:0.9em;font-weight:700;color:white;"
             f"font-family:Georgia,serif;margin:3px 0;'>{hub['icon']} {hub['name']}</div>"
-            f"<div style='font-size:0.75em;color:#8899AA;font-style:italic;"
+            f"<div style='font-size:0.75em;color:#718096;font-style:italic;"
             f"margin-bottom:8px;'>{tagline}</div>"
             f"{status_html}"
             f"</div>",
@@ -155,7 +155,7 @@ try:
 
         # Section header with overall progress
         st.markdown(
-            f"<div style='background:linear-gradient(135deg, #1e293b 0%, #334155 100%);"
+            f"<div style='background:linear-gradient(135deg, #2D6A2D 0%, #245624 100%);"
             f"color:white;padding:24px 28px;border-radius:14px;margin-bottom:16px;'>"
             f"<div style='display:flex;justify-content:space-between;align-items:center;"
             f"flex-wrap:wrap;gap:12px;'>"
@@ -183,7 +183,7 @@ try:
             f"{_ip_stuck_all}</div>"
             f"<div style='font-size:0.75em;opacity:0.7;'>Stuck</div></div>"
             f"</div></div>"
-            f"<div style='background:rgba(255,255,255,0.08);border-radius:6px;"
+            f"<div style='background:rgba(0,0,0,0.08);border-radius:6px;"
             f"height:8px;margin-top:16px;'>"
             f"<div style='background:#4ade80;height:8px;border-radius:6px;"
             f"width:{_ip_pct_all}%;transition:width 0.5s;'></div></div>"
@@ -204,8 +204,8 @@ try:
             _ip_color = _ip_p["color"]
             with _ip_cols[_ip_i]:
                 st.markdown(
-                    "<div style='border-left:3px solid {color};background:rgba(255,255,255,0.05);"
-                    "border:1px solid rgba(255,255,255,0.08);border-left:3px solid {color};"
+                    "<div style='border-left:3px solid {color};background:rgba(0,0,0,0.04);"
+                    "border:1px solid rgba(0,0,0,0.08);border-left:3px solid {color};"
                     "border-radius:0 8px 8px 0;padding:14px;"
                     "min-height:140px;'>"
                     "<div style='font-size:0.75em;color:{color};"
@@ -213,18 +213,18 @@ try:
                     "letter-spacing:0.5px;'>{icon} {name}</div>"
                     "<div style='font-size:1.4em;font-weight:700;color:white;"
                     "margin:6px 0 4px;'>{done}<span style='font-size:0.6em;"
-                    "color:#8899AA;font-weight:400;'>/{total}</span></div>"
+                    "color:#718096;font-weight:400;'>/{total}</span></div>"
                     "<div style='display:flex;gap:6px;font-size:0.72em;"
                     "margin-bottom:8px;'>"
-                    "<span style='color:#2ECC71;'>&check; {done}</span>"
+                    "<span style='color:#2D6A2D;'>&check; {done}</span>"
                     "<span style='color:#2563eb;'>&bull; {prog}</span>"
                     "<span style='color:#dc2626;'>&bull; {stuck}</span>"
                     "</div>"
-                    "<div style='background:rgba(255,255,255,0.1);border-radius:4px;"
+                    "<div style='background:rgba(0,0,0,0.08);border-radius:4px;"
                     "height:6px;'>"
                     "<div style='background:{color};height:6px;"
                     "border-radius:4px;width:{pct}%;'></div></div>"
-                    "<div style='font-size:0.68em;color:#8899AA;"
+                    "<div style='font-size:0.68em;color:#718096;"
                     "text-align:right;margin-top:2px;'>{pct}%</div>"
                     "</div>".format(
                         color=_ip_color, icon=_ip_p["icon"],
@@ -256,7 +256,7 @@ except ImportError:
 
 st.markdown(
     "<h2 style='color:white;margin-bottom:4px;font-family:Georgia,serif;'>The 5 Goals</h2>"
-    "<p style='color:#8899AA;margin-top:0;'>Why The Hub exists &mdash; "
+    "<p style='color:#718096;margin-top:0;'>Why The Hub exists &mdash; "
     "live progress across every goal.</p>",
     unsafe_allow_html=True,
 )
@@ -280,7 +280,7 @@ for i, (gid, goal) in enumerate(HUB_GOALS.items()):
         for label, val in metric_items.items():
             metric_html += (
                 f"<div style='display:flex;justify-content:space-between;"
-                f"font-size:0.8em;color:#B0BEC5;margin:3px 0;'>"
+                f"font-size:0.8em;color:#4A5568;margin:3px 0;'>"
                 f"<span>{label}</span>"
                 f"<span style='font-weight:600;color:white;'>{val:,}</span></div>"
             )
@@ -289,21 +289,21 @@ for i, (gid, goal) in enumerate(HUB_GOALS.items()):
 
         st.markdown(
             f"<div style='border-left:4px solid {goal['color']};"
-            f"background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);"
+            f"background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);"
             f"border-left:4px solid {goal['color']};"
             f"border-radius:0 10px 10px 0;padding:16px;min-height:240px;'>"
             f"<div style='font-size:1.4em;'>{goal['icon']}</div>"
             f"<div style='font-size:0.95em;font-weight:700;color:white;"
             f"font-family:Georgia,serif;margin:4px 0 2px;'>{goal['title']}</div>"
-            f"<div style='font-size:0.78em;color:#8899AA;margin-bottom:8px;'>"
+            f"<div style='font-size:0.78em;color:#718096;margin-bottom:8px;'>"
             f"{desc}</div>"
             f"<div style='font-size:0.75em;color:{goal['color']};font-style:italic;"
             f"margin-bottom:10px;'>{goal['key_question']}</div>"
             f"<div style='margin:8px 0;'>{metric_html}</div>"
-            f"<div style='background:rgba(255,255,255,0.1);border-radius:6px;height:6px;margin-top:10px;'>"
+            f"<div style='background:rgba(0,0,0,0.08);border-radius:6px;height:6px;margin-top:10px;'>"
             f"<div style='background:{bar_color};height:6px;border-radius:6px;"
             f"width:{progress}%;'></div></div>"
-            f"<div style='font-size:0.7em;color:#8899AA;text-align:right;margin-top:2px;'>"
+            f"<div style='font-size:0.7em;color:#718096;text-align:right;margin-top:2px;'>"
             f"{progress}%</div>"
             f"</div>",
             unsafe_allow_html=True,

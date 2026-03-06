@@ -129,7 +129,7 @@ wd_system = wd_status.get("system", {})
 wd_metrics = wd_status.get("metrics", {})
 
 status_active = wd_system.get("watchdog_active", False)
-status_color = "#22c55e" if status_active else "#ef4444"
+status_color = "#2D6A2D" if status_active else "#ef4444"
 st.markdown(
     '<div style="background:{}; color:white; padding:12px 20px; '
     'border-radius:8px; font-weight:600; text-align:center; '
@@ -569,7 +569,7 @@ with tab3:
                 avg = agent.get("avg_score", 0)
                 color = "green" if avg >= 8 else "orange" if avg >= 6 else "red"
                 st.markdown(
-                    "<div style='text-align:center;border:1px solid rgba(255,255,255,0.08);"
+                    "<div style='text-align:center;border:1px solid rgba(0,0,0,0.08);"
                     "border-radius:8px;padding:16px;margin:4px'>"
                     "<b>{}</b><br>"
                     "<span style='font-size:2em;color:{}'>{:.1f}</span>"

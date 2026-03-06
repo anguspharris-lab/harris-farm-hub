@@ -72,10 +72,10 @@ if is_configured():
     initiative_summary_card(summary)
 else:
     st.markdown(
-        "<div style='background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);"
+        "<div style='background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.08);"
         "border-radius:8px;padding:12px 16px;"
-        "color:#8899AA;font-size:0.9em;'>"
-        "\U0001f4cb <strong style='color:#B0BEC5;'>Initiative Tracking:</strong> Connect Monday.com "
+        "color:#718096;font-size:0.9em;'>"
+        "\U0001f4cb <strong style='color:#4A5568;'>Initiative Tracking:</strong> Connect Monday.com "
         "to see P4 strategic initiatives here. "
         "Add <code>MONDAY_API_KEY</code> to your <code>.env</code> file."
         "</div>",
@@ -85,17 +85,17 @@ else:
 # ── Strategic Context ──
 st.markdown("---")
 st.markdown(
-    "<div style='background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);"
+    "<div style='background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);"
     "border-radius:10px;padding:20px;'>"
     "<h3 style='color:white;margin-top:0;font-family:Georgia,serif;'>Tidy Up the Supply Chain</h3>"
-    "<p style='color:#B0BEC5;'>"
+    "<p style='color:#4A5568;'>"
     "Grant Enders is transforming our supply chain from pay to purchase. "
     "The Hub tracks this transformation with 383.6 million transaction rows, "
     "store-level P&Ls, PLU wastage analysis, and demand forecasting.</p>"
-    "<p style='color:#8899AA;font-size:0.9em;'>"
-    "<strong style='color:#B0BEC5;'>Key targets:</strong> OOS reduction 20% by Jun 2026 | "
+    "<p style='color:#718096;font-size:0.9em;'>"
+    "<strong style='color:#4A5568;'>Key targets:</strong> OOS reduction 20% by Jun 2026 | "
     "Category buying optimisation | Weather-adjusted demand planning</p>"
-    "<p style='color:#B0BEC5;font-style:italic;font-size:0.9em;'>"
+    "<p style='color:#4A5568;font-style:italic;font-size:0.9em;'>"
     "AI doesn't replace operational expertise \u2014 it compounds it. "
     "Prompt the whole process, not just one report.</p>"
     "</div>",

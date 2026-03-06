@@ -109,13 +109,13 @@ else:
         # Status colour
         status_colours = {
             "pending_approval": "#d97706",
-            "approved": "#2ECC71",
+            "approved": "#2D6A2D",
             "revision_requested": "#dc2626",
-            "draft": "#8899AA",
+            "draft": "#718096",
             "generated": "#3b82f6",
             "scored": "#8b5cf6",
         }
-        colour = status_colours.get(status, "#8899AA")
+        colour = status_colours.get(status, "#718096")
 
         # Summary card
         with st.expander(
@@ -149,8 +149,8 @@ else:
             with st.container():
                 st.markdown("**Original Prompt:**")
                 st.markdown(
-                    f"<div style='background:rgba(255,255,255,0.03); padding:12px; border-radius:6px; "
-                    f"font-size:0.9em; border:1px solid rgba(255,255,255,0.08);'>"
+                    f"<div style='background:rgba(0,0,0,0.03); padding:12px; border-radius:6px; "
+                    f"font-size:0.9em; border:1px solid rgba(0,0,0,0.08);'>"
                     f"{full.get('original_prompt', 'N/A')}</div>",
                     unsafe_allow_html=True,
                 )
@@ -172,8 +172,8 @@ else:
                 st.markdown("**Human Annotations:**")
                 for ann in annotations:
                     st.markdown(
-                        f"<div style='background:rgba(46,204,113,0.08); padding:10px; border-radius:6px; "
-                        f"border-left:3px solid #2ECC71; margin-bottom:8px; font-size:0.9em;'>"
+                        f"<div style='background:rgba(45,106,45,0.08); padding:10px; border-radius:6px; "
+                        f"border-left:3px solid #2D6A2D; margin-bottom:8px; font-size:0.9em;'>"
                         f"{ann}</div>",
                         unsafe_allow_html=True,
                     )

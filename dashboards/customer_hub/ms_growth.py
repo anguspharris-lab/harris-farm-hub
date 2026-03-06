@@ -230,7 +230,7 @@ def render():
                     pcdf, x="period_date", y="market_share_pct",
                     labels={"period_date": "",
                             "market_share_pct": "Market Share %"},
-                    color_discrete_sequence=["#2ECC71"],
+                    color_discrete_sequence=["#2D6A2D"],
                     title="Market Share Trend",
                 )
                 fig_pc.update_layout(height=300)

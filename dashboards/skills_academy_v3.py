@@ -46,14 +46,14 @@ API_URL = os.getenv("API_URL", "http://localhost:8000")
 PASS_THRESHOLD = ASSESSMENT_RUBRIC["pass_threshold"]  # 18
 MAX_SCORE = ASSESSMENT_RUBRIC["max_score"]  # 25
 CRITERIA = ASSESSMENT_RUBRIC["criteria"]
-BRAND_GREEN = "#2ECC71"
+BRAND_GREEN = "#2D6A2D"
 PEOPLE_GREEN = "#059669"
 
 L_MODULES = [m for m in SKILLS_MODULES if m["series"] == "L"]
 D_MODULES = [m for m in SKILLS_MODULES if m["series"] == "D"]
 
 DIFFICULTY_COLOURS = {
-    "beginner": "#22c55e",
+    "beginner": "#2D6A2D",
     "intermediate": "#eab308",
     "advanced": "#ef4444",
 }
@@ -373,14 +373,14 @@ def _render_module_card(mod, status, best, tier_info=None, key_suffix=""):
         status_bg = "#94a3b8"
     elif status == "passed":
         bg = "#f0fdf4"
-        border_col = "#22c55e"
+        border_col = "#2D6A2D"
         opacity = "1"
         icon = "&#9989;"
         score_str = ""
         if best is not None:
             score_str = " ({}/25)".format(int(best))
         status_label = "Passed" + score_str
-        status_bg = "#22c55e"
+        status_bg = "#2D6A2D"
     elif status == "in-progress":
         bg = "#fefce8"
         border_col = "#eab308"
@@ -444,7 +444,7 @@ def _render_score_bars(result):
         ckey = crit["key"]
         val = result.get(ckey, 0)
         pct = val / crit["max"] * 100
-        bar_col = "#22c55e" if val >= 4 else ("#eab308" if val >= 3 else "#ef4444")
+        bar_col = "#2D6A2D" if val >= 4 else ("#eab308" if val >= 3 else "#ef4444")
         st.markdown(
             "<div style='margin:6px 0;'>"
             "<div style='display:flex;justify-content:space-between;"
@@ -586,7 +586,7 @@ with tabs[0]:
             "{score}</span></div>"
             "<div><span style='font-size:0.82em;color:#6b7280;'>"
             "Strengths</span><br/>"
-            "<span style='font-size:0.95em;color:#B0BEC5;'>"
+            "<span style='font-size:0.95em;color:#4A5568;'>"
             "{strengths}</span></div>"
             "</div></div>".format(
                 level=p_level, score=p_score, strengths=strengths_str,
@@ -774,7 +774,7 @@ with tabs[0]:
                     b_name = b.get("badge_name", "")
                     st.markdown(
                         "<div style='text-align:center;padding:8px;"
-                        "background:rgba(46,204,113,0.08);border-radius:10px;"
+                        "background:rgba(45,106,45,0.08);border-radius:10px;"
                         "border:1px solid #bbf7d0;margin-bottom:8px;'>"
                         "<div style='font-size:1.6em;'>{}</div>"
                         "<div style='font-weight:600;font-size:0.82em;'>"
@@ -845,7 +845,7 @@ with tabs[1]:
             for i, resp in enumerate(p_responses):
                 sc_score = resp.get("score", 0)
                 sc_id = resp.get("scenario_id", "Scenario {}".format(i + 1))
-                bar_col = "#22c55e" if sc_score >= 8 else ("#eab308" if sc_score >= 5 else "#ef4444")
+                bar_col = "#2D6A2D" if sc_score >= 8 else ("#eab308" if sc_score >= 5 else "#ef4444")
                 bar_pct = min(int(sc_score / 10 * 100), 100)
                 st.markdown(
                     "<div style='display:flex;align-items:center;gap:12px;"
@@ -915,7 +915,7 @@ with tabs[1]:
                 r_strengths = result.get("detected_strengths", [])
                 st.markdown(
                     "<div style='background:linear-gradient(135deg, #f0fdf4, #dcfce7);"
-                    "border:2px solid #22c55e;border-radius:14px;padding:24px;"
+                    "border:2px solid #2D6A2D;border-radius:14px;padding:24px;"
                     "text-align:center;margin-bottom:20px;'>"
                     "<div style='font-size:1.3em;font-weight:700;color:#166534;'>"
                     "Placement Complete!</div>"
@@ -987,7 +987,7 @@ with tabs[1]:
                 "border-radius:12px;padding:20px;margin-bottom:16px;'>"
                 "<div style='font-size:1.3em;font-weight:700;color:#1e293b;'>"
                 "{icon} {title}</div>"
-                "<div style='font-size:0.95em;color:#B0BEC5;margin-top:12px;"
+                "<div style='font-size:0.95em;color:#4A5568;margin-top:12px;"
                 "line-height:1.7;'>{instruction}</div>"
                 "</div>".format(
                     icon=sc_icon, title=sc_title, instruction=sc_instruction,
@@ -1107,7 +1107,7 @@ def _render_module_content(mod, status, pmap, tab_prefix):
         "<div style='display:flex;align-items:center;gap:12px;"
         "padding:8px 14px;background:#f8fafc;border-radius:8px;"
         "margin-bottom:16px;'>"
-        "<span style='font-size:0.9em;color:#B0BEC5;'>Current Tier:</span>"
+        "<span style='font-size:0.9em;color:#4A5568;'>Current Tier:</span>"
         "{badge}"
         "<span style='font-size:0.82em;color:#6b7280;'>"
         "({elite} consecutive elite scores)</span>"
@@ -1159,8 +1159,8 @@ def _render_module_content(mod, status, pmap, tab_prefix):
                     )
                 with col_strong:
                     st.markdown(
-                        "<div style='background:rgba(46,204,113,0.08);border-left:4px solid "
-                        "#22c55e;padding:12px 16px;border-radius:0 8px 8px 0;"
+                        "<div style='background:rgba(45,106,45,0.08);border-left:4px solid "
+                        "#2D6A2D;padding:12px 16px;border-radius:0 8px 8px 0;"
                         "margin-bottom:8px;'>"
                         "<div style='font-weight:600;color:#166534;"
                         "font-size:0.85em;margin-bottom:4px;'>Strong Prompt</div>"
@@ -1244,7 +1244,7 @@ def _render_module_content(mod, status, pmap, tab_prefix):
                     score_pct = total / MAX_SCORE * 100
 
                     # Show result
-                    verdict_col = "#22c55e" if total >= PASS_THRESHOLD else "#ef4444"
+                    verdict_col = "#2D6A2D" if total >= PASS_THRESHOLD else "#ef4444"
                     st.markdown(
                         "<div style='text-align:center;margin:16px 0;'>"
                         "<div style='font-size:2em;font-weight:800;"
@@ -1466,7 +1466,7 @@ def _render_module_content(mod, status, pmap, tab_prefix):
                 _render_score_bars(result)
 
                 # Total + verdict
-                verdict_col = "#22c55e" if passed else "#ef4444"
+                verdict_col = "#2D6A2D" if passed else "#ef4444"
                 verdict_text = "PASS" if passed else "NEEDS IMPROVEMENT"
                 st.markdown(
                     "<div style='text-align:center;margin:16px 0;'>"
@@ -1491,8 +1491,8 @@ def _render_module_content(mod, status, pmap, tab_prefix):
                 if improved:
                     with st.expander("View improved prompt (23+ score version)"):
                         st.markdown(
-                            "<div style='background:rgba(46,204,113,0.08);border-left:4px "
-                            "solid #22c55e;padding:12px 16px;border-radius:"
+                            "<div style='background:rgba(45,106,45,0.08);border-left:4px "
+                            "solid #2D6A2D;padding:12px 16px;border-radius:"
                             "0 8px 8px 0;'>{}</div>".format(improved),
                             unsafe_allow_html=True,
                         )
@@ -1589,7 +1589,7 @@ with tabs[2]:
         "locked": ("&#128274; Locked", "#94a3b8"),
         "available": ("&#9654; Available", BRAND_GREEN),
         "in-progress": ("&#9997; In Progress", "#eab308"),
-        "passed": ("&#9989; Passed", "#22c55e"),
+        "passed": ("&#9989; Passed", "#2D6A2D"),
     }
     s_label, s_color = status_labels.get(sel_status, ("", "#6b7280"))
     best = _best_score(selected_mod["code"], pmap)
@@ -1649,7 +1649,7 @@ with tabs[3]:
         "locked": ("&#128274; Locked", "#94a3b8"),
         "available": ("&#9654; Available", BRAND_GREEN),
         "in-progress": ("&#9997; In Progress", "#eab308"),
-        "passed": ("&#9989; Passed", "#22c55e"),
+        "passed": ("&#9989; Passed", "#2D6A2D"),
     }
     s_label_d, s_color_d = status_labels_d.get(sel_d_status, ("", "#6b7280"))
     best_d = _best_score(selected_d_mod["code"], pmap)
@@ -1757,7 +1757,7 @@ with tabs[4]:
                 )
             ):
                 st.markdown(
-                    "<div style='font-size:0.95em;color:#B0BEC5;"
+                    "<div style='font-size:0.95em;color:#4A5568;"
                     "margin-bottom:12px;'>{}</div>".format(ch_desc),
                     unsafe_allow_html=True,
                 )
@@ -1802,7 +1802,7 @@ with tabs[4]:
                         total = result["total"]
                         passed = total >= PASS_THRESHOLD
                         verdict_col = (
-                            "#22c55e" if passed else "#ef4444"
+                            "#2D6A2D" if passed else "#ef4444"
                         )
 
                         st.markdown(
@@ -1904,7 +1904,7 @@ with tabs[5]:
 
                 if remaining > 0:
                     pbar_val = remaining / ch_time_limit
-                    timer_col = "#22c55e" if remaining > 30 else (
+                    timer_col = "#2D6A2D" if remaining > 30 else (
                         "#eab308" if remaining > 10 else "#ef4444"
                     )
                     st.markdown(
@@ -2273,7 +2273,7 @@ with tabs[6]:
             for entry in leaders:
                 is_me = entry.get("user_id") == uid
                 bg = "#f0fdf4" if is_me else "#ffffff"
-                border = "2px solid #22c55e" if is_me else "1px solid #f1f5f9"
+                border = "2px solid #2D6A2D" if is_me else "1px solid #f1f5f9"
                 me_tag = " (You)" if is_me else ""
                 raw_name = entry.get("user_id", "")
                 display_name = _display_name(raw_name)
@@ -2352,7 +2352,7 @@ with tabs[6]:
                 is_me = entry.get("user_id") == uid
                 bg = "#f0fdf4" if is_me else "#ffffff"
                 border = (
-                    "2px solid #22c55e" if is_me else "1px solid #f1f5f9"
+                    "2px solid #2D6A2D" if is_me else "1px solid #f1f5f9"
                 )
                 me_tag = " (You)" if is_me else ""
                 raw_name = entry.get("user_id", "")
@@ -2420,7 +2420,7 @@ with tabs[6]:
                     "icon": "🌟",
                     "desc": "High skill + High engagement",
                     "bg": "#f0fdf4",
-                    "border": "#22c55e",
+                    "border": "#2D6A2D",
                 },
                 {
                     "key": "hidden_gems",
@@ -2483,7 +2483,7 @@ with tabs[6]:
                         "{icon} {label}</div>"
                         "<div style='font-size:0.8em;color:#6b7280;"
                         "margin:4px 0 8px;'>{desc}</div>"
-                        "<div style='font-weight:600;color:#B0BEC5;"
+                        "<div style='font-weight:600;color:#4A5568;"
                         "margin-bottom:4px;'>{count} users</div>"
                         "{users}"
                         "</div>".format(
@@ -2542,7 +2542,7 @@ with tabs[6]:
                                 int(float(sig_val) / 10 * 100), 100,
                             )
                             sig_col = (
-                                "#22c55e" if sig_val >= 7
+                                "#2D6A2D" if sig_val >= 7
                                 else (
                                     "#eab308" if sig_val >= 4
                                     else "#ef4444"

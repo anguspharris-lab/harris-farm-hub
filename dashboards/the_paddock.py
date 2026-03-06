@@ -42,7 +42,7 @@ TIER_ICONS = {
 }
 TIER_ORDER = ["Unranked", "Seed", "Sprout", "Grower", "Harvester", "Cultivator", "Legend"]
 
-BRAND_GREEN = "#2ECC71"
+BRAND_GREEN = "#2D6A2D"
 
 
 # ---------------------------------------------------------------------------
@@ -105,7 +105,7 @@ def _tier_colour(tier_name):
     colours = {
         "Unranked": "#94a3b8",
         "Seed": "#84cc16",
-        "Sprout": "#22c55e",
+        "Sprout": "#2D6A2D",
         "Grower": "#f59e0b",
         "Harvester": "#f97316",
         "Cultivator": "#8b5cf6",

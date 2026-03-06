@@ -82,10 +82,10 @@ if is_configured():
     initiative_summary_card(summary)
 else:
     st.markdown(
-        "<div style='background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);"
+        "<div style='background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.08);"
         "border-radius:8px;padding:12px 16px;"
-        "color:#8899AA;font-size:0.9em;'>"
-        "\U0001f4cb <strong style='color:#B0BEC5;'>Initiative Tracking:</strong> Connect Monday.com "
+        "color:#718096;font-size:0.9em;'>"
+        "\U0001f4cb <strong style='color:#4A5568;'>Initiative Tracking:</strong> Connect Monday.com "
         "to see P3 strategic initiatives here. "
         "Add <code>MONDAY_API_KEY</code> to your <code>.env</code> file."
         "</div>",
@@ -95,17 +95,17 @@ else:
 # ── Strategic Context ──
 st.markdown("---")
 st.markdown(
-    "<div style='background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);"
+    "<div style='background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);"
     "border-radius:10px;padding:20px;'>"
     "<h3 style='color:white;margin-top:0;font-family:Georgia,serif;'>Growing Legends, Not Just Skills</h3>"
-    "<p style='color:#B0BEC5;'>AI adoption is a people strategy, not a tech project. "
+    "<p style='color:#4A5568;'>AI adoption is a people strategy, not a tech project. "
     "The Academy, Prompt Engine, and Paddock exist because we believe every Harris Farmer "
     "can become exceptional \u2014 if we give them the right tools, the right training, "
     "and the right encouragement.</p>"
-    "<p style='color:#8899AA;font-size:0.9em;'>"
-    "<strong style='color:#B0BEC5;'>Prosci ADKAR</strong> change management is active across all P3 initiatives. "
+    "<p style='color:#718096;font-size:0.9em;'>"
+    "<strong style='color:#4A5568;'>Prosci ADKAR</strong> change management is active across all P3 initiatives. "
     "We measure adoption, not just availability.</p>"
-    "<p style='color:#B0BEC5;font-style:italic;font-size:0.9em;'>"
+    "<p style='color:#4A5568;font-style:italic;font-size:0.9em;'>"
     "The Harris Farm Method gives our people a repeatable system: "
     "Define your goal. Flood with context. Add a rubric. Nothing ships below an 8.</p>"
     "</div>",

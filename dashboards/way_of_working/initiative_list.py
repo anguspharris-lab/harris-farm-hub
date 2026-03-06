@@ -13,9 +13,9 @@ from shared.pillar_data import get_all_pillars
 def _status_color(status):
     """Return a colour for a Monday.com status label."""
     colors = {
-        "Done": "#2ECC71",
-        "Complete": "#2ECC71",
-        "Immediate requirements complete": "#2ECC71",
+        "Done": "#2D6A2D",
+        "Complete": "#2D6A2D",
+        "Immediate requirements complete": "#2D6A2D",
         "Working on it": "#2563eb",
         "In Progress": "#2563eb",
         "Stuck": "#dc2626",

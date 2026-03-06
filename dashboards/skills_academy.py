@@ -34,13 +34,13 @@ from shared.strategic_framing import growing_legends_banner
 
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 API_BASE = "/api/skills-academy"
-BRAND_GREEN = "#2ECC71"
+BRAND_GREEN = "#2D6A2D"
 PEOPLE_GREEN = "#059669"
 
 LEVEL_DISPLAY = [
     {"name": "Seed", "icon": "🌱", "num": 1, "color": "#a3e635"},
-    {"name": "Sprout", "icon": "🌿", "num": 2, "color": "#22c55e"},
-    {"name": "Growing", "icon": "🌻", "num": 3, "color": "#2ECC71"},
+    {"name": "Sprout", "icon": "🌿", "num": 2, "color": "#2D6A2D"},
+    {"name": "Growing", "icon": "🌻", "num": 3, "color": "#2D6A2D"},
     {"name": "Harvest", "icon": "🌾", "num": 4, "color": "#ca8a04"},
     {"name": "Canopy", "icon": "🌳", "num": 5, "color": "#059669"},
     {"name": "Root System", "icon": "🏆", "num": 6, "color": "#7c3aed"},
@@ -56,7 +56,7 @@ RING_COLOURS = {
     "foundation": "#3b82f6",
     "breadth": "#8b5cf6",
     "depth": "#f59e0b",
-    "application": "#22c55e",
+    "application": "#2D6A2D",
 }
 
 # ---------------------------------------------------------------------------
@@ -71,12 +71,11 @@ is_admin = (user or {}).get("is_admin", False)
 
 render_header(
     "Growing Legends Academy",
-    "**Your AI Capability Journey** | Prove what you can ship",
+    "Chapter 2 \u2014 the best tech means nothing without great people",
     goals=["G3"],
     strategy_context=(
-        "You are the architect. AI is the builder. "
-        "Every Harris Farmer grows from Seed to Legend "
-        "\u2014 prove what you can ship at each level."
+        "Every Harris Farmer builds AI capability at their own pace "
+        "\u2014 from Seed to Legend, prove what you can ship."
     ),
 )
 
@@ -228,7 +227,7 @@ def _clear_caches():
 # RENDERING HELPERS
 # ============================================================================
 
-def _render_card(content_html, bg="rgba(255,255,255,0.05)", border="rgba(255,255,255,0.08)", padding="16px"):
+def _render_card(content_html, bg="rgba(0,0,0,0.04)", border="rgba(0,0,0,0.08)", padding="16px"):
     """Styled card container."""
     st.markdown(
         "<div style='background:{};border:1px solid {};border-radius:10px;"
@@ -243,9 +242,9 @@ def _render_metric_card(label, value, subtitle="", color=BRAND_GREEN):
     """Small metric card."""
     html = (
         "<div style='text-align:center;'>"
-        "<div style='font-size:0.85em;color:#8899AA;margin-bottom:4px;'>{}</div>"
+        "<div style='font-size:0.85em;color:#718096;margin-bottom:4px;'>{}</div>"
         "<div style='font-size:2em;font-weight:800;color:{};'>{}</div>"
-        "<div style='font-size:0.8em;color:#8899AA;'>{}</div>"
+        "<div style='font-size:0.8em;color:#718096;'>{}</div>"
         "</div>"
     ).format(label, color, value, subtitle)
     _render_card(html)
@@ -291,15 +290,15 @@ def _render_verification_rings(rings):
             html = (
                 "<div style='background:{bg};border:{border};border-radius:12px;"
                 "padding:16px;text-align:center;min-height:140px;'>"
-                "<div style='font-size:0.8em;color:#8899AA;text-transform:uppercase;"
+                "<div style='font-size:0.8em;color:#718096;text-transform:uppercase;"
                 "letter-spacing:1px;margin-bottom:8px;'>{dim}</div>"
                 "<div style='font-size:2em;font-weight:800;color:{color};'>"
                 "{pct}%</div>"
-                "<div style='background:rgba(255,255,255,0.1);border-radius:4px;height:8px;"
+                "<div style='background:rgba(0,0,0,0.08);border-radius:4px;height:8px;"
                 "margin:8px 0;overflow:hidden;'>"
                 "<div style='background:{color};height:100%;width:{pct}%;"
                 "border-radius:4px;transition:width 0.3s;'></div></div>"
-                "<div style='font-size:0.75em;color:#8899AA;'>{target} {icon}</div>"
+                "<div style='font-size:0.75em;color:#718096;'>{target} {icon}</div>"
                 "</div>"
             ).format(
                 bg=bg, border=border_style, dim=dim.title(), color=color,
@@ -321,7 +320,7 @@ def _render_level_badge(level_num, status="provisional"):
         "border-radius:20px;padding:8px 20px;margin:4px;'>"
         "<span style='font-size:1.3em;'>{icon}</span> "
         "<span style='font-weight:700;color:{color};'>{name}</span> "
-        "<span style='font-size:0.75em;color:#8899AA;'>({label})</span>"
+        "<span style='font-size:0.75em;color:#718096;'>({label})</span>"
         "</div>"
     ).format(
         bg=badge_bg, border=border, icon=lv["icon"],
@@ -493,21 +492,21 @@ with tabs[0]:
                             if mod_status == "complete":
                                 icon = "&#10003;"
                                 bg = "rgba(34,197,94,0.1)"
-                                border = "#22c55e"
+                                border = "#2D6A2D"
                             elif mod_status == "in_progress":
                                 icon = "&#9654;"
                                 bg = "rgba(245,158,11,0.1)"
                                 border = "#f59e0b"
                             else:
                                 icon = "&#9711;"
-                                bg = "rgba(255,255,255,0.03)"
-                                border = "rgba(255,255,255,0.08)"
+                                bg = "rgba(0,0,0,0.03)"
+                                border = "rgba(0,0,0,0.08)"
 
                             _render_card(
                                 "<div style='text-align:center;'>"
                                 "<div style='font-size:1.5em;'>{}</div>"
                                 "<div style='font-weight:700;font-size:0.9em;'>{}</div>"
-                                "<div style='font-size:0.8em;color:#8899AA;'>{}</div>"
+                                "<div style='font-size:0.8em;color:#718096;'>{}</div>"
                                 "</div>".format(icon, code, name),
                                 bg=bg, border=border,
                             )
@@ -522,7 +521,7 @@ with tabs[0]:
                 xp = entry.get("xp_amount", 0)
                 ts = entry.get("created_at", "")[:16]
                 st.markdown(
-                    "- **+{} XP** — {} <span style='color:#8899AA;font-size:0.8em;'>{}</span>".format(
+                    "- **+{} XP** — {} <span style='color:#718096;font-size:0.8em;'>{}</span>".format(
                         xp, action, ts
                     ),
                     unsafe_allow_html=True,
@@ -655,13 +654,13 @@ with tabs[3]:
                 reasoning = resp.get("reasoning", "")
                 names = {1: "Recognition", 2: "Construction", 3: "Iteration", 4: "Scope", 5: "Application"}
                 name = names.get(sid, "Challenge {}".format(sid))
-                color = "#22c55e" if score >= 4 else "#f59e0b" if score >= 2 else "#ef4444"
+                color = "#2D6A2D" if score >= 4 else "#f59e0b" if score >= 2 else "#ef4444"
                 _render_card(
                     "<div style='display:flex;justify-content:space-between;align-items:center;'>"
                     "<div><strong>{}</strong></div>"
                     "<div style='color:{};font-weight:700;font-size:1.2em;'>{}/5</div>"
                     "</div>"
-                    "<div style='font-size:0.85em;color:#8899AA;margin-top:4px;'>{}</div>".format(
+                    "<div style='font-size:0.85em;color:#718096;margin-top:4px;'>{}</div>".format(
                         name, color, score, reasoning
                     ),
                 )
@@ -878,7 +877,7 @@ def _render_series_tab(series_prefix, series_name, tab_idx):
                     for ex in examples:
                         _render_card(
                             "<div style='font-weight:600;margin-bottom:4px;'>{}</div>"
-                            "<div style='font-size:0.9em;color:#B0BEC5;'>{}</div>".format(
+                            "<div style='font-size:0.9em;color:#4A5568;'>{}</div>".format(
                                 ex.get("title", "Example"), ex.get("content", "")
                             ),
                             bg="rgba(34,197,94,0.1)",
@@ -927,7 +926,7 @@ def _render_series_tab(series_prefix, series_name, tab_idx):
 
             st.markdown("**{}** {}".format(
                 _render_tier_badge(tier),
-                " &mdash; <span style='color:#8899AA;font-size:0.8em;'>{}</span>".format(context) if context else "",
+                " &mdash; <span style='color:#718096;font-size:0.8em;'>{}</span>".format(context) if context else "",
             ), unsafe_allow_html=True)
             st.markdown(instruction)
 
@@ -959,7 +958,7 @@ def _render_series_tab(series_prefix, series_name, tab_idx):
                             max_sc = result.get("max_score", 5)
                             reasoning = result.get("reasoning", "")
 
-                            color = "#22c55e" if score >= 4 else "#f59e0b" if score >= 2 else "#ef4444"
+                            color = "#2D6A2D" if score >= 4 else "#f59e0b" if score >= 2 else "#ef4444"
                             st.markdown(
                                 "<div style='font-size:2em;font-weight:800;color:{};text-align:center;'>"
                                 "{}/{}</div>".format(color, score, max_sc),
@@ -1000,7 +999,7 @@ def _render_series_tab(series_prefix, series_name, tab_idx):
                         mx = h.get("max_score", 5)
                         ts = h.get("completed_at", "")[:16]
                         st.markdown(
-                            "- **{}/{}** — {} <span style='color:#8899AA;font-size:0.8em;'>{}</span>".format(
+                            "- **{}/{}** — {} <span style='color:#718096;font-size:0.8em;'>{}</span>".format(
                                 sc, mx, ex_id, ts
                             ),
                             unsafe_allow_html=True,
@@ -1162,7 +1161,7 @@ with tabs[6]:
                                 score = result.get("score", 0)
                                 max_sc = result.get("max_score", 5)
                                 reasoning = result.get("reasoning", "")
-                                color = "#22c55e" if score >= 4 else "#f59e0b" if score >= 2 else "#ef4444"
+                                color = "#2D6A2D" if score >= 4 else "#f59e0b" if score >= 2 else "#ef4444"
                                 st.markdown(
                                     "<div style='font-size:1.5em;font-weight:700;color:{};'>"
                                     "{}/{}</div>".format(color, score, max_sc),
@@ -1361,7 +1360,7 @@ with tabs[7]:
 
                     _render_card(
                         "<div><strong>{}</strong> {} "
-                        "<span style='color:#8899AA;'>| Focus: {} | Status: {}</span></div>".format(
+                        "<span style='color:#718096;'>| Focus: {} | Status: {}</span></div>".format(
                             role, _display_name(partner), focus, status_m
                         ),
                     )
@@ -1427,7 +1426,7 @@ with tabs[8]:
             _render_card(
                 "<div style='font-weight:700;font-size:1.1em;margin-bottom:8px;'>"
                 "Today's Challenge</div>"
-                "<div style='font-size:0.85em;color:#8899AA;margin-bottom:8px;'>"
+                "<div style='font-size:0.85em;color:#718096;margin-bottom:8px;'>"
                 "Category: {}</div>"
                 "<div>{}</div>".format(category, question),
                 bg="rgba(59,130,246,0.1)",
@@ -1495,7 +1494,7 @@ with tabs[8]:
                         score = result.get("score", 0)
                         max_sc = result.get("max_score", 5)
                         reasoning = result.get("reasoning", "")
-                        color = "#22c55e" if score >= 4 else "#f59e0b" if score >= 2 else "#ef4444"
+                        color = "#2D6A2D" if score >= 4 else "#f59e0b" if score >= 2 else "#ef4444"
                         st.markdown(
                             "<div style='font-size:1.5em;font-weight:700;color:{};'>"
                             "{}/{}</div>".format(color, score, max_sc),
@@ -1542,7 +1541,7 @@ with tabs[9]:
                 elif idx == 2:
                     medal = "&#129353; "
 
-                bg = "rgba(34,197,94,0.1)" if entry.get("user_id") == uid else "rgba(255,255,255,0.05)"
+                bg = "rgba(34,197,94,0.1)" if entry.get("user_id") == uid else "rgba(0,0,0,0.04)"
                 _render_card(
                     "<div style='display:flex;justify-content:space-between;"
                     "align-items:center;'>"
@@ -1550,7 +1549,7 @@ with tabs[9]:
                     "<span style='font-size:0.85em;'>{} {}</span></div>"
                     "<div style='text-align:right;'>"
                     "<span style='font-size:1.3em;font-weight:700;color:{};'>{} XP</span>"
-                    "<br><span style='font-size:0.8em;color:#8899AA;'>Streak: {} days</span>"
+                    "<br><span style='font-size:0.8em;color:#718096;'>Streak: {} days</span>"
                     "</div></div>".format(
                         medal, idx + 1, name, lv_info["icon"], lv_info["name"],
                         lv_info["color"], xp, streak,
@@ -1657,11 +1656,11 @@ with tabs[9]:
                                 sname = sig.get("name", sig.get("signal_type", ""))
                                 sscore = sig.get("score", 0)
                                 bar_pct = int(sscore * 10)
-                                color = "#22c55e" if sscore >= 7 else "#f59e0b" if sscore >= 4 else "#ef4444"
+                                color = "#2D6A2D" if sscore >= 7 else "#f59e0b" if sscore >= 4 else "#ef4444"
                                 st.markdown(
                                     "<div style='display:flex;align-items:center;gap:8px;margin:4px 0;'>"
                                     "<div style='width:160px;font-size:0.85em;'>{}</div>"
-                                    "<div style='flex:1;background:rgba(255,255,255,0.1);border-radius:4px;height:12px;'>"
+                                    "<div style='flex:1;background:rgba(0,0,0,0.08);border-radius:4px;height:12px;'>"
                                     "<div style='background:{};height:100%;width:{}%;border-radius:4px;'>"
                                     "</div></div>"
                                     "<div style='width:40px;text-align:right;font-weight:600;'>{}</div>"

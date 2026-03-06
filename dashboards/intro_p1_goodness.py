@@ -32,12 +32,12 @@ c1, c2, c3, c4 = st.columns(4)
 
 with c1:
     st.markdown(
-        "<div style='background:rgba(255,255,255,0.05);border-radius:10px;padding:20px;"
-        "text-align:center;border:1px solid rgba(255,255,255,0.08);"
+        "<div style='background:rgba(0,0,0,0.04);border-radius:10px;padding:20px;"
+        "text-align:center;border:1px solid rgba(0,0,0,0.08);"
         "border-top:3px solid {};min-height:120px;'>"
         "<div style='font-size:2em;font-weight:700;color:{};'>100%</div>"
         "<div style='font-size:0.85em;color:#6b7280;'>Renewable Energy</div>"
-        "<div style='font-size:0.75em;color:#2ECC71;margin-top:4px;'>"
+        "<div style='font-size:0.75em;color:#2D6A2D;margin-top:4px;'>"
         "\u2713 Achieved</div>"
         "</div>".format(HFM_GREEN, HFM_GREEN),
         unsafe_allow_html=True,
@@ -69,7 +69,7 @@ if is_configured():
     initiative_summary_card(summary)
 else:
     st.markdown(
-        "<div style='background:rgba(255,255,255,0.03);border-radius:8px;padding:12px 16px;"
+        "<div style='background:rgba(0,0,0,0.03);border-radius:8px;padding:12px 16px;"
         "color:#6b7280;font-size:0.9em;'>"
         "\U0001f4cb <strong>Initiative Tracking:</strong> Connect Monday.com "
         "to see P1 strategic initiatives here. "
@@ -81,10 +81,10 @@ else:
 # ── Strategic Context ──
 st.markdown("---")
 st.markdown(
-    "<div style='background:rgba(255,255,255,0.05);border-radius:10px;padding:20px;"
-    "border:1px solid rgba(255,255,255,0.08);'>"
+    "<div style='background:rgba(0,0,0,0.04);border-radius:10px;padding:20px;"
+    "border:1px solid rgba(0,0,0,0.08);'>"
     "<h3 style='color:{};margin-top:0;'>What Does Greater Goodness Mean?</h3>"
-    "<p style='color:#B0BEC5;'>Harris Farm's purpose goes beyond selling fresh food. "
+    "<p style='color:#4A5568;'>Harris Farm's purpose goes beyond selling fresh food. "
     "We're building a business that does right \u2014 from end-to-end. "
     "That means 100% renewable energy (achieved), B-Corp certification (in progress), "
     "and a supply chain that treats farmers, communities, and the planet fairly.</p>"

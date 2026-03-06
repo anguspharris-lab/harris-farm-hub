@@ -427,7 +427,7 @@ with di_sub3:
                         wd_level = wd.get("risk_level", "SAFE")
                         wd_icon = wd.get("risk_icon", "")
                         wd_colors = {
-                            "SAFE": "#22c55e", "LOW": "#eab308",
+                            "SAFE": "#2D6A2D", "LOW": "#eab308",
                             "MEDIUM": "#f97316", "HIGH": "#ef4444",
                             "BLOCKED": "#1f2937",
                         }

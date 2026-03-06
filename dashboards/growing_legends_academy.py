@@ -37,9 +37,9 @@ _pages = st.session_state.get("_pages", {})
 
 render_header(
     "Growing Legends Academy",
-    "Your AI capability journey | From Seed to Legend | Learn, Practice, Build",
+    "Chapter 2 of our transformation \u2014 because the best tech means nothing without great people",
     goals=["G3"],
-    strategy_context="Famous for attracting, developing, and retaining exceptional people \u2014 Pillar 3 in action.",
+    strategy_context="From Seed to Legend \u2014 every Harris Farmer building AI capability at their own pace",
 )
 
 # ---------------------------------------------------------------------------
@@ -70,7 +70,7 @@ st.markdown(
     f"<span style='font-size:1.3em;'>\U0001f31f</span>"
     f"<div>"
     f"<strong style='color:#7c3aed;'>Goal 3: Train Our Superstars</strong>"
-    f"<span style='color:#8899AA;font-size:0.9em;'> &mdash; "
+    f"<span style='color:#718096;font-size:0.9em;'> &mdash; "
     f"Making every Harris Farmer more capable with AI, at their own pace.</span>"
     f"</div>"
     f"<div>{goal_badge_html('G3')}</div>"
@@ -175,7 +175,7 @@ with tabs[0]:
             f"<span>{level_icon} {level_name} ({min_xp} XP)</span>"
             f"<span>{xp_to_next} XP to next level</span>"
             f"</div>"
-            f"<div style='background:rgba(255,255,255,0.1);border-radius:8px;height:16px;margin:4px 0;'>"
+            f"<div style='background:rgba(0,0,0,0.08);border-radius:8px;height:16px;margin:4px 0;'>"
             f"<div style='background:linear-gradient(90deg, #059669, #34d399);width:{bar_pct}%;"
             f"height:100%;border-radius:8px;transition:width 0.3s;'></div></div>"
             f"</div>",
@@ -202,11 +202,11 @@ with tabs[0]:
 
     if ch:
         completed = ch.get("completed_today", False)
-        diff_colors = {"beginner": "#22c55e", "intermediate": "#eab308", "advanced": "#ef4444"}
-        diff_color = diff_colors.get(ch.get("difficulty", "beginner"), "#8899AA")
+        diff_colors = {"beginner": "#2D6A2D", "intermediate": "#eab308", "advanced": "#ef4444"}
+        diff_color = diff_colors.get(ch.get("difficulty", "beginner"), "#718096")
 
         st.markdown(
-            f"<div style='background:rgba(46,204,113,0.08);border:2px solid rgba(187,247,208,0.3);border-radius:12px;"
+            f"<div style='background:rgba(45,106,45,0.08);border:2px solid rgba(187,247,208,0.3);border-radius:12px;"
             f"padding:16px;margin-bottom:16px;'>"
             f"<div style='display:flex;justify-content:space-between;align-items:center;'>"
             f"<div style='font-weight:700;font-size:1.1em;color:#166534;'>"
@@ -217,7 +217,7 @@ with tabs[0]:
             f"<span style='background:#059669;color:white;padding:2px 10px;"
             f"border-radius:12px;font-size:0.8em;'>+{ch.get('xp_reward', 20)} XP</span>"
             f"</div></div>"
-            f"<div style='margin-top:8px;color:#B0BEC5;'>{ch['description']}</div>"
+            f"<div style='margin-top:8px;color:#4A5568;'>{ch['description']}</div>"
             f"</div>",
             unsafe_allow_html=True,
         )
@@ -262,7 +262,7 @@ with tabs[0]:
                 _b_icon = b.get("badge_icon", "\U0001f3c5")
                 _b_name = b.get("badge_name", "")
                 st.markdown(
-                    f"<div style='text-align:center;padding:8px;background:rgba(46,204,113,0.08);"
+                    f"<div style='text-align:center;padding:8px;background:rgba(45,106,45,0.08);"
                     f"border-radius:10px;border:1px solid rgba(187,247,208,0.3);margin-bottom:8px;'>"
                     f"<div style='font-size:1.6em;'>{_b_icon}</div>"
                     f"<div style='font-weight:600;font-size:0.85em;'>{_b_name}</div>"
@@ -276,8 +276,8 @@ with tabs[0]:
             for i, b in enumerate(locked[:18]):
                 with lock_cols[i % len(lock_cols)]:
                     st.markdown(
-                        f"<div style='text-align:center;padding:8px;background:rgba(255,255,255,0.03);"
-                        f"border-radius:10px;border:1px solid rgba(255,255,255,0.08);margin-bottom:8px;"
+                        f"<div style='text-align:center;padding:8px;background:rgba(0,0,0,0.03);"
+                        f"border-radius:10px;border:1px solid rgba(0,0,0,0.08);margin-bottom:8px;"
                         f"opacity:0.5;'>"
                         f"<div style='font-size:1.6em;'>\U0001f512</div>"
                         f"<div style='font-weight:600;font-size:0.85em;color:#94a3b8;'>"
@@ -302,7 +302,7 @@ with tabs[0]:
             icon = action_icons.get(act.get("action_type", ""), "\u2728")
             st.markdown(
                 f"<div style='display:flex;align-items:center;gap:10px;padding:6px 0;"
-                f"border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.9em;'>"
+                f"border-bottom:1px solid rgba(0,0,0,0.04);font-size:0.9em;'>"
                 f"<span>{icon}</span>"
                 f"<span style='flex:1;'>{act.get('description', act.get('action_type', ''))}</span>"
                 f"<span style='color:#059669;font-weight:600;'>+{act.get('xp_amount', 0)} XP</span>"
@@ -342,8 +342,8 @@ with tabs[1]:
         uid = (user or {}).get("email", "anonymous")
         for entry in leaders:
             is_me = entry["user_id"] == uid
-            bg = "rgba(46,204,113,0.08)" if is_me else "rgba(255,255,255,0.05)"
-            border = "2px solid #22c55e" if is_me else "1px solid rgba(255,255,255,0.05)"
+            bg = "rgba(45,106,45,0.08)" if is_me else "rgba(0,0,0,0.04)"
+            border = "2px solid #2D6A2D" if is_me else "1px solid rgba(0,0,0,0.04)"
             me_tag = " (You)" if is_me else ""
             display_name = entry["user_id"].split("@")[0] if "@" in entry["user_id"] else entry["user_id"]
             _e_icon = entry.get("level_icon", "\U0001f331")
@@ -354,13 +354,13 @@ with tabs[1]:
             st.markdown(
                 f"<div style='display:flex;align-items:center;padding:10px 14px;"
                 f"border-radius:8px;margin-bottom:6px;background:{bg};border:{border};'>"
-                f"<div style='width:40px;font-weight:700;font-size:1.2em;color:#8899AA;'>"
+                f"<div style='width:40px;font-weight:700;font-size:1.2em;color:#718096;'>"
                 f"#{entry['rank']}</div>"
                 f"<div style='width:36px;font-size:1.4em;text-align:center;'>"
                 f"{_e_icon}</div>"
                 f"<div style='flex:1;'>"
                 f"<div style='font-weight:600;'>{display_name}{me_tag}</div>"
-                f"<div style='font-size:0.8em;color:#8899AA;'>"
+                f"<div style='font-size:0.8em;color:#718096;'>"
                 f"{_e_level} | "
                 f"\U0001f525 {_e_streak} day streak</div>"
                 f"</div>"
@@ -404,7 +404,7 @@ with tabs[2]:
     )
     st.markdown(
         f"<div style='display:flex;border-radius:10px;overflow:hidden;"
-        f"margin-bottom:24px;border:1px solid rgba(255,255,255,0.08);'>"
+        f"margin-bottom:24px;border:1px solid rgba(0,0,0,0.08);'>"
         f"{bar_html}</div>",
         unsafe_allow_html=True,
     )
@@ -421,7 +421,7 @@ with tabs[2]:
                 st.markdown(
                     f"<div style='background:{lv['color']};color:{lv['text_color']};"
                     f"border-radius:14px;padding:20px;min-height:180px;"
-                    f"border:1px solid rgba(255,255,255,0.08);'>"
+                    f"border:1px solid rgba(0,0,0,0.08);'>"
                     f"<div style='font-size:2em;'>{lv['icon']}</div>"
                     f"<div style='font-size:1.2em;font-weight:700;'>{lv['name']}</div>"
                     f"<div style='font-size:0.85em;opacity:0.85;font-style:italic;'>"
@@ -464,12 +464,12 @@ with tabs[3]:
     for i, block in enumerate(BUILDING_BLOCKS):
         with bb_cols[i]:
             st.markdown(
-                f"<div style='background:rgba(46,204,113,0.08);border-radius:10px;padding:12px;"
+                f"<div style='background:rgba(45,106,45,0.08);border-radius:10px;padding:12px;"
                 f"text-align:center;border:1px solid rgba(187,247,208,0.3);min-height:100px;'>"
                 f"<div style='font-size:1.4em;font-weight:700;color:#059669;'>"
                 f"{block['icon']}</div>"
                 f"<div style='font-weight:600;'>{block['name']}</div>"
-                f"<div style='font-size:0.8em;color:#B0BEC5;'>{block['short']}</div>"
+                f"<div style='font-size:0.8em;color:#4A5568;'>{block['short']}</div>"
                 f"</div>",
                 unsafe_allow_html=True,
             )
@@ -486,7 +486,7 @@ with tabs[3]:
 
             st.markdown("**Harris Farm Example:**")
             st.markdown(
-                f"<div style='background:rgba(46,204,113,0.08);border-left:4px solid #059669;"
+                f"<div style='background:rgba(45,106,45,0.08);border-left:4px solid #059669;"
                 f"padding:12px 16px;border-radius:0 8px 8px 0;margin:8px 0;'>"
                 f"{pattern['hfm_example']}</div>",
                 unsafe_allow_html=True,
@@ -549,7 +549,7 @@ with tabs[4]:
             st.markdown(f"**Panelists:** {tier['panelists']}")
             st.markdown(
                 f"<div style='display:flex;gap:12px;margin:12px 0;'>"
-                f"<div style='flex:1;background:rgba(46,204,113,0.08);border-left:4px solid #22c55e;"
+                f"<div style='flex:1;background:rgba(45,106,45,0.08);border-left:4px solid #2D6A2D;"
                 f"padding:12px;border-radius:0 8px 8px 0;'>"
                 f"<strong>What 8+ looks like:</strong><br>{tier['what_8_looks_like']}</div>"
                 f"<div style='flex:1;background:rgba(239,68,68,0.08);border-left:4px solid #ef4444;"
@@ -570,7 +570,7 @@ with tabs[4]:
     for ex in SCORE_THIS_EXERCISES:
         st.markdown(f"**{ex['label']}**")
         st.markdown(
-            f"<div style='background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);padding:14px;"
+            f"<div style='background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.08);padding:14px;"
             f"border-radius:8px;font-family:monospace;margin:8px 0;'>"
             f"{ex['prompt']}</div>",
             unsafe_allow_html=True,
@@ -592,7 +592,7 @@ with tabs[5]:
 
     # "Where should I start?" guide
     st.markdown(
-        "<div style='background:rgba(46,204,113,0.08);border:2px solid rgba(187,247,208,0.3);border-radius:12px;"
+        "<div style='background:rgba(45,106,45,0.08);border:2px solid rgba(187,247,208,0.3);border-radius:12px;"
         "padding:16px;margin-bottom:20px;'>"
         "<strong>Where should I start?</strong><br>"
         "\U0001f331 Never used AI? \u2192 <strong>AI Foundations</strong><br>"
@@ -620,14 +620,14 @@ with tabs[5]:
                 st.markdown(
                     f"<div style='background:{path['color']};color:{path['text_color']};"
                     f"border-radius:14px;padding:20px;min-height:200px;"
-                    f"border:1px solid rgba(255,255,255,0.08);'>"
+                    f"border:1px solid rgba(0,0,0,0.08);'>"
                     f"<div style='font-size:1.15em;font-weight:700;'>{path['name']}</div>"
                     f"<div style='display:flex;gap:8px;margin:6px 0;flex-wrap:wrap;'>"
-                    f"<span style='background:rgba(255,255,255,0.3);padding:2px 8px;"
+                    f"<span style='background:rgba(0,0,0,0.20);padding:2px 8px;"
                     f"border-radius:20px;font-size:0.75em;'>{path['audience']}</span>"
-                    f"<span style='background:rgba(255,255,255,0.3);padding:2px 8px;"
+                    f"<span style='background:rgba(0,0,0,0.20);padding:2px 8px;"
                     f"border-radius:20px;font-size:0.75em;'>{path['levels']}</span>"
-                    f"<span style='background:rgba(255,255,255,0.3);padding:2px 8px;"
+                    f"<span style='background:rgba(0,0,0,0.20);padding:2px 8px;"
                     f"border-radius:20px;font-size:0.75em;'>{path['hours']}</span>"
                     f"</div>"
                     f"<div style='font-style:italic;font-size:0.9em;margin:6px 0;'>"
@@ -681,16 +681,16 @@ with tabs[6]:
         ch = active[0]
         ch_badges = " ".join(goal_badge_html(g) for g in ch.get("goal_tags", []))
         st.markdown(
-            f"<div style='background:rgba(46,204,113,0.08);border:3px solid #22c55e;"
+            f"<div style='background:rgba(45,106,45,0.08);border:3px solid #2D6A2D;"
             f"border-radius:14px;padding:24px;margin-bottom:20px;'>"
             f"<div style='display:flex;justify-content:space-between;align-items:center;'>"
             f"<div style='font-size:1.3em;font-weight:700;color:#166534;'>"
             f"\U0001f525 Active Challenge: {ch['title']}</div>"
-            f"<span style='background:#22c55e;color:white;padding:4px 12px;"
+            f"<span style='background:#2D6A2D;color:white;padding:4px 12px;"
             f"border-radius:20px;font-size:0.8em;font-weight:600;'>"
             f"{ch['difficulty']}</span>"
             f"</div>"
-            f"<div style='margin-top:12px;color:#B0BEC5;line-height:1.6;'>"
+            f"<div style='margin-top:12px;color:#4A5568;line-height:1.6;'>"
             f"{ch['description']}</div>"
             f"<div style='margin-top:10px;'>{ch_badges}</div>"
             f"</div>",
@@ -736,11 +736,11 @@ with tabs[7]:
         st.markdown(
             f"<div style='border-left:4px solid #059669;padding:12px 16px;"
             f"margin:12px 0;border-radius:0 8px 8px 0;"
-            f"background:rgba(255,255,255,0.03);'>"
+            f"background:rgba(0,0,0,0.03);'>"
             f"<div style='font-weight:700;font-size:1.05em;'>{item['name']}</div>"
             f"<div style='color:#059669;font-weight:600;font-size:0.9em;'>"
             f"{item['stat']}</div>"
-            f"<div style='font-size:0.9em;color:#B0BEC5;margin-top:4px;'>"
+            f"<div style='font-size:0.9em;color:#4A5568;margin-top:4px;'>"
             f"{item['description']}</div>"
             f"<div style='margin-top:6px;'>{sc_badges}</div>"
             f"</div>",
@@ -773,11 +773,11 @@ with tabs[8]:
     for crit in DASHBOARD_QUALITY_RUBRIC["criteria"]:
         st.markdown(
             f"<div style='display:flex;align-items:center;padding:8px 0;"
-            f"border-bottom:1px solid rgba(255,255,255,0.05);'>"
+            f"border-bottom:1px solid rgba(0,0,0,0.04);'>"
             f"<div style='width:180px;font-weight:600;'>{crit['name']}</div>"
             f"<div style='width:40px;text-align:center;color:#059669;"
             f"font-weight:700;'>/{crit['max']}</div>"
-            f"<div style='flex:1;color:#B0BEC5;font-size:0.9em;'>"
+            f"<div style='flex:1;color:#4A5568;font-size:0.9em;'>"
             f"{crit['description']}</div>"
             f"</div>",
             unsafe_allow_html=True,
@@ -792,11 +792,11 @@ with tabs[8]:
     for crit in PAGE_CONTENT_RUBRIC["criteria"]:
         st.markdown(
             f"<div style='display:flex;align-items:center;padding:8px 0;"
-            f"border-bottom:1px solid rgba(255,255,255,0.05);'>"
+            f"border-bottom:1px solid rgba(0,0,0,0.04);'>"
             f"<div style='width:180px;font-weight:600;'>{crit['name']}</div>"
             f"<div style='width:40px;text-align:center;color:#059669;"
             f"font-weight:700;'>/{crit['max']}</div>"
-            f"<div style='flex:1;color:#B0BEC5;font-size:0.9em;'>"
+            f"<div style='flex:1;color:#4A5568;font-size:0.9em;'>"
             f"{crit['description']}</div>"
             f"</div>",
             unsafe_allow_html=True,
@@ -814,17 +814,17 @@ with tabs[8]:
     scores = ACADEMY_SELF_SCORE["content_rubric"]
     for name, data in scores.items():
         bar_pct = data["score"] / 5 * 100
-        bar_color = "#22c55e" if data["score"] >= 4 else ("#eab308" if data["score"] >= 3 else "#ef4444")
+        bar_color = "#2D6A2D" if data["score"] >= 4 else ("#eab308" if data["score"] >= 3 else "#ef4444")
         st.markdown(
             f"<div style='margin:8px 0;'>"
             f"<div style='display:flex;justify-content:space-between;'>"
             f"<strong>{name}</strong>"
             f"<span style='color:{bar_color};font-weight:700;'>{data['score']}/5</span>"
             f"</div>"
-            f"<div style='background:rgba(255,255,255,0.1);border-radius:4px;height:8px;margin:4px 0;'>"
+            f"<div style='background:rgba(0,0,0,0.08);border-radius:4px;height:8px;margin:4px 0;'>"
             f"<div style='background:{bar_color};width:{bar_pct}%;height:100%;"
             f"border-radius:4px;'></div></div>"
-            f"<div style='font-size:0.8em;color:#8899AA;'>{data['rationale']}</div>"
+            f"<div style='font-size:0.8em;color:#718096;'>{data['rationale']}</div>"
             f"</div>",
             unsafe_allow_html=True,
         )
@@ -879,7 +879,7 @@ with tabs[8]:
 
     _total = sum(_quality_scores.values())
     _pct = round(_total / _rubric["max_points"] * 100, 1)
-    _color = "#22c55e" if _pct >= 80 else ("#eab308" if _pct >= 60 else "#ef4444")
+    _color = "#2D6A2D" if _pct >= 80 else ("#eab308" if _pct >= 60 else "#ef4444")
     st.markdown(
         f"**Total: <span style='color:{_color}'>{_total}/{_rubric['max_points']}"
         f" ({_pct}%)</span>**",
@@ -1020,7 +1020,7 @@ with tabs[9]:
 
 st.markdown("---")
 st.markdown(
-    "<div style='background:linear-gradient(135deg, rgba(46,204,113,0.08), rgba(46,204,113,0.04));"
+    "<div style='background:linear-gradient(135deg, rgba(45,106,45,0.08), rgba(45,106,45,0.04));"
     "border-radius:12px;padding:20px;text-align:center;margin:16px 0;'>"
     "<div style='font-size:1.3em;font-weight:700;color:#166534;'>"
     "\"Every expert was once a beginner.\"</div>"

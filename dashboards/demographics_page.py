@@ -34,7 +34,7 @@ _DARK_LAYOUT = dict(
     plot_bgcolor="rgba(0,0,0,0)",
     font=dict(color="#FFFFFF", family="Trebuchet MS, sans-serif"),
 )
-_GRID = dict(showgrid=True, gridcolor="rgba(255,255,255,0.08)")
+_GRID = dict(showgrid=True, gridcolor="rgba(0,0,0,0.08)")
 
 _METRIC_LABELS = {
     "pct_professional_catchment": "Professional/Managerial %",
@@ -175,7 +175,7 @@ with tab_exec:
                     y="gpm_roc_primary_4k",
                     text="store",
                     color="format_segment" if "format_segment" in scorecard.columns else None,
-                    color_discrete_map={"Express": "#2ECC71", "Standard": "#3B82F6", "Large": "#d97706"},
+                    color_discrete_map={"Express": "#2D6A2D", "Standard": "#3B82F6", "Large": "#d97706"},
                     labels={
                         "pct_professional_catchment": "Professional/Managerial % (Catchment)",
                         "gpm_roc_primary_4k": "GPM ROC (est. @ $4K/sqm)",
@@ -186,7 +186,7 @@ with tab_exec:
                 fig.update_layout(**_DARK_LAYOUT, height=500)
                 fig.update_xaxes(**_GRID)
                 fig.update_yaxes(**_GRID)
-                fig.add_hline(y=1.0, line_dash="dash", line_color="rgba(255,255,255,0.3)",
+                fig.add_hline(y=1.0, line_dash="dash", line_color="rgba(0,0,0,0.20)",
                               annotation_text="1.0x breakeven")
                 st.plotly_chart(fig, use_container_width=True)
 
@@ -261,8 +261,8 @@ with tab_profiles:
                 theta=labels + [labels[0]],
                 fill="toself",
                 name=selected,
-                line_color="#2ECC71",
-                fillcolor="rgba(46,204,113,0.15)",
+                line_color="#2D6A2D",
+                fillcolor="rgba(45,106,45,0.15)",
             ))
             fig.add_trace(go.Scatterpolar(
                 r=avg_norm + [avg_norm[0]],
@@ -276,8 +276,8 @@ with tab_profiles:
                 **_DARK_LAYOUT,
                 polar=dict(
                     bgcolor="rgba(0,0,0,0)",
-                    radialaxis=dict(visible=True, range=[0, 100], gridcolor="rgba(255,255,255,0.1)"),
-                    angularaxis=dict(gridcolor="rgba(255,255,255,0.1)"),
+                    radialaxis=dict(visible=True, range=[0, 100], gridcolor="rgba(0,0,0,0.08)"),
+                    angularaxis=dict(gridcolor="rgba(0,0,0,0.08)"),
                 ),
                 height=450,
                 showlegend=True,
@@ -362,7 +362,7 @@ with tab_blueprint:
                     y="metric_label",
                     orientation="h",
                     color="difference_pct",
-                    color_continuous_scale=["#dc2626", "#6B7280", "#2ECC71"],
+                    color_continuous_scale=["#dc2626", "#6B7280", "#2D6A2D"],
                     labels={"difference_pct": "Difference %", "metric_label": ""},
                     title="How Top Quartile Stores Differ Demographically",
                 )
@@ -485,7 +485,7 @@ with tab_scores:
         # Score distribution
         fig = px.histogram(
             filtered, x="demographic_score", nbins=30,
-            color_discrete_sequence=["#2ECC71"],
+            color_discrete_sequence=["#2D6A2D"],
             labels={"demographic_score": "Demographic Score"},
             title="Score Distribution",
         )

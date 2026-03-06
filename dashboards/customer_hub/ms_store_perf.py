@@ -150,7 +150,7 @@ def render():
                 fig_chan = go.Figure()
                 fig_chan.add_trace(go.Bar(
                     name="Instore", x=top_chan["region_name"],
-                    y=top_chan["instore_share"], marker_color="#2ECC71",
+                    y=top_chan["instore_share"], marker_color="#2D6A2D",
                     hovertemplate="%{x}<br>Instore: %{y:.1f}%<extra></extra>",
                 ))
                 fig_chan.add_trace(go.Bar(
@@ -202,7 +202,7 @@ def render():
                         "{:.1f}%".format(worst["avg_share"]))
 
             colours = [
-                "#2ECC71" if (r["share_change"] or 0) >= 0 else "#dc2626"
+                "#2D6A2D" if (r["share_change"] or 0) >= 0 else "#dc2626"
                 for _, r in macro_df.iterrows()
             ]
             fig_macro = go.Figure()

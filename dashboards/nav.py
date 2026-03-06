@@ -20,7 +20,7 @@ HUBS = [
         "pillar": "Pillar 1",
         "pillar_title": "For The Greater Goodness",
         "icon": "\U0001f331",
-        "color": "#2ECC71",
+        "color": "#2D6A2D",
         "dashboards": [
             ("Greater Goodness", 8516, "\U0001f331", "Our purpose, sustainability & community impact"),
         ],
@@ -72,7 +72,7 @@ HUBS = [
         "pillar": "Pillar 5",
         "pillar_title": "Tomorrow's Business, Built Better",
         "icon": "\U0001f680",
-        "color": "#2ECC71",
+        "color": "#2D6A2D",
         "dashboards": [
             ("Analytics Engine", 8521, "\U0001f52c", "Data Intelligence command center"),
             ("Agent Hub", 8520, "\U0001f916", "Scoreboard, Arena, Agent Network"),

@@ -248,7 +248,7 @@ def get_enriched_scorecard(fy_year=None):
 # ── Colour Constants ──────────────────────────────────────────────────────────
 
 CLASSIFICATION_COLOURS = {
-    "Invest": "#2ECC71",
+    "Invest": "#2D6A2D",
     "Hold": "#3B82F6",
     "Rationalise": "#d97706",
     "Exit Review": "#dc2626",
@@ -257,13 +257,13 @@ CLASSIFICATION_COLOURS = {
 }
 
 FORMAT_COLOURS = {
-    "Express": "#2ECC71",
+    "Express": "#2D6A2D",
     "Standard": "#3B82F6",
     "Large": "#d97706",
 }
 
 QUADRANT_COLOURS = {
-    "Star": "#2ECC71",
+    "Star": "#2D6A2D",
     "Cash Cow": "#3B82F6",
     "Question Mark": "#d97706",
     "Fix or Exit": "#dc2626",

@@ -103,27 +103,35 @@ _pages = {
     "sc-analysis": st.Page(str(_DIR / "supply_chain_analysis.py"), title="SC Analysis", icon="\U0001f4ca", url_path="sc-analysis"),
     # AI Readiness
     "arr-interview": st.Page(str(_DIR / "ai_readiness_interview.py"), title="AI Readiness Interview", icon="\U0001f916", url_path="arr-interview"),
+    # The Harris Farm Way
+    "hfw-landing": st.Page(str(_DIR / "harris_farm_way" / "landing.py"), title="The Harris Farm Way", icon="\U0001f9ed", url_path="hfw-landing"),
+    "hfw-ai-vision": st.Page(str(_DIR / "harris_farm_way" / "ai_vision.py"), title="AI Vision Session", icon="\U0001f9e0", url_path="hfw-ai-vision"),
+    "hfw-strategy-sprint": st.Page(str(_DIR / "harris_farm_way" / "strategy_sprint.py"), title="Strategy Sprint", icon="\u26a1", url_path="hfw-strategy-sprint"),
+    "hfw-dept-one-pager": st.Page(str(_DIR / "harris_farm_way" / "dept_one_pager.py"), title="Dept One-Pager", icon="\U0001f4cb", url_path="hfw-dept-one-pager"),
+    "hfw-board-prep": st.Page(str(_DIR / "harris_farm_way" / "board_prep.py"), title="Board Prep", icon="\U0001f3db\ufe0f", url_path="hfw-board-prep"),
 }
 
 # Section groupings for navigation (purpose-based, not pillar-based)
 _SECTIONS = [
-    {"name": "Strategy", "icon": "\U0001f3af", "color": "#2ECC71",
+    {"name": "Our Strategy", "icon": "\U0001f33f", "color": "#2D6A2D",
      "slugs": ["strategy-overview", "greater-goodness", "intro-people",
                "intro-operations", "intro-digital", "way-of-working"]},
-    {"name": "Growing Legends", "icon": "\U0001f331", "color": "#8B5CF6",
+    {"name": "Growing Legends", "icon": "\U0001f31f", "color": "#8B5CF6",
      "slugs": ["skills-academy", "the-paddock", "prompt-builder", "hub-assistant", "the-rubric"]},
-    {"name": "Operations", "icon": "\U0001f4ca", "color": "#F1C40F",
+    {"name": "Operations", "icon": "\U0001f4e6", "color": "#E8B84B",
      "slugs": ["customers", "sales", "profitability", "revenue-bridge",
                "store-ops", "buying-hub", "product-intel", "plu-intel",
                "transport", "analytics-engine"]},
-    {"name": "Property", "icon": "\U0001f3d8\ufe0f", "color": "#06B6D4",
+    {"name": "Our Stores", "icon": "\U0001f3ea", "color": "#0891B2",
      "slugs": ["store-network", "market-share", "demographics",
                "whitespace", "competitor-map", "roce", "cannibalisation"]},
-    {"name": "MDHE", "icon": "\U0001f3e5", "color": "#E74C3C",
+    {"name": "MDHE", "icon": "\U0001f91d", "color": "#DC2626",
      "slugs": ["mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide"]},
-    {"name": "Supply Chain", "icon": "\U0001f69b", "color": "#F97316",
-     "slugs": ["sc-interview", "sc-analysis", "arr-interview"]},
-    {"name": "Back of House", "icon": "\u2699\ufe0f", "color": "#8899AA",
+    {"name": "The Harris Farm Way", "icon": "\U0001f9ed", "color": "#E8B84B",
+     "slugs": ["hfw-landing", "sc-interview", "sc-analysis", "arr-interview",
+               "hfw-ai-vision", "hfw-strategy-sprint",
+               "hfw-dept-one-pager", "hfw-board-prep"]},
+    {"name": "Back of House", "icon": "\U0001f527", "color": "#718096",
      "is_muted": True,
      "slugs": ["approvals", "workflow-engine", "agent-ops",
                "mission-control", "ai-adoption", "adoption", "trending",
@@ -155,7 +163,7 @@ else:
 # Build nav dict — only include sections that have at least one visible page
 _full_nav = {
     "": [_home],
-    "Strategy": [
+    "Our Strategy": [
         "strategy-overview", "greater-goodness",
         "intro-people", "intro-operations", "intro-digital",
         "way-of-working",
@@ -168,15 +176,17 @@ _full_nav = {
         "store-ops", "buying-hub", "product-intel", "plu-intel",
         "transport", "analytics-engine",
     ],
-    "Property": [
+    "Our Stores": [
         "store-network", "market-share", "demographics",
         "whitespace", "competitor-map", "roce", "cannibalisation",
     ],
     "MDHE": [
         "mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide",
     ],
-    "Supply Chain": [
-        "sc-interview", "sc-analysis",
+    "The Harris Farm Way": [
+        "hfw-landing", "sc-interview", "sc-analysis", "arr-interview",
+        "hfw-ai-vision", "hfw-strategy-sprint",
+        "hfw-dept-one-pager", "hfw-board-prep",
     ],
     "Back of House": [
         "approvals", "workflow-engine", "agent-ops",
@@ -209,7 +219,10 @@ PUBLIC_SLUGS = frozenset({
     "skills-academy", "the-paddock", "prompt-builder",
     "hub-assistant", "the-rubric",
     # Supply Chain
-    "sc-interview", "sc-analysis",
+    "sc-interview", "sc-analysis", "arr-interview",
+    # The Harris Farm Way (meeting forms accessible without login)
+    "hfw-landing", "hfw-ai-vision", "hfw-strategy-sprint",
+    "hfw-dept-one-pager", "hfw-board-prep",
 })
 
 current_slug = nav.url_path
@@ -275,14 +288,14 @@ if _visible_sections and _visible_sections[-1].get("is_muted"):
         f"<style>"
         f"[data-testid='stHorizontalBlock']:first-of-type "
         f"> [data-testid='column']:nth-child({_n}) button {{"
-        f"  color: #8899AA !important;"
+        f"  color: #718096 !important;"
         f"  font-size: 0.88em !important;"
         f"  opacity: 0.5;"
         f"}}"
         f"[data-testid='stHorizontalBlock']:first-of-type "
         f"> [data-testid='column']:nth-child({_n}) button:hover {{"
         f"  opacity: 1;"
-        f"  color: #B0BEC5 !important;"
+        f"  color: #4A5568 !important;"
         f"}}"
         f"</style>",
         unsafe_allow_html=True,
@@ -327,12 +340,12 @@ _auth_user = st.session_state.get("auth_user")
 with st.sidebar:
     if _auth_user and isinstance(_auth_user, dict) and _auth_user.get("name"):
         st.markdown(
-            f"<div style='background:rgba(255,255,255,0.05);"
-            f"border:1px solid rgba(255,255,255,0.08);"
+            f"<div style='background:rgba(0,0,0,0.04);"
+            f"border:1px solid rgba(0,0,0,0.08);"
             f"border-radius:8px;padding:10px 12px;margin-bottom:10px;'>"
-            f"<div style='font-weight:600;font-size:0.85em;color:#2ECC71;'>"
+            f"<div style='font-weight:600;font-size:0.85em;color:#2D6A2D;'>"
             f"{_auth_user['name']}</div>"
-            f"<div style='font-size:0.78em;color:#8899AA;'>"
+            f"<div style='font-size:0.78em;color:#718096;'>"
             f"{_auth_user.get('email', '')}</div>"
             f"</div>",
             unsafe_allow_html=True,
@@ -342,7 +355,7 @@ with st.sidebar:
             logout_user()
     elif _auth_user is None:
         st.markdown(
-            "<div style='font-size:0.82em;color:#8899AA;margin-bottom:8px;'>"
+            "<div style='font-size:0.82em;color:#718096;margin-bottom:8px;'>"
             "Sign in to access all dashboards</div>",
             unsafe_allow_html=True,
         )
@@ -358,11 +371,11 @@ if _auth_user and _auth_user.get("hub_role", "user") == "user":
         _role_keys = [k for k, _ in _role_options]
         _role_labels = [n for _, n in _role_options]
         st.markdown(
-            "<div style='background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);"
+            "<div style='background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);"
             "border-radius:8px;padding:10px 12px;margin-bottom:10px;'>"
-            "<div style='font-weight:600;font-size:0.85em;color:#2ECC71;'>"
+            "<div style='font-weight:600;font-size:0.85em;color:#2D6A2D;'>"
             "Personalise your Hub</div>"
-            "<div style='font-size:0.78em;color:#8899AA;'>"
+            "<div style='font-size:0.78em;color:#718096;'>"
             "Select your role to see relevant pages only.</div>"
             "</div>",
             unsafe_allow_html=True,
@@ -417,12 +430,12 @@ if _auth_user:
             _total = _xp.get("total_xp", 0)
             with st.sidebar:
                 st.markdown(
-                    f"<div style='background:rgba(46,204,113,0.12);"
-                    f"border:1px solid rgba(46,204,113,0.25);"
+                    f"<div style='background:rgba(45,106,45,0.12);"
+                    f"border:1px solid rgba(45,106,45,0.25);"
                     f"color:white;border-radius:10px;padding:10px 14px;margin-bottom:12px;'>"
-                    f"<div style='font-weight:700;font-size:0.95em;color:#2ECC71;'>"
+                    f"<div style='font-weight:700;font-size:0.95em;color:#2D6A2D;'>"
                     f"{_lvl_icon} {_lvl_name}</div>"
-                    f"<div style='font-size:0.8em;color:#B0BEC5;'>"
+                    f"<div style='font-size:0.8em;color:#4A5568;'>"
                     f"{_total:,} XP</div>"
                     f"</div>",
                     unsafe_allow_html=True,

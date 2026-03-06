@@ -2001,7 +2001,7 @@ DAILY_CHALLENGE_TOPICS = {
         "name": "Fundamentals",
         "description": "The 4 elements, verb choice, clarity, specificity",
         "icon": "book",
-        "color": "#2ECC71",
+        "color": "#2D6A2D",
     },
     "role_specific": {
         "name": "Role-Specific",

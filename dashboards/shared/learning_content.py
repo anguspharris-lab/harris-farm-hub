@@ -1158,7 +1158,7 @@ PILLARS = {
 # ---------------------------------------------------------------------------
 
 DIFFICULTY_META = {
-    "beginner": {"label": "Beginner", "color": "#22c55e", "icon": "🌱"},
+    "beginner": {"label": "Beginner", "color": "#2D6A2D", "icon": "🌱"},
     "intermediate": {"label": "Intermediate", "color": "#f59e0b", "icon": "📈"},
     "advanced": {"label": "Advanced", "color": "#ef4444", "icon": "🎓"},
 }

@@ -615,7 +615,7 @@ with tab5:
         def _detail_color(detail, item_type):
             d = (detail or "").strip().upper()
             if d in ("COMPLETED", "APPROVED"):
-                return "#22c55e"
+                return "#2D6A2D"
             if d in ("PENDING",):
                 return "#f59e0b"
             if d in ("FAILED", "REJECTED"):
@@ -628,7 +628,7 @@ with tab5:
                 return "#f59e0b"
             if item_type == "improvement":
                 return "#a855f7"
-            return "#8899AA"
+            return "#718096"
 
         feed_html = "<div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;'>"
         for item in activity:
@@ -640,8 +640,8 @@ with tab5:
             ts = item.get("timestamp", "")[:16]
 
             feed_html += (
-                "<div style='background:rgba(255,255,255,0.05);border-radius:8px;padding:12px 14px;"
-                "border:1px solid rgba(255,255,255,0.08);'>"
+                "<div style='background:rgba(0,0,0,0.04);border-radius:8px;padding:12px 14px;"
+                "border:1px solid rgba(0,0,0,0.08);'>"
                 "<div style='display:flex;align-items:center;gap:8px;'>"
                 "<span style='font-size:1.2em;'>{icon}</span>"
                 "<span style='font-size:0.85em;font-weight:600;color:{dark};"
@@ -651,7 +651,7 @@ with tab5:
                 "align-items:center;margin-top:6px;'>"
                 "<span style='font-size:0.75em;color:{dc};font-weight:500;'>"
                 "{det}</span>"
-                "<span style='font-size:0.7em;color:#8899AA;'>{ts}</span>"
+                "<span style='font-size:0.7em;color:#718096;'>{ts}</span>"
                 "</div>"
                 "<div style='margin-top:4px;'>{badges}</div>"
                 "</div>"

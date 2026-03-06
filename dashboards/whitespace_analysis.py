@@ -177,7 +177,7 @@ with tab_network:
         chart_df, x="Rev per SQM", y="Short Name",
         orientation="h",
         color="Rev per SQM",
-        color_continuous_scale=["#dc2626", "#d97706", "#2ECC71"],
+        color_continuous_scale=["#dc2626", "#d97706", "#2D6A2D"],
     )
     fig.update_layout(
         height=max(400, len(chart_df) * 22),
@@ -186,7 +186,7 @@ with tab_network:
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color="#FFFFFF"),
         coloraxis_showscale=False,
-        xaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.08)", title="Revenue per SQM ($)"),
+        xaxis=dict(showgrid=True, gridcolor="rgba(0,0,0,0.08)", title="Revenue per SQM ($)"),
         yaxis=dict(showgrid=False, title=""),
     )
     st.plotly_chart(fig, use_container_width=True)
@@ -289,8 +289,8 @@ with tab_profile:
     fig_radar = go.Figure()
     fig_radar.add_trace(go.Scatterpolar(
         r=tq_norm + [tq_norm[0]], theta=radar_labels + [radar_labels[0]],
-        fill="toself", fillcolor="rgba(46,204,113,0.15)",
-        line=dict(color="#2ECC71", width=2), name="Top Quartile",
+        fill="toself", fillcolor="rgba(45,106,45,0.15)",
+        line=dict(color="#2D6A2D", width=2), name="Top Quartile",
     ))
     fig_radar.add_trace(go.Scatterpolar(
         r=avg_norm + [avg_norm[0]], theta=radar_labels + [radar_labels[0]],
@@ -306,8 +306,8 @@ with tab_profile:
         polar=dict(
             bgcolor="rgba(0,0,0,0)",
             radialaxis=dict(visible=True, range=[0, 1.1], showticklabels=False,
-                            gridcolor="rgba(255,255,255,0.1)"),
-            angularaxis=dict(gridcolor="rgba(255,255,255,0.1)"),
+                            gridcolor="rgba(0,0,0,0.08)"),
+            angularaxis=dict(gridcolor="rgba(0,0,0,0.08)"),
         ),
         height=420,
         margin=dict(l=60, r=60, t=30, b=30),
@@ -516,7 +516,7 @@ with tab_map:
 
             popup_html = (
                 f"<div style='font-family:sans-serif;min-width:180px;'>"
-                f"<h4 style='margin:0 0 4px;color:#2ECC71;'>{short_name}</h4>"
+                f"<h4 style='margin:0 0 4px;color:#2D6A2D;'>{short_name}</h4>"
                 f"<div style='font-size:0.85em;color:#666;'>{catch.get('locality', '')}</div>"
                 f"<hr style='margin:4px 0;'>"
                 f"<table style='font-size:0.85em;width:100%;'>"
@@ -529,9 +529,9 @@ with tab_map:
             folium.CircleMarker(
                 location=[lat, lon],
                 radius=8,
-                color="#2ECC71",
+                color="#2D6A2D",
                 fill=True,
-                fill_color="#2ECC71",
+                fill_color="#2D6A2D",
                 fill_opacity=0.7,
                 popup=folium.Popup(popup_html, max_width=250),
                 tooltip=short_name,
@@ -541,7 +541,7 @@ with tab_map:
                 folium.Circle(
                     location=[lat, lon],
                     radius=5000,
-                    color="#2ECC71",
+                    color="#2D6A2D",
                     fill=False,
                     weight=1,
                     opacity=0.3,
@@ -595,8 +595,8 @@ with tab_map:
         # Legend
         st.markdown(
             "**Legend:** "
-            '<span style="color:#2ECC71;">&#9679;</span> Existing Store | '
-            '<span style="color:#2ECC71;">&#9679;</span> Phase 1 | '
+            '<span style="color:#2D6A2D;">&#9679;</span> Existing Store | '
+            '<span style="color:#2D6A2D;">&#9679;</span> Phase 1 | '
             '<span style="color:#3B82F6;">&#9679;</span> Phase 2 | '
             '<span style="color:#8B5CF6;">&#9679;</span> Phase 3',
             unsafe_allow_html=True,

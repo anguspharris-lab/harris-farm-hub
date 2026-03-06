@@ -115,7 +115,7 @@ MATURITY_LEVELS = [
         "name": "Cultivator",
         "icon": "\U0001f333",
         "tagline": "Shaping the farm",
-        "color": "#22c55e",
+        "color": "#2D6A2D",
         "text_color": "#f0fdf4",
         "description": (
             "You design AI solutions for the business. Multi-step workflows, "
@@ -615,7 +615,7 @@ LEARNING_PATHS = [
         "levels": "Harvester \u2192 Cultivator",
         "hours": "~5 hrs",
         "tagline": "Build AI-powered tools",
-        "color": "#22c55e",
+        "color": "#2D6A2D",
         "text_color": "#f0fdf4",
         "goal_tags": ["G3", "G5"],
         "description": (

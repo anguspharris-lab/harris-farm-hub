@@ -34,7 +34,7 @@ def pillar_hero(pillar, metrics=None):
                     "{}</span>".format(delta)
                 )
             chips.append(
-                "<div style='background:rgba(255,255,255,0.15);"
+                "<div style='background:rgba(0,0,0,0.12);"
                 "padding:10px 16px;border-radius:8px;text-align:center;'>"
                 "<div style='font-size:1.6em;font-weight:700;'>"
                 "{}{}</div>"
@@ -67,13 +67,13 @@ def pillar_hero(pillar, metrics=None):
 def coming_soon_card(title, description="Data source not yet connected."):
     """Render a placeholder card for metrics that don't have data yet."""
     st.markdown(
-        "<div style='background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.1);"
+        "<div style='background:rgba(0,0,0,0.03);border:2px dashed rgba(0,0,0,0.08);"
         "border-radius:10px;padding:20px;text-align:center;min-height:100px;"
         "display:flex;flex-direction:column;justify-content:center;'>"
         "<div style='font-size:1.8em;margin-bottom:6px;'>\U0001f6a7</div>"
-        "<div style='font-weight:700;color:#B0BEC5;font-size:1em;'>"
+        "<div style='font-weight:700;color:#4A5568;font-size:1em;'>"
         "{title}</div>"
-        "<div style='font-size:0.85em;color:#8899AA;margin-top:4px;'>"
+        "<div style='font-size:0.85em;color:#718096;margin-top:4px;'>"
         "{desc}</div>"
         "</div>".format(title=title, desc=description),
         unsafe_allow_html=True,
@@ -83,15 +83,15 @@ def coming_soon_card(title, description="Data source not yet connected."):
 def one_thing_box(text):
     """Render a highlighted 'One Thing to Remember' takeaway box."""
     st.markdown(
-        "<div style='background:linear-gradient(135deg, #1A2D50, #132240);"
-        "border-left:4px solid #F1C40F;border:1px solid rgba(255,255,255,0.08);"
-        "border-left:4px solid #F1C40F;"
+        "<div style='background:linear-gradient(135deg, #E8E8E4, #132240);"
+        "border-left:4px solid #E8B84B;border:1px solid rgba(0,0,0,0.08);"
+        "border-left:4px solid #E8B84B;"
         "border-radius:0 10px 10px 0;"
         "padding:16px 20px;margin:16px 0;'>"
-        "<div style='font-weight:700;color:#F1C40F;font-size:0.9em;"
+        "<div style='font-weight:700;color:#E8B84B;font-size:0.9em;"
         "margin-bottom:4px;'>"
         "\U0001f4a1 One Thing to Remember</div>"
-        "<div style='color:#B0BEC5;font-size:0.95em;'>{text}</div>"
+        "<div style='color:#4A5568;font-size:0.95em;'>{text}</div>"
         "</div>".format(text=text),
         unsafe_allow_html=True,
     )
@@ -113,29 +113,29 @@ def initiative_summary_card(summary):
     pct = int((done / total) * 100) if total > 0 else 0
 
     st.markdown(
-        "<div style='background:rgba(255,255,255,0.05);"
-        "border:1px solid rgba(255,255,255,0.08);"
+        "<div style='background:rgba(0,0,0,0.04);"
+        "border:1px solid rgba(0,0,0,0.08);"
         "border-radius:10px;padding:16px;'>"
         "<div style='font-weight:600;color:white;font-size:0.95em;"
         "margin-bottom:8px;font-family:Georgia,serif;'>"
         "\U0001f4cb Strategic Initiatives</div>"
         "<div style='display:flex;gap:16px;margin-bottom:10px;'>"
         "<div><span style='font-size:1.3em;font-weight:700;color:white;'>{total}</span>"
-        " <span style='color:#8899AA;font-size:0.85em;'>Total</span></div>"
-        "<div><span style='font-size:1.3em;font-weight:700;color:#2ECC71;'>"
+        " <span style='color:#718096;font-size:0.85em;'>Total</span></div>"
+        "<div><span style='font-size:1.3em;font-weight:700;color:#2D6A2D;'>"
         "{done}</span>"
-        " <span style='color:#8899AA;font-size:0.85em;'>Done</span></div>"
+        " <span style='color:#718096;font-size:0.85em;'>Done</span></div>"
         "<div><span style='font-size:1.3em;font-weight:700;color:#3B82F6;'>"
         "{ip}</span>"
-        " <span style='color:#8899AA;font-size:0.85em;'>In Progress</span></div>"
+        " <span style='color:#718096;font-size:0.85em;'>In Progress</span></div>"
         "<div><span style='font-size:1.3em;font-weight:700;color:#EF4444;'>"
         "{stuck}</span>"
-        " <span style='color:#8899AA;font-size:0.85em;'>Stuck</span></div>"
+        " <span style='color:#718096;font-size:0.85em;'>Stuck</span></div>"
         "</div>"
-        "<div style='background:rgba(255,255,255,0.1);border-radius:6px;height:8px;'>"
-        "<div style='background:#2ECC71;height:8px;border-radius:6px;"
+        "<div style='background:rgba(0,0,0,0.08);border-radius:6px;height:8px;'>"
+        "<div style='background:#2D6A2D;height:8px;border-radius:6px;"
         "width:{pct}%;'></div></div>"
-        "<div style='font-size:0.75em;color:#8899AA;text-align:right;"
+        "<div style='font-size:0.75em;color:#718096;text-align:right;"
         "margin-top:2px;'>{pct}% complete</div>"
         "</div>".format(
             dark=HFM_DARK, total=total, done=done, ip=in_prog,
@@ -152,7 +152,7 @@ def growing_legends_banner():
     to create visual unity under the AI-First Manifesto.
     """
     st.markdown(
-        "<div style='background:linear-gradient(135deg, #1A2D50, #132240);"
+        "<div style='background:linear-gradient(135deg, #E8E8E4, #132240);"
         "border:1px solid rgba(139,92,246,0.25);"
         "border-radius:12px;padding:20px 24px;margin-bottom:20px;'>"
         "<div style='font-size:0.75em;text-transform:uppercase;"
@@ -162,7 +162,7 @@ def growing_legends_banner():
         "<div style='font-size:1.15em;font-weight:700;color:white;"
         "font-family:Georgia,serif;margin-bottom:6px;'>"
         "AI is our brain partner. The prompt is our unlock.</div>"
-        "<div style='font-size:0.9em;color:#B0BEC5;'>"
+        "<div style='font-size:0.9em;color:#4A5568;'>"
         "Every Harris Farmer who masters these tools doesn't just use AI "
         "&mdash; they lead with it. Same family. Same values. "
         "Radically better tools.</div>"

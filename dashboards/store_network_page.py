@@ -48,7 +48,7 @@ _DARK_LAYOUT = dict(
     font=dict(color="#FFFFFF", family="Trebuchet MS, sans-serif"),
 )
 
-_GRID = dict(showgrid=True, gridcolor="rgba(255,255,255,0.08)")
+_GRID = dict(showgrid=True, gridcolor="rgba(0,0,0,0.08)")
 _NO_GRID = dict(showgrid=False)
 
 
@@ -89,7 +89,7 @@ def _colour_for_roc(roc_val) -> str:
     except (ValueError, TypeError):
         return "#6B7280"
     if v >= 1.0:
-        return "#2ECC71"
+        return "#2D6A2D"
     elif v >= 0.7:
         return "#d97706"
     else:
@@ -234,9 +234,9 @@ with tab_exec:
                     glass_card(
                         f"<span style='color:{colour};font-size:1.6em;font-weight:700;'>"
                         f"{roc_val:.2f}x</span>"
-                        f"<span style='color:#FFFFFF;font-size:1.1em;margin-left:12px;'>"
+                        f"<span style='color:#1A1A1A;font-size:1.1em;margin-left:12px;'>"
                         f"{name}</span>"
-                        f"<br><span style='color:#8899AA;font-size:0.85em;'>"
+                        f"<br><span style='color:#718096;font-size:0.85em;'>"
                         f"{fmt} | {sqm:,.0f} sqm</span>",
                         border_color=colour,
                     ),
@@ -255,9 +255,9 @@ with tab_exec:
                     glass_card(
                         f"<span style='color:{colour};font-size:1.6em;font-weight:700;'>"
                         f"{roc_val:.2f}x</span>"
-                        f"<span style='color:#FFFFFF;font-size:1.1em;margin-left:12px;'>"
+                        f"<span style='color:#1A1A1A;font-size:1.1em;margin-left:12px;'>"
                         f"{name}</span>"
-                        f"<br><span style='color:#8899AA;font-size:0.85em;'>"
+                        f"<br><span style='color:#718096;font-size:0.85em;'>"
                         f"{fmt} | {sqm:,.0f} sqm</span>",
                         border_color=colour,
                     ),
@@ -283,14 +283,14 @@ with tab_exec:
         # ── Key insight callout ──────────────────────────────────────────
         st.markdown(
             glass_card(
-                "<span style='color:#2ECC71;font-weight:700;font-size:1.1em;'>"
+                "<span style='color:#2D6A2D;font-weight:700;font-size:1.1em;'>"
                 "Key Insight</span><br>"
-                "<span style='color:#FFFFFF;'>"
+                "<span style='color:#1A1A1A;'>"
                 "Express format (&lt;1,200 sqm) averages ~1.17x GPM ROC -- "
                 "1.8x more capital-efficient than Large format (0.66x). "
                 "Smaller stores generate higher returns per dollar of invested capital."
                 "</span>",
-                border_color="#2ECC71",
+                border_color="#2D6A2D",
             ),
             unsafe_allow_html=True,
         )
@@ -342,7 +342,7 @@ with tab_roc:
                 y="short_name",
                 orientation="h",
                 color="gpm_roc_primary_4k",
-                color_continuous_scale=["#dc2626", "#d97706", "#2ECC71"],
+                color_continuous_scale=["#dc2626", "#d97706", "#2D6A2D"],
                 labels={
                     "gpm_roc_primary_4k": "GPM ROC (est.) at $4K/sqm",
                     "short_name": "",
@@ -429,7 +429,7 @@ with tab_roc:
             )
             fig_scatter.update_traces(textposition="top center", textfont_size=10)
             fig_scatter.add_hline(
-                y=1.0, line_dash="dash", line_color="rgba(255,255,255,0.4)",
+                y=1.0, line_dash="dash", line_color="rgba(0,0,0,0.25)",
                 annotation_text="1.0x breakeven",
                 annotation_font_color="#FFFFFF",
             )
@@ -463,7 +463,7 @@ with tab_roc:
                     z=pivot.values,
                     x=pivot.columns.tolist(),
                     y=pivot.index.tolist(),
-                    colorscale=[[0, "#dc2626"], [0.5, "#d97706"], [1, "#2ECC71"]],
+                    colorscale=[[0, "#dc2626"], [0.5, "#d97706"], [1, "#2D6A2D"]],
                     text=np.round(pivot.values, 1),
                     texttemplate="%{text}%",
                     hovertemplate="Store: %{y}<br>Dept: %{x}<br>GP: %{z:.1f}%<extra></extra>",
@@ -589,12 +589,12 @@ with tab_ms:
                     share_val = row.get("weighted_avg_share_pct", 0)
                     st.markdown(
                         glass_card(
-                            f"<span style='color:#2ECC71;font-weight:700;'>"
+                            f"<span style='color:#2D6A2D;font-weight:700;'>"
                             f"+{trend_val:.1f}pp</span> "
-                            f"<span style='color:#FFFFFF;'>{name}</span>"
-                            f"<br><span style='color:#8899AA;font-size:0.85em;'>"
+                            f"<span style='color:#1A1A1A;'>{name}</span>"
+                            f"<br><span style='color:#718096;font-size:0.85em;'>"
                             f"Current share: {share_val:.1f}%</span>",
-                            border_color="#2ECC71",
+                            border_color="#2D6A2D",
                         ),
                         unsafe_allow_html=True,
                     )
@@ -610,8 +610,8 @@ with tab_ms:
                         glass_card(
                             f"<span style='color:#dc2626;font-weight:700;'>"
                             f"{trend_val:.1f}pp</span> "
-                            f"<span style='color:#FFFFFF;'>{name}</span>"
-                            f"<br><span style='color:#8899AA;font-size:0.85em;'>"
+                            f"<span style='color:#1A1A1A;'>{name}</span>"
+                            f"<br><span style='color:#718096;font-size:0.85em;'>"
                             f"Current share: {share_val:.1f}%</span>",
                             border_color="#dc2626",
                         ),
@@ -690,7 +690,7 @@ with tab_matrix:
             shapes = [
                 # Star (top-right) - green
                 dict(type="rect", x0=med_share, x1=x_max, y0=med_roc, y1=y_max,
-                     fillcolor="rgba(46,204,113,0.08)", line_width=0, layer="below"),
+                     fillcolor="rgba(45,106,45,0.08)", line_width=0, layer="below"),
                 # Cash Cow (bottom-right) - blue
                 dict(type="rect", x0=med_share, x1=x_max, y0=y_min, y1=med_roc,
                      fillcolor="rgba(59,130,246,0.08)", line_width=0, layer="below"),
@@ -733,22 +733,22 @@ with tab_matrix:
 
             # Add median divider lines
             fig_matrix.add_hline(
-                y=med_roc, line_dash="dot", line_color="rgba(255,255,255,0.3)",
+                y=med_roc, line_dash="dot", line_color="rgba(0,0,0,0.20)",
                 annotation_text=f"Median ROC: {med_roc:.2f}x",
-                annotation_font_color="#8899AA",
+                annotation_font_color="#718096",
                 annotation_position="bottom right",
             )
             fig_matrix.add_vline(
-                x=med_share, line_dash="dot", line_color="rgba(255,255,255,0.3)",
+                x=med_share, line_dash="dot", line_color="rgba(0,0,0,0.20)",
                 annotation_text=f"Median Share: {med_share:.1f}%",
-                annotation_font_color="#8899AA",
+                annotation_font_color="#718096",
                 annotation_position="top left",
             )
 
             # Quadrant labels
             fig_matrix.add_annotation(
                 x=x_max - 0.5, y=y_max - 0.05, text="STAR", showarrow=False,
-                font=dict(color="#2ECC71", size=14, family="Georgia"),
+                font=dict(color="#2D6A2D", size=14, family="Georgia"),
             )
             fig_matrix.add_annotation(
                 x=x_max - 0.5, y=y_min + 0.05, text="CASH COW", showarrow=False,
@@ -789,7 +789,7 @@ with tab_matrix:
                     f"border:1px solid {qcolour};'>"
                     f"<span style='color:{qcolour};font-size:1.6em;font-weight:700;'>"
                     f"{count}</span><br>"
-                    f"<span style='color:#B0BEC5;font-size:0.9em;'>{qname}</span></div>",
+                    f"<span style='color:#4A5568;font-size:0.9em;'>{qname}</span></div>",
                     unsafe_allow_html=True,
                 )
 
@@ -885,7 +885,7 @@ with tab_cannibal:
                             f"<span style='color:#d97706;font-weight:700;'>Cannibalisation Summary</span><br>"
                             f"<span style='color:#dc2626;font-weight:600;'>{high_risk_count} High Risk</span> "
                             f"opportunities would primarily steal from existing stores.<br>"
-                            f"<span style='color:#2ECC71;font-weight:600;'>{low_risk_count} Low Risk</span> "
+                            f"<span style='color:#2D6A2D;font-weight:600;'>{low_risk_count} Low Risk</span> "
                             f"opportunities represent genuinely new market entries.",
                             border_color="#d97706",
                         ),
@@ -1018,7 +1018,7 @@ with tab_score:
                 f"border:2px solid {colour};'>"
                 f"<span style='color:{colour};font-size:1.8em;font-weight:700;'>"
                 f"{count}</span><br>"
-                f"<span style='color:#B0BEC5;font-size:0.85em;'>{cls_name}</span></div>",
+                f"<span style='color:#4A5568;font-size:0.85em;'>{cls_name}</span></div>",
                 unsafe_allow_html=True,
             )
 
@@ -1097,7 +1097,7 @@ with tab_fix:
                 glass_card(
                     "<span style='color:#d97706;font-weight:700;font-size:1.1em;'>"
                     "The Drummoyne Pattern</span><br>"
-                    "<span style='color:#FFFFFF;'>"
+                    "<span style='color:#1A1A1A;'>"
                     "Some stores have loyal customers and decent market share, "
                     "but the physical store is too large for the revenue it generates. "
                     "The fix is typically format reduction (downsize SQM), "
@@ -1152,7 +1152,7 @@ with tab_gaps:
     def _status_colour(status: str) -> str:
         s = status.upper()
         if "ACTUAL" in s:
-            return "#2ECC71"
+            return "#2D6A2D"
         elif "ESTIMATED" in s:
             return "#d97706"
         elif "PLANNED" in s:
@@ -1183,7 +1183,7 @@ with tab_gaps:
     fig_avail = go.Figure()
     fig_avail.add_trace(go.Bar(
         x=[actual_count], y=["Data Coverage"], orientation="h",
-        name="Actual", marker_color="#2ECC71",
+        name="Actual", marker_color="#2D6A2D",
         text=[f"{actual_count}"], textposition="inside",
     ))
     fig_avail.add_trace(go.Bar(
@@ -1266,7 +1266,7 @@ with tab_gaps:
         glass_card(
             "<span style='color:#3B82F6;font-weight:700;font-size:1.1em;'>"
             "Data Audit Reference</span><br>"
-            "<span style='color:#FFFFFF;'>"
+            "<span style='color:#1A1A1A;'>"
             "For the full data audit including methodology notes, assumptions log, "
             "and data request templates, see <code>hub-roc-data-audit.md</code> in the project docs. "
             "The finance team data request has been drafted and is ready for review."

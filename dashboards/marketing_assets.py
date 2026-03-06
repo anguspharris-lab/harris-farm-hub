@@ -58,7 +58,7 @@ def _render_asset_card(asset):
             st.image(str(file_path), width=120)
         else:
             st.markdown(
-                "<div style='width:120px;height:80px;background:rgba(255,255,255,0.05);"
+                "<div style='width:120px;height:80px;background:rgba(0,0,0,0.04);"
                 "border-radius:8px;display:flex;align-items:center;"
                 "justify-content:center;font-size:2em;'>{}</div>".format(icon),
                 unsafe_allow_html=True,
@@ -124,11 +124,11 @@ def _render_video_links(video_links):
 
 st.markdown(
     "<div style='border-left:4px solid {};padding:12px 16px;"
-    "background:rgba(255,255,255,0.05);border-radius:0 8px 8px 0;"
-    "border:1px solid rgba(255,255,255,0.08);margin-bottom:20px;'>"
+    "background:rgba(0,0,0,0.04);border-radius:0 8px 8px 0;"
+    "border:1px solid rgba(0,0,0,0.08);margin-bottom:20px;'>"
     "<div style='font-size:1.4em;font-weight:700;color:{};'>"
     "\U0001f4c1 Marketing Assets</div>"
-    "<div style='color:#8899AA;font-size:0.9em;'>"
+    "<div style='color:#718096;font-size:0.9em;'>"
     "Harris Farm's centralised library of brand assets, campaign creatives, "
     "and marketing collateral.</div>"
     "</div>".format(HFM_GREEN, HFM_DARK),

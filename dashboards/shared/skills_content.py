@@ -2023,7 +2023,7 @@ SERIES_INFO = {
             "Master the fundamentals of prompting, role-specific applications, "
             "advanced techniques, and rubric-based self-evaluation."
         ),
-        "colour": "#2ECC71",
+        "colour": "#2D6A2D",
     },
     "D": {
         "name": "Applied Data + AI",

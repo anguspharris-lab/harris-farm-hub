@@ -737,7 +737,7 @@ try:
                 measure=wf_measures,
                 x=wf_labels,
                 y=wf_values,
-                connector={"line": {"color": "rgba(255,255,255,0.2)"}},
+                connector={"line": {"color": "rgba(0,0,0,0.15)"}},
                 decreasing={"marker": {"color": "#ef4444"}},
                 increasing={"marker": {"color": "#10b981"}},
                 totals={"marker": {"color": "#3b82f6"}},
@@ -745,7 +745,7 @@ try:
             fig_gl_wf.update_layout(
                 title=f"FY{gl_fy} — Revenue to Net Profit (Network)",
                 height=420, template="plotly_dark",
-                paper_bgcolor="#0A0F0A", plot_bgcolor="#0D150D",
+                paper_bgcolor="#FAFAF7", plot_bgcolor="#FFFFFF",
             )
             st.plotly_chart(fig_gl_wf, key="gl_pnl_waterfall")
 

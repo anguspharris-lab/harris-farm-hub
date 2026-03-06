@@ -142,12 +142,12 @@ def score_breakdown_chart(opp):
     fig = go.Figure()
     fig.add_trace(go.Bar(
         y=names, x=maxes, orientation="h",
-        marker_color="rgba(255,255,255,0.08)", name="Max",
+        marker_color="rgba(0,0,0,0.08)", name="Max",
         hoverinfo="skip",
     ))
     fig.add_trace(go.Bar(
         y=names, x=values, orientation="h",
-        marker_color="#2ECC71", name="Score",
+        marker_color="#2D6A2D", name="Score",
         text=[str(v) for v in values], textposition="auto",
     ))
     fig.update_layout(
@@ -202,6 +202,6 @@ def format_comparison(store_name):
     }
 
 
-TIER_COLOURS = {1: "#2ECC71", 2: "#65a30d", 3: "#d97706", 4: "#ea580c", 5: "#dc2626"}
-PHASE_COLOURS = {1: "#2ECC71", 2: "#3B82F6", 3: "#8B5CF6"}
-CONFIDENCE_COLOURS = {"High": "#2ECC71", "Medium": "#d97706", "Low": "#dc2626"}
+TIER_COLOURS = {1: "#2D6A2D", 2: "#65a30d", 3: "#d97706", 4: "#ea580c", 5: "#dc2626"}
+PHASE_COLOURS = {1: "#2D6A2D", 2: "#3B82F6", 3: "#8B5CF6"}
+CONFIDENCE_COLOURS = {"High": "#2D6A2D", "Medium": "#d97706", "Low": "#dc2626"}

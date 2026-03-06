@@ -198,7 +198,7 @@ DEMO_SCORE_TIERS = {
 }
 
 DEMO_SCORE_COLOURS = {
-    "Excellent": "#2ECC71",
+    "Excellent": "#2D6A2D",
     "Strong": "#3B82F6",
     "Moderate": "#d97706",
     "Below Average": "#dc2626",
