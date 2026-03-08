@@ -137,31 +137,16 @@ for ws in _active:
             unsafe_allow_html=True,
         )
 
-        ch_web, ch_wa, ch_sms, ch_email = st.columns(4)
+        ch_web, ch_sms, ch_wa, ch_email = st.columns(4)
 
         with ch_web:
             if "hfw-transformation-readiness" in _pages:
                 st.page_link(
                     _pages["hfw-transformation-readiness"],
-                    label="Web Survey",
+                    label="Web Form",
                     use_container_width=True,
                 )
                 st.caption("Complete in your browser")
-
-        with ch_wa:
-            _wa_deep = (
-                f"https://wa.me/{_WA_SANDBOX}"
-                f"?text={urllib.parse.quote(_WA_JOIN_CODE)}"
-            )
-            st.link_button(
-                "WhatsApp",
-                _wa_deep,
-                use_container_width=True,
-            )
-            st.caption(
-                f"Send **{_WA_JOIN_CODE}** first, "
-                f"then text **{_ws_code}**"
-            )
 
         with ch_sms:
             _sms_deep = (
@@ -169,12 +154,28 @@ for ws in _active:
                 f"?body={urllib.parse.quote(_ws_code)}"
             )
             st.link_button(
-                "SMS",
+                "SMS \u2014 1 tap",
                 _sms_deep,
                 use_container_width=True,
             )
+            st.caption("Opens your messages app, just hit Send")
+
+        with ch_wa:
+            _wa_deep = (
+                f"https://wa.me/{_WA_SANDBOX}"
+                f"?text={urllib.parse.quote(_ws_code)}"
+            )
+            _wa_join = (
+                f"https://wa.me/{_WA_SANDBOX}"
+                f"?text={urllib.parse.quote(_WA_JOIN_CODE)}"
+            )
+            st.link_button(
+                "WhatsApp",
+                _wa_join,
+                use_container_width=True,
+            )
             st.caption(
-                f"Text **{_ws_code}** to {_SMS_NUMBER}"
+                f"Hit Send to connect, then text **{_ws_code}**"
             )
 
         with ch_email:
