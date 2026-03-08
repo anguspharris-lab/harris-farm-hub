@@ -248,11 +248,9 @@ class ConversationEngine:
         except ImportError:
             pass
 
-        return _fmt(
-            "Hmm, I didn't catch that. Reply with the number of your "
-            "workstream, or text the workstream code (e.g. SCR2026).",
-            channel,
-        )
+        # Unrecognised input — show the full greeting so the user
+        # always knows what to do (especially after WhatsApp sandbox join)
+        return self._greeting_prompt(channel)
 
     def _handle_email(self, session, user_input, channel):
         # type: (Dict[str, Any], str, str) -> str

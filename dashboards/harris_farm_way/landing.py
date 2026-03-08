@@ -161,10 +161,6 @@ for ws in _active:
             st.caption("Opens your messages app, just hit Send")
 
         with ch_wa:
-            _wa_deep = (
-                f"https://wa.me/{_WA_SANDBOX}"
-                f"?text={urllib.parse.quote(_ws_code)}"
-            )
             _wa_join = (
                 f"https://wa.me/{_WA_SANDBOX}"
                 f"?text={urllib.parse.quote(_WA_JOIN_CODE)}"
@@ -175,7 +171,7 @@ for ws in _active:
                 use_container_width=True,
             )
             st.caption(
-                f"Hit Send to connect, then text **{_ws_code}**"
+                "Hit Send, then follow the prompts"
             )
 
         with ch_email:
