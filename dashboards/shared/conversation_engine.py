@@ -377,13 +377,26 @@ class ConversationEngine:
                 session["completed"] = True
                 session["submitted_to_bq"] = True
                 name = session["answers"].get("first_name", "")
+                ws_code = session["answers"].get(
+                    "workstream_id", ""
+                ).replace("-", "").replace("2026", "2026").upper()
+                # Get the actual channel code
+                try:
+                    from config.workstreams import get_workstream_by_id
+                    _ws = get_workstream_by_id(
+                        session["answers"].get("workstream_id", "")
+                    )
+                    ws_code = _ws.get("channel_code", "") if _ws else ""
+                except ImportError:
+                    pass
                 return _fmt(
                     f"Submitted! Thank you, *{name}*.\n\n"
-                    f"Your voice is shaping our future. "
-                    f"If you want to share this with a colleague, "
-                    f"send them this link:\n\n"
-                    f"https://harris-farm-hub.onrender.com/hfw-landing\n\n"
-                    f"Or tell them to text the workstream code to this number.",
+                    f"Your voice is shaping our future.\n\n"
+                    f"Share with a colleague \u2014 they can respond "
+                    f"however suits them:\n"
+                    f"Web: https://harris-farm-hub.onrender.com/hfw-landing\n"
+                    f"SMS: Text {ws_code} to +18778364405\n"
+                    f"WhatsApp: Message +14155238886",
                     channel,
                 )
             else:

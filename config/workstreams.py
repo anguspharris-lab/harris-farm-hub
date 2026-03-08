@@ -18,7 +18,11 @@ WORKSTREAMS = [
         "channel_code": "SCR2026",
         "share_message": (
             "Hey! Harris Farm is reshaping our supply chain and your "
-            "perspective matters. Takes 5 mins: {url}"
+            "perspective matters. Takes 5 mins.\n\n"
+            "Web: {url}\n"
+            "SMS: Text SCR2026 to +18778364405 (just hit Send)\n"
+            "WhatsApp: Message +14155238886, send 'join choose-now', "
+            "then follow the prompts"
         ),
     },
     {
@@ -33,7 +37,11 @@ WORKSTREAMS = [
         "channel_code": "AIVISION",
         "share_message": (
             "Harris Farm wants to hear how AI can help YOUR role. "
-            "5 min survey: {url}"
+            "Takes 5 mins.\n\n"
+            "Web: {url}\n"
+            "SMS: Text AIVISION to +18778364405 (just hit Send)\n"
+            "WhatsApp: Message +14155238886, send 'join choose-now', "
+            "then follow the prompts"
         ),
     },
     {
