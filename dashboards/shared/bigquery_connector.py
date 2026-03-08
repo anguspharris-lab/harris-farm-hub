@@ -503,3 +503,83 @@ def get_sc_responses():
     df = bq_query(sql)
     rows = df.to_dict("records")
     return [_bq_row_to_interview_format(r) for r in rows]
+
+
+# ---------------------------------------------------------------------------
+# Transformation at Scale — query helpers
+# ---------------------------------------------------------------------------
+
+def _survey_table(test=False):
+    # type: (bool) -> str
+    """Return the correct survey table name."""
+    suffix = "_test" if test else ""
+    return f"`{DS_SURVEYS}.sc_review_responses{suffix}`"
+
+
+@st.cache_data(ttl=300)
+def get_response_count(workstream_name, test=False):
+    # type: (str, bool) -> int
+    """Count responses for a specific workstream (by transformation_focus)."""
+    table = _survey_table(test)
+    sql = f"""
+        SELECT COUNT(*) AS cnt
+        FROM {table}
+        WHERE transformation_focus = @ws_name
+    """
+    from google.cloud import bigquery
+    params = [bigquery.ScalarQueryParameter("ws_name", "STRING", workstream_name)]
+    df = bq_query(sql, _params=params)
+    return int(df["cnt"].iloc[0]) if len(df) > 0 else 0
+
+
+@st.cache_data(ttl=300)
+def get_response_counts_by_focus(test=False):
+    # type: (bool) -> Dict[str, int]
+    """Count responses grouped by transformation_focus. Returns {focus: count}."""
+    table = _survey_table(test)
+    sql = f"""
+        SELECT
+            COALESCE(transformation_focus, 'Unknown') AS focus,
+            COUNT(*) AS cnt
+        FROM {table}
+        GROUP BY focus
+    """
+    df = bq_query(sql)
+    return dict(zip(df["focus"].tolist(), df["cnt"].tolist()))
+
+
+@st.cache_data(ttl=300)
+def get_responses_by_email(email, test=False):
+    # type: (str, bool) -> List[Dict[str, Any]]
+    """Fetch all responses for a given email address."""
+    table = _survey_table(test)
+    sql = f"""
+        SELECT *
+        FROM {table}
+        WHERE LOWER(email) = LOWER(@email)
+        ORDER BY submitted_at DESC
+    """
+    from google.cloud import bigquery
+    params = [bigquery.ScalarQueryParameter("email", "STRING", email)]
+    df = bq_query(sql, _params=params)
+    return df.to_dict("records")
+
+
+@st.cache_data(ttl=300)
+def get_department_counts(workstream_name, test=False):
+    # type: (str, bool) -> Dict[str, int]
+    """Count responses by department for a specific workstream."""
+    table = _survey_table(test)
+    sql = f"""
+        SELECT
+            COALESCE(department, 'Unknown') AS dept,
+            COUNT(*) AS cnt
+        FROM {table}
+        WHERE transformation_focus = @ws_name
+        GROUP BY dept
+        ORDER BY cnt DESC
+    """
+    from google.cloud import bigquery
+    params = [bigquery.ScalarQueryParameter("ws_name", "STRING", workstream_name)]
+    df = bq_query(sql, _params=params)
+    return dict(zip(df["dept"].tolist(), df["cnt"].tolist()))

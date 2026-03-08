@@ -10,8 +10,11 @@ from pathlib import Path
 
 import streamlit as st
 
-# Add backend/ to sys.path once — all dashboards and shared modules can now
-# import backend modules (fiscal_calendar, transaction_layer, etc.) directly.
+# Add project root and backend/ to sys.path once — all dashboards and shared
+# modules can import backend modules and config/ package directly.
+_PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
 _BACKEND = str(Path(__file__).resolve().parent.parent / "backend")
 if _BACKEND not in sys.path:
     sys.path.insert(0, _BACKEND)
@@ -98,17 +101,20 @@ _pages = {
     "adoption": st.Page(str(_DIR / "adoption_dashboard.py"), title="Adoption", icon="\U0001f4c8", url_path="adoption"),
     # Admin
     "user-management": st.Page(str(_DIR / "mdhe" / "user_management.py"), title="User Management", icon="\U0001f465", url_path="user-management"),
-    # Supply Chain
-    "sc-interview": st.Page(str(_DIR / "supply_chain_interview.py"), title="SC Interview", icon="\U0001f4cb", url_path="sc-interview"),
-    "sc-analysis": st.Page(str(_DIR / "supply_chain_analysis.py"), title="SC Analysis", icon="\U0001f4ca", url_path="sc-analysis"),
-    # AI Readiness
-    "arr-interview": st.Page(str(_DIR / "ai_readiness_interview.py"), title="AI Readiness Interview", icon="\U0001f916", url_path="arr-interview"),
-    # The Harris Farm Way
-    "hfw-landing": st.Page(str(_DIR / "harris_farm_way" / "landing.py"), title="The Harris Farm Way", icon="\U0001f9ed", url_path="hfw-landing"),
-    "hfw-ai-vision": st.Page(str(_DIR / "harris_farm_way" / "ai_vision.py"), title="AI Vision Session", icon="\U0001f9e0", url_path="hfw-ai-vision"),
+    # Back of House landing
+    "boh-landing": st.Page(str(_DIR / "back_of_house_landing.py"), title="Back of House", icon="\U0001f527", url_path="boh-landing"),
+    # The Harris Farm Way (BOH sub-section landing)
+    "hfw-way-landing": st.Page(str(_DIR / "hfw_way_landing.py"), title="The Harris Farm Way", icon="\U0001f9ed", url_path="hfw-way-landing"),
+    # Supply Chain (analysis only — interview merged into Transformation Readiness)
+    "sc-analysis": st.Page(str(_DIR / "supply_chain_analysis.py"), title="Transformation Analysis", icon="\U0001f4ca", url_path="sc-analysis"),
+    # Transformation
+    "hfw-landing": st.Page(str(_DIR / "harris_farm_way" / "landing.py"), title="Transformation", icon="\U0001f9ed", url_path="hfw-landing"),
+    "hfw-transformation-readiness": st.Page(str(_DIR / "harris_farm_way" / "transformation_readiness.py"), title="Transformation Readiness", icon="\U0001f504", url_path="hfw-transformation-readiness"),
     "hfw-strategy-sprint": st.Page(str(_DIR / "harris_farm_way" / "strategy_sprint.py"), title="Strategy Sprint", icon="\u26a1", url_path="hfw-strategy-sprint"),
     "hfw-dept-one-pager": st.Page(str(_DIR / "harris_farm_way" / "dept_one_pager.py"), title="Dept One-Pager", icon="\U0001f4cb", url_path="hfw-dept-one-pager"),
     "hfw-board-prep": st.Page(str(_DIR / "harris_farm_way" / "board_prep.py"), title="Board Prep", icon="\U0001f3db\ufe0f", url_path="hfw-board-prep"),
+    # Channel Simulator (BOH)
+    "channel-simulator": st.Page(str(_DIR / "channel_simulator.py"), title="Channel Simulator", icon="\U0001f4f1", url_path="channel-simulator"),
 }
 
 # Section groupings for navigation (purpose-based, not pillar-based)
@@ -118,23 +124,31 @@ _SECTIONS = [
                "intro-operations", "intro-digital", "way-of-working"]},
     {"name": "Growing Legends", "icon": "\U0001f31f", "color": "#8B5CF6",
      "slugs": ["skills-academy", "the-paddock", "prompt-builder", "hub-assistant", "the-rubric"]},
-    {"name": "Operations", "icon": "\U0001f4e6", "color": "#E8B84B",
+    {"name": "Operations", "icon": "\U0001f4e6", "color": "#C8971F",
      "slugs": ["customers", "sales", "profitability", "revenue-bridge",
                "store-ops", "buying-hub", "product-intel", "plu-intel",
                "transport", "analytics-engine"]},
     {"name": "Our Stores", "icon": "\U0001f3ea", "color": "#0891B2",
      "slugs": ["store-network", "market-share", "demographics",
                "whitespace", "competitor-map", "roce", "cannibalisation"]},
-    {"name": "Transformation", "icon": "\U0001f680", "color": "#E8B84B",
-     "slugs": ["hfw-landing", "sc-interview", "sc-analysis", "arr-interview",
-               "hfw-ai-vision", "hfw-strategy-sprint",
-               "hfw-dept-one-pager", "hfw-board-prep"]},
-    {"name": "Back of House", "icon": "\U0001f527", "color": "#718096",
+    {"name": "Transformation", "icon": "\U0001f680", "color": "#C8971F",
+     "slugs": ["hfw-landing", "hfw-transformation-readiness", "sc-analysis"]},
+    {"name": "The Harris Farm Way", "icon": "\U0001f9ed", "color": "#C8971F",
      "is_muted": True,
-     "slugs": ["mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide",
-               "approvals", "workflow-engine", "agent-ops",
-               "mission-control", "ai-adoption", "adoption", "trending",
-               "agent-hub", "marketing-assets", "user-management"]},
+     "slugs": ["hfw-way-landing", "hfw-strategy-sprint", "hfw-dept-one-pager", "hfw-board-prep"]},
+    {"name": "Master Data", "icon": "\U0001f4ca", "color": "#717171",
+     "is_muted": True,
+     "slugs": ["mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide"]},
+    {"name": "System & AI", "icon": "\u2699\ufe0f", "color": "#717171",
+     "is_muted": True,
+     "slugs": ["workflow-engine", "agent-hub", "agent-ops",
+               "mission-control", "ai-adoption", "adoption"]},
+    {"name": "How We Build", "icon": "\U0001f527", "color": "#717171",
+     "is_muted": True,
+     "slugs": ["approvals", "trending", "channel-simulator"]},
+    {"name": "Admin", "icon": "\U0001f465", "color": "#717171",
+     "is_muted": True,
+     "slugs": ["user-management", "marketing-assets"]},
 ]
 
 # Store page objects and sections in session_state so landing.py can use them
@@ -180,15 +194,26 @@ _full_nav = {
         "whitespace", "competitor-map", "roce", "cannibalisation",
     ],
     "Transformation": [
-        "hfw-landing", "sc-interview", "sc-analysis", "arr-interview",
-        "hfw-ai-vision", "hfw-strategy-sprint",
-        "hfw-dept-one-pager", "hfw-board-prep",
+        "hfw-landing", "hfw-transformation-readiness", "sc-analysis",
+    ],
+    "The Harris Farm Way": [
+        "hfw-way-landing", "hfw-strategy-sprint", "hfw-dept-one-pager", "hfw-board-prep",
+    ],
+    "Master Data": [
+        "mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide",
+    ],
+    "System & AI": [
+        "workflow-engine", "agent-hub", "agent-ops",
+        "mission-control", "ai-adoption", "adoption",
+    ],
+    "How We Build": [
+        "approvals", "trending", "channel-simulator",
+    ],
+    "Admin": [
+        "user-management", "marketing-assets",
     ],
     "Back of House": [
-        "mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide",
-        "approvals", "workflow-engine", "agent-ops",
-        "mission-control", "ai-adoption", "adoption", "trending",
-        "agent-hub", "marketing-assets", "user-management",
+        "boh-landing",
     ],
 }
 
@@ -201,7 +226,7 @@ for section, slugs_or_pages in _full_nav.items():
     if filtered:
         _nav_dict[section] = filtered
 
-nav = st.navigation(_nav_dict)
+nav = st.navigation(_nav_dict, position="hidden")
 
 # ---------------------------------------------------------------------------
 # Public / Protected page gate
@@ -215,11 +240,13 @@ PUBLIC_SLUGS = frozenset({
     # Growing Legends
     "skills-academy", "the-paddock", "prompt-builder",
     "hub-assistant", "the-rubric",
-    # Supply Chain
-    "sc-interview", "sc-analysis", "arr-interview",
-    # The Harris Farm Way (meeting forms accessible without login)
-    "hfw-landing", "hfw-ai-vision", "hfw-strategy-sprint",
+    # Supply Chain (analysis only)
+    "sc-analysis",
+    # Transformation (meeting forms accessible without login)
+    "hfw-landing", "hfw-transformation-readiness", "hfw-strategy-sprint",
     "hfw-dept-one-pager", "hfw-board-prep",
+    # Back of House landing + Harris Farm Way
+    "boh-landing", "hfw-way-landing",
 })
 
 current_slug = nav.url_path
@@ -267,32 +294,44 @@ if _logo.exists():
 # Row 1: Home + section tabs (only those with visible pages)
 _visible_sections = [s for s in _SECTIONS if any(slug in _visible_pages for slug in s["slugs"])]
 
-cols = st.columns(1 + len(_visible_sections))
+# Consolidate muted sub-sections into a single "Back of House" tab
+_tab_sections = []
+_boh_slugs = ["boh-landing"] if "boh-landing" in _visible_pages else []
+for _s in _visible_sections:
+    if _s.get("is_muted"):
+        _boh_slugs.extend(_s["slugs"])
+    else:
+        _tab_sections.append(_s)
+if _boh_slugs:
+    _tab_sections.append({"name": "Back of House", "icon": "\U0001f527", "color": "#717171",
+                          "is_muted": True, "slugs": _boh_slugs})
+
+cols = st.columns(1 + len(_tab_sections))
 
 with cols[0]:
     st.page_link(_home, label="\U0001f34e Home", use_container_width=True)
 
-for i, section in enumerate(_visible_sections):
+for i, section in enumerate(_tab_sections):
     with cols[i + 1]:
         first_slug = next((s for s in section["slugs"] if s in _visible_pages), section["slugs"][0])
         label = f"{section['icon']} {section['name']}"
         st.page_link(_visible_pages.get(first_slug, _pages[first_slug]), label=label, use_container_width=True)
 
 # De-emphasize Back of House tab (last muted section)
-if _visible_sections and _visible_sections[-1].get("is_muted"):
-    _n = 1 + len(_visible_sections)
+if _tab_sections and _tab_sections[-1].get("is_muted"):
+    _n = 1 + len(_tab_sections)
     st.markdown(
         f"<style>"
         f"[data-testid='stHorizontalBlock']:first-of-type "
         f"> [data-testid='column']:nth-child({_n}) button {{"
-        f"  color: #718096 !important;"
-        f"  font-size: 0.88em !important;"
+        f"  color: #717171 !important;"
+        f"  font-size: 14px !important;"
         f"  opacity: 0.5;"
         f"}}"
         f"[data-testid='stHorizontalBlock']:first-of-type "
         f"> [data-testid='column']:nth-child({_n}) button:hover {{"
         f"  opacity: 1;"
-        f"  color: #4A5568 !important;"
+        f"  color: #4A4A4A !important;"
         f"}}"
         f"</style>",
         unsafe_allow_html=True,
@@ -300,6 +339,31 @@ if _visible_sections and _visible_sections[-1].get("is_muted"):
 
 # Row 2: Sub-pages within active section (only visible ones)
 if active_section:
+    # Back of House: show sub-section tabs first, then pages within active sub-section
+    if active_section.get("is_muted"):
+        _muted_secs = [s for s in _SECTIONS if s.get("is_muted")
+                       and any(sl in _visible_pages for sl in s["slugs"])]
+        if len(_muted_secs) > 1:
+            _ms_cols = st.columns(len(_muted_secs))
+            for j, msec in enumerate(_muted_secs):
+                with _ms_cols[j]:
+                    _first = next((s for s in msec["slugs"] if s in _visible_pages), msec["slugs"][0])
+                    _is_active = msec["name"] == active_section["name"]
+                    if _is_active:
+                        st.markdown(
+                            f"<div style='text-align:center;padding:8px 6px;"
+                            f"border-bottom:3px solid #717171;"
+                            f"font-weight:600;color:#4A4A4A;'>"
+                            f"{msec['icon']} {msec['name']}</div>",
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        st.page_link(
+                            _visible_pages.get(_first, _pages[_first]),
+                            label=f"{msec['icon']} {msec['name']}",
+                            use_container_width=True,
+                        )
+
     _visible_sub = [s for s in active_section["slugs"] if s in _visible_pages]
     # Hide marketing-assets from sub-nav (URL-only access)
     _visible_sub = [s for s in _visible_sub if s != "marketing-assets"]
@@ -340,9 +404,9 @@ with st.sidebar:
             f"<div style='background:rgba(0,0,0,0.04);"
             f"border:1px solid rgba(0,0,0,0.08);"
             f"border-radius:8px;padding:10px 12px;margin-bottom:10px;'>"
-            f"<div style='font-weight:600;font-size:0.85em;color:#2D6A2D;'>"
+            f"<div style='font-weight:600;font-size:12px;color:#2D6A2D;'>"
             f"{_auth_user['name']}</div>"
-            f"<div style='font-size:0.78em;color:#718096;'>"
+            f"<div style='font-size:12px;color:#717171;'>"
             f"{_auth_user.get('email', '')}</div>"
             f"</div>",
             unsafe_allow_html=True,
@@ -352,7 +416,7 @@ with st.sidebar:
             logout_user()
     elif _auth_user is None:
         st.markdown(
-            "<div style='font-size:0.82em;color:#718096;margin-bottom:8px;'>"
+            "<div style='font-size:13px;color:#717171;margin-bottom:8px;'>"
             "Sign in to access all dashboards</div>",
             unsafe_allow_html=True,
         )
@@ -370,9 +434,9 @@ if _auth_user and _auth_user.get("hub_role", "user") == "user":
         st.markdown(
             "<div style='background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);"
             "border-radius:8px;padding:10px 12px;margin-bottom:10px;'>"
-            "<div style='font-weight:600;font-size:0.85em;color:#2D6A2D;'>"
+            "<div style='font-weight:600;font-size:12px;color:#2D6A2D;'>"
             "Personalise your Hub</div>"
-            "<div style='font-size:0.78em;color:#718096;'>"
+            "<div style='font-size:12px;color:#717171;'>"
             "Select your role to see relevant pages only.</div>"
             "</div>",
             unsafe_allow_html=True,
@@ -429,10 +493,10 @@ if _auth_user:
                 st.markdown(
                     f"<div style='background:rgba(45,106,45,0.12);"
                     f"border:1px solid rgba(45,106,45,0.25);"
-                    f"color:white;border-radius:10px;padding:10px 14px;margin-bottom:12px;'>"
-                    f"<div style='font-weight:700;font-size:0.95em;color:#2D6A2D;'>"
+                    f"border-radius:10px;padding:10px 14px;margin-bottom:12px;'>"
+                    f"<div style='font-weight:700;font-size:14px;color:#2D6A2D;'>"
                     f"{_lvl_icon} {_lvl_name}</div>"
-                    f"<div style='font-size:0.8em;color:#4A5568;'>"
+                    f"<div style='font-size:12px;color:#4A4A4A;'>"
                     f"{_total:,} XP</div>"
                     f"</div>",
                     unsafe_allow_html=True,
