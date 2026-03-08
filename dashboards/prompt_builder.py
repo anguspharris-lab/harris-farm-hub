@@ -330,13 +330,13 @@ with st.sidebar:
             level = stats.get("level", "Prompt Apprentice")
             points = stats.get("total_points", 0)
             level_info = NINJA_LEVELS.get(level, {})
-            level_colour = level_info.get("colour", "#6b7280")
+            level_colour = level_info.get("colour", "#717171")
             st.markdown(
                 f"<div style='background:{level_colour}15; border:1px solid {level_colour}; "
                 f"padding:10px; border-radius:8px; text-align:center; margin:8px 0;'>"
-                f"<div style='font-size:1.1em; font-weight:700; color:{level_colour};'>{level}</div>"
-                f"<div style='font-size:0.85em; color:#666;'>{points} points</div>"
-                f"<div style='font-size:0.75em; color:#999;'>"
+                f"<div style='font-size:18px; font-weight:700; color:{level_colour};'>{level}</div>"
+                f"<div style='font-size:14px; color:#717171;'>{points} points</div>"
+                f"<div style='font-size:12px; color:#717171;'>"
                 f"{stats.get('approved', 0)} approved | {stats.get('avg_rubric_score', 0)}/10 avg</div>"
                 f"</div>",
                 unsafe_allow_html=True,
@@ -361,12 +361,12 @@ with st.sidebar:
                     avg = s.get("rubric_average") or 0
                     verdict = s.get("rubric_verdict", "")
                     status = s.get("status", "draft")
-                    colour = "#2D6A2D" if status == "approved" else "#d97706" if status == "pending_approval" else "#6b7280"
+                    colour = "#2D6A2D" if status == "approved" else "#C8971F" if status == "pending_approval" else "#717171"
                     st.markdown(
                         f"<div style='padding:4px 0; border-bottom:1px solid #f3f4f6;'>"
                         f"<strong>{s.get('task_type', 'custom')}</strong><br/>"
-                        f"<span style='font-size:0.8em; color:{colour};'>{status}</span>"
-                        f" | <span style='font-size:0.8em;'>{avg}/10</span>"
+                        f"<span style='font-size:13px; color:{colour};'>{status}</span>"
+                        f" | <span style='font-size:13px;'>{avg}/10</span>"
                         f"</div>",
                         unsafe_allow_html=True,
                     )
@@ -495,7 +495,7 @@ with tabs[0]:
             "Vendor": 5, "Property": 5, "Competitor": 4, "Projects": 5, "Utilities": 6,
         }
         avg_reliability = sum(source_reliability.get(s, 5) for s in data_sources) / len(data_sources)
-        conf_colour = "#2D6A2D" if avg_reliability >= 8 else "#d97706" if avg_reliability >= 6 else "#dc2626"
+        conf_colour = "#2D6A2D" if avg_reliability >= 8 else "#C8971F" if avg_reliability >= 6 else "#C0392B"
         st.markdown(
             f"<div style='background:{conf_colour}10; border:1px solid {conf_colour}; "
             f"padding:8px 12px; border-radius:6px; margin:8px 0;'>"
@@ -701,8 +701,8 @@ with tabs[2]:
         _stage_html += (
             f"<div style='flex:1;text-align:center;padding:10px 6px;background:{bg};"
             f"border-radius:8px;opacity:{opacity};'>"
-            f"<div style='font-size:1.2em;'>{icon}</div>"
-            f"<div style='font-size:0.8em;font-weight:600;color:{text_col};'>{name}</div>"
+            f"<div style='font-size:19px;'>{icon}</div>"
+            f"<div style='font-size:13px;font-weight:600;color:{text_col};'>{name}</div>"
             f"</div>"
         )
     _stage_html += "</div>"

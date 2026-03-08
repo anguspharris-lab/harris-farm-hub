@@ -259,8 +259,8 @@ def _score_colour(score):
     if score >= 8:
         return "#2D6A2D"
     elif score >= 6:
-        return "#d97706"
-    return "#dc2626"
+        return "#C8971F"
+    return "#C0392B"
 
 
 def _verdict_style(verdict):
@@ -268,8 +268,8 @@ def _verdict_style(verdict):
     if verdict == "SHIP":
         return "#2D6A2D", "check-circle"
     elif verdict == "REVISE":
-        return "#d97706", "alert-triangle"
-    return "#dc2626", "x-circle"
+        return "#C8971F", "alert-triangle"
+    return "#C0392B", "x-circle"
 
 
 def render_rubric_scorecard(scores_data):
@@ -294,9 +294,9 @@ def render_rubric_scorecard(scores_data):
     st.markdown(
         f"""<div style="background:{v_colour}15; border-left:4px solid {v_colour};
         padding:12px 16px; border-radius:6px; margin-bottom:16px;">
-        <span style="font-size:1.3em; font-weight:700; color:{v_colour};">
+        <span style="font-size:20px; font-weight:700; color:{v_colour};">
         {verdict}</span>
-        <span style="color:#666; margin-left:12px;">Average: {avg}/10</span>
+        <span style="color:#717171; margin-left:12px;">Average: {avg}/10</span>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -320,9 +320,9 @@ def render_rubric_scorecard(scores_data):
                 st.markdown(
                     f"""<div style="text-align:center; padding:8px; border:1px solid rgba(0,0,0,0.08);
                     border-radius:8px; background:rgba(0,0,0,0.04);">
-                    <div style="font-size:2em; font-weight:700; color:{colour};">{score_val}</div>
-                    <div style="font-size:0.85em; font-weight:600; color:#4A5568;">{info['name']}</div>
-                    <div style="font-size:0.7em; color:#718096; margin-top:4px;">{rationale[:60]}</div>
+                    <div style="font-size:32px; font-weight:700; color:{colour};">{score_val}</div>
+                    <div style="font-size:12px; font-weight:600; color:#4A4A4A;">{info['name']}</div>
+                    <div style="font-size:11px; color:#717171; margin-top:4px;">{rationale[:60]}</div>
                     </div>""",
                     unsafe_allow_html=True,
                 )

@@ -42,7 +42,7 @@ HUB_GOALS = {
         "title": "Democratise Data",
         "short": "Data",
         "icon": "\U0001f4ca",
-        "color": "#3b82f6",
+        "color": "#1565C0",
         "description": (
             "Put data into the hands of every Harris Farmer — from store managers checking "
             "weekend sales to buyers optimising orders with weather forecasts."
@@ -78,7 +78,7 @@ HUB_GOALS = {
         "title": "Fast-Track Supply Chain",
         "short": "Supply Chain",
         "icon": "\U0001f69a",
-        "color": "#f59e0b",
+        "color": "#C8971F",
         "description": (
             "Use AI to tidy up the supply chain from pay to purchase — reduce out-of-stocks, "
             "optimise buying, and get Grant Enders' vision into the data."
@@ -96,7 +96,7 @@ HUB_GOALS = {
         "title": "Always Improve",
         "short": "Improve",
         "icon": "\U0001f504",
-        "color": "#ef4444",
+        "color": "#C0392B",
         "description": (
             "The Hub watches itself. WATCHDOG governance, self-improvement cycles, and "
             "continuous quality scoring ensure we get better every iteration."
@@ -192,7 +192,7 @@ def goal_badge_html(goal_id: str) -> str:
     return (
         f"<span style='display:inline-block;background:{goal['color']}30;"
         f"color:{goal['color']};border:1px solid {goal['color']}50;"
-        f"border-radius:12px;padding:2px 10px;font-size:0.75em;"
+        f"border-radius:12px;padding:2px 10px;font-size:12px;"
         f"font-weight:600;margin:0 2px;'>"
         f"{goal['icon']} {goal_id}: {goal['short']}</span>"
     )

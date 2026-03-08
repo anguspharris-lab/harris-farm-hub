@@ -1,14 +1,165 @@
 """
 Harris Farm Way -- Board Prep
 Board-ready in one session — highlights, metrics, decisions, risks.
+Native Streamlit — no iframe.
 """
 
 import json
+import logging
+
+import requests
 import streamlit as st
-import streamlit.components.v1 as components
 from shared.styles import render_header, render_footer
 
+_log = logging.getLogger(__name__)
 user = st.session_state.get("auth_user")
+
+# ---------------------------------------------------------------------------
+# Config
+# ---------------------------------------------------------------------------
+
+_SUBMIT_URL = (
+    "https://australia-southeast1-oval-blend-488902-p2"
+    ".cloudfunctions.net/hfm-meeting-os-insert"
+)
+_API_KEY = "hfm-mos-2026"
+
+_SECTIONS = [
+    {
+        "key": "highlights",
+        "label": "Highlights & Performance",
+        "icon": "\U0001f3c6",
+        "color": "#C8971F",
+        "question": "What should the board know first?",
+        "cards": [
+            {
+                "title": "Performance Snapshot",
+                "icon": "\U0001f4ca",
+                "fields": [
+                    {
+                        "key": "top_highlight",
+                        "type": "text",
+                        "label": "Top Highlight",
+                        "help": "The single most important thing to share with the board.",
+                        "rows": 3,
+                    },
+                    {
+                        "key": "performance_summary",
+                        "type": "text",
+                        "label": "Performance Summary",
+                        "help": "2\u20133 sentences on how we\u2019re tracking against plan.",
+                        "rows": 3,
+                    },
+                    {
+                        "key": "confidence_level",
+                        "type": "slider",
+                        "label": "Confidence in Hitting Targets",
+                        "help": "How confident are you that we\u2019ll hit this year\u2019s targets?",
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        "key": "decisions",
+        "label": "Decisions & Approvals",
+        "icon": "\u2705",
+        "color": "#C0392B",
+        "question": "What does the board need to decide or approve?",
+        "cards": [
+            {
+                "title": "Board Decisions",
+                "icon": "\u2757",
+                "fields": [
+                    {
+                        "key": "decisions_required",
+                        "type": "text",
+                        "label": "Decisions Required",
+                        "help": "List each decision clearly \u2014 what, why, recommended action.",
+                        "rows": 4,
+                    },
+                    {
+                        "key": "investment_asks",
+                        "type": "text",
+                        "label": "Investment Asks",
+                        "help": "Any capital or operating expenditure that needs approval.",
+                        "rows": 3,
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        "key": "risks",
+        "label": "Risks & Outlook",
+        "icon": "\U0001f52d",
+        "color": "#7C3AED",
+        "question": "What should the board be watching?",
+        "cards": [
+            {
+                "title": "Risk & Outlook",
+                "icon": "\U0001f31f",
+                "fields": [
+                    {
+                        "key": "top_risks",
+                        "type": "text",
+                        "label": "Top 3 Risks",
+                        "help": "The three biggest risks and what we\u2019re doing about each.",
+                        "rows": 4,
+                    },
+                    {
+                        "key": "outlook",
+                        "type": "text",
+                        "label": "6-Month Outlook",
+                        "help": "Where do you expect us to be in 6 months?",
+                        "rows": 3,
+                    },
+                    {
+                        "key": "board_message",
+                        "type": "text",
+                        "label": "One Thing the Board Should Know",
+                        "help": "If you could tell the board one thing, what would it be?",
+                        "rows": 3,
+                    },
+                ],
+            },
+        ],
+    },
+]
+
+_STEP_LABELS = (
+    ["Welcome"]
+    + [s["label"] for s in _SECTIONS]
+    + ["Review & Submit"]
+)
+_N_STEPS = len(_STEP_LABELS)
+
+# ---------------------------------------------------------------------------
+# State helpers
+# ---------------------------------------------------------------------------
+
+_SK = "_bp"  # session-state key prefix
+
+
+def _k(field):
+    return f"{_SK}_{field}"
+
+
+def _val(field, default=""):
+    return st.session_state.get(_k(field), default)
+
+
+def _score_label(v):
+    if v >= 8:
+        return "High", "#2D6A2D"
+    if v >= 5:
+        return "Moderate", "#C8971F"
+    return "Low", "#C0392B"
+
+
+# ---------------------------------------------------------------------------
+# Page header
+# ---------------------------------------------------------------------------
 
 render_header(
     "Board Prep",
@@ -17,109 +168,365 @@ render_header(
     strategy_context="The Harris Farm Way \u2014 Board Prep",
 )
 
-MEETING_CONFIG = {
-    "meetingType": "BOARD_PREP",
-    "title": "Board Prep",
-    "subtitle": "Board-ready in one session \u2014 the right information from the right people",
-    "headerEmoji": "\uD83C\uDFDB\uFE0F",
-    "accent": "#E8B84B",
-    "storageKey": "hfm_mos_board_prep_v2",
-    "emailRequired": True,
-    "submitUrl": "https://australia-southeast1-oval-blend-488902-p2.cloudfunctions.net/hfm-meeting-os-insert",
-    "apiKey": "hfm-mos-2026",
-    "welcomeTitle": "About You",
-    "welcomeDescription": "Your structured input helps build a clear, honest board pack. Takes 10 minutes.",
-    "welcomeFields": [
-        {"key": "name", "label": "Full Name", "placeholder": "Your full name", "required": True},
-        {"key": "role", "label": "Role / Title", "placeholder": "e.g. Co-CEO, Head of Operations", "required": True},
-        {"key": "department", "label": "Department", "placeholder": "e.g. Executive, Operations, Finance", "required": True},
-    ],
-    "sections": [
-        {
-            "key": "highlights",
-            "label": "Highlights & Performance",
-            "icon": "\uD83C\uDFC6",
-            "description": "What should the board know first?",
-            "cards": [
-                {
-                    "title": "Performance Snapshot",
-                    "color": "#E8B84B",
-                    "icon": "\uD83D\uDCCA",
-                    "questions": [
-                        {"key": "top_highlight", "type": "text", "label": "Top Highlight", "help": "The single most important thing to share with the board.", "rows": 3},
-                        {"key": "performance_summary", "type": "text", "label": "Performance Summary", "help": "2\u20133 sentences on how we\u2019re tracking against plan.", "rows": 3},
-                        {"key": "confidence_level", "type": "slider", "label": "Confidence in Hitting Targets", "help": "How confident are you that we\u2019ll hit this year\u2019s targets?", "color": "#E8B84B"},
-                    ],
-                },
-            ],
-        },
-        {
-            "key": "decisions",
-            "label": "Decisions & Approvals",
-            "icon": "\u2705",
-            "description": "What does the board need to decide or approve?",
-            "cards": [
-                {
-                    "title": "Board Decisions",
-                    "color": "#DC2626",
-                    "icon": "\u2757",
-                    "questions": [
-                        {"key": "decisions_required", "type": "text", "label": "Decisions Required", "help": "List each decision clearly \u2014 what, why, recommended action.", "rows": 4},
-                        {"key": "investment_asks", "type": "text", "label": "Investment Asks", "help": "Any capital or operating expenditure that needs approval.", "rows": 3},
-                    ],
-                },
-            ],
-        },
-        {
-            "key": "risks",
-            "label": "Risks & Outlook",
-            "icon": "\uD83D\uDD2D",
-            "description": "What should the board be watching?",
-            "cards": [
-                {
-                    "title": "Risk & Outlook",
-                    "color": "#7C3AED",
-                    "icon": "\uD83C\uDF1F",
-                    "questions": [
-                        {"key": "top_risks", "type": "text", "label": "Top 3 Risks", "help": "The three biggest risks and what we\u2019re doing about each.", "rows": 4},
-                        {"key": "outlook", "type": "text", "label": "6-Month Outlook", "help": "Where do you expect us to be in 6 months?", "rows": 3},
-                        {"key": "board_message", "type": "text", "label": "One Thing the Board Should Know", "help": "If you could tell the board one thing, what would it be?", "rows": 3},
-                    ],
-                },
-            ],
-        },
-    ],
-}
+# Init step
+if _k("step") not in st.session_state:
+    st.session_state[_k("step")] = 0
+if _k("submitted") not in st.session_state:
+    st.session_state[_k("submitted")] = False
 
-_JSX_PATH = str(__import__("pathlib").Path(__file__).resolve().parent.parent.parent / "artifacts" / "hfm-meeting-os.jsx")
+step = st.session_state[_k("step")]
 
-_HTML = """
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #FAFAF7; color: #1A1A1A; font-family: 'Trebuchet MS', 'Segoe UI', sans-serif; }
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 3px; }
-</style>
-</head>
-<body>
-<div id="root"></div>
-<script>window.__MEETING_CONFIG__ = """ + json.dumps(MEETING_CONFIG) + """;</script>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
-<script type="text/babel">
-""" + open(_JSX_PATH).read() + """
-</script>
-</body>
-</html>
-"""
+# ---------------------------------------------------------------------------
+# Stepper bar
+# ---------------------------------------------------------------------------
 
-components.html(_HTML, height=1400, scrolling=True)
+_pills = []
+for i, label in enumerate(_STEP_LABELS):
+    if i == step:
+        _pills.append(
+            f"<span style='display:inline-block;background:#C8971F;"
+            f"color:#FFFFFF;font-weight:700;padding:7px 16px;"
+            f"border-radius:20px;font-size:13px;margin:3px 2px;"
+            f"box-shadow:0 2px 6px rgba(200,151,31,0.25);'>"
+            f"{i + 1}. {label}</span>"
+        )
+    elif i < step:
+        _pills.append(
+            f"<span style='display:inline-block;"
+            f"background:rgba(200,151,31,0.08);color:#C8971F;"
+            f"font-weight:600;padding:6px 14px;border-radius:20px;"
+            f"font-size:12px;margin:3px 2px;"
+            f"border:1px solid rgba(200,151,31,0.15);'>"
+            f"\u2713 {label}</span>"
+        )
+    else:
+        _pills.append(
+            f"<span style='display:inline-block;"
+            f"background:rgba(0,0,0,0.02);color:#717171;"
+            f"font-weight:400;padding:6px 14px;border-radius:20px;"
+            f"font-size:12px;margin:3px 2px;"
+            f"border:1px solid rgba(0,0,0,0.04);'>"
+            f"{i + 1}. {label}</span>"
+        )
 
+st.markdown(
+    "<div style='text-align:center;margin:4px 0 8px;'>"
+    + "".join(_pills) + "</div>",
+    unsafe_allow_html=True,
+)
+
+progress_pct = int(((step + 1) / _N_STEPS) * 100)
+st.progress((step + 1) / _N_STEPS)
+st.caption(f"{progress_pct}% complete")
+
+st.markdown("")
+
+# ---------------------------------------------------------------------------
+# Thank-you screen
+# ---------------------------------------------------------------------------
+
+if st.session_state[_k("submitted")]:
+    st.balloons()
+    with st.container(border=True):
+        st.markdown(
+            "<div style='text-align:center;padding:20px 0;'>"
+            "<div style='font-size:48px;margin-bottom:8px;'>"
+            "\U0001f3db\ufe0f</div>"
+            "<div style='font-size:24px;font-weight:700;color:#C8971F;"
+            "font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;margin-bottom:8px;'>"
+            f"Thank you{', ' + _val('name') if _val('name') else ''}."
+            "</div>"
+            "<div style='color:#1A1A1A;font-size:15px;'>"
+            "Your input builds a stronger board pack.</div>"
+            "</div>",
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("")
+    st.markdown("#### Your responses")
+    for sec in _SECTIONS:
+        for card in sec["cards"]:
+            for f in card["fields"]:
+                v = _val(f["key"])
+                if not v:
+                    continue
+                if f["type"] == "slider":
+                    label_txt, label_color = _score_label(int(v))
+                    st.markdown(
+                        f"**{f['label']}:** "
+                        f"<span style='color:{label_color};"
+                        f"font-weight:700;'>{v}/10 ({label_txt})</span>",
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    st.markdown(f"**{f['label']}**")
+                    st.markdown(f"> {v}")
+
+    st.divider()
+    if st.button("Start a new response"):
+        for key in list(st.session_state.keys()):
+            if key.startswith(_SK):
+                del st.session_state[key]
+        st.rerun()
+
+    render_footer("Board Prep", "The Harris Farm Way", user=user)
+    st.stop()
+
+
+# ---------------------------------------------------------------------------
+# Step 0: Welcome
+# ---------------------------------------------------------------------------
+
+if step == 0:
+    with st.container(border=True):
+        st.markdown(
+            "<div style='border-top:3px solid #C8971F;"
+            "border-radius:3px 3px 0 0;margin:-20px -20px 16px;"
+            "padding:0;'></div>",
+            unsafe_allow_html=True,
+        )
+        st.markdown("#### \U0001f3db\ufe0f About You")
+        st.markdown(
+            "Your structured input helps build a clear, honest board pack. "
+            "Takes **10 minutes**."
+        )
+        st.markdown("")
+
+        st.text_input(
+            "Full Name *",
+            placeholder="Your full name",
+            key=_k("name"),
+        )
+        st.text_input(
+            "Email *",
+            placeholder="you@harrisfarm.com.au",
+            key=_k("email"),
+        )
+        email_val = _val("email")
+        if (
+            email_val
+            and "@" in email_val
+            and not email_val.endswith("@harrisfarm.com.au")
+        ):
+            st.error("Only @harrisfarm.com.au email addresses are accepted.")
+
+        st.text_input(
+            "Role / Title *",
+            placeholder="e.g. Co-CEO, Head of Operations",
+            key=_k("role"),
+        )
+        st.text_input(
+            "Department *",
+            placeholder="e.g. Executive, Operations, Finance",
+            key=_k("department"),
+        )
+
+
+# ---------------------------------------------------------------------------
+# Steps 1-3: Sections
+# ---------------------------------------------------------------------------
+
+elif 1 <= step <= len(_SECTIONS):
+    sec = _SECTIONS[step - 1]
+
+    st.markdown(
+        f"<div style='text-align:center;color:#1A1A1A;"
+        f"font-style:italic;margin-bottom:16px;'>"
+        f"{sec['question']}</div>",
+        unsafe_allow_html=True,
+    )
+
+    for card in sec["cards"]:
+        with st.container(border=True):
+            st.markdown(
+                f"<div style='border-top:3px solid {sec['color']};"
+                f"border-radius:3px 3px 0 0;margin:-20px -20px 16px;"
+                f"padding:0;'></div>",
+                unsafe_allow_html=True,
+            )
+            st.markdown(f"#### {card['icon']} {card['title']}")
+
+            for f in card["fields"]:
+                if f["type"] == "slider":
+                    val = st.slider(
+                        f["label"],
+                        min_value=1,
+                        max_value=10,
+                        value=int(_val(f["key"], 5)),
+                        key=_k(f["key"]),
+                        help=f.get("help", ""),
+                    )
+                    label_txt, label_color = _score_label(val)
+                    st.markdown(
+                        f"<span style='font-size:24px;font-weight:700;"
+                        f"color:{label_color};'>{val}/10</span>"
+                        f" <span style='font-size:13px;color:{label_color};"
+                        f"font-weight:600;'>{label_txt}</span>",
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    st.text_area(
+                        f["label"],
+                        height=f.get("rows", 3) * 32,
+                        placeholder="Share your thoughts\u2026",
+                        key=_k(f["key"]),
+                        help=f.get("help", ""),
+                    )
+
+
+# ---------------------------------------------------------------------------
+# Final step: Review & Submit
+# ---------------------------------------------------------------------------
+
+else:
+    _slider_fields = []
+    for sec in _SECTIONS:
+        for card in sec["cards"]:
+            for f in card["fields"]:
+                if f["type"] == "slider":
+                    v = int(_val(f["key"], 5))
+                    _slider_fields.append((sec["label"], f["label"], v))
+
+    if _slider_fields:
+        avg = sum(v for _, _, v in _slider_fields) / len(_slider_fields)
+        avg_label, avg_color = _score_label(avg)
+
+        st.markdown(
+            f"<div style='text-align:center;background:rgba(200,151,31,0.06);"
+            f"border-radius:12px;padding:28px 20px;margin-bottom:20px;"
+            f"border:1px solid rgba(200,151,31,0.12);'>"
+            f"<div style='font-size:45px;font-weight:800;color:{avg_color};"
+            f"font-family:-apple-system, BlinkMacSystemFont, sans-serif;'>{avg:.1f}</div>"
+            f"<div style='font-size:12px;color:#717171;text-transform:uppercase;"
+            f"letter-spacing:0.08em;margin-top:4px;'>Target Confidence</div>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+
+    st.divider()
+
+    st.markdown("#### Your responses")
+    for sec in _SECTIONS:
+        for card in sec["cards"]:
+            for f in card["fields"]:
+                if f["type"] == "text":
+                    v = _val(f["key"])
+                    if v:
+                        st.markdown(f"**{f['label']}**")
+                        st.markdown(f"> {v}")
+                        st.markdown("")
+
+    st.divider()
+
+    with st.container(border=True):
+        st.markdown(
+            "<div style='border-top:3px solid #C8971F;"
+            "border-radius:3px 3px 0 0;margin:-20px -20px 16px;"
+            "padding:0;'></div>",
+            unsafe_allow_html=True,
+        )
+        st.markdown("#### \U0001f680 Ready to Submit")
+        st.markdown(
+            "Your response will be saved to the board prep database. "
+            "Every perspective builds a stronger pack."
+        )
+
+        _welcome_valid = (
+            _val("name").strip()
+            and _val("email").endswith("@harrisfarm.com.au")
+            and _val("role").strip()
+            and _val("department").strip()
+        )
+
+        if not _welcome_valid:
+            st.warning(
+                "Please complete all required fields in the Welcome "
+                "section before submitting."
+            )
+
+        if st.button(
+            "\U0001f3db\ufe0f Submit Board Prep",
+            type="primary",
+            use_container_width=True,
+            disabled=not _welcome_valid,
+        ):
+            responses = {}
+            scores = {}
+            for sec in _SECTIONS:
+                for card in sec["cards"]:
+                    for f in card["fields"]:
+                        v = _val(f["key"])
+                        if f["type"] == "slider":
+                            scores[f["key"]] = int(v) if v else 5
+                        else:
+                            responses[f["key"]] = v or ""
+
+            payload = {
+                "meeting_type": "BOARD_PREP",
+                "email": _val("email"),
+                "name": _val("name"),
+                "role": _val("role"),
+                "department": _val("department"),
+                "responses_json": json.dumps(responses),
+                "scores_json": json.dumps(scores),
+            }
+
+            try:
+                sep = "?" if "?" not in _SUBMIT_URL else "&"
+                url = f"{_SUBMIT_URL}{sep}api_key={_API_KEY}"
+                resp = requests.post(url, json=payload, timeout=15)
+                if resp.ok:
+                    st.session_state[_k("submitted")] = True
+                    st.rerun()
+                else:
+                    st.error(
+                        f"Submission failed: {resp.status_code} "
+                        f"\u2014 {resp.text[:200]}"
+                    )
+            except Exception as e:
+                st.error(f"Submission error: {e}")
+                _log.exception("BP submit failed")
+
+# ---------------------------------------------------------------------------
+# Navigation
+# ---------------------------------------------------------------------------
+
+st.markdown("")
+
+if step == _N_STEPS - 1:
+    if st.button("\u2190 Back to edit", use_container_width=False):
+        st.session_state[_k("step")] = step - 1
+        st.rerun()
+else:
+    c1, c2 = st.columns(2)
+    with c1:
+        if step > 0:
+            if st.button("\u2190 Back", use_container_width=True):
+                st.session_state[_k("step")] = step - 1
+                st.rerun()
+    with c2:
+        if step == 0:
+            _can_next = (
+                _val("name").strip()
+                and _val("email").endswith("@harrisfarm.com.au")
+                and _val("role").strip()
+                and _val("department").strip()
+            )
+        else:
+            _can_next = True
+
+        if st.button(
+            "Next \u2192",
+            type="primary",
+            use_container_width=True,
+            disabled=not _can_next,
+        ):
+            st.session_state[_k("step")] = step + 1
+            st.rerun()
+
+# ---------------------------------------------------------------------------
+# Footer
+# ---------------------------------------------------------------------------
+
+st.divider()
 render_footer("Board Prep", "The Harris Farm Way", user=user)

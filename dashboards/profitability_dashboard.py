@@ -22,7 +22,7 @@ from shared.styles import render_header, render_footer
 from shared.ask_question import render_ask_question
 from shared.voice_realtime import render_voice_data_box
 
-st.markdown("<style>.profit-positive { color: #10b981; font-weight: bold; }\n    .profit-negative { color: #ef4444; font-weight: bold; }</style>", unsafe_allow_html=True)
+st.markdown("<style>.profit-positive { color: #2D6A2D; font-weight: bold; }\n    .profit-negative { color: #C0392B; font-weight: bold; }</style>", unsafe_allow_html=True)
 user = st.session_state.get("auth_user")
 
 
@@ -323,15 +323,17 @@ fig_waterfall = go.Figure(go.Waterfall(
     x=["Sales", "Initial GP", "Shrinkage / Markdowns", "Final GP"],
     y=[total_sales, 0, -(total_initial_gp - total_gp), 0],
     connector={"line": {"color": "rgb(63, 63, 63)"}},
-    decreasing={"marker": {"color": "#ef4444"}},
-    increasing={"marker": {"color": "#10b981"}},
-    totals={"marker": {"color": "#1e3a8a"}},
+    decreasing={"marker": {"color": "#C0392B"}},
+    increasing={"marker": {"color": "#2D6A2D"}},
+    totals={"marker": {"color": "#1565C0"}},
 ))
 
 fig_waterfall.update_layout(
     title=f"Revenue to Final GP | Margin erosion: {margin_erosion:.1f}pp from shrinkage",
     height=400,
-    showlegend=False
+    showlegend=False,
+    paper_bgcolor="#FFFFFF", plot_bgcolor="#FFFFFF",
+    font=dict(family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif", color="#1A1A1A"),
 )
 
 st.plotly_chart(fig_waterfall, key="profit_waterfall")
@@ -369,7 +371,7 @@ with col1:
             x=plot_df['gp'],
             orientation='h',
             marker_color=plot_df['gp_pct'].apply(
-                lambda x: '#10b981' if x > store_pnl['gp_pct'].mean() else '#ef4444'
+                lambda x: '#2D6A2D' if x > store_pnl['gp_pct'].mean() else '#C0392B'
             ),
             text=plot_df.apply(lambda r: f"${r['gp']/1000:.0f}k ({r['gp_pct']:.1f}%)", axis=1),
             textposition='auto'
@@ -377,7 +379,9 @@ with col1:
         fig_stores.update_layout(
             height=max(400, len(plot_df) * 22),
             xaxis_title="Gross Profit ($)",
-            showlegend=False
+            showlegend=False,
+            paper_bgcolor="#FFFFFF", plot_bgcolor="#FFFFFF",
+            font=dict(family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif", color="#1A1A1A"),
         )
         st.plotly_chart(fig_stores, key="profit_store_gp_comparison")
     elif view_type == "By Department":
@@ -394,13 +398,15 @@ with col1:
             x=dept_pnl['gp'],
             orientation='h',
             marker_color=dept_pnl['gp_pct'].apply(
-                lambda x: '#10b981' if x > dept_pnl['gp_pct'].mean() else '#ef4444'
+                lambda x: '#2D6A2D' if x > dept_pnl['gp_pct'].mean() else '#C0392B'
             ),
             text=dept_pnl.apply(lambda r: f"${r['gp']/1000:.0f}k ({r['gp_pct']:.1f}%)", axis=1),
             textposition='auto'
         ))
         fig_dept.update_layout(
-            height=400, xaxis_title="Gross Profit ($)", showlegend=False
+            height=400, xaxis_title="Gross Profit ($)", showlegend=False,
+            paper_bgcolor="#FFFFFF", plot_bgcolor="#FFFFFF",
+            font=dict(family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif", color="#1A1A1A"),
         )
         st.plotly_chart(fig_dept, key="profit_dept_gp_comparison")
     else:
@@ -430,7 +436,11 @@ with col2:
             y=avg_gp, line_dash="dash", line_color="red",
             annotation_text=f"Avg: {avg_gp:.1f}%"
         )
-        fig_scatter.update_layout(height=400)
+        fig_scatter.update_layout(
+            height=400,
+            paper_bgcolor="#FFFFFF", plot_bgcolor="#FFFFFF",
+            font=dict(family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif", color="#1A1A1A"),
+        )
         st.plotly_chart(fig_scatter, key="profit_gp_vs_sales_scatter")
 
 st.markdown("---")
@@ -463,7 +473,11 @@ with col1:
         labels={'margin_erosion': 'Margin Erosion (pp)', 'dept_name': 'Department'},
         title="Margin Erosion by Department (Initial GP% - Final GP%)",
     )
-    fig_erosion.update_layout(height=350)
+    fig_erosion.update_layout(
+        height=350,
+        paper_bgcolor="#FFFFFF", plot_bgcolor="#FFFFFF",
+        font=dict(family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif", color="#1A1A1A"),
+    )
     st.plotly_chart(fig_erosion, key="profit_margin_erosion")
 
 with col2:
@@ -477,7 +491,11 @@ with col2:
         title="Top 10 Stores by Shrinkage Rate",
     )
     fig_shrink.update_xaxes(tickangle=-45)
-    fig_shrink.update_layout(height=350)
+    fig_shrink.update_layout(
+        height=350,
+        paper_bgcolor="#FFFFFF", plot_bgcolor="#FFFFFF",
+        font=dict(family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif", color="#1A1A1A"),
+    )
     st.plotly_chart(fig_shrink, key="profit_shrinkage_by_store")
 
 st.markdown("---")
@@ -499,7 +517,7 @@ with col1:
         x=var_df['sales_var'],
         orientation='h',
         marker_color=var_df['sales_var'].apply(
-            lambda x: '#10b981' if x >= 0 else '#ef4444'
+            lambda x: '#2D6A2D' if x >= 0 else '#C0392B'
         ),
         text=var_df['sales_var'].apply(lambda x: f"{x:+.1f}%"),
         textposition='auto'
@@ -508,7 +526,9 @@ with col1:
         height=max(400, len(var_df) * 22),
         title="Sales vs Budget by Store",
         xaxis_title="Variance (%)",
-        showlegend=False
+        showlegend=False,
+        paper_bgcolor="#FFFFFF", plot_bgcolor="#FFFFFF",
+        font=dict(family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif", color="#1A1A1A"),
     )
     st.plotly_chart(fig_sales_var, key="profit_sales_budget_variance")
 
@@ -521,7 +541,7 @@ with col2:
         x=gp_var_df['gp_var'],
         orientation='h',
         marker_color=gp_var_df['gp_var'].apply(
-            lambda x: '#10b981' if x >= 0 else '#ef4444'
+            lambda x: '#2D6A2D' if x >= 0 else '#C0392B'
         ),
         text=gp_var_df['gp_var'].apply(lambda x: f"{x:+.1f}%"),
         textposition='auto'
@@ -530,7 +550,9 @@ with col2:
         height=max(400, len(gp_var_df) * 22),
         title="GP vs Budget by Store",
         xaxis_title="Variance (%)",
-        showlegend=False
+        showlegend=False,
+        paper_bgcolor="#FFFFFF", plot_bgcolor="#FFFFFF",
+        font=dict(family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif", color="#1A1A1A"),
     )
     st.plotly_chart(fig_gp_var, key="profit_gp_budget_variance")
 
@@ -738,14 +760,15 @@ try:
                 x=wf_labels,
                 y=wf_values,
                 connector={"line": {"color": "rgba(0,0,0,0.15)"}},
-                decreasing={"marker": {"color": "#ef4444"}},
-                increasing={"marker": {"color": "#10b981"}},
-                totals={"marker": {"color": "#3b82f6"}},
+                decreasing={"marker": {"color": "#C0392B"}},
+                increasing={"marker": {"color": "#2D6A2D"}},
+                totals={"marker": {"color": "#1565C0"}},
             ))
             fig_gl_wf.update_layout(
                 title=f"FY{gl_fy} — Revenue to Net Profit (Network)",
-                height=420, template="plotly_dark",
-                paper_bgcolor="#FAFAF7", plot_bgcolor="#FFFFFF",
+                height=420,
+                paper_bgcolor="#FFFFFF", plot_bgcolor="#FFFFFF",
+                font=dict(family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif", color="#1A1A1A"),
             )
             st.plotly_chart(fig_gl_wf, key="gl_pnl_waterfall")
 

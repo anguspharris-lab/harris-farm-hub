@@ -114,7 +114,7 @@ if llm_wins:
             color="winner",
             title="Chairman's Decision — Win Count by LLM",
             labels={"winner": "LLM Provider", "wins": "Wins"},
-            color_discrete_sequence=["#1e3a8a", "#10b981", "#f59e0b"]
+            color_discrete_sequence=["#1565C0", "#7CB342", "#C8971F"]
         )
         fig_wins.update_layout(height=350, showlegend=False)
         st.plotly_chart(fig_wins,
@@ -127,7 +127,7 @@ if llm_wins:
             values="wins",
             names="winner",
             title="Win Rate Distribution",
-            color_discrete_sequence=["#1e3a8a", "#10b981", "#f59e0b"]
+            color_discrete_sequence=["#1565C0", "#7CB342", "#C8971F"]
         )
         fig_pie.update_layout(height=350)
         st.plotly_chart(fig_pie,

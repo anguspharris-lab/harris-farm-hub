@@ -675,8 +675,8 @@ with tab2:
         fig_impact = go.Figure(data=[go.Bar(
             x=[c["category"].title() for c in categories],
             y=[c["impact"] for c in categories],
-            marker_color=["#0d9488", "#f59e0b", "#6366f1",
-                          "#ec4899", "#84cc16"][:len(categories)],
+            marker_color=["#0891B2", "#C8971F", "#7C3AED",
+                          "#DB2777", "#7CB342"][:len(categories)],
             text=["${:,.0f}".format(c["impact"]) for c in categories],
             textposition="outside",
         )])

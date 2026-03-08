@@ -211,15 +211,15 @@ with tab1:
             fig.add_trace(go.Scatter(
                 x=df_trend["period"], y=df_trend["revenue"],
                 name="Revenue", fill="tozeroy",
-                line=dict(color="#0d9488", width=2),
-                fillcolor="rgba(13, 148, 136, 0.1)",
+                line=dict(color="#0891B2", width=2),
+                fillcolor="rgba(8, 145, 178, 0.1)",
             ))
 
             if compare_mode == "vs Prior Year" and "gp" in df_trend.columns:
                 fig.add_trace(go.Scatter(
                     x=df_trend["period"], y=df_trend["gp"],
                     name="Est Gross Profit",
-                    line=dict(color="#059669", width=2, dash="dot"),
+                    line=dict(color="#2D6A2D", width=2, dash="dot"),
                 ))
 
             fig.update_layout(
@@ -255,7 +255,7 @@ with tab2:
             fig_decomp.add_trace(go.Scatter(
                 x=df_decomp["period"], y=df_decomp["fresh_revenue"],
                 name="Fresh", stackgroup="one",
-                line=dict(color="#059669"),
+                line=dict(color="#2D6A2D"),
             ))
             fig_decomp.add_trace(go.Scatter(
                 x=df_decomp["period"], y=df_decomp["packaged_revenue"],
@@ -267,7 +267,7 @@ with tab2:
                 if hasattr(df_decomp["returns_value"], "abs")
                 else [-v for v in df_decomp["returns_value"]],
                 name="Returns (abs)",
-                line=dict(color="#dc2626", dash="dot"),
+                line=dict(color="#C0392B", dash="dot"),
             ))
             fig_decomp.update_layout(
                 height=450, yaxis_title="Revenue ($)",
@@ -338,7 +338,7 @@ with tab3:
             x="revenue", y=name_col,
             orientation="h",
             color="revenue",
-            color_continuous_scale=["#dbeafe", "#1e3a8a"],
+            color_continuous_scale=["rgba(21,101,192,0.08)", "#1565C0"],
             labels={"revenue": "Revenue ($)", name_col: ""},
         )
         fig_dept.update_layout(height=400, coloraxis_showscale=False)
@@ -407,7 +407,7 @@ with tab4:
                 x="revenue", y="store_name", orientation="h",
                 labels={"revenue": "Revenue ($)", "store_name": "Store"},
                 color="revenue",
-                color_continuous_scale=["#ccfbf1", "#0d9488"],
+                color_continuous_scale=["rgba(8,145,178,0.08)", "#0891B2"],
             )
             fig_rank.update_layout(
                 height=max(400, 25 * len(df_stores)),
@@ -456,7 +456,7 @@ with tab5:
                 barmode="group",
                 labels={"month_name": "Fiscal Month", "revenue": "Revenue ($)",
                         "finyear": "Fiscal Year"},
-                color_discrete_sequence=["#94a3b8", "#0d9488"],
+                color_discrete_sequence=["#717171", "#0891B2"],
             )
             fig_yoy.update_layout(height=450)
             st.plotly_chart(fig_yoy, key="revbridge_yoy_comparison")

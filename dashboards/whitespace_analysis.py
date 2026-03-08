@@ -177,14 +177,14 @@ with tab_network:
         chart_df, x="Rev per SQM", y="Short Name",
         orientation="h",
         color="Rev per SQM",
-        color_continuous_scale=["#dc2626", "#d97706", "#2D6A2D"],
+        color_continuous_scale=["#C0392B", "#C8971F", "#2D6A2D"],
     )
     fig.update_layout(
         height=max(400, len(chart_df) * 22),
         margin=dict(l=0, r=20, t=10, b=10),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#FFFFFF"),
+        font=dict(color="#1A1A1A"),
         coloraxis_showscale=False,
         xaxis=dict(showgrid=True, gridcolor="rgba(0,0,0,0.08)", title="Revenue per SQM ($)"),
         yaxis=dict(showgrid=False, title=""),
@@ -294,13 +294,13 @@ with tab_profile:
     ))
     fig_radar.add_trace(go.Scatterpolar(
         r=avg_norm + [avg_norm[0]], theta=radar_labels + [radar_labels[0]],
-        fill="toself", fillcolor="rgba(59,130,246,0.1)",
-        line=dict(color="#3B82F6", width=2), name="Network Avg",
+        fill="toself", fillcolor="rgba(21,101,192,0.1)",
+        line=dict(color="#1565C0", width=2), name="Network Avg",
     ))
     fig_radar.add_trace(go.Scatterpolar(
         r=bq_norm + [bq_norm[0]], theta=radar_labels + [radar_labels[0]],
         fill="toself", fillcolor="rgba(220,38,38,0.08)",
-        line=dict(color="#dc2626", width=1, dash="dot"), name="Bottom Quartile",
+        line=dict(color="#C0392B", width=1, dash="dot"), name="Bottom Quartile",
     ))
     fig_radar.update_layout(
         polar=dict(
@@ -312,7 +312,7 @@ with tab_profile:
         height=420,
         margin=dict(l=60, r=60, t=30, b=30),
         paper_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#FFFFFF"),
+        font=dict(color="#1A1A1A"),
         legend=dict(orientation="h", yanchor="bottom", y=-0.15, xanchor="center", x=0.5),
     )
     st.plotly_chart(fig_radar, use_container_width=True)
@@ -479,7 +479,7 @@ with tab_map:
         m = folium.Map(
             location=[centre_lat, centre_lon],
             zoom_start=zoom,
-            tiles="CartoDB dark_matter",
+            tiles="CartoDB positron",
         )
 
         # Existing stores (green markers)
@@ -517,9 +517,9 @@ with tab_map:
             popup_html = (
                 f"<div style='font-family:sans-serif;min-width:180px;'>"
                 f"<h4 style='margin:0 0 4px;color:#2D6A2D;'>{short_name}</h4>"
-                f"<div style='font-size:0.85em;color:#666;'>{catch.get('locality', '')}</div>"
+                f"<div style='font-size:14px;color:#717171;'>{catch.get('locality', '')}</div>"
                 f"<hr style='margin:4px 0;'>"
-                f"<table style='font-size:0.85em;width:100%;'>"
+                f"<table style='font-size:14px;width:100%;'>"
                 f"<tr><td>Sales</td><td style='text-align:right;'>${sales}M</td></tr>"
                 f"<tr><td>Perf Tier</td><td style='text-align:right;'>{tier}</td></tr>"
                 f"<tr><td>Share</td><td style='text-align:right;'>{share_str}</td></tr>"
@@ -558,16 +558,16 @@ with tab_map:
             if map_state != "All" and opp_state != map_state:
                 continue
 
-            phase_col = PHASE_COLOURS.get(opp["phase"], "#3B82F6")
+            phase_col = PHASE_COLOURS.get(opp["phase"], "#1565C0")
 
             popup_html = (
                 f"<div style='font-family:sans-serif;min-width:200px;'>"
                 f"<h4 style='margin:0 0 4px;color:{phase_col};'>"
                 f"#{opp['rank']} {opp['suburb']}</h4>"
-                f"<div style='font-size:0.85em;color:#666;'>Phase {opp['phase']} | "
+                f"<div style='font-size:14px;color:#717171;'>Phase {opp['phase']} | "
                 f"Score: {opp['score']}/100</div>"
                 f"<hr style='margin:4px 0;'>"
-                f"<table style='font-size:0.85em;width:100%;'>"
+                f"<table style='font-size:14px;width:100%;'>"
                 f"<tr><td>Format</td><td style='text-align:right;'>"
                 f"{opp['recommended_format']}</td></tr>"
                 f"<tr><td>Revenue</td><td style='text-align:right;'>"
@@ -597,8 +597,8 @@ with tab_map:
             "**Legend:** "
             '<span style="color:#2D6A2D;">&#9679;</span> Existing Store | '
             '<span style="color:#2D6A2D;">&#9679;</span> Phase 1 | '
-            '<span style="color:#3B82F6;">&#9679;</span> Phase 2 | '
-            '<span style="color:#8B5CF6;">&#9679;</span> Phase 3',
+            '<span style="color:#1565C0;">&#9679;</span> Phase 2 | '
+            '<span style="color:#7C3AED;">&#9679;</span> Phase 3',
             unsafe_allow_html=True,
         )
 

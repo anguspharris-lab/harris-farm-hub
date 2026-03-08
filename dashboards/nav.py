@@ -40,7 +40,7 @@ HUBS = [
         "pillar": "Pillar 3",
         "pillar_title": "Growing Legendary Leadership",
         "icon": "\U0001f393",
-        "color": "#059669",
+        "color": "#2D6A2D",
         "dashboards": [
             ("Learning Centre", 8510, "\U0001f393", "AI & data skills — Prompt Academy"),
             ("The Paddock", 8523, "\U0001f331", "Practice AI conversations"),
@@ -55,7 +55,7 @@ HUBS = [
         "pillar": "Pillar 4",
         "pillar_title": "Today's Business, Done Better",
         "icon": "\U0001f4ca",
-        "color": "#d97706",
+        "color": "#C8971F",
         "dashboards": [
             ("Sales", 8501, "\U0001f4ca", "Revenue, store performance, trends"),
             ("Profitability", 8502, "\U0001f4b0", "GP analysis, margins, P&L"),

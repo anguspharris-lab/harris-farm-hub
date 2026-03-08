@@ -16,14 +16,14 @@ def _status_color(status):
         "Done": "#2D6A2D",
         "Complete": "#2D6A2D",
         "Immediate requirements complete": "#2D6A2D",
-        "Working on it": "#2563eb",
-        "In Progress": "#2563eb",
-        "Stuck": "#dc2626",
-        "Blocked": "#dc2626",
+        "Working on it": "#1565C0",
+        "In Progress": "#1565C0",
+        "Stuck": "#C0392B",
+        "Blocked": "#C0392B",
         "Future steps": "#9ca3af",
         "Not Started": "#9ca3af",
     }
-    return colors.get(status, "#6b7280")
+    return colors.get(status, "#717171")
 
 
 def render():

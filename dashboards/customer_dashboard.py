@@ -131,20 +131,20 @@ def query_named(name, **kwargs):
 # ============================================================================
 
 COLORS = {
-    "green": "#2d8659",
-    "dark_blue": "#1e3a8a",
+    "green": "#2D6A2D",
+    "dark_blue": "#1565C0",
     "purple": "#7c3aed",
-    "teal": "#0d9488",
-    "amber": "#d97706",
-    "red": "#dc2626",
+    "teal": "#0891B2",
+    "amber": "#C8971F",
+    "red": "#C0392B",
 }
 
 SEGMENT_COLORS = {
-    "Champion": "#059669",
-    "High-Value": "#0d9488",
-    "Regular": "#3b82f6",
-    "Occasional": "#f59e0b",
-    "Lapsed": "#ef4444",
+    "Champion": "#2D6A2D",
+    "High-Value": "#0891B2",
+    "Regular": "#1565C0",
+    "Occasional": "#C8971F",
+    "Lapsed": "#C0392B",
 }
 
 
@@ -350,7 +350,7 @@ with tab1:
                 labels={"store_short": "",
                         "Variance %": "Variance vs Budget (%)"},
                 color="Variance %",
-                color_continuous_scale=["#dc2626", "#fbbf24", "#059669"],
+                color_continuous_scale=["#C0392B", "#C8971F", "#2D6A2D"],
                 color_continuous_midpoint=0,
             )
             fig_var.update_layout(
@@ -492,8 +492,8 @@ with tab2:
             if ltv_data:
                 df_ltv = pd.DataFrame(ltv_data)
 
-                ltv_colors = ["#059669", "#0d9488", "#3b82f6",
-                              "#f59e0b", "#94a3b8"]
+                ltv_colors = ["#2D6A2D", "#0891B2", "#1565C0",
+                              "#C8971F", "#717171"]
                 fig_ltv = px.bar(
                     df_ltv, x="customer_count", y="ltv_tier",
                     orientation="h",
@@ -589,7 +589,7 @@ with tab2:
                     orientation="h", barmode="group",
                     color_discrete_map={
                         "Loyalty Customers": COLORS["green"],
-                        "All Customers": "#94a3b8",
+                        "All Customers": "#717171",
                     },
                     labels={"Department": ""},
                 )
@@ -1030,10 +1030,10 @@ with tab4:
                 x=pivot.columns.tolist(),
                 y=pivot.index.tolist(),
                 colorscale=[
-                    [0, "#ef4444"],
-                    [0.3, "#fbbf24"],
-                    [0.6, "#86efac"],
-                    [1, "#059669"],
+                    [0, "#C0392B"],
+                    [0.3, "#C8971F"],
+                    [0.6, "#7CB342"],
+                    [1, "#2D6A2D"],
                 ],
                 text=[["{:.0f}%".format(v) if pd.notna(v) else ""
                        for v in row] for row in pivot.values],

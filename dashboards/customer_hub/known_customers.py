@@ -149,7 +149,7 @@ def render():
         ltv_data = _query("customer_ltv_tiers", start=txn_start, end=txn_end)
         if ltv_data:
             df_ltv = pd.DataFrame(ltv_data)
-            ltv_colors = ["#059669", "#0d9488", "#3b82f6", "#f59e0b", "#94a3b8"]
+            ltv_colors = ["#2D6A2D", "#0891B2", "#1565C0", "#C8971F", "#717171"]
             fig_ltv = px.bar(
                 df_ltv, x="customer_count", y="ltv_tier", orientation="h",
                 color="ltv_tier", color_discrete_sequence=ltv_colors,
@@ -227,7 +227,7 @@ def render():
                 orientation="h", barmode="group",
                 color_discrete_map={
                     "Loyalty Customers": PALETTE["green"],
-                    "All Customers": "#94a3b8",
+                    "All Customers": "#717171",
                 },
                 labels={"Department": ""},
             )

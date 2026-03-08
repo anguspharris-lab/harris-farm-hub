@@ -1135,19 +1135,19 @@ PILLARS = {
     "core_ai": {
         "name": "Core AI Skills",
         "icon": "🎯",
-        "color": "#2563eb",
+        "color": "#1565C0",
         "description": "Master prompting techniques from basics to advanced",
     },
     "data": {
         "name": "Applied Data Skills",
         "icon": "📊",
-        "color": "#059669",
+        "color": "#2D6A2D",
         "description": "Query, analyse, and interpret Harris Farm data",
     },
     "knowledge": {
         "name": "Harris Farm Knowledge",
         "icon": "🏪",
-        "color": "#d97706",
+        "color": "#C8971F",
         "description": "Company policies, procedures, and operational standards",
     },
 }
@@ -1159,6 +1159,6 @@ PILLARS = {
 
 DIFFICULTY_META = {
     "beginner": {"label": "Beginner", "color": "#2D6A2D", "icon": "🌱"},
-    "intermediate": {"label": "Intermediate", "color": "#f59e0b", "icon": "📈"},
-    "advanced": {"label": "Advanced", "color": "#ef4444", "icon": "🎓"},
+    "intermediate": {"label": "Intermediate", "color": "#C8971F", "icon": "📈"},
+    "advanced": {"label": "Advanced", "color": "#C0392B", "icon": "🎓"},
 }

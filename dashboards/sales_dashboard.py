@@ -454,19 +454,19 @@ weekly = df.groupby('week_ending').agg(
 fig_trend = go.Figure()
 fig_trend.add_trace(go.Scatter(
     x=weekly['week_ending'], y=weekly['sales'],
-    name='Sales', line=dict(color='#1e3a8a', width=2), fill='tozeroy',
+    name='Sales', line=dict(color='#1565C0', width=2), fill='tozeroy',
 ))
 fig_trend.add_trace(go.Scatter(
     x=weekly['week_ending'], y=weekly['gp'],
-    name='Gross Profit', line=dict(color='#10b981', width=2), fill='tozeroy',
+    name='Gross Profit', line=dict(color='#7CB342', width=2), fill='tozeroy',
 ))
 fig_trend.add_trace(go.Scatter(
     x=weekly['week_ending'], y=weekly['budget_sales'],
-    name='Budget', line=dict(color='#f59e0b', width=1, dash='dash'),
+    name='Budget', line=dict(color='#C8971F', width=1, dash='dash'),
 ))
 fig_trend.add_trace(go.Scatter(
     x=weekly['week_ending'], y=weekly['shrinkage'],
-    name='Shrinkage', line=dict(color='#ef4444', width=1, dash='dot'),
+    name='Shrinkage', line=dict(color='#C0392B', width=1, dash='dot'),
 ))
 fig_trend.update_layout(
     height=400, hovermode='x unified',

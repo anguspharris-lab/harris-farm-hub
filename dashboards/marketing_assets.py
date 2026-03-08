@@ -18,10 +18,10 @@ _CATALOGUE_PATH = _HUB_ROOT / "marketing-assets" / "index.json"
 # Category display metadata
 _CATEGORY_META = {
     "brand": {"label": "Brand", "icon": "\U0001f3a8", "color": HFM_GREEN},
-    "campaigns/amazon": {"label": "Amazon Ads", "icon": "\U0001f6d2", "color": "#f59e0b"},
-    "campaigns/ecomm": {"label": "eCommerce", "icon": "\U0001f4e6", "color": "#3b82f6"},
-    "campaigns/weekend-specials": {"label": "Weekend Specials", "icon": "\u2b50", "color": "#ef4444"},
-    "campaigns/ooh": {"label": "Out of Home", "icon": "\U0001f5bc\ufe0f", "color": "#8b5cf6"},
+    "campaigns/amazon": {"label": "Amazon Ads", "icon": "\U0001f6d2", "color": "#C8971F"},
+    "campaigns/ecomm": {"label": "eCommerce", "icon": "\U0001f4e6", "color": "#1565C0"},
+    "campaigns/weekend-specials": {"label": "Weekend Specials", "icon": "\u2b50", "color": "#C0392B"},
+    "campaigns/ooh": {"label": "Out of Home", "icon": "\U0001f5bc\ufe0f", "color": "#7C3AED"},
     "campaigns/butcher": {"label": "Butcher Campaign", "icon": "\U0001f969", "color": "#b91c1c"},
 }
 
@@ -49,7 +49,7 @@ def _render_asset_card(asset):
     icon = _TYPE_ICONS.get(asset["type"], "\U0001f4c1")
     cat_meta = _CATEGORY_META.get(asset["category"], {})
     cat_label = cat_meta.get("label", asset["category"])
-    cat_color = cat_meta.get("color", "#6b7280")
+    cat_color = cat_meta.get("color", "#717171")
 
     col_preview, col_info, col_action = st.columns([1, 3, 1])
 
@@ -60,7 +60,7 @@ def _render_asset_card(asset):
             st.markdown(
                 "<div style='width:120px;height:80px;background:rgba(0,0,0,0.04);"
                 "border-radius:8px;display:flex;align-items:center;"
-                "justify-content:center;font-size:2em;'>{}</div>".format(icon),
+                "justify-content:center;font-size:32px;'>{}</div>".format(icon),
                 unsafe_allow_html=True,
             )
 
@@ -68,7 +68,7 @@ def _render_asset_card(asset):
         st.markdown("**{}**".format(asset["title"]))
         badge = (
             "<span style='background:{};color:white;padding:2px 8px;"
-            "border-radius:4px;font-size:0.75em;font-weight:600;'>"
+            "border-radius:4px;font-size:12px;font-weight:600;'>"
             "{}</span>".format(cat_color, cat_label)
         )
         st.markdown(
@@ -126,9 +126,9 @@ st.markdown(
     "<div style='border-left:4px solid {};padding:12px 16px;"
     "background:rgba(0,0,0,0.04);border-radius:0 8px 8px 0;"
     "border:1px solid rgba(0,0,0,0.08);margin-bottom:20px;'>"
-    "<div style='font-size:1.4em;font-weight:700;color:{};'>"
+    "<div style='font-size:22px;font-weight:700;color:{};'>"
     "\U0001f4c1 Marketing Assets</div>"
-    "<div style='color:#718096;font-size:0.9em;'>"
+    "<div style='color:#717171;font-size:13px;'>"
     "Harris Farm's centralised library of brand assets, campaign creatives, "
     "and marketing collateral.</div>"
     "</div>".format(HFM_GREEN, HFM_DARK),

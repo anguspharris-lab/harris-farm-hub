@@ -37,9 +37,9 @@ def _make_popup_html(row):
     return """
     <div style="font-family:sans-serif;min-width:200px;">
       <h4 style="margin:0 0 4px 0;">{name}</h4>
-      <div style="font-size:0.85em;color:#6b7280;">Postcode {pc}</div>
+      <div style="font-size:14px;color:#717171;">Postcode {pc}</div>
       <hr style="margin:6px 0;">
-      <table style="font-size:0.85em;width:100%;">
+      <table style="font-size:14px;width:100%;">
         <tr><td>Market Share</td><td style="text-align:right;font-weight:600;">{share:.1f}%</td></tr>
         <tr><td>YoY Change</td><td style="text-align:right;">{yoy}</td></tr>
         <tr><td>Trend</td><td style="text-align:right;">{slope}</td></tr>
@@ -49,7 +49,7 @@ def _make_popup_html(row):
         <tr><td>Distance</td><td style="text-align:right;">{dist:.1f}km</td></tr>
       </table>
       <div style="margin-top:6px;text-align:center;padding:3px 8px;border-radius:4px;
-                  background:{health_color};color:white;font-weight:600;font-size:0.8em;">
+                  background:{health_color};color:white;font-weight:600;font-size:13px;">
         {health}
       </div>
     </div>
@@ -157,7 +157,7 @@ def render():
     # ── Catchment rings ──
     if show_rings:
         ring_radii = [3, 5, 10, 20]
-        ring_colors = ["#2D6A2D", "#2563eb", "#d97706", "#94a3b8"]
+        ring_colors = ["#2D6A2D", "#1565C0", "#C8971F", "#717171"]
 
         stores_to_ring = (
             {ring_store: STORE_LOCATIONS[ring_store]}
@@ -223,9 +223,9 @@ def render():
         cnt = health_counts.get(h, 0)
         hk[i].markdown(
             "<div style='text-align:center;'>"
-            "<span style='color:{color};font-size:1.5rem;"
+            "<span style='color:{color};font-size:24px;"
             "font-weight:700;'>{cnt}</span><br>"
-            "<span style='font-size:0.75rem;'>{label}</span></div>".format(
+            "<span style='font-size:12px;'>{label}</span></div>".format(
                 color=HEALTH_COLOURS[h], cnt=cnt, label=h,
             ),
             unsafe_allow_html=True,

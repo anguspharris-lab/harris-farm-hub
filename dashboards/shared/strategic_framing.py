@@ -30,15 +30,15 @@ def pillar_hero(pillar, metrics=None):
             delta_html = ""
             if delta:
                 delta_html = (
-                    "<span style='font-size:0.7em;opacity:0.85;margin-left:4px;'>"
+                    "<span style='font-size:11px;opacity:0.85;margin-left:4px;'>"
                     "{}</span>".format(delta)
                 )
             chips.append(
                 "<div style='background:rgba(0,0,0,0.12);"
                 "padding:10px 16px;border-radius:8px;text-align:center;'>"
-                "<div style='font-size:1.6em;font-weight:700;'>"
+                "<div style='font-size:24px;font-weight:700;'>"
                 "{}{}</div>"
-                "<div style='font-size:0.8em;opacity:0.9;'>{}</div>"
+                "<div style='font-size:12px;opacity:0.9;'>{}</div>"
                 "</div>".format(m.get("value", ""), delta_html, m.get("label", ""))
             )
         metric_html = (
@@ -50,10 +50,10 @@ def pillar_hero(pillar, metrics=None):
     st.markdown(
         "<div style='background:linear-gradient(135deg, {c} 0%, {c}dd 100%);"
         "color:white;padding:32px 36px;border-radius:14px;margin-bottom:20px;'>"
-        "<div style='font-size:0.8em;opacity:0.8;text-transform:uppercase;"
+        "<div style='font-size:12px;opacity:0.8;text-transform:uppercase;"
         "letter-spacing:0.1em;font-weight:600;'>{icon} {name}</div>"
-        "<div style='font-size:1.1em;font-weight:500;margin:6px 0;'>{tagline}</div>"
-        "<div style='font-size:1.5em;font-weight:700;margin-top:12px;"
+        "<div style='font-size:16px;font-weight:500;margin:6px 0;'>{tagline}</div>"
+        "<div style='font-size:24px;font-weight:700;margin-top:12px;"
         "font-style:italic;'>\u201c{question}\u201d</div>"
         "{metrics}"
         "</div>".format(
@@ -70,10 +70,10 @@ def coming_soon_card(title, description="Data source not yet connected."):
         "<div style='background:rgba(0,0,0,0.03);border:2px dashed rgba(0,0,0,0.08);"
         "border-radius:10px;padding:20px;text-align:center;min-height:100px;"
         "display:flex;flex-direction:column;justify-content:center;'>"
-        "<div style='font-size:1.8em;margin-bottom:6px;'>\U0001f6a7</div>"
-        "<div style='font-weight:700;color:#4A5568;font-size:1em;'>"
+        "<div style='font-size:29px;margin-bottom:6px;'>\U0001f6a7</div>"
+        "<div style='font-weight:700;color:#4A4A4A;font-size:16px;'>"
         "{title}</div>"
-        "<div style='font-size:0.85em;color:#718096;margin-top:4px;'>"
+        "<div style='font-size:12px;color:#717171;margin-top:4px;'>"
         "{desc}</div>"
         "</div>".format(title=title, desc=description),
         unsafe_allow_html=True,
@@ -83,15 +83,15 @@ def coming_soon_card(title, description="Data source not yet connected."):
 def one_thing_box(text):
     """Render a highlighted 'One Thing to Remember' takeaway box."""
     st.markdown(
-        "<div style='background:linear-gradient(135deg, #E8E8E4, #132240);"
-        "border-left:4px solid #E8B84B;border:1px solid rgba(0,0,0,0.08);"
-        "border-left:4px solid #E8B84B;"
+        "<div style='background:rgba(200,151,31,0.08);"
+        "border-left:4px solid #C8971F;border:1px solid rgba(0,0,0,0.08);"
+        "border-left:4px solid #C8971F;"
         "border-radius:0 10px 10px 0;"
         "padding:16px 20px;margin:16px 0;'>"
-        "<div style='font-weight:700;color:#E8B84B;font-size:0.9em;"
+        "<div style='font-weight:700;color:#C8971F;font-size:13px;"
         "margin-bottom:4px;'>"
         "\U0001f4a1 One Thing to Remember</div>"
-        "<div style='color:#4A5568;font-size:0.95em;'>{text}</div>"
+        "<div style='color:#4A4A4A;font-size:14px;'>{text}</div>"
         "</div>".format(text=text),
         unsafe_allow_html=True,
     )
@@ -113,29 +113,29 @@ def initiative_summary_card(summary):
     pct = int((done / total) * 100) if total > 0 else 0
 
     st.markdown(
-        "<div style='background:rgba(0,0,0,0.04);"
+        "<div style='background:#FFFFFF;"
         "border:1px solid rgba(0,0,0,0.08);"
         "border-radius:10px;padding:16px;'>"
-        "<div style='font-weight:600;color:white;font-size:0.95em;"
-        "margin-bottom:8px;font-family:Georgia,serif;'>"
+        "<div style='font-weight:600;color:#1A1A1A;font-size:14px;"
+        "margin-bottom:8px;font-family:-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Oxygen, sans-serif;'>"
         "\U0001f4cb Strategic Initiatives</div>"
         "<div style='display:flex;gap:16px;margin-bottom:10px;'>"
-        "<div><span style='font-size:1.3em;font-weight:700;color:white;'>{total}</span>"
-        " <span style='color:#718096;font-size:0.85em;'>Total</span></div>"
-        "<div><span style='font-size:1.3em;font-weight:700;color:#2D6A2D;'>"
+        "<div><span style='font-size:20px;font-weight:700;color:#1A1A1A;'>{total}</span>"
+        " <span style='color:#4A4A4A;font-size:12px;'>Total</span></div>"
+        "<div><span style='font-size:20px;font-weight:700;color:#2D6A2D;'>"
         "{done}</span>"
-        " <span style='color:#718096;font-size:0.85em;'>Done</span></div>"
-        "<div><span style='font-size:1.3em;font-weight:700;color:#3B82F6;'>"
+        " <span style='color:#4A4A4A;font-size:12px;'>Done</span></div>"
+        "<div><span style='font-size:20px;font-weight:700;color:#1565C0;'>"
         "{ip}</span>"
-        " <span style='color:#718096;font-size:0.85em;'>In Progress</span></div>"
-        "<div><span style='font-size:1.3em;font-weight:700;color:#EF4444;'>"
+        " <span style='color:#4A4A4A;font-size:12px;'>In Progress</span></div>"
+        "<div><span style='font-size:20px;font-weight:700;color:#C0392B;'>"
         "{stuck}</span>"
-        " <span style='color:#718096;font-size:0.85em;'>Stuck</span></div>"
+        " <span style='color:#4A4A4A;font-size:12px;'>Stuck</span></div>"
         "</div>"
-        "<div style='background:rgba(0,0,0,0.08);border-radius:6px;height:8px;'>"
+        "<div style='background:rgba(0,0,0,0.06);border-radius:6px;height:8px;'>"
         "<div style='background:#2D6A2D;height:8px;border-radius:6px;"
         "width:{pct}%;'></div></div>"
-        "<div style='font-size:0.75em;color:#718096;text-align:right;"
+        "<div style='font-size:12px;color:#4A4A4A;text-align:right;"
         "margin-top:2px;'>{pct}% complete</div>"
         "</div>".format(
             dark=HFM_DARK, total=total, done=done, ip=in_prog,
@@ -152,17 +152,17 @@ def growing_legends_banner():
     to create visual unity under the AI-First Manifesto.
     """
     st.markdown(
-        "<div style='background:linear-gradient(135deg, #E8E8E4, #132240);"
-        "border:1px solid rgba(139,92,246,0.25);"
+        "<div style='background:rgba(139,92,246,0.06);"
+        "border:1px solid rgba(139,92,246,0.15);"
         "border-radius:12px;padding:20px 24px;margin-bottom:20px;'>"
-        "<div style='font-size:0.75em;text-transform:uppercase;"
-        "letter-spacing:0.15em;color:#8B5CF6;font-weight:700;"
+        "<div style='font-size:12px;text-transform:uppercase;"
+        "letter-spacing:0.15em;color:#7C3AED;font-weight:700;"
         "margin-bottom:8px;'>"
         "\U0001f331 Growing Legends</div>"
-        "<div style='font-size:1.15em;font-weight:700;color:white;"
-        "font-family:Georgia,serif;margin-bottom:6px;'>"
+        "<div style='font-size:18px;font-weight:700;color:#1A1A1A;"
+        "font-family:-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, sans-serif;margin-bottom:6px;'>"
         "AI is our brain partner. The prompt is our unlock.</div>"
-        "<div style='font-size:0.9em;color:#4A5568;'>"
+        "<div style='font-size:13px;color:#4A4A4A;'>"
         "Every Harris Farmer who masters these tools doesn't just use AI "
         "&mdash; they lead with it. Same family. Same values. "
         "Radically better tools.</div>"

@@ -43,20 +43,20 @@ render_header(
 )
 
 # ---------------------------------------------------------------------------
-# HERO BANNER — People pillar green (#059669)
+# HERO BANNER — People pillar green (#2D6A2D)
 # ---------------------------------------------------------------------------
 
 st.markdown(
-    "<div style='background:linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%);"
+    "<div style='background:linear-gradient(135deg, #2D6A2D 0%, #235522 50%, #1B4D1B 100%);"
     "color:white;padding:36px 32px;border-radius:14px;margin-bottom:24px;'>"
-    "<div style='font-size:2.2em;font-weight:800;margin-bottom:8px;'>"
+    "<div style='font-size:35px;font-weight:800;margin-bottom:8px;'>"
     "\U0001f331 Growing Legends Academy</div>"
-    "<div style='font-size:1.15em;opacity:0.95;max-width:800px;line-height:1.6;'>"
+    "<div style='font-size:18px;opacity:0.95;max-width:800px;line-height:1.6;'>"
     "Every expert was once a beginner. This Academy maps your journey from first "
     "AI prompt to leading transformation across the business. Six levels, seven "
     "prompt patterns, real Harris Farm examples, and a community of learners."
     "</div>"
-    "<div style='margin-top:16px;font-size:0.9em;opacity:0.8;'>"
+    "<div style='margin-top:16px;font-size:13px;opacity:0.8;'>"
     "Pillar 3: Growing Legendary Leadership &mdash; "
     "Part of the Fewer, Bigger, Better strategy</div>"
     "</div>",
@@ -67,10 +67,10 @@ st.markdown(
 st.markdown(
     f"<div style='background:rgba(124,58,237,0.08);border:1px solid rgba(216,180,254,0.3);border-radius:10px;"
     f"padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;'>"
-    f"<span style='font-size:1.3em;'>\U0001f31f</span>"
+    f"<span style='font-size:20px;'>\U0001f31f</span>"
     f"<div>"
     f"<strong style='color:#7c3aed;'>Goal 3: Train Our Superstars</strong>"
-    f"<span style='color:#718096;font-size:0.9em;'> &mdash; "
+    f"<span style='color:#717171;font-size:13px;'> &mdash; "
     f"Making every Harris Farmer more capable with AI, at their own pace.</span>"
     f"</div>"
     f"<div>{goal_badge_html('G3')}</div>"
@@ -171,12 +171,12 @@ with tabs[0]:
                         next_level_name = lt["name"]
         st.markdown(
             f"<div style='margin:8px 0;'>"
-            f"<div style='display:flex;justify-content:space-between;font-size:0.85em;'>"
+            f"<div style='display:flex;justify-content:space-between;font-size:12px;'>"
             f"<span>{level_icon} {level_name} ({min_xp} XP)</span>"
             f"<span>{xp_to_next} XP to next level</span>"
             f"</div>"
             f"<div style='background:rgba(0,0,0,0.08);border-radius:8px;height:16px;margin:4px 0;'>"
-            f"<div style='background:linear-gradient(90deg, #059669, #34d399);width:{bar_pct}%;"
+            f"<div style='background:linear-gradient(90deg, #2D6A2D, #7CB342);width:{bar_pct}%;"
             f"height:100%;border-radius:8px;transition:width 0.3s;'></div></div>"
             f"</div>",
             unsafe_allow_html=True,
@@ -202,22 +202,22 @@ with tabs[0]:
 
     if ch:
         completed = ch.get("completed_today", False)
-        diff_colors = {"beginner": "#2D6A2D", "intermediate": "#eab308", "advanced": "#ef4444"}
-        diff_color = diff_colors.get(ch.get("difficulty", "beginner"), "#718096")
+        diff_colors = {"beginner": "#2D6A2D", "intermediate": "#C8971F", "advanced": "#C0392B"}
+        diff_color = diff_colors.get(ch.get("difficulty", "beginner"), "#717171")
 
         st.markdown(
             f"<div style='background:rgba(45,106,45,0.08);border:2px solid rgba(187,247,208,0.3);border-radius:12px;"
             f"padding:16px;margin-bottom:16px;'>"
             f"<div style='display:flex;justify-content:space-between;align-items:center;'>"
-            f"<div style='font-weight:700;font-size:1.1em;color:#166534;'>"
+            f"<div style='font-weight:700;font-size:16px;color:#1B4D1B;'>"
             f"\U0001f4c5 {ch['title']}</div>"
             f"<div style='display:flex;gap:8px;'>"
             f"<span style='background:{diff_color};color:white;padding:2px 10px;"
-            f"border-radius:12px;font-size:0.8em;'>{ch.get('difficulty', 'beginner').title()}</span>"
-            f"<span style='background:#059669;color:white;padding:2px 10px;"
-            f"border-radius:12px;font-size:0.8em;'>+{ch.get('xp_reward', 20)} XP</span>"
+            f"border-radius:12px;font-size:12px;'>{ch.get('difficulty', 'beginner').title()}</span>"
+            f"<span style='background:#2D6A2D;color:white;padding:2px 10px;"
+            f"border-radius:12px;font-size:12px;'>+{ch.get('xp_reward', 20)} XP</span>"
             f"</div></div>"
-            f"<div style='margin-top:8px;color:#4A5568;'>{ch['description']}</div>"
+            f"<div style='margin-top:8px;color:#4A4A4A;'>{ch['description']}</div>"
             f"</div>",
             unsafe_allow_html=True,
         )
@@ -264,8 +264,8 @@ with tabs[0]:
                 st.markdown(
                     f"<div style='text-align:center;padding:8px;background:rgba(45,106,45,0.08);"
                     f"border-radius:10px;border:1px solid rgba(187,247,208,0.3);margin-bottom:8px;'>"
-                    f"<div style='font-size:1.6em;'>{_b_icon}</div>"
-                    f"<div style='font-weight:600;font-size:0.85em;'>{_b_name}</div>"
+                    f"<div style='font-size:24px;'>{_b_icon}</div>"
+                    f"<div style='font-weight:600;font-size:12px;'>{_b_name}</div>"
                     f"</div>",
                     unsafe_allow_html=True,
                 )
@@ -279,10 +279,10 @@ with tabs[0]:
                         f"<div style='text-align:center;padding:8px;background:rgba(0,0,0,0.03);"
                         f"border-radius:10px;border:1px solid rgba(0,0,0,0.08);margin-bottom:8px;"
                         f"opacity:0.5;'>"
-                        f"<div style='font-size:1.6em;'>\U0001f512</div>"
-                        f"<div style='font-weight:600;font-size:0.85em;color:#94a3b8;'>"
+                        f"<div style='font-size:24px;'>\U0001f512</div>"
+                        f"<div style='font-weight:600;font-size:12px;color:#717171;'>"
                         f"{b.get('name', '')}</div>"
-                        f"<div style='font-size:0.75em;color:#94a3b8;'>{b.get('desc', '')}</div>"
+                        f"<div style='font-size:12px;color:#717171;'>{b.get('desc', '')}</div>"
                         f"</div>",
                         unsafe_allow_html=True,
                     )
@@ -302,11 +302,11 @@ with tabs[0]:
             icon = action_icons.get(act.get("action_type", ""), "\u2728")
             st.markdown(
                 f"<div style='display:flex;align-items:center;gap:10px;padding:6px 0;"
-                f"border-bottom:1px solid rgba(0,0,0,0.04);font-size:0.9em;'>"
+                f"border-bottom:1px solid rgba(0,0,0,0.04);font-size:13px;'>"
                 f"<span>{icon}</span>"
                 f"<span style='flex:1;'>{act.get('description', act.get('action_type', ''))}</span>"
-                f"<span style='color:#059669;font-weight:600;'>+{act.get('xp_amount', 0)} XP</span>"
-                f"<span style='color:#94a3b8;font-size:0.8em;'>{act.get('created_at', '')[:10]}</span>"
+                f"<span style='color:#2D6A2D;font-weight:600;'>+{act.get('xp_amount', 0)} XP</span>"
+                f"<span style='color:#717171;font-size:12px;'>{act.get('created_at', '')[:10]}</span>"
                 f"</div>",
                 unsafe_allow_html=True,
             )
@@ -354,17 +354,17 @@ with tabs[1]:
             st.markdown(
                 f"<div style='display:flex;align-items:center;padding:10px 14px;"
                 f"border-radius:8px;margin-bottom:6px;background:{bg};border:{border};'>"
-                f"<div style='width:40px;font-weight:700;font-size:1.2em;color:#718096;'>"
+                f"<div style='width:40px;font-weight:700;font-size:18px;color:#717171;'>"
                 f"#{entry['rank']}</div>"
-                f"<div style='width:36px;font-size:1.4em;text-align:center;'>"
+                f"<div style='width:36px;font-size:22px;text-align:center;'>"
                 f"{_e_icon}</div>"
                 f"<div style='flex:1;'>"
                 f"<div style='font-weight:600;'>{display_name}{me_tag}</div>"
-                f"<div style='font-size:0.8em;color:#718096;'>"
+                f"<div style='font-size:12px;color:#717171;'>"
                 f"{_e_level} | "
                 f"\U0001f525 {_e_streak} day streak</div>"
                 f"</div>"
-                f"<div style='font-weight:700;color:#059669;font-size:1.1em;'>"
+                f"<div style='font-weight:700;color:#2D6A2D;font-size:16px;'>"
                 f"{_e_xp:,} XP</div>"
                 f"</div>",
                 unsafe_allow_html=True,
@@ -394,7 +394,7 @@ with tabs[2]:
         f"<div style='flex:1;text-align:center;padding:8px 4px;"
         f"background:{lv['color']};color:{lv['text_color']};"
         f"font-weight:{'800' if lv['name'] == _user_level else '600'};"
-        f"font-size:{'0.95em' if lv['name'] == _user_level else '0.85em'};"
+        f"font-size:{'14px' if lv['name'] == _user_level else '12px'};"
         f"{'border-radius:10px 0 0 10px;' if i == 0 else ''}"
         f"{'border-radius:0 10px 10px 0;' if i == len(MATURITY_LEVELS) - 1 else ''}"
         f"{'box-shadow:inset 0 0 0 3px rgba(0,0,0,0.3);' if lv['name'] == _user_level else ''}'>"
@@ -422,12 +422,12 @@ with tabs[2]:
                     f"<div style='background:{lv['color']};color:{lv['text_color']};"
                     f"border-radius:14px;padding:20px;min-height:180px;"
                     f"border:1px solid rgba(0,0,0,0.08);'>"
-                    f"<div style='font-size:2em;'>{lv['icon']}</div>"
-                    f"<div style='font-size:1.2em;font-weight:700;'>{lv['name']}</div>"
-                    f"<div style='font-size:0.85em;opacity:0.85;font-style:italic;'>"
+                    f"<div style='font-size:32px;'>{lv['icon']}</div>"
+                    f"<div style='font-size:18px;font-weight:700;'>{lv['name']}</div>"
+                    f"<div style='font-size:12px;opacity:0.85;font-style:italic;'>"
                     f"\"{lv['tagline']}\"</div>"
-                    f"<div style='margin-top:8px;font-size:0.9em;'>{lv['description']}</div>"
-                    f"<div style='margin-top:10px;font-size:0.8em;font-weight:600;'>"
+                    f"<div style='margin-top:8px;font-size:13px;'>{lv['description']}</div>"
+                    f"<div style='margin-top:10px;font-size:12px;font-weight:600;'>"
                     f"Rubric Score: {lv['rubric_threshold']}</div>"
                     f"</div>",
                     unsafe_allow_html=True,
@@ -466,10 +466,10 @@ with tabs[3]:
             st.markdown(
                 f"<div style='background:rgba(45,106,45,0.08);border-radius:10px;padding:12px;"
                 f"text-align:center;border:1px solid rgba(187,247,208,0.3);min-height:100px;'>"
-                f"<div style='font-size:1.4em;font-weight:700;color:#059669;'>"
+                f"<div style='font-size:22px;font-weight:700;color:#2D6A2D;'>"
                 f"{block['icon']}</div>"
                 f"<div style='font-weight:600;'>{block['name']}</div>"
-                f"<div style='font-size:0.8em;color:#4A5568;'>{block['short']}</div>"
+                f"<div style='font-size:12px;color:#4A4A4A;'>{block['short']}</div>"
                 f"</div>",
                 unsafe_allow_html=True,
             )
@@ -486,7 +486,7 @@ with tabs[3]:
 
             st.markdown("**Harris Farm Example:**")
             st.markdown(
-                f"<div style='background:rgba(45,106,45,0.08);border-left:4px solid #059669;"
+                f"<div style='background:rgba(45,106,45,0.08);border-left:4px solid #2D6A2D;"
                 f"padding:12px 16px;border-radius:0 8px 8px 0;margin:8px 0;'>"
                 f"{pattern['hfm_example']}</div>",
                 unsafe_allow_html=True,
@@ -552,7 +552,7 @@ with tabs[4]:
                 f"<div style='flex:1;background:rgba(45,106,45,0.08);border-left:4px solid #2D6A2D;"
                 f"padding:12px;border-radius:0 8px 8px 0;'>"
                 f"<strong>What 8+ looks like:</strong><br>{tier['what_8_looks_like']}</div>"
-                f"<div style='flex:1;background:rgba(239,68,68,0.08);border-left:4px solid #ef4444;"
+                f"<div style='flex:1;background:rgba(239,68,68,0.08);border-left:4px solid #C0392B;"
                 f"padding:12px;border-radius:0 8px 8px 0;'>"
                 f"<strong>What 5 looks like:</strong><br>{tier['what_5_looks_like']}</div>"
                 f"</div>",
@@ -621,18 +621,18 @@ with tabs[5]:
                     f"<div style='background:{path['color']};color:{path['text_color']};"
                     f"border-radius:14px;padding:20px;min-height:200px;"
                     f"border:1px solid rgba(0,0,0,0.08);'>"
-                    f"<div style='font-size:1.15em;font-weight:700;'>{path['name']}</div>"
+                    f"<div style='font-size:18px;font-weight:700;'>{path['name']}</div>"
                     f"<div style='display:flex;gap:8px;margin:6px 0;flex-wrap:wrap;'>"
                     f"<span style='background:rgba(0,0,0,0.20);padding:2px 8px;"
-                    f"border-radius:20px;font-size:0.75em;'>{path['audience']}</span>"
+                    f"border-radius:20px;font-size:12px;'>{path['audience']}</span>"
                     f"<span style='background:rgba(0,0,0,0.20);padding:2px 8px;"
-                    f"border-radius:20px;font-size:0.75em;'>{path['levels']}</span>"
+                    f"border-radius:20px;font-size:12px;'>{path['levels']}</span>"
                     f"<span style='background:rgba(0,0,0,0.20);padding:2px 8px;"
-                    f"border-radius:20px;font-size:0.75em;'>{path['hours']}</span>"
+                    f"border-radius:20px;font-size:12px;'>{path['hours']}</span>"
                     f"</div>"
-                    f"<div style='font-style:italic;font-size:0.9em;margin:6px 0;'>"
+                    f"<div style='font-style:italic;font-size:13px;margin:6px 0;'>"
                     f"\"{path['tagline']}\"</div>"
-                    f"<div style='font-size:0.85em;margin-top:8px;'>"
+                    f"<div style='font-size:12px;margin-top:8px;'>"
                     f"{path['description']}</div>"
                     f"<div style='margin-top:8px;'>{path_badges}</div>"
                     f"</div>",
@@ -667,7 +667,7 @@ with tabs[6]:
     # XP rewards callout
     st.markdown(
         "<div style='background:rgba(254,243,199,0.1);border:1px solid rgba(251,191,36,0.3);border-radius:8px;"
-        "padding:10px 14px;margin-bottom:16px;font-size:0.9em;'>"
+        "padding:10px 14px;margin-bottom:16px;font-size:13px;'>"
         "\u2728 <strong>XP Rewards:</strong> "
         "Submit a challenge = <strong>+30 XP</strong> | "
         "Win a challenge = <strong>+100 XP</strong>"
@@ -684,13 +684,13 @@ with tabs[6]:
             f"<div style='background:rgba(45,106,45,0.08);border:3px solid #2D6A2D;"
             f"border-radius:14px;padding:24px;margin-bottom:20px;'>"
             f"<div style='display:flex;justify-content:space-between;align-items:center;'>"
-            f"<div style='font-size:1.3em;font-weight:700;color:#166534;'>"
+            f"<div style='font-size:20px;font-weight:700;color:#1B4D1B;'>"
             f"\U0001f525 Active Challenge: {ch['title']}</div>"
             f"<span style='background:#2D6A2D;color:white;padding:4px 12px;"
-            f"border-radius:20px;font-size:0.8em;font-weight:600;'>"
+            f"border-radius:20px;font-size:12px;font-weight:600;'>"
             f"{ch['difficulty']}</span>"
             f"</div>"
-            f"<div style='margin-top:12px;color:#4A5568;line-height:1.6;'>"
+            f"<div style='margin-top:12px;color:#4A4A4A;line-height:1.6;'>"
             f"{ch['description']}</div>"
             f"<div style='margin-top:10px;'>{ch_badges}</div>"
             f"</div>",
@@ -734,13 +734,13 @@ with tabs[7]:
     for item in TOP_SHOWCASE:
         sc_badges = " ".join(goal_badge_html(g) for g in item.get("goal_tags", []))
         st.markdown(
-            f"<div style='border-left:4px solid #059669;padding:12px 16px;"
+            f"<div style='border-left:4px solid #2D6A2D;padding:12px 16px;"
             f"margin:12px 0;border-radius:0 8px 8px 0;"
             f"background:rgba(0,0,0,0.03);'>"
-            f"<div style='font-weight:700;font-size:1.05em;'>{item['name']}</div>"
-            f"<div style='color:#059669;font-weight:600;font-size:0.9em;'>"
+            f"<div style='font-weight:700;font-size:15px;'>{item['name']}</div>"
+            f"<div style='color:#2D6A2D;font-weight:600;font-size:13px;'>"
             f"{item['stat']}</div>"
-            f"<div style='font-size:0.9em;color:#4A5568;margin-top:4px;'>"
+            f"<div style='font-size:13px;color:#4A4A4A;margin-top:4px;'>"
             f"{item['description']}</div>"
             f"<div style='margin-top:6px;'>{sc_badges}</div>"
             f"</div>",
@@ -775,9 +775,9 @@ with tabs[8]:
             f"<div style='display:flex;align-items:center;padding:8px 0;"
             f"border-bottom:1px solid rgba(0,0,0,0.04);'>"
             f"<div style='width:180px;font-weight:600;'>{crit['name']}</div>"
-            f"<div style='width:40px;text-align:center;color:#059669;"
+            f"<div style='width:40px;text-align:center;color:#2D6A2D;"
             f"font-weight:700;'>/{crit['max']}</div>"
-            f"<div style='flex:1;color:#4A5568;font-size:0.9em;'>"
+            f"<div style='flex:1;color:#4A4A4A;font-size:13px;'>"
             f"{crit['description']}</div>"
             f"</div>",
             unsafe_allow_html=True,
@@ -794,9 +794,9 @@ with tabs[8]:
             f"<div style='display:flex;align-items:center;padding:8px 0;"
             f"border-bottom:1px solid rgba(0,0,0,0.04);'>"
             f"<div style='width:180px;font-weight:600;'>{crit['name']}</div>"
-            f"<div style='width:40px;text-align:center;color:#059669;"
+            f"<div style='width:40px;text-align:center;color:#2D6A2D;"
             f"font-weight:700;'>/{crit['max']}</div>"
-            f"<div style='flex:1;color:#4A5568;font-size:0.9em;'>"
+            f"<div style='flex:1;color:#4A4A4A;font-size:13px;'>"
             f"{crit['description']}</div>"
             f"</div>",
             unsafe_allow_html=True,
@@ -814,7 +814,7 @@ with tabs[8]:
     scores = ACADEMY_SELF_SCORE["content_rubric"]
     for name, data in scores.items():
         bar_pct = data["score"] / 5 * 100
-        bar_color = "#2D6A2D" if data["score"] >= 4 else ("#eab308" if data["score"] >= 3 else "#ef4444")
+        bar_color = "#2D6A2D" if data["score"] >= 4 else ("#C8971F" if data["score"] >= 3 else "#C0392B")
         st.markdown(
             f"<div style='margin:8px 0;'>"
             f"<div style='display:flex;justify-content:space-between;'>"
@@ -824,7 +824,7 @@ with tabs[8]:
             f"<div style='background:rgba(0,0,0,0.08);border-radius:4px;height:8px;margin:4px 0;'>"
             f"<div style='background:{bar_color};width:{bar_pct}%;height:100%;"
             f"border-radius:4px;'></div></div>"
-            f"<div style='font-size:0.8em;color:#718096;'>{data['rationale']}</div>"
+            f"<div style='font-size:12px;color:#717171;'>{data['rationale']}</div>"
             f"</div>",
             unsafe_allow_html=True,
         )
@@ -879,7 +879,7 @@ with tabs[8]:
 
     _total = sum(_quality_scores.values())
     _pct = round(_total / _rubric["max_points"] * 100, 1)
-    _color = "#2D6A2D" if _pct >= 80 else ("#eab308" if _pct >= 60 else "#ef4444")
+    _color = "#2D6A2D" if _pct >= 80 else ("#C8971F" if _pct >= 60 else "#C0392B")
     st.markdown(
         f"**Total: <span style='color:{_color}'>{_total}/{_rubric['max_points']}"
         f" ({_pct}%)</span>**",
@@ -1022,9 +1022,9 @@ st.markdown("---")
 st.markdown(
     "<div style='background:linear-gradient(135deg, rgba(45,106,45,0.08), rgba(45,106,45,0.04));"
     "border-radius:12px;padding:20px;text-align:center;margin:16px 0;'>"
-    "<div style='font-size:1.3em;font-weight:700;color:#166534;'>"
+    "<div style='font-size:20px;font-weight:700;color:#1B4D1B;'>"
     "\"Every expert was once a beginner.\"</div>"
-    "<div style='font-size:0.95em;color:#059669;margin-top:8px;'>"
+    "<div style='font-size:14px;color:#2D6A2D;margin-top:8px;'>"
     "Start where you are. Use what you have. Do what you can. "
     "The journey from Seed to Legend starts with a single prompt.</div>"
     "</div>",

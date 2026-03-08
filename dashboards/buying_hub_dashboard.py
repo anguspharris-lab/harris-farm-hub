@@ -205,7 +205,7 @@ with tab1:
                 path=["item_label"],
                 values="revenue",
                 color="revenue",
-                color_continuous_scale=["#ccfbf1", "#0d9488"],
+                color_continuous_scale=["rgba(8,145,178,0.08)", "#0891B2"],
                 custom_data=custom_cols,
             )
             fig_tree.update_traces(texttemplate=text_tpl)
@@ -219,7 +219,7 @@ with tab1:
                 x="revenue", y=dept_name_col,
                 orientation="h",
                 color="revenue",
-                color_continuous_scale=["#ccfbf1", "#0d9488"],
+                color_continuous_scale=["rgba(8,145,178,0.08)", "#0891B2"],
                 labels={"revenue": "Revenue ($)", dept_name_col: ""},
             )
             fig_bar.update_layout(height=450, showlegend=False,
@@ -287,7 +287,7 @@ with tab2:
         fig_mg = px.bar(
             df_mg, x="majorgroupdesc", y="revenue",
             color="revenue",
-            color_continuous_scale=["#ccfbf1", "#0d9488"],
+            color_continuous_scale=["rgba(8,145,178,0.08)", "#0891B2"],
             labels={"majorgroupdesc": "Major Group", "revenue": "Revenue ($)"},
         )
         fig_mg.update_layout(height=350, coloraxis_showscale=False)
@@ -394,7 +394,7 @@ with tab3:
                 x="revenue", y="buyerid",
                 orientation="h",
                 color="revenue",
-                color_continuous_scale=["#dbeafe", "#1e3a8a"],
+                color_continuous_scale=["rgba(21,101,192,0.08)", "#1565C0"],
                 labels={"revenue": "Revenue ($)", "buyerid": "Buyer"},
             )
             fig_buyer.update_layout(height=450, coloraxis_showscale=False)
@@ -446,10 +446,10 @@ with tab4:
                 color="ProductLifecycleStateId",
                 barmode="stack",
                 color_discrete_map={
-                    "Active": "#059669",
-                    "Deleted": "#dc2626",
-                    "New/Inactive": "#f59e0b",
-                    "Derange": "#6b7280",
+                    "Active": "#2D6A2D",
+                    "Deleted": "#C0392B",
+                    "New/Inactive": "#C8971F",
+                    "Derange": "#717171",
                 },
                 labels={
                     "DepartmentDesc": "Department",

@@ -79,7 +79,7 @@ with tab_pipeline:
                 f"<div style='text-align:center;padding:8px;background:{colour}20;"
                 f"border-radius:8px;border-top:3px solid {colour};margin-bottom:8px;'>"
                 f"<strong style='color:{colour};'>{stage_label}</strong>"
-                f"<br><span style='font-size:0.8em;color:#718096;'>{len(items)} items</span>"
+                f"<br><span style='font-size:12px;color:#717171;'>{len(items)} items</span>"
                 f"</div>",
                 unsafe_allow_html=True,
             )
@@ -88,14 +88,14 @@ with tab_pipeline:
             for item in items[:10]:
                 task_type = (item.get("task_type") or "custom").replace("_", " ").title()
                 avg = item.get("rubric_average") or 0
-                score_color = "#2D6A2D" if avg >= 8 else "#d97706" if avg >= 5 else "#dc2626" if avg > 0 else "#718096"
+                score_color = "#2D6A2D" if avg >= 8 else "#C8971F" if avg >= 5 else "#C0392B" if avg > 0 else "#717171"
                 user_id = item.get("user_id", "?")
                 st.markdown(
                     f"<div style='background:rgba(0,0,0,0.04);padding:10px;border-radius:8px;"
                     f"border-left:3px solid {colour};margin-bottom:6px;"
-                    f"border:1px solid rgba(0,0,0,0.08);font-size:0.85em;'>"
+                    f"border:1px solid rgba(0,0,0,0.08);font-size:12px;'>"
                     f"<strong>#{item['id']}</strong> {task_type}"
-                    f"<br><span style='color:#718096;'>{user_id}</span>"
+                    f"<br><span style='color:#717171;'>{user_id}</span>"
                     f"<br><span style='color:{score_color};font-weight:600;'>"
                     f"{avg}/10</span> {item.get('rubric_verdict', '')}"
                     f"</div>",
@@ -169,8 +169,8 @@ with tab_projects:
         st.info("No projects yet. Create one above to start tracking work.")
     else:
         for p in projects:
-            health_colour = {"green": "#2D6A2D", "amber": "#d97706", "red": "#dc2626"}.get(
-                p.get("health", "green"), "#718096"
+            health_colour = {"green": "#2D6A2D", "amber": "#C8971F", "red": "#C0392B"}.get(
+                p.get("health", "green"), "#717171"
             )
             priority = p.get("priority", "P3")
             total = p.get("items_total", 0)
@@ -251,15 +251,15 @@ with tab_talent:
                 f"justify-content:space-between;align-items:center;'>"
                 f"<div>"
                 f"<strong>{level_badge} {t['user_id']}</strong>"
-                f" <span style='color:#718096;font-size:0.85em;'>({t.get('user_role', '')})</span>"
-                f"<br><span style='font-size:0.8em;color:#718096;'>"
+                f" <span style='color:#717171;font-size:12px;'>({t.get('user_role', '')})</span>"
+                f"<br><span style='font-size:12px;color:#717171;'>"
                 f"{t.get('submissions', 0)} submissions | "
                 f"{t.get('avg_quality', 0)}/10 avg quality | "
                 f"{int(t.get('first_time_approval_rate', 0) * 100)}% first-time approval</span>"
                 f"</div>"
                 f"<div style='text-align:right;'>"
-                f"<strong style='color:{HFM_GREEN};font-size:1.1em;'>{t.get('total_points', 0)} pts</strong>"
-                f"<br><span style='font-size:0.8em;color:#718096;'>{t.get('level', '')}</span>"
+                f"<strong style='color:{HFM_GREEN};font-size:16px;'>{t.get('total_points', 0)} pts</strong>"
+                f"<br><span style='font-size:12px;color:#717171;'>{t.get('level', '')}</span>"
                 f"</div></div>",
                 unsafe_allow_html=True,
             )
@@ -330,14 +330,14 @@ with tab_velocity:
             colour = {
                 "proposing": "#FDAB3D",
                 "proving": "#00C875",
-                "blocked": "#dc2626",
-            }.get(stage, "#718096")
+                "blocked": "#C0392B",
+            }.get(stage, "#717171")
             st.markdown(
                 f"<div style='background:{colour}10;padding:10px;border-radius:8px;"
                 f"border-left:3px solid {colour};margin-bottom:6px;'>"
                 f"<strong style='color:{colour};'>{stage.title()}</strong>: "
                 f"{b.get('count', 0)} items stuck"
-                f"<br><span style='font-size:0.8em;color:#718096;'>Oldest: {(b.get('oldest') or '')[:16]}</span>"
+                f"<br><span style='font-size:12px;color:#717171;'>Oldest: {(b.get('oldest') or '')[:16]}</span>"
                 f"</div>",
                 unsafe_allow_html=True,
             )

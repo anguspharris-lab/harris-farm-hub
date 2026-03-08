@@ -84,8 +84,8 @@ else:
     st.markdown(
         "<div style='background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.08);"
         "border-radius:8px;padding:12px 16px;"
-        "color:#718096;font-size:0.9em;'>"
-        "\U0001f4cb <strong style='color:#4A5568;'>Initiative Tracking:</strong> Connect Monday.com "
+        "color:#717171;font-size:13px;'>"
+        "\U0001f4cb <strong style='color:#4A4A4A;'>Initiative Tracking:</strong> Connect Monday.com "
         "to see P3 strategic initiatives here. "
         "Add <code>MONDAY_API_KEY</code> to your <code>.env</code> file."
         "</div>",
@@ -97,15 +97,15 @@ st.markdown("---")
 st.markdown(
     "<div style='background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);"
     "border-radius:10px;padding:20px;'>"
-    "<h3 style='color:white;margin-top:0;font-family:Georgia,serif;'>Growing Legends, Not Just Skills</h3>"
-    "<p style='color:#4A5568;'>AI adoption is a people strategy, not a tech project. "
+    "<h3 style='color:white;margin-top:0;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;'>Growing Legends, Not Just Skills</h3>"
+    "<p style='color:#4A4A4A;'>AI adoption is a people strategy, not a tech project. "
     "The Academy, Prompt Engine, and Paddock exist because we believe every Harris Farmer "
     "can become exceptional \u2014 if we give them the right tools, the right training, "
     "and the right encouragement.</p>"
-    "<p style='color:#718096;font-size:0.9em;'>"
-    "<strong style='color:#4A5568;'>Prosci ADKAR</strong> change management is active across all P3 initiatives. "
+    "<p style='color:#717171;font-size:13px;'>"
+    "<strong style='color:#4A4A4A;'>Prosci ADKAR</strong> change management is active across all P3 initiatives. "
     "We measure adoption, not just availability.</p>"
-    "<p style='color:#4A5568;font-style:italic;font-size:0.9em;'>"
+    "<p style='color:#4A4A4A;font-style:italic;font-size:13px;'>"
     "The Harris Farm Method gives our people a repeatable system: "
     "Define your goal. Flood with context. Add a rubric. Nothing ships below an 8.</p>"
     "</div>",

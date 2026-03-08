@@ -13,7 +13,7 @@ _RESTRICTED_SLUGS = {
     "sales", "profitability", "revenue-bridge",
     "store-network", "market-share", "demographics",
     "whitespace", "competitor-map", "roce", "cannibalisation",
-    "sc-interview", "sc-analysis",
+    "sc-analysis",
 }
 
 ROLE_DEFINITIONS = {
@@ -53,7 +53,7 @@ ROLE_DEFINITIONS = {
             "whitespace", "competitor-map", "roce", "cannibalisation",
             "ai-adoption", "mission-control", "adoption",
             "mdhe-dashboard", "mdhe-upload", "mdhe-issues", "mdhe-guide",
-            "sc-interview", "sc-analysis",
+            "sc-analysis",
         ],
     },
     "store_manager": {

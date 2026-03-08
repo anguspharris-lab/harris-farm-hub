@@ -57,10 +57,10 @@ def render_home_page():
                 "and turn 383 million transactions into actionable intelligence."
             )
             st.caption("Where the biggest operational wins live")
-            if "sc-interview" in _pages:
+            if "hfw-transformation-readiness" in _pages:
                 st.page_link(
-                    _pages["sc-interview"],
-                    label="Supply Chain Review",
+                    _pages["hfw-transformation-readiness"],
+                    label="Transformation Readiness",
                     use_container_width=True,
                 )
 

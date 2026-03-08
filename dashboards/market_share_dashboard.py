@@ -151,7 +151,7 @@ with tab_overview:
         fig_st = px.line(
             stdf, x="period_date", y="share", color="state",
             labels={"period_date": "", "share": "Market Share %", "state": "State"},
-            color_discrete_map={"NSW": "#2D6A2D", "QLD": "#7c3aed", "ACT": "#d97706"},
+            color_discrete_map={"NSW": "#2D6A2D", "QLD": "#7c3aed", "ACT": "#C8971F"},
         )
         fig_st.update_layout(height=400, legend=dict(orientation="h", y=-0.15))
         st.plotly_chart(fig_st, use_container_width=True, key="overview_state_trend")
@@ -186,7 +186,7 @@ with tab_overview:
                         bot.sort_values("market_share_pct"),
                         x="market_share_pct", y="region_name", orientation="h",
                         labels={"market_share_pct": "Share %", "region_name": ""},
-                        color_discrete_sequence=["#dc2626"],
+                        color_discrete_sequence=["#C0392B"],
                         hover_data={"nearest_store": True, "distance_km": True},
                     )
                     fig_bot.update_layout(height=450)
@@ -265,11 +265,11 @@ with tab_map:
             # Health indicator colour map (based on annualised trend slope)
             _HEALTH_COLOURS = {
                 "Accelerating": "#2D6A2D",
-                "Growing": "#65a30d",
-                "Stable": "#d97706",
-                "Softening": "#ea580c",
-                "Declining": "#dc2626",
-                "New": "#9ca3af",
+                "Growing": "#7CB342",
+                "Stable": "#C8971F",
+                "Softening": "#C8971F",
+                "Declining": "#C0392B",
+                "New": "#717171",
             }
             # Ordered for legend
             _HEALTH_ORDER = ["Accelerating", "Growing", "Stable",
@@ -382,9 +382,9 @@ with tab_map:
                 cnt = health_counts.get(h, 0)
                 hk[i].markdown(
                     f"<div style='text-align:center;'>"
-                    f"<span style='color:{_HEALTH_COLOURS[h]};font-size:1.5rem;"
+                    f"<span style='color:{_HEALTH_COLOURS[h]};font-size:24px;"
                     f"font-weight:700;'>{cnt}</span><br>"
-                    f"<span style='font-size:0.75rem;'>{h}</span></div>",
+                    f"<span style='font-size:12px;'>{h}</span></div>",
                     unsafe_allow_html=True,
                 )
 
@@ -451,7 +451,7 @@ with tab_store:
                     cum_with_data, x="label", y="avg_share",
                     labels={"label": "Cumulative Radius", "avg_share": "Avg Market Share %"},
                     color="avg_share",
-                    color_continuous_scale=["#dc2626", "#d97706", "#2D6A2D"],
+                    color_continuous_scale=["#C0392B", "#C8971F", "#2D6A2D"],
                     text="avg_share",
                 )
                 fig_decay.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
@@ -511,10 +511,10 @@ with tab_store:
                     fig_ta.add_trace(go.Scattermapbox(
                         lat=[store_info["lat"]], lon=[store_info["lon"]],
                         mode="markers+text",
-                        marker=dict(size=16, color="#dc2626", symbol="circle"),
+                        marker=dict(size=16, color="#C0392B", symbol="circle"),
                         text=[selected_store.replace("HFM ", "")],
                         textposition="top center",
-                        textfont=dict(size=11, color="#dc2626", family="Arial Black"),
+                        textfont=dict(size=11, color="#C0392B", family="Arial Black"),
                         name=selected_store,
                         hovertemplate=f"<b>{selected_store}</b><extra>Store</extra>",
                     ))
@@ -557,8 +557,8 @@ with tab_store:
                         all_trends, x="period_date", y="avg_share", color="radius",
                         labels={"period_date": "", "avg_share": "Avg Market Share %",
                                 "radius": "Radius"},
-                        color_discrete_sequence=["#2D6A2D", "#2563eb", "#d97706",
-                                                 "#9333ea", "#6b7280"],
+                        color_discrete_sequence=["#2D6A2D", "#1565C0", "#C8971F",
+                                                 "#9333ea", "#717171"],
                     )
                     fig_tt.update_layout(
                         height=400,
@@ -597,7 +597,7 @@ with tab_health:
             scorecard = [s for s in scorecard if s["state"] == state_filter]
 
         # Grade colour mapping
-        _GRADE_COLOURS = {"A": "#2D6A2D", "B": "#65a30d", "C": "#d97706", "D": "#ea580c", "F": "#dc2626"}
+        _GRADE_COLOURS = {"A": "#2D6A2D", "B": "#7CB342", "C": "#C8971F", "D": "#C8971F", "F": "#C0392B"}
 
         # Summary KPIs
         grades = [s["grade"] for s in scorecard]
@@ -739,7 +739,7 @@ with tab_health:
             # Cluster comparison bar chart
             fig_macro = go.Figure()
             colours = [
-                "#2D6A2D" if (r["share_change"] or 0) >= 0 else "#dc2626"
+                "#2D6A2D" if (r["share_change"] or 0) >= 0 else "#C0392B"
                 for _, r in macro_df.iterrows()
             ]
             fig_macro.add_trace(go.Bar(
@@ -916,7 +916,7 @@ with tab_trends:
                     top_loss.sort_values("share_change", ascending=False),
                     x="share_change", y="region_name", orientation="h",
                     labels={"share_change": "Share Change (pp)", "region_name": ""},
-                    color_discrete_sequence=["#dc2626"],
+                    color_discrete_sequence=["#C0392B"],
                     hover_data={"nearest_store": True, "distance_tier": True},
                 )
                 fig_loss.update_layout(height=450)
@@ -1028,10 +1028,10 @@ with tab_opps:
                 },
                 color_discrete_map={
                     "Stronghold": "#2D6A2D",
-                    "Growth Opportunity": "#2563eb",
-                    "Basket Opportunity": "#d97706",
-                    "Retention Risk": "#dc2626",
-                    "Monitor": "#9ca3af",
+                    "Growth Opportunity": "#1565C0",
+                    "Basket Opportunity": "#C8971F",
+                    "Retention Risk": "#C0392B",
+                    "Monitor": "#717171",
                 },
                 size_max=30,
             )
@@ -1166,7 +1166,7 @@ with tab_issues:
                 fig_pc_spend = px.line(
                     pcdf, x="period_date", y="spend_per_customer",
                     labels={"period_date": "", "spend_per_customer": "Spend ($)"},
-                    color_discrete_sequence=["#d97706"],
+                    color_discrete_sequence=["#C8971F"],
                     title="Spend per Customer Trend",
                 )
                 fig_pc_spend.update_layout(height=300)
@@ -1175,7 +1175,7 @@ with tab_issues:
                 fig_pc_mkt = px.line(
                     pcdf, x="period_date", y="market_size_dollars",
                     labels={"period_date": "", "market_size_dollars": "Market Size ($)"},
-                    color_discrete_sequence=["#6366f1"],
+                    color_discrete_sequence=["#7C3AED"],
                     title="Market Size Trend (directional only)",
                 )
                 fig_pc_mkt.update_layout(height=300)

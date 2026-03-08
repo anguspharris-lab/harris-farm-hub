@@ -193,14 +193,14 @@ with di_sub1:
                     grade_colors = {
                         "Board-ready": "#2e7d32",
                         "Reviewed": "#f57c00",
-                        "Draft": "#666",
+                        "Draft": "#717171",
                     }
                     st.markdown(
                         '<span style="background:{}; color:white; '
                         'padding:4px 12px; border-radius:12px; '
                         'font-weight:bold">{} ({:.1f}/10)</span>'
                         '&nbsp;&nbsp; Report #{}'.format(
-                            grade_colors.get(grade, "#666"),
+                            grade_colors.get(grade, "#717171"),
                             grade, avg, result.get("id", "?"),
                         ),
                         unsafe_allow_html=True,
@@ -254,7 +254,7 @@ with di_sub1:
                             "#f57c00" if score >= 6 else "#e74c3c")
                         col.markdown(
                             '<div style="text-align:center">'
-                            '<span style="font-size:1.5em; '
+                            '<span style="font-size:24px; '
                             'color:{}">{}/10</span><br/>'
                             '<strong>{}</strong></div>'.format(
                                 color, score, dim.get("label", key)),
@@ -288,7 +288,7 @@ with di_sub2:
             grade_colors = {
                 "Board-ready": "#2e7d32",
                 "Reviewed": "#f57c00",
-                "Draft": "#666",
+                "Draft": "#717171",
             }
 
             with st.expander(
@@ -427,11 +427,11 @@ with di_sub3:
                         wd_level = wd.get("risk_level", "SAFE")
                         wd_icon = wd.get("risk_icon", "")
                         wd_colors = {
-                            "SAFE": "#2D6A2D", "LOW": "#eab308",
-                            "MEDIUM": "#f97316", "HIGH": "#ef4444",
+                            "SAFE": "#2D6A2D", "LOW": "#C8971F",
+                            "MEDIUM": "#C8971F", "HIGH": "#C0392B",
                             "BLOCKED": "#1f2937",
                         }
-                        wd_color = wd_colors.get(wd_level, "#666")
+                        wd_color = wd_colors.get(wd_level, "#717171")
                         st.markdown(
                             '<span style="background:{}; color:white; '
                             'padding:4px 12px; border-radius:12px; '
@@ -456,7 +456,7 @@ with di_sub3:
                             grade_colors = {
                                 "Board-ready": "#2e7d32",
                                 "Reviewed": "#f57c00",
-                                "Draft": "#666",
+                                "Draft": "#717171",
                             }
 
                             with st.expander(
@@ -469,9 +469,9 @@ with di_sub3:
                                     '<span style="background:{}; '
                                     'color:white; padding:3px 10px; '
                                     'border-radius:10px; '
-                                    'font-size:0.9em">'
+                                    'font-size:14px">'
                                     '{} {:.1f}/10</span>'.format(
-                                        grade_colors.get(grade, "#666"),
+                                        grade_colors.get(grade, "#717171"),
                                         grade, avg,
                                     ),
                                     unsafe_allow_html=True,
@@ -547,7 +547,7 @@ with di_sub3:
                                             '<div style='
                                             '"text-align:center">'
                                             '<span style='
-                                            '"font-size:1.3em; '
+                                            '"font-size:21px; '
                                             'color:{}">'
                                             '{}/10</span><br/>'
                                             '<strong>{}</strong>'

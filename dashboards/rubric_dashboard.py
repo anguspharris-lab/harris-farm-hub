@@ -22,7 +22,7 @@ from shared.training_content import (
     check_prompt_quality,
 )
 
-st.markdown("<style>.winner-card { border: 3px solid #10b981; border-radius: 10px; padding: 10px; }</style>", unsafe_allow_html=True)
+st.markdown("<style>.winner-card { border: 3px solid #7CB342; border-radius: 10px; padding: 10px; }</style>", unsafe_allow_html=True)
 user = st.session_state.get("auth_user")
 _USER_ID = (user or {}).get("email", "anonymous")
 
@@ -540,7 +540,7 @@ with tabs[3]:
             categories = [c["name"] for c in RUBRIC_CRITERIA]
 
             fig = go.Figure()
-            colors = ["#1e3a8a", "#10b981", "#f59e0b"]
+            colors = ["#1565C0", "#7CB342", "#C8971F"]
             for i, (provider, scores) in enumerate(all_scores.items()):
                 values = [scores[cat] for cat in categories]
                 values.append(values[0])  # close the polygon

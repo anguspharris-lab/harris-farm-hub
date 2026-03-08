@@ -129,7 +129,7 @@ wd_system = wd_status.get("system", {})
 wd_metrics = wd_status.get("metrics", {})
 
 status_active = wd_system.get("watchdog_active", False)
-status_color = "#2D6A2D" if status_active else "#ef4444"
+status_color = "#2D6A2D" if status_active else "#C0392B"
 st.markdown(
     '<div style="background:{}; color:white; padding:12px 20px; '
     'border-radius:8px; font-weight:600; text-align:center; '
@@ -206,7 +206,7 @@ with tab1:
                 risk_names.append("{} {}".format(
                     RISK_ICONS.get(level, ""), level))
                 risk_counts.append(count)
-                risk_colors.append(RISK_COLORS.get(level, "#666"))
+                risk_colors.append(RISK_COLORS.get(level, "#717171"))
 
         if risk_names:
             fig_risk = go.Figure(data=[go.Bar(
@@ -490,10 +490,10 @@ with tab2:
                     "margin:8px 0;background:#f8f9fa;border-radius:4px'>"
                     "<b>{}</b> &mdash; {} "
                     "<span style='background:{};color:white;padding:2px 8px;"
-                    "border-radius:4px;font-size:0.8em'>{} RISK</span>"
-                    "<br><span style='color:#6b7280;font-size:0.85em'>"
+                    "border-radius:4px;font-size:13px'>{} RISK</span>"
+                    "<br><span style='color:#717171;font-size:14px'>"
                     "{}</span><br>"
-                    "<span style='color:#059669;font-size:0.85em'>"
+                    "<span style='color:#2D6A2D;font-size:14px'>"
                     "Impact: {}</span>"
                     "</div>".format(
                         risk_color,
@@ -572,9 +572,9 @@ with tab3:
                     "<div style='text-align:center;border:1px solid rgba(0,0,0,0.08);"
                     "border-radius:8px;padding:16px;margin:4px'>"
                     "<b>{}</b><br>"
-                    "<span style='font-size:2em;color:{}'>{:.1f}</span>"
+                    "<span style='font-size:32px;color:{}'>{:.1f}</span>"
                     "<span style='color:#9ca3af'> / 10</span><br>"
-                    "<span style='color:#6b7280;font-size:0.85em'>"
+                    "<span style='color:#717171;font-size:14px'>"
                     "{} measurements</span></div>".format(
                         agent.get("agent_name", ""),
                         color, avg,

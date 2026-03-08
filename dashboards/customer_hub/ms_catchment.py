@@ -85,7 +85,7 @@ def render():
             labels={"label": "Cumulative Radius",
                     "avg_share": "Avg Market Share %"},
             color="avg_share",
-            color_continuous_scale=["#dc2626", "#d97706", "#2D6A2D"],
+            color_continuous_scale=["#C0392B", "#C8971F", "#2D6A2D"],
             text="avg_share",
         )
         fig_decay.update_traces(texttemplate="%{text:.1f}%",
@@ -148,10 +148,10 @@ def render():
             fig_ta.add_trace(go.Scattermapbox(
                 lat=[store_info["lat"]], lon=[store_info["lon"]],
                 mode="markers+text",
-                marker=dict(size=16, color="#dc2626", symbol="circle"),
+                marker=dict(size=16, color="#C0392B", symbol="circle"),
                 text=[selected_store.replace("HFM ", "")],
                 textposition="top center",
-                textfont=dict(size=11, color="#dc2626", family="Arial Black"),
+                textfont=dict(size=11, color="#C0392B", family="Arial Black"),
                 name=selected_store,
                 hovertemplate="<b>{}</b><extra>Store</extra>".format(
                     selected_store),
@@ -193,8 +193,8 @@ def render():
                 all_trends, x="period_date", y="avg_share", color="radius",
                 labels={"period_date": "", "avg_share": "Avg Market Share %",
                         "radius": "Radius"},
-                color_discrete_sequence=["#2D6A2D", "#2563eb", "#d97706",
-                                         "#9333ea", "#6b7280"],
+                color_discrete_sequence=["#2D6A2D", "#1565C0", "#C8971F",
+                                         "#9333ea", "#717171"],
             )
             fig_tt.update_layout(
                 height=400, legend=dict(orientation="h", y=-0.15))
@@ -222,11 +222,11 @@ def render():
             if pd.isna(val):
                 return ""
             if val >= 10:
-                return "background-color: #dcfce7"
+                return "background-color: rgba(45,106,45,0.08)"
             elif val >= 5:
-                return "background-color: #fef9c3"
+                return "background-color: rgba(200,151,31,0.08)"
             elif val > 0:
-                return "background-color: #fee2e2"
+                return "background-color: rgba(192,57,43,0.08)"
             return ""
 
         radius_cols = ["0-{}km".format(r) for r in TRADE_AREA_RADII]

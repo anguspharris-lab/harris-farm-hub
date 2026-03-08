@@ -242,11 +242,11 @@ def render_module_tab(pillar_key, tab_key_prefix):
 
 # --- ADKAR Change Management Banner ---
 st.markdown(
-    "<div style='background:linear-gradient(135deg, #059669 0%, #047857 100%);"
+    "<div style='background:linear-gradient(135deg, #2D6A2D 0%, #235522 100%);"
     "color:white;padding:18px 24px;border-radius:10px;margin-bottom:16px;'>"
-    "<div style='font-size:1.15em;font-weight:700;margin-bottom:6px;'>"
+    "<div style='font-size:18px;font-weight:700;margin-bottom:6px;'>"
     "AI Is Your Job Partner — Not Your Replacement</div>"
-    "<div style='font-size:0.9em;opacity:0.95;'>"
+    "<div style='font-size:13px;opacity:0.95;'>"
     "The Prompt Academy follows the <strong>Prosci ADKAR</strong> model: "
     "we help you build <strong>Awareness</strong> of why AI matters, "
     "<strong>Desire</strong> to learn, <strong>Knowledge</strong> of how it works, "
@@ -270,9 +270,9 @@ for i, (stage, desc, maps_to) in enumerate(adkar_stages):
         st.markdown(
             f"<div style='text-align:center;padding:8px;background:rgba(45,106,45,0.08);"
             f"border-radius:8px;border:1px solid rgba(0,0,0,0.08);'>"
-            f"<div style='font-weight:700;color:#059669;font-size:0.9em;'>{stage}</div>"
-            f"<div style='font-size:0.75em;color:#718096;'>{desc}</div>"
-            f"<div style='font-size:0.7em;color:#718096;'>{maps_to}</div>"
+            f"<div style='font-weight:700;color:#2D6A2D;font-size:13px;'>{stage}</div>"
+            f"<div style='font-size:12px;color:#717171;'>{desc}</div>"
+            f"<div style='font-size:11px;color:#717171;'>{maps_to}</div>"
             f"</div>",
             unsafe_allow_html=True,
         )
@@ -289,9 +289,9 @@ with st.expander("**Start Here: When In Doubt, Ask AI** — the one habit that c
     st.markdown(
         "<div style='background:linear-gradient(135deg, rgba(45,106,45,0.08) 0%, rgba(45,106,45,0.12) 100%);"
         "border:2px solid #2D6A2D;border-radius:12px;padding:24px;margin-bottom:20px;'>"
-        "<div style='font-size:1.3em;font-weight:700;color:#166534;margin-bottom:8px;'>"
+        "<div style='font-size:20px;font-weight:700;color:#1B4D1B;margin-bottom:8px;'>"
         "The one thing that changes everything</div>"
-        "<div style='font-size:1em;color:#15803d;line-height:1.6;'>"
+        "<div style='font-size:16px;color:#235522;line-height:1.6;'>"
         "Whenever you're stuck, whenever you have to think hard about something, "
         "whenever you're staring at a screen wondering <em>\"how do I do this?\"</em> "
         "— <strong>just ask AI</strong>. It's sitting right there. It's fast, it's smart, "
@@ -307,8 +307,8 @@ with st.expander("**Start Here: When In Doubt, Ask AI** — the one habit that c
         st.markdown(
             "<div style='background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.08);border-radius:10px;"
             "padding:16px;height:100%;'>"
-            "<div style='font-weight:700;color:#718096;margin-bottom:10px;'>THE OLD WAY</div>"
-            "<div style='font-size:0.9em;color:#718096;line-height:1.7;'>"
+            "<div style='font-weight:700;color:#717171;margin-bottom:10px;'>THE OLD WAY</div>"
+            "<div style='font-size:13px;color:#717171;line-height:1.7;'>"
             "1. <em>\"How do I do this?\"</em><br>"
             "2. Google it for 20 minutes<br>"
             "3. Find 6 conflicting answers<br>"
@@ -322,8 +322,8 @@ with st.expander("**Start Here: When In Doubt, Ask AI** — the one habit that c
         st.markdown(
             "<div style='background:rgba(45,106,45,0.08);border:2px solid #2D6A2D;border-radius:10px;"
             "padding:16px;height:100%;'>"
-            "<div style='font-weight:700;color:#166534;margin-bottom:10px;'>THE NEW WAY</div>"
-            "<div style='font-size:0.9em;color:#15803d;line-height:1.7;'>"
+            "<div style='font-weight:700;color:#1B4D1B;margin-bottom:10px;'>THE NEW WAY</div>"
+            "<div style='font-size:13px;color:#235522;line-height:1.7;'>"
             "1. <em>\"How do I do this?\"</em><br>"
             "2. Open Claude. Ask it.<br>"
             "3. Get a clear, tailored answer<br>"
@@ -351,13 +351,13 @@ with st.expander("**Start Here: When In Doubt, Ask AI** — the one habit that c
     g1, g2, g3 = st.columns(3)
     with g1:
         st.markdown(
-            "<div style='background:#eff6ff;border:2px solid #3b82f6;border-radius:10px;"
+            "<div style='background:rgba(21,101,192,0.04);border:2px solid #1565C0;border-radius:10px;"
             "padding:16px;text-align:center;'>"
-            "<div style='font-size:1.8em;'>1</div>"
-            "<div style='font-weight:700;color:#1d4ed8;font-size:1.1em;'>ASK</div>"
-            "<div style='font-size:0.8em;color:#1e40af;margin-top:4px;'>\"I'm stuck. Help.\"</div>"
+            "<div style='font-size:28px;'>1</div>"
+            "<div style='font-weight:700;color:#1d4ed8;font-size:16px;'>ASK</div>"
+            "<div style='font-size:12px;color:#1565C0;margin-top:4px;'>\"I'm stuck. Help.\"</div>"
             "<hr style='border-color:#bfdbfe;margin:10px 0;'>"
-            "<div style='font-size:0.85em;color:#4A5568;text-align:left;line-height:1.6;'>"
+            "<div style='font-size:12px;color:#4A4A4A;text-align:left;line-height:1.6;'>"
             "You ask AI questions and use its answers. "
             "This alone saves hours every week. "
             "<strong>Most people stay here and that's FINE.</strong> "
@@ -369,11 +369,11 @@ with st.expander("**Start Here: When In Doubt, Ask AI** — the one habit that c
         st.markdown(
             "<div style='background:rgba(45,106,45,0.08);border:2px solid #2D6A2D;border-radius:10px;"
             "padding:16px;text-align:center;'>"
-            "<div style='font-size:1.8em;'>2</div>"
-            "<div style='font-weight:700;color:#166534;font-size:1.1em;'>REFINE</div>"
-            "<div style='font-size:0.8em;color:#15803d;margin-top:4px;'>\"Make it better.\"</div>"
+            "<div style='font-size:28px;'>2</div>"
+            "<div style='font-weight:700;color:#1B4D1B;font-size:16px;'>REFINE</div>"
+            "<div style='font-size:12px;color:#235522;margin-top:4px;'>\"Make it better.\"</div>"
             "<hr style='border-color:#bbf7d0;margin:10px 0;'>"
-            "<div style='font-size:0.85em;color:#4A5568;text-align:left;line-height:1.6;'>"
+            "<div style='font-size:12px;color:#4A4A4A;text-align:left;line-height:1.6;'>"
             "You learn that the <strong>quality of AI's output</strong> depends on the "
             "<strong>quality of your input</strong>. Rubrics teach you how to evaluate "
             "and improve both. A 5/10 becomes an 8/10."
@@ -382,13 +382,13 @@ with st.expander("**Start Here: When In Doubt, Ask AI** — the one habit that c
         )
     with g3:
         st.markdown(
-            "<div style='background:#fef3c7;border:2px solid #f59e0b;border-radius:10px;"
+            "<div style='background:rgba(200,151,31,0.08);border:2px solid #C8971F;border-radius:10px;"
             "padding:16px;text-align:center;'>"
-            "<div style='font-size:1.8em;'>3</div>"
-            "<div style='font-weight:700;color:#92400e;font-size:1.1em;'>BUILD</div>"
-            "<div style='font-size:0.8em;color:#a16207;margin-top:4px;'>\"Automate it.\"</div>"
-            "<hr style='border-color:#fde68a;margin:10px 0;'>"
-            "<div style='font-size:0.85em;color:#4A5568;text-align:left;line-height:1.6;'>"
+            "<div style='font-size:28px;'>3</div>"
+            "<div style='font-weight:700;color:#C8971F;font-size:16px;'>BUILD</div>"
+            "<div style='font-size:12px;color:#a16207;margin-top:4px;'>\"Automate it.\"</div>"
+            "<hr style='border-color:rgba(200,151,31,0.12);margin:10px 0;'>"
+            "<div style='font-size:12px;color:#4A4A4A;text-align:left;line-height:1.6;'>"
             "Use Claude.ai (the Brain) to <strong>design</strong> what you want. "
             "Use Claude Code (the Hands) to <strong>build</strong> it. "
             "Use Claude.ai again to <strong>review</strong>. "
@@ -444,11 +444,11 @@ with st.expander("**Start Here: When In Doubt, Ask AI** — the one habit that c
     # --- Call to Action ---
     st.markdown("---")
     st.markdown(
-        "<div style='background:linear-gradient(135deg, #166534 0%, #059669 100%);"
+        "<div style='background:linear-gradient(135deg, #1B4D1B 0%, #2D6A2D 100%);"
         "color:white;border-radius:12px;padding:24px;text-align:center;'>"
-        "<div style='font-size:1.2em;font-weight:700;margin-bottom:10px;'>"
+        "<div style='font-size:18px;font-weight:700;margin-bottom:10px;'>"
         "Start Right Now</div>"
-        "<div style='font-size:0.95em;line-height:1.7;max-width:600px;margin:0 auto;'>"
+        "<div style='font-size:14px;line-height:1.7;max-width:600px;margin:0 auto;'>"
         "Think of <strong>one thing</strong> you did this week that was tedious, confusing, "
         "or took longer than it should. Open Claude. Describe it exactly as you'd tell a colleague: "
         "<em>\"Hey, I need to [thing]. I've got [context]. Can you help?\"</em><br><br>"
@@ -460,7 +460,7 @@ with st.expander("**Start Here: When In Doubt, Ask AI** — the one habit that c
     st.markdown("")
     st.markdown(
         "<div style='text-align:center;padding:12px;background:rgba(0,0,0,0.03);border-radius:8px;"
-        "border:1px solid rgba(0,0,0,0.08);font-size:0.9em;color:#4A5568;'>"
+        "border:1px solid rgba(0,0,0,0.08);font-size:13px;color:#4A4A4A;'>"
         "AI is not a tool you need to learn. "
         "It's a colleague you need to <strong>remember to ask</strong>."
         "</div>",
@@ -832,7 +832,7 @@ with tab_lab:
                         ]
                         for i, (key, label) in enumerate(criteria_names):
                             score = scores.get(key, 0)
-                            color = "#2D6A2D" if score >= 4 else "#f59e0b" if score >= 3 else "#ef4444"
+                            color = "#2D6A2D" if score >= 4 else "#C8971F" if score >= 3 else "#C0392B"
                             score_cols[i].markdown(
                                 f"<div style='text-align:center;padding:8px;background:{color}20;"
                                 f"border-radius:8px;border:2px solid {color};'>"
@@ -911,9 +911,9 @@ with tab_lab:
 
 st.markdown("---")
 st.markdown(
-    "<div style='background:rgba(45,106,45,0.08);border-left:4px solid #059669;"
+    "<div style='background:rgba(45,106,45,0.08);border-left:4px solid #2D6A2D;"
     "padding:12px 16px;border-radius:0 8px 8px 0;margin:10px 0;'>"
-    "<div style='font-size:0.85em;color:#065f46;'>"
+    "<div style='font-size:12px;color:#1B4D1B;'>"
     "<strong>Your Learning Journey:</strong> "
     "The Prompt Academy has 5 levels — from AI Explorer to Citizen Developer. "
     "Every Harris Farmer can learn at their own pace. "

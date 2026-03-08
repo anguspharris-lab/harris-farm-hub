@@ -43,9 +43,9 @@ from shared.whitespace_data import (
 # ── Common layout helpers ─────────────────────────────────────────────────────
 
 _DARK_LAYOUT = dict(
-    paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(color="#FFFFFF", family="Trebuchet MS, sans-serif"),
+    paper_bgcolor="#FFFFFF",
+    plot_bgcolor="#FFFFFF",
+    font=dict(color="#1A1A1A", family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif"),
 )
 
 _GRID = dict(showgrid=True, gridcolor="rgba(0,0,0,0.08)")
@@ -87,13 +87,13 @@ def _colour_for_roc(roc_val) -> str:
     try:
         v = float(roc_val)
     except (ValueError, TypeError):
-        return "#6B7280"
+        return "#717171"
     if v >= 1.0:
         return "#2D6A2D"
     elif v >= 0.7:
-        return "#d97706"
+        return "#C8971F"
     else:
-        return "#dc2626"
+        return "#C0392B"
 
 
 def _placeholder(message: str = "Data not yet available."):
@@ -232,11 +232,11 @@ with tab_exec:
                 sqm = row.get("retail_sqm", 0)
                 st.markdown(
                     glass_card(
-                        f"<span style='color:{colour};font-size:1.6em;font-weight:700;'>"
+                        f"<span style='color:{colour};font-size:24px;font-weight:700;'>"
                         f"{roc_val:.2f}x</span>"
-                        f"<span style='color:#1A1A1A;font-size:1.1em;margin-left:12px;'>"
+                        f"<span style='color:#1A1A1A;font-size:16px;margin-left:12px;'>"
                         f"{name}</span>"
-                        f"<br><span style='color:#718096;font-size:0.85em;'>"
+                        f"<br><span style='color:#717171;font-size:12px;'>"
                         f"{fmt} | {sqm:,.0f} sqm</span>",
                         border_color=colour,
                     ),
@@ -253,11 +253,11 @@ with tab_exec:
                 sqm = row.get("retail_sqm", 0)
                 st.markdown(
                     glass_card(
-                        f"<span style='color:{colour};font-size:1.6em;font-weight:700;'>"
+                        f"<span style='color:{colour};font-size:24px;font-weight:700;'>"
                         f"{roc_val:.2f}x</span>"
-                        f"<span style='color:#1A1A1A;font-size:1.1em;margin-left:12px;'>"
+                        f"<span style='color:#1A1A1A;font-size:16px;margin-left:12px;'>"
                         f"{name}</span>"
-                        f"<br><span style='color:#718096;font-size:0.85em;'>"
+                        f"<br><span style='color:#717171;font-size:12px;'>"
                         f"{fmt} | {sqm:,.0f} sqm</span>",
                         border_color=colour,
                     ),
@@ -283,7 +283,7 @@ with tab_exec:
         # ── Key insight callout ──────────────────────────────────────────
         st.markdown(
             glass_card(
-                "<span style='color:#2D6A2D;font-weight:700;font-size:1.1em;'>"
+                "<span style='color:#2D6A2D;font-weight:700;font-size:16px;'>"
                 "Key Insight</span><br>"
                 "<span style='color:#1A1A1A;'>"
                 "Express format (&lt;1,200 sqm) averages ~1.17x GPM ROC -- "
@@ -342,7 +342,7 @@ with tab_roc:
                 y="short_name",
                 orientation="h",
                 color="gpm_roc_primary_4k",
-                color_continuous_scale=["#dc2626", "#d97706", "#2D6A2D"],
+                color_continuous_scale=["#C0392B", "#C8971F", "#2D6A2D"],
                 labels={
                     "gpm_roc_primary_4k": "GPM ROC (est.) at $4K/sqm",
                     "short_name": "",
@@ -351,9 +351,9 @@ with tab_roc:
 
         # Add 1.0x reference line
         fig_bar.add_vline(
-            x=1.0, line_dash="dash", line_color="#FFFFFF",
+            x=1.0, line_dash="dash", line_color="#4A4A4A",
             annotation_text="1.0x breakeven",
-            annotation_font_color="#FFFFFF",
+            annotation_font_color="#4A4A4A",
         )
         fig_bar.update_layout(
             height=max(500, len(bar_df) * 24),
@@ -431,7 +431,7 @@ with tab_roc:
             fig_scatter.add_hline(
                 y=1.0, line_dash="dash", line_color="rgba(0,0,0,0.25)",
                 annotation_text="1.0x breakeven",
-                annotation_font_color="#FFFFFF",
+                annotation_font_color="#4A4A4A",
             )
             fig_scatter.update_layout(
                 height=550,
@@ -463,7 +463,7 @@ with tab_roc:
                     z=pivot.values,
                     x=pivot.columns.tolist(),
                     y=pivot.index.tolist(),
-                    colorscale=[[0, "#dc2626"], [0.5, "#d97706"], [1, "#2D6A2D"]],
+                    colorscale=[[0, "#C0392B"], [0.5, "#C8971F"], [1, "#2D6A2D"]],
                     text=np.round(pivot.values, 1),
                     texttemplate="%{text}%",
                     hovertemplate="Store: %{y}<br>Dept: %{x}<br>GP: %{z:.1f}%<extra></extra>",
@@ -592,7 +592,7 @@ with tab_ms:
                             f"<span style='color:#2D6A2D;font-weight:700;'>"
                             f"+{trend_val:.1f}pp</span> "
                             f"<span style='color:#1A1A1A;'>{name}</span>"
-                            f"<br><span style='color:#718096;font-size:0.85em;'>"
+                            f"<br><span style='color:#717171;font-size:12px;'>"
                             f"Current share: {share_val:.1f}%</span>",
                             border_color="#2D6A2D",
                         ),
@@ -608,12 +608,12 @@ with tab_ms:
                     share_val = row.get("weighted_avg_share_pct", 0)
                     st.markdown(
                         glass_card(
-                            f"<span style='color:#dc2626;font-weight:700;'>"
+                            f"<span style='color:#C0392B;font-weight:700;'>"
                             f"{trend_val:.1f}pp</span> "
                             f"<span style='color:#1A1A1A;'>{name}</span>"
-                            f"<br><span style='color:#718096;font-size:0.85em;'>"
+                            f"<br><span style='color:#717171;font-size:12px;'>"
                             f"Current share: {share_val:.1f}%</span>",
-                            border_color="#dc2626",
+                            border_color="#C0392B",
                         ),
                         unsafe_allow_html=True,
                     )
@@ -717,11 +717,11 @@ with tab_matrix:
                         ),
                         color=quad_colour,
                         opacity=0.85,
-                        line=dict(width=1, color="#FFFFFF"),
+                        line=dict(width=1, color="rgba(0,0,0,0.15)"),
                     ),
                     text=q_data["short_name"],
                     textposition="top center",
-                    textfont=dict(size=9, color="#FFFFFF"),
+                    textfont=dict(size=9, color="#1A1A1A"),
                     name=quad_name,
                     hovertemplate=(
                         "<b>%{text}</b><br>"
@@ -735,32 +735,32 @@ with tab_matrix:
             fig_matrix.add_hline(
                 y=med_roc, line_dash="dot", line_color="rgba(0,0,0,0.20)",
                 annotation_text=f"Median ROC: {med_roc:.2f}x",
-                annotation_font_color="#718096",
+                annotation_font_color="#717171",
                 annotation_position="bottom right",
             )
             fig_matrix.add_vline(
                 x=med_share, line_dash="dot", line_color="rgba(0,0,0,0.20)",
                 annotation_text=f"Median Share: {med_share:.1f}%",
-                annotation_font_color="#718096",
+                annotation_font_color="#717171",
                 annotation_position="top left",
             )
 
             # Quadrant labels
             fig_matrix.add_annotation(
                 x=x_max - 0.5, y=y_max - 0.05, text="STAR", showarrow=False,
-                font=dict(color="#2D6A2D", size=14, family="Georgia"),
+                font=dict(color="#2D6A2D", size=14, family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif"),
             )
             fig_matrix.add_annotation(
                 x=x_max - 0.5, y=y_min + 0.05, text="CASH COW", showarrow=False,
-                font=dict(color="#3B82F6", size=14, family="Georgia"),
+                font=dict(color="#1565C0", size=14, family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif"),
             )
             fig_matrix.add_annotation(
                 x=x_min + 0.5, y=y_max - 0.05, text="QUESTION MARK", showarrow=False,
-                font=dict(color="#d97706", size=14, family="Georgia"),
+                font=dict(color="#C8971F", size=14, family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif"),
             )
             fig_matrix.add_annotation(
                 x=x_min + 0.5, y=y_min + 0.05, text="FIX OR EXIT", showarrow=False,
-                font=dict(color="#dc2626", size=14, family="Georgia"),
+                font=dict(color="#C0392B", size=14, family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif"),
             )
 
             fig_matrix.update_layout(
@@ -771,8 +771,8 @@ with tab_matrix:
                 yaxis=dict(**_GRID, title="GPM ROC (est.) @ $4K/sqm"),
                 legend=dict(
                     title="Quadrant",
-                    bgcolor="rgba(0,0,0,0.4)",
-                    font=dict(color="#FFFFFF"),
+                    bgcolor="rgba(255,255,255,0.9)",
+                    font=dict(color="#1A1A1A"),
                 ),
                 margin=dict(l=60, r=20, t=30, b=60),
             )
@@ -787,9 +787,9 @@ with tab_matrix:
                 qcols[i].markdown(
                     f"<div style='text-align:center;padding:10px;border-radius:8px;"
                     f"border:1px solid {qcolour};'>"
-                    f"<span style='color:{qcolour};font-size:1.6em;font-weight:700;'>"
+                    f"<span style='color:{qcolour};font-size:24px;font-weight:700;'>"
                     f"{count}</span><br>"
-                    f"<span style='color:#4A5568;font-size:0.9em;'>{qname}</span></div>",
+                    f"<span style='color:#4A4A4A;font-size:13px;'>{qname}</span></div>",
                     unsafe_allow_html=True,
                 )
 
@@ -882,12 +882,12 @@ with tab_cannibal:
                     low_risk_count = len(ws_display[ws_display[risk_col].str.lower().str.contains("low", na=False)])
                     st.markdown(
                         glass_card(
-                            f"<span style='color:#d97706;font-weight:700;'>Cannibalisation Summary</span><br>"
-                            f"<span style='color:#dc2626;font-weight:600;'>{high_risk_count} High Risk</span> "
+                            f"<span style='color:#C8971F;font-weight:700;'>Cannibalisation Summary</span><br>"
+                            f"<span style='color:#C0392B;font-weight:600;'>{high_risk_count} High Risk</span> "
                             f"opportunities would primarily steal from existing stores.<br>"
                             f"<span style='color:#2D6A2D;font-weight:600;'>{low_risk_count} Low Risk</span> "
                             f"opportunities represent genuinely new market entries.",
-                            border_color="#d97706",
+                            border_color="#C8971F",
                         ),
                         unsafe_allow_html=True,
                     )
@@ -1012,13 +1012,13 @@ with tab_score:
         cls_counts = scorecard_df["classification"].value_counts()
         cls_cols = st.columns(min(len(cls_counts), 6))
         for i, (cls_name, count) in enumerate(cls_counts.items()):
-            colour = CLASSIFICATION_COLOURS.get(cls_name, "#6B7280")
+            colour = CLASSIFICATION_COLOURS.get(cls_name, "#717171")
             cls_cols[i % len(cls_cols)].markdown(
                 f"<div style='text-align:center;padding:12px;border-radius:8px;"
                 f"border:2px solid {colour};'>"
-                f"<span style='color:{colour};font-size:1.8em;font-weight:700;'>"
+                f"<span style='color:{colour};font-size:28px;font-weight:700;'>"
                 f"{count}</span><br>"
-                f"<span style='color:#4A5568;font-size:0.85em;'>{cls_name}</span></div>",
+                f"<span style='color:#4A4A4A;font-size:12px;'>{cls_name}</span></div>",
                 unsafe_allow_html=True,
             )
 
@@ -1066,7 +1066,7 @@ with tab_fix:
                 roc_str = f"{roc_val:.2f}x" if roc_val is not None else "N/A"
                 share_str = f"{share_val:.1f}%" if share_val is not None else "N/A"
                 sqm_str = f"{sqm:,.0f} sqm" if sqm is not None else "N/A"
-                roc_colour = _colour_for_roc(roc_val) if roc_val is not None else "#6B7280"
+                roc_colour = _colour_for_roc(roc_val) if roc_val is not None else "#717171"
 
                 with st.expander(f"{store_name} -- GPM ROC: {roc_str} | Share: {share_str}", expanded=(i == 0)):
                     mc1, mc2, mc3, mc4 = st.columns(4)
@@ -1095,7 +1095,7 @@ with tab_fix:
             st.markdown("---")
             st.markdown(
                 glass_card(
-                    "<span style='color:#d97706;font-weight:700;font-size:1.1em;'>"
+                    "<span style='color:#C8971F;font-weight:700;font-size:16px;'>"
                     "The Drummoyne Pattern</span><br>"
                     "<span style='color:#1A1A1A;'>"
                     "Some stores have loyal customers and decent market share, "
@@ -1105,7 +1105,7 @@ with tab_fix:
                     "not closing the store. These are valuable market positions "
                     "with a capital efficiency problem."
                     "</span>",
-                    border_color="#d97706",
+                    border_color="#C8971F",
                 ),
                 unsafe_allow_html=True,
             )
@@ -1154,11 +1154,11 @@ with tab_gaps:
         if "ACTUAL" in s:
             return "#2D6A2D"
         elif "ESTIMATED" in s:
-            return "#d97706"
+            return "#C8971F"
         elif "PLANNED" in s:
-            return "#3B82F6"
+            return "#1565C0"
         else:
-            return "#dc2626"
+            return "#C0392B"
 
     st.dataframe(
         gaps_df[["Category", "Item", "Status", "Source"]],
@@ -1188,17 +1188,17 @@ with tab_gaps:
     ))
     fig_avail.add_trace(go.Bar(
         x=[estimated_count], y=["Data Coverage"], orientation="h",
-        name="Estimated", marker_color="#d97706",
+        name="Estimated", marker_color="#C8971F",
         text=[f"{estimated_count}"], textposition="inside",
     ))
     fig_avail.add_trace(go.Bar(
         x=[planned_count], y=["Data Coverage"], orientation="h",
-        name="Planned", marker_color="#3B82F6",
+        name="Planned", marker_color="#1565C0",
         text=[f"{planned_count}"], textposition="inside",
     ))
     fig_avail.add_trace(go.Bar(
         x=[missing_count], y=["Data Coverage"], orientation="h",
-        name="Missing", marker_color="#dc2626",
+        name="Missing", marker_color="#C0392B",
         text=[f"{missing_count}"], textposition="inside",
     ))
     fig_avail.update_layout(
@@ -1210,7 +1210,7 @@ with tab_gaps:
         yaxis=dict(showticklabels=False, showgrid=False),
         legend=dict(
             orientation="h", yanchor="bottom", y=1.1, xanchor="center", x=0.5,
-            font=dict(color="#FFFFFF"),
+            font=dict(color="#1A1A1A"),
         ),
     )
     st.plotly_chart(fig_avail, use_container_width=True)
@@ -1264,14 +1264,14 @@ with tab_gaps:
     st.markdown("---")
     st.markdown(
         glass_card(
-            "<span style='color:#3B82F6;font-weight:700;font-size:1.1em;'>"
+            "<span style='color:#1565C0;font-weight:700;font-size:16px;'>"
             "Data Audit Reference</span><br>"
             "<span style='color:#1A1A1A;'>"
             "For the full data audit including methodology notes, assumptions log, "
             "and data request templates, see <code>hub-roc-data-audit.md</code> in the project docs. "
             "The finance team data request has been drafted and is ready for review."
             "</span>",
-            border_color="#3B82F6",
+            border_color="#1565C0",
         ),
         unsafe_allow_html=True,
     )

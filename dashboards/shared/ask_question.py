@@ -221,7 +221,7 @@ def _render_voice_input(page_context: str):
             width:42px;height:42px;cursor:pointer;font-size:18px;
             display:flex;align-items:center;justify-content:center;
             transition:all 0.2s ease;" title="Click to speak">&#127908;</button>
-        <span id="mic-status" style="color:#666;font-size:13px;"></span>
+        <span id="mic-status" style="color:#717171;font-size:13px;"></span>
     </div>
 
     <script>
@@ -290,8 +290,8 @@ def _render_voice_input(page_context: str):
         } else {
             recognition.start();
             isListening = true;
-            document.getElementById('mic-btn').style.background = '#ef4444';
-            document.getElementById('mic-btn').style.boxShadow = '0 0 0 3px rgba(239,68,68,0.3)';
+            document.getElementById('mic-btn').style.background = '#C0392B';
+            document.getElementById('mic-btn').style.boxShadow = '0 0 0 3px rgba(192,57,43,0.3)';
             document.getElementById('mic-status').textContent = 'Listening...';
         }
     }
@@ -321,7 +321,7 @@ def _render_voice_output(text: str, auto_read: bool, page_context: str):
             background:#f0f2f6;border:1px solid #ddd;border-radius:20px;
             padding:6px 16px;cursor:pointer;font-size:13px;
             display:inline-flex;align-items:center;gap:6px;
-            transition:all 0.2s ease;color:#333;">
+            transition:all 0.2s ease;color:#4A4A4A;">
             <span id="speak-icon">&#128264;</span>
             <span id="speak-label">Read Answer Aloud</span>
         </button>

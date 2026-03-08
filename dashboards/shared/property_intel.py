@@ -249,22 +249,22 @@ def get_enriched_scorecard(fy_year=None):
 
 CLASSIFICATION_COLOURS = {
     "Invest": "#2D6A2D",
-    "Hold": "#3B82F6",
-    "Rationalise": "#d97706",
-    "Exit Review": "#dc2626",
-    "Monitor (New)": "#8B5CF6",
-    "Unclassified": "#6B7280",
+    "Hold": "#1565C0",
+    "Rationalise": "#C8971F",
+    "Exit Review": "#C0392B",
+    "Monitor (New)": "#7C3AED",
+    "Unclassified": "#717171",
 }
 
 FORMAT_COLOURS = {
     "Express": "#2D6A2D",
-    "Standard": "#3B82F6",
-    "Large": "#d97706",
+    "Standard": "#1565C0",
+    "Large": "#C8971F",
 }
 
 QUADRANT_COLOURS = {
     "Star": "#2D6A2D",
-    "Cash Cow": "#3B82F6",
-    "Question Mark": "#d97706",
-    "Fix or Exit": "#dc2626",
+    "Cash Cow": "#1565C0",
+    "Question Mark": "#C8971F",
+    "Fix or Exit": "#C0392B",
 }

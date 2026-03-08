@@ -47,20 +47,20 @@ PASS_THRESHOLD = ASSESSMENT_RUBRIC["pass_threshold"]  # 18
 MAX_SCORE = ASSESSMENT_RUBRIC["max_score"]  # 25
 CRITERIA = ASSESSMENT_RUBRIC["criteria"]
 BRAND_GREEN = "#2D6A2D"
-PEOPLE_GREEN = "#059669"
+PEOPLE_GREEN = "#2D6A2D"
 
 L_MODULES = [m for m in SKILLS_MODULES if m["series"] == "L"]
 D_MODULES = [m for m in SKILLS_MODULES if m["series"] == "D"]
 
 DIFFICULTY_COLOURS = {
     "beginner": "#2D6A2D",
-    "intermediate": "#eab308",
-    "advanced": "#ef4444",
+    "intermediate": "#C8971F",
+    "advanced": "#C0392B",
 }
 
 TIER_COLOURS = {
-    "Standard": "#6b7280",
-    "Stretch": "#d97706",
+    "Standard": "#717171",
+    "Stretch": "#C8971F",
     "Elite": "#7c3aed",
 }
 
@@ -106,17 +106,17 @@ render_header(
 # ---------------------------------------------------------------------------
 
 st.markdown(
-    "<div style='background:linear-gradient(135deg, #059669 0%, #047857 50%, "
-    "#065f46 100%);color:white;padding:36px 32px;border-radius:14px;"
+    "<div style='background:linear-gradient(135deg, #2D6A2D 0%, #235522 50%, "
+    "#1B4D1B 100%);color:white;padding:36px 32px;border-radius:14px;"
     "margin-bottom:24px;'>"
-    "<div style='font-size:2.2em;font-weight:800;margin-bottom:8px;'>"
+    "<div style='font-size:35px;font-weight:800;margin-bottom:8px;'>"
     "Skills Academy v3</div>"
-    "<div style='font-size:1.15em;opacity:0.95;max-width:800px;line-height:1.6;'>"
+    "<div style='font-size:18px;opacity:0.95;max-width:800px;line-height:1.6;'>"
     "Adaptive learning across two tracks. Take the placement challenge, "
     "learn at your level, compete with peers, and earn your AI certification. "
     "Now with adaptive difficulty, daily micro-challenges, and peer battles."
     "</div>"
-    "<div style='margin-top:16px;font-size:0.9em;opacity:0.8;'>"
+    "<div style='margin-top:16px;font-size:13px;opacity:0.8;'>"
     "L-Series: Core AI Skills &bull; D-Series: Applied Data + AI &bull; "
     "Level 6: Enterprise Capstone &bull; 18/25 to pass</div>"
     "</div>",
@@ -316,11 +316,11 @@ def _render_card(content_html, bg="#ffffff", border="#e2e8f0", padding="16px"):
 
 def _render_tier_badge(tier):
     """Render an inline tier badge."""
-    colour = TIER_COLOURS.get(tier, "#6b7280")
+    colour = TIER_COLOURS.get(tier, "#717171")
     icon = TIER_ICONS.get(tier, "")
     return (
         "<span style='background:{c};color:white;padding:2px 10px;"
-        "border-radius:12px;font-size:0.78em;font-weight:600;'>"
+        "border-radius:12px;font-size:12px;font-weight:600;'>"
         "{icon} {tier}</span>".format(c=colour, icon=icon, tier=tier)
     )
 
@@ -360,7 +360,7 @@ def _render_module_card(mod, status, best, tier_info=None, key_suffix=""):
     code = mod["code"]
     name = mod["name"]
     diff = mod["difficulty"]
-    diff_col = DIFFICULTY_COLOURS.get(diff, "#6b7280")
+    diff_col = DIFFICULTY_COLOURS.get(diff, "#717171")
     dur = mod["duration_minutes"]
     prereqs = mod["prerequisites"]
 
@@ -370,9 +370,9 @@ def _render_module_card(mod, status, best, tier_info=None, key_suffix=""):
         opacity = "0.6"
         icon = "&#128274;"
         status_label = "Locked"
-        status_bg = "#94a3b8"
+        status_bg = "#717171"
     elif status == "passed":
-        bg = "#f0fdf4"
+        bg = "rgba(45,106,45,0.04)"
         border_col = "#2D6A2D"
         opacity = "1"
         icon = "&#9989;"
@@ -382,12 +382,12 @@ def _render_module_card(mod, status, best, tier_info=None, key_suffix=""):
         status_label = "Passed" + score_str
         status_bg = "#2D6A2D"
     elif status == "in-progress":
-        bg = "#fefce8"
-        border_col = "#eab308"
+        bg = "rgba(200,151,31,0.04)"
+        border_col = "#C8971F"
         opacity = "1"
         icon = "&#9997;"
         status_label = "In Progress"
-        status_bg = "#eab308"
+        status_bg = "#C8971F"
     else:
         bg = "#ffffff"
         border_col = BRAND_GREEN
@@ -400,7 +400,7 @@ def _render_module_card(mod, status, best, tier_info=None, key_suffix=""):
     if status == "locked" and prereqs:
         prereq_names = ", ".join(prereqs)
         prereq_html = (
-            "<div style='font-size:0.8em;color:#94a3b8;margin-top:6px;'>"
+            "<div style='font-size:12px;color:#717171;margin-top:6px;'>"
             "Requires: {}</div>".format(prereq_names)
         )
 
@@ -415,17 +415,17 @@ def _render_module_card(mod, status, best, tier_info=None, key_suffix=""):
         "opacity:{op};'>"
         "<div style='display:flex;justify-content:space-between;align-items:center;"
         "flex-wrap:wrap;gap:6px;'>"
-        "<div style='font-weight:700;font-size:1.05em;'>"
+        "<div style='font-weight:700;font-size:15px;'>"
         "{icon} {code}: {name}{tier}</div>"
         "<span style='background:{sbg};color:white;padding:2px 10px;"
-        "border-radius:12px;font-size:0.78em;font-weight:600;'>"
+        "border-radius:12px;font-size:12px;font-weight:600;'>"
         "{sl}</span></div>"
         "<div style='display:flex;gap:10px;margin-top:6px;'>"
         "<span style='background:{dc};color:white;padding:1px 8px;"
-        "border-radius:10px;font-size:0.75em;'>{diff}</span>"
-        "<span style='font-size:0.8em;color:#6b7280;'>{dur} min</span>"
+        "border-radius:10px;font-size:12px;'>{diff}</span>"
+        "<span style='font-size:12px;color:#717171;'>{dur} min</span>"
         "</div>"
-        "<div style='font-size:0.88em;color:#555;margin-top:6px;'>"
+        "<div style='font-size:14px;color:#4A4A4A;margin-top:6px;'>"
         "{desc}</div>"
         "{prereq}"
         "</div>".format(
@@ -444,11 +444,11 @@ def _render_score_bars(result):
         ckey = crit["key"]
         val = result.get(ckey, 0)
         pct = val / crit["max"] * 100
-        bar_col = "#2D6A2D" if val >= 4 else ("#eab308" if val >= 3 else "#ef4444")
+        bar_col = "#2D6A2D" if val >= 4 else ("#C8971F" if val >= 3 else "#C0392B")
         st.markdown(
             "<div style='margin:6px 0;'>"
             "<div style='display:flex;justify-content:space-between;"
-            "font-size:0.9em;'>"
+            "font-size:13px;'>"
             "<span>{name}</span>"
             "<span style='font-weight:700;color:{col};'>{val}/{mx}</span>"
             "</div>"
@@ -473,16 +473,16 @@ has_placement = placement_data is not None
 
 if not has_placement:
     st.markdown(
-        "<div style='background:linear-gradient(135deg, #fef3c7, #fde68a);"
-        "border:2px solid #f59e0b;border-radius:12px;padding:20px;"
+        "<div style='background:linear-gradient(135deg, rgba(200,151,31,0.08), rgba(200,151,31,0.12));"
+        "border:2px solid #C8971F;border-radius:12px;padding:20px;"
         "margin-bottom:20px;text-align:center;'>"
-        "<div style='font-size:1.3em;font-weight:700;color:#92400e;'>"
+        "<div style='font-size:20px;font-weight:700;color:#C8971F;'>"
         "Welcome! Start with the Placement Challenge</div>"
-        "<div style='font-size:1em;color:#78350f;margin-top:8px;'>"
+        "<div style='font-size:16px;color:#78350f;margin-top:8px;'>"
         "Take a 5-scenario placement test to find your starting level. "
         "It takes about 10 minutes and helps us personalise your learning path."
         "</div>"
-        "<div style='margin-top:12px;font-size:0.9em;color:#92400e;'>"
+        "<div style='margin-top:12px;font-size:13px;color:#C8971F;'>"
         "Head to the <strong>Placement Challenge</strong> tab to begin."
         "</div></div>",
         unsafe_allow_html=True,
@@ -530,30 +530,30 @@ with tabs[0]:
     pbar_pct = int(lv_pct * 100)
 
     st.markdown(
-        "<div style='background:linear-gradient(135deg, #f0fdf4, #dcfce7);"
-        "border:2px solid #86efac;border-radius:14px;padding:20px;"
+        "<div style='background:linear-gradient(135deg, rgba(45,106,45,0.04), rgba(45,106,45,0.08));"
+        "border:2px solid #7CB342;border-radius:14px;padding:20px;"
         "margin-bottom:16px;'>"
         "<div style='display:flex;justify-content:space-between;"
         "align-items:center;flex-wrap:wrap;'>"
         "<div>"
-        "<div style='font-size:1.8em;font-weight:800;color:#166534;'>"
+        "<div style='font-size:28px;font-weight:800;color:#1B4D1B;'>"
         "{icon} {name}</div>"
-        "<div style='font-size:0.95em;color:#059669;margin-top:4px;'>"
+        "<div style='font-size:14px;color:#2D6A2D;margin-top:4px;'>"
         "{xp:,} XP &bull; {streak} day streak &bull; {mult:.1f}x multiplier"
         "</div></div>"
         "<div style='text-align:right;'>"
-        "<div style='font-size:2em;font-weight:800;color:#059669;'>"
+        "<div style='font-size:32px;font-weight:800;color:#2D6A2D;'>"
         "{xp:,}</div>"
-        "<div style='font-size:0.8em;color:#6b7280;'>Total XP</div>"
+        "<div style='font-size:12px;color:#717171;'>Total XP</div>"
         "</div></div>"
         "<div style='margin-top:14px;'>"
         "<div style='display:flex;justify-content:space-between;"
-        "font-size:0.82em;color:#6b7280;margin-bottom:4px;'>"
+        "font-size:13px;color:#717171;margin-bottom:4px;'>"
         "<span>{cur_name}</span>"
         "<span>{pct}% to {nxt}</span>"
         "</div>"
         "<div style='background:#d1fae5;border-radius:6px;height:12px;'>"
-        "<div style='background:linear-gradient(90deg, #059669, #10b981);"
+        "<div style='background:linear-gradient(90deg, #2D6A2D, #7CB342);"
         "width:{pct}%;height:100%;border-radius:6px;"
         "transition:width 0.3s;'></div>"
         "</div></div></div>".format(
@@ -571,22 +571,22 @@ with tabs[0]:
         strengths = placement_data.get("detected_strengths", [])
         strengths_str = ", ".join(strengths) if strengths else "N/A"
         st.markdown(
-            "<div style='background:#eff6ff;border:1px solid #93c5fd;"
+            "<div style='background:rgba(21,101,192,0.04);border:1px solid #93c5fd;"
             "border-radius:10px;padding:14px 18px;margin-bottom:16px;'>"
-            "<div style='font-weight:700;color:#1e40af;font-size:1em;'>"
+            "<div style='font-weight:700;color:#1565C0;font-size:16px;'>"
             "Placement Result</div>"
             "<div style='display:flex;gap:24px;margin-top:8px;flex-wrap:wrap;'>"
-            "<div><span style='font-size:0.82em;color:#6b7280;'>"
+            "<div><span style='font-size:13px;color:#717171;'>"
             "Assigned Level</span><br/>"
-            "<span style='font-weight:700;font-size:1.1em;color:#1e40af;'>"
+            "<span style='font-weight:700;font-size:16px;color:#1565C0;'>"
             "{level}</span></div>"
-            "<div><span style='font-size:0.82em;color:#6b7280;'>"
+            "<div><span style='font-size:13px;color:#717171;'>"
             "Score</span><br/>"
-            "<span style='font-weight:700;font-size:1.1em;color:#1e40af;'>"
+            "<span style='font-weight:700;font-size:16px;color:#1565C0;'>"
             "{score}</span></div>"
-            "<div><span style='font-size:0.82em;color:#6b7280;'>"
+            "<div><span style='font-size:13px;color:#717171;'>"
             "Strengths</span><br/>"
-            "<span style='font-size:0.95em;color:#4A5568;'>"
+            "<span style='font-size:14px;color:#4A4A4A;'>"
             "{strengths}</span></div>"
             "</div></div>".format(
                 level=p_level, score=p_score, strengths=strengths_str,
@@ -604,7 +604,7 @@ with tabs[0]:
     with col_l:
         series_info_l = SERIES_INFO["L"]
         st.markdown(
-            "<div style='font-weight:700;font-size:1.1em;color:{};"
+            "<div style='font-weight:700;font-size:16px;color:{};"
             "margin-bottom:8px;'>"
             "L-Series: {}</div>".format(
                 series_info_l["colour"], series_info_l["name"],
@@ -626,7 +626,7 @@ with tabs[0]:
     with col_d:
         series_info_d = SERIES_INFO["D"]
         st.markdown(
-            "<div style='font-weight:700;font-size:1.1em;color:{};"
+            "<div style='font-weight:700;font-size:16px;color:{};"
             "margin-bottom:8px;'>"
             "D-Series: {}</div>".format(
                 series_info_d["colour"], series_info_d["name"],
@@ -680,11 +680,11 @@ with tabs[0]:
                     elif diff < 0:
                         trend = " ({})".format(diff)
                 bar_pct = min(int(latest / 10 * 100), 100)
-                bar_col = "#7c3aed" if latest >= 7 else ("#d97706" if latest >= 4 else "#6b7280")
+                bar_col = "#7c3aed" if latest >= 7 else ("#C8971F" if latest >= 4 else "#717171")
                 st.markdown(
                     "<div style='margin:8px 0;'>"
                     "<div style='display:flex;justify-content:space-between;"
-                    "font-size:0.88em;'>"
+                    "font-size:14px;'>"
                     "<span>{label}</span>"
                     "<span style='font-weight:600;color:{col};'>"
                     "{val}/10{trend}</span></div>"
@@ -735,12 +735,12 @@ with tabs[0]:
             st.markdown(
                 "<div style='display:flex;align-items:center;gap:10px;"
                 "padding:6px 0;border-bottom:1px solid #f1f5f9;"
-                "font-size:0.9em;'>"
+                "font-size:13px;'>"
                 "<span>{icon}</span>"
                 "<span style='flex:1;'>{desc}</span>"
-                "<span style='color:#059669;font-weight:600;'>"
+                "<span style='color:#2D6A2D;font-weight:600;'>"
                 "+{xp} XP</span>"
-                "<span style='color:#94a3b8;font-size:0.8em;'>"
+                "<span style='color:#717171;font-size:12px;'>"
                 "{date}</span>"
                 "</div>".format(
                     icon=icon, desc=desc, xp=xp_amt, date=date_str,
@@ -776,8 +776,8 @@ with tabs[0]:
                         "<div style='text-align:center;padding:8px;"
                         "background:rgba(45,106,45,0.08);border-radius:10px;"
                         "border:1px solid #bbf7d0;margin-bottom:8px;'>"
-                        "<div style='font-size:1.6em;'>{}</div>"
-                        "<div style='font-weight:600;font-size:0.82em;'>"
+                        "<div style='font-size:24px;'>{}</div>"
+                        "<div style='font-weight:600;font-size:13px;'>"
                         "{}</div></div>".format(b_icon, b_name),
                         unsafe_allow_html=True,
                     )
@@ -794,10 +794,10 @@ with tabs[0]:
                             "background:#f1f5f9;border-radius:10px;"
                             "border:1px solid #e2e8f0;margin-bottom:8px;"
                             "opacity:0.5;'>"
-                            "<div style='font-size:1.6em;'>&#128274;</div>"
-                            "<div style='font-weight:600;font-size:0.82em;"
-                            "color:#94a3b8;'>{}</div>"
-                            "<div style='font-size:0.72em;color:#94a3b8;'>"
+                            "<div style='font-size:24px;'>&#128274;</div>"
+                            "<div style='font-weight:600;font-size:13px;"
+                            "color:#717171;'>{}</div>"
+                            "<div style='font-size:11px;color:#717171;'>"
                             "{}</div></div>".format(
                                 b.get("name", ""), b.get("desc", ""),
                             ),
@@ -822,14 +822,14 @@ with tabs[1]:
         strengths = placement_data.get("detected_strengths", [])
 
         st.markdown(
-            "<div style='background:linear-gradient(135deg, #eff6ff, #dbeafe);"
+            "<div style='background:linear-gradient(135deg, rgba(21,101,192,0.04), rgba(21,101,192,0.08));"
             "border:2px solid #60a5fa;border-radius:14px;padding:24px;"
             "text-align:center;margin-bottom:20px;'>"
-            "<div style='font-size:1.5em;font-weight:800;color:#1e40af;'>"
+            "<div style='font-size:24px;font-weight:800;color:#1565C0;'>"
             "Assigned Level: {level}</div>"
-            "<div style='font-size:2em;font-weight:800;color:#2563eb;"
+            "<div style='font-size:32px;font-weight:800;color:#1565C0;"
             "margin-top:8px;'>{score}</div>"
-            "<div style='font-size:0.9em;color:#3b82f6;margin-top:4px;'>"
+            "<div style='font-size:13px;color:#1565C0;margin-top:4px;'>"
             "Total Placement Score</div>"
             "</div>".format(level=p_level, score=p_score),
             unsafe_allow_html=True,
@@ -845,12 +845,12 @@ with tabs[1]:
             for i, resp in enumerate(p_responses):
                 sc_score = resp.get("score", 0)
                 sc_id = resp.get("scenario_id", "Scenario {}".format(i + 1))
-                bar_col = "#2D6A2D" if sc_score >= 8 else ("#eab308" if sc_score >= 5 else "#ef4444")
+                bar_col = "#2D6A2D" if sc_score >= 8 else ("#C8971F" if sc_score >= 5 else "#C0392B")
                 bar_pct = min(int(sc_score / 10 * 100), 100)
                 st.markdown(
                     "<div style='display:flex;align-items:center;gap:12px;"
                     "margin:6px 0;'>"
-                    "<span style='width:100px;font-size:0.9em;'>{sid}</span>"
+                    "<span style='width:100px;font-size:13px;'>{sid}</span>"
                     "<div style='flex:1;background:#e2e8f0;border-radius:4px;"
                     "height:10px;'>"
                     "<div style='background:{col};width:{pct}%;"
@@ -870,8 +870,8 @@ with tabs[1]:
             "Your responses will be scored to determine your starting level."
         )
         st.markdown(
-            "<div style='background:#fef3c7;border:1px solid #fbbf24;"
-            "border-radius:8px;padding:10px 14px;font-size:0.9em;"
+            "<div style='background:rgba(200,151,31,0.08);border:1px solid #C8971F;"
+            "border-radius:8px;padding:10px 14px;font-size:13px;"
             "margin-bottom:16px;'>"
             "Estimated time: <strong>10 minutes</strong> &bull; "
             "5 scenarios &bull; Scored automatically"
@@ -914,14 +914,14 @@ with tabs[1]:
                 r_score = result.get("total_score", 0)
                 r_strengths = result.get("detected_strengths", [])
                 st.markdown(
-                    "<div style='background:linear-gradient(135deg, #f0fdf4, #dcfce7);"
+                    "<div style='background:linear-gradient(135deg, rgba(45,106,45,0.04), rgba(45,106,45,0.08));"
                     "border:2px solid #2D6A2D;border-radius:14px;padding:24px;"
                     "text-align:center;margin-bottom:20px;'>"
-                    "<div style='font-size:1.3em;font-weight:700;color:#166534;'>"
+                    "<div style='font-size:20px;font-weight:700;color:#1B4D1B;'>"
                     "Placement Complete!</div>"
-                    "<div style='font-size:2em;font-weight:800;color:#059669;"
+                    "<div style='font-size:32px;font-weight:800;color:#2D6A2D;"
                     "margin-top:8px;'>Level: {level}</div>"
-                    "<div style='font-size:1.2em;color:#059669;margin-top:4px;'>"
+                    "<div style='font-size:18px;color:#2D6A2D;margin-top:4px;'>"
                     "Score: {score}</div>"
                     "</div>".format(level=r_level, score=r_score),
                     unsafe_allow_html=True,
@@ -976,7 +976,7 @@ with tabs[1]:
             mins = elapsed // 60
             secs = elapsed % 60
             st.markdown(
-                "<div style='text-align:right;font-size:0.85em;color:#6b7280;'>"
+                "<div style='text-align:right;font-size:12px;color:#717171;'>"
                 "Time elapsed: {}:{:02d}</div>".format(mins, secs),
                 unsafe_allow_html=True,
             )
@@ -985,9 +985,9 @@ with tabs[1]:
             st.markdown(
                 "<div style='background:#f8fafc;border:1px solid #e2e8f0;"
                 "border-radius:12px;padding:20px;margin-bottom:16px;'>"
-                "<div style='font-size:1.3em;font-weight:700;color:#1e293b;'>"
+                "<div style='font-size:20px;font-weight:700;color:#1e293b;'>"
                 "{icon} {title}</div>"
-                "<div style='font-size:0.95em;color:#4A5568;margin-top:12px;"
+                "<div style='font-size:14px;color:#4A4A4A;margin-top:12px;"
                 "line-height:1.7;'>{instruction}</div>"
                 "</div>".format(
                     icon=sc_icon, title=sc_title, instruction=sc_instruction,
@@ -1107,9 +1107,9 @@ def _render_module_content(mod, status, pmap, tab_prefix):
         "<div style='display:flex;align-items:center;gap:12px;"
         "padding:8px 14px;background:#f8fafc;border-radius:8px;"
         "margin-bottom:16px;'>"
-        "<span style='font-size:0.9em;color:#4A5568;'>Current Tier:</span>"
+        "<span style='font-size:13px;color:#4A4A4A;'>Current Tier:</span>"
         "{badge}"
-        "<span style='font-size:0.82em;color:#6b7280;'>"
+        "<span style='font-size:13px;color:#717171;'>"
         "({elite} consecutive elite scores)</span>"
         "</div>".format(
             badge=_render_tier_badge(current_tier),
@@ -1149,11 +1149,11 @@ def _render_module_content(mod, status, pmap, tab_prefix):
                 with col_weak:
                     st.markdown(
                         "<div style='background:#fef2f2;border-left:4px solid "
-                        "#ef4444;padding:12px 16px;border-radius:0 8px 8px 0;"
+                        "#C0392B;padding:12px 16px;border-radius:0 8px 8px 0;"
                         "margin-bottom:8px;'>"
                         "<div style='font-weight:600;color:#b91c1c;"
-                        "font-size:0.85em;margin-bottom:4px;'>Weak Prompt</div>"
-                        "<div style='font-size:0.95em;'>{}</div>"
+                        "font-size:12px;margin-bottom:4px;'>Weak Prompt</div>"
+                        "<div style='font-size:14px;'>{}</div>"
                         "</div>".format(ex.get("weak", "")),
                         unsafe_allow_html=True,
                     )
@@ -1162,9 +1162,9 @@ def _render_module_content(mod, status, pmap, tab_prefix):
                         "<div style='background:rgba(45,106,45,0.08);border-left:4px solid "
                         "#2D6A2D;padding:12px 16px;border-radius:0 8px 8px 0;"
                         "margin-bottom:8px;'>"
-                        "<div style='font-weight:600;color:#166534;"
-                        "font-size:0.85em;margin-bottom:4px;'>Strong Prompt</div>"
-                        "<div style='font-size:0.95em;'>{}</div>"
+                        "<div style='font-weight:600;color:#1B4D1B;"
+                        "font-size:12px;margin-bottom:4px;'>Strong Prompt</div>"
+                        "<div style='font-size:14px;'>{}</div>"
                         "</div>".format(ex.get("strong", "")),
                         unsafe_allow_html=True,
                     )
@@ -1186,7 +1186,7 @@ def _render_module_content(mod, status, pmap, tab_prefix):
             st.markdown(
                 "<div style='display:flex;align-items:center;gap:10px;"
                 "margin-bottom:12px;'>"
-                "<span style='font-size:0.95em;font-weight:600;'>"
+                "<span style='font-size:14px;font-weight:600;'>"
                 "Exercise Tier:</span>"
                 "{badge}</div>".format(
                     badge=_render_tier_badge(current_tier),
@@ -1201,11 +1201,11 @@ def _render_module_content(mod, status, pmap, tab_prefix):
             if scenario_text:
                 st.markdown(
                     "<div style='background:#f0f9ff;border-left:4px solid "
-                    "#3b82f6;padding:12px 16px;border-radius:0 8px 8px 0;"
+                    "#1565C0;padding:12px 16px;border-radius:0 8px 8px 0;"
                     "margin:12px 0;'>"
-                    "<div style='font-weight:600;color:#1e40af;"
-                    "font-size:0.85em;margin-bottom:4px;'>Scenario</div>"
-                    "<div style='font-size:0.95em;'>{}</div>"
+                    "<div style='font-weight:600;color:#1565C0;"
+                    "font-size:12px;margin-bottom:4px;'>Scenario</div>"
+                    "<div style='font-size:14px;'>{}</div>"
                     "</div>".format(scenario_text),
                     unsafe_allow_html=True,
                 )
@@ -1244,10 +1244,10 @@ def _render_module_content(mod, status, pmap, tab_prefix):
                     score_pct = total / MAX_SCORE * 100
 
                     # Show result
-                    verdict_col = "#2D6A2D" if total >= PASS_THRESHOLD else "#ef4444"
+                    verdict_col = "#2D6A2D" if total >= PASS_THRESHOLD else "#C0392B"
                     st.markdown(
                         "<div style='text-align:center;margin:16px 0;'>"
-                        "<div style='font-size:2em;font-weight:800;"
+                        "<div style='font-size:32px;font-weight:800;"
                         "color:{};'>{}/{}</div>"
                         "</div>".format(verdict_col, total, MAX_SCORE),
                         unsafe_allow_html=True,
@@ -1295,12 +1295,12 @@ def _render_module_content(mod, status, pmap, tab_prefix):
                         if skip_now:
                             st.markdown(
                                 "<div style='background:#faf5ff;"
-                                "border:2px solid #a78bfa;"
+                                "border:2px solid #7C3AED;"
                                 "border-radius:10px;padding:14px;"
                                 "margin-top:12px;'>"
                                 "<div style='font-weight:700;"
                                 "color:#5b21b6;'>Skip Ahead Eligible!</div>"
-                                "<div style='font-size:0.9em;"
+                                "<div style='font-size:13px;"
                                 "color:#6d28d9;margin-top:4px;'>"
                                 "You scored Elite 3 times in a row. "
                                 "You can skip to the next module!"
@@ -1409,9 +1409,9 @@ def _render_module_content(mod, status, pmap, tab_prefix):
         st.markdown(assessment.get("instructions", ""))
 
         st.markdown(
-            "<div style='background:#fef3c7;border:1px solid #fbbf24;"
+            "<div style='background:rgba(200,151,31,0.08);border:1px solid #C8971F;"
             "border-radius:8px;padding:10px 14px;margin:12px 0;"
-            "font-size:0.9em;'>"
+            "font-size:13px;'>"
             "Pass threshold: <strong>{}/{}</strong> &bull; "
             "Scored on 5 criteria (Clarity, Context, Data Spec, "
             "Format, Actionability)."
@@ -1466,13 +1466,13 @@ def _render_module_content(mod, status, pmap, tab_prefix):
                 _render_score_bars(result)
 
                 # Total + verdict
-                verdict_col = "#2D6A2D" if passed else "#ef4444"
+                verdict_col = "#2D6A2D" if passed else "#C0392B"
                 verdict_text = "PASS" if passed else "NEEDS IMPROVEMENT"
                 st.markdown(
                     "<div style='text-align:center;margin:16px 0;'>"
-                    "<div style='font-size:2em;font-weight:800;color:{};'>"
+                    "<div style='font-size:32px;font-weight:800;color:{};'>"
                     "{}/{}</div>"
-                    "<div style='font-size:1.2em;font-weight:700;color:{};'>"
+                    "<div style='font-size:18px;font-weight:700;color:{};'>"
                     "{}</div></div>".format(
                         verdict_col, total, MAX_SCORE,
                         verdict_col, verdict_text,
@@ -1586,12 +1586,12 @@ with tabs[2]:
     sel_status = _module_status(selected_mod["code"], pmap)
 
     status_labels = {
-        "locked": ("&#128274; Locked", "#94a3b8"),
+        "locked": ("&#128274; Locked", "#717171"),
         "available": ("&#9654; Available", BRAND_GREEN),
-        "in-progress": ("&#9997; In Progress", "#eab308"),
+        "in-progress": ("&#9997; In Progress", "#C8971F"),
         "passed": ("&#9989; Passed", "#2D6A2D"),
     }
-    s_label, s_color = status_labels.get(sel_status, ("", "#6b7280"))
+    s_label, s_color = status_labels.get(sel_status, ("", "#717171"))
     best = _best_score(selected_mod["code"], pmap)
     best_str = ""
     if best is not None:
@@ -1606,7 +1606,7 @@ with tabs[2]:
         "flex-wrap:wrap;'>"
         "<span style='color:{col};font-weight:600;'>{label}</span>"
         "{tier_badge}"
-        "<span style='font-size:0.85em;color:#6b7280;'>"
+        "<span style='font-size:12px;color:#717171;'>"
         "{diff} &bull; {dur} min{best}</span>"
         "</div>".format(
             col=s_color, label=s_label,
@@ -1646,12 +1646,12 @@ with tabs[3]:
     sel_d_status = _module_status(selected_d_mod["code"], pmap)
 
     status_labels_d = {
-        "locked": ("&#128274; Locked", "#94a3b8"),
+        "locked": ("&#128274; Locked", "#717171"),
         "available": ("&#9654; Available", BRAND_GREEN),
-        "in-progress": ("&#9997; In Progress", "#eab308"),
+        "in-progress": ("&#9997; In Progress", "#C8971F"),
         "passed": ("&#9989; Passed", "#2D6A2D"),
     }
-    s_label_d, s_color_d = status_labels_d.get(sel_d_status, ("", "#6b7280"))
+    s_label_d, s_color_d = status_labels_d.get(sel_d_status, ("", "#717171"))
     best_d = _best_score(selected_d_mod["code"], pmap)
     best_d_str = ""
     if best_d is not None:
@@ -1666,7 +1666,7 @@ with tabs[3]:
         "flex-wrap:wrap;'>"
         "<span style='color:{col};font-weight:600;'>{label}</span>"
         "{tier_badge}"
-        "<span style='font-size:0.85em;color:#6b7280;'>"
+        "<span style='font-size:12px;color:#717171;'>"
         "{diff} &bull; {dur} min{best}</span>"
         "</div>".format(
             col=s_color_d, label=s_label_d,
@@ -1701,10 +1701,10 @@ with tabs[4]:
             "<div style='background:#fef2f2;border:2px solid #fca5a5;"
             "border-radius:12px;padding:24px;text-align:center;"
             "margin-bottom:20px;'>"
-            "<div style='font-size:1.8em;margin-bottom:8px;'>&#128274;</div>"
-            "<div style='font-size:1.2em;font-weight:700;color:#991b1b;'>"
+            "<div style='font-size:28px;margin-bottom:8px;'>&#128274;</div>"
+            "<div style='font-size:18px;font-weight:700;color:#991b1b;'>"
             "Level 6 is Locked</div>"
-            "<div style='font-size:0.95em;color:#7f1d1d;margin-top:8px;'>"
+            "<div style='font-size:14px;color:#7f1d1d;margin-top:8px;'>"
             "Complete <strong>L5</strong> or <strong>D4</strong> to unlock "
             "the Enterprise Capstone challenges.</div>"
             "</div>",
@@ -1736,7 +1736,7 @@ with tabs[4]:
 
         st.markdown(
             "<div style='background:#faf5ff;border:1px solid #d8b4fe;"
-            "border-radius:8px;padding:10px 14px;font-size:0.9em;"
+            "border-radius:8px;padding:10px 14px;font-size:13px;"
             "margin-bottom:16px;'>"
             "6 challenges &bull; Panel rubric scored &bull; 100 XP each"
             "</div>",
@@ -1757,7 +1757,7 @@ with tabs[4]:
                 )
             ):
                 st.markdown(
-                    "<div style='font-size:0.95em;color:#4A5568;"
+                    "<div style='font-size:14px;color:#4A4A4A;"
                     "margin-bottom:12px;'>{}</div>".format(ch_desc),
                     unsafe_allow_html=True,
                 )
@@ -1802,14 +1802,14 @@ with tabs[4]:
                         total = result["total"]
                         passed = total >= PASS_THRESHOLD
                         verdict_col = (
-                            "#2D6A2D" if passed else "#ef4444"
+                            "#2D6A2D" if passed else "#C0392B"
                         )
 
                         st.markdown(
                             "<div style='text-align:center;margin:16px 0;'>"
-                            "<div style='font-size:2em;font-weight:800;"
+                            "<div style='font-size:32px;font-weight:800;"
                             "color:{};'>{}/{}</div>"
-                            "<div style='font-size:1em;color:{};'>{}</div>"
+                            "<div style='font-size:16px;color:{};'>{}</div>"
                             "</div>".format(
                                 verdict_col, total, MAX_SCORE,
                                 verdict_col,
@@ -1876,11 +1876,11 @@ with tabs[5]:
             st.markdown(
                 "<div style='background:#f0f9ff;border:2px solid #93c5fd;"
                 "border-radius:12px;padding:20px;margin-bottom:16px;'>"
-                "<div style='font-weight:700;font-size:1.1em;color:#1e40af;'>"
+                "<div style='font-weight:700;font-size:16px;color:#1565C0;'>"
                 "Today's Challenge</div>"
-                "<div style='margin-top:10px;font-size:1.05em;color:#1e293b;"
+                "<div style='margin-top:10px;font-size:15px;color:#1e293b;"
                 "line-height:1.6;'>{q}</div>"
-                "<div style='margin-top:8px;font-size:0.82em;color:#6b7280;'>"
+                "<div style='margin-top:8px;font-size:13px;color:#717171;'>"
                 "Time limit: {t} seconds</div>"
                 "</div>".format(q=ch_question, t=ch_time_limit),
                 unsafe_allow_html=True,
@@ -1905,10 +1905,10 @@ with tabs[5]:
                 if remaining > 0:
                     pbar_val = remaining / ch_time_limit
                     timer_col = "#2D6A2D" if remaining > 30 else (
-                        "#eab308" if remaining > 10 else "#ef4444"
+                        "#C8971F" if remaining > 10 else "#C0392B"
                     )
                     st.markdown(
-                        "<div style='text-align:center;font-size:1.5em;"
+                        "<div style='text-align:center;font-size:24px;"
                         "font-weight:700;color:{};margin:8px 0;'>"
                         "{}s remaining</div>".format(timer_col, remaining),
                         unsafe_allow_html=True,
@@ -2072,16 +2072,16 @@ with tabs[5]:
                     challenger_name = _display_name(b_challenger)
 
                     st.markdown(
-                        "<div style='background:#fff7ed;border:1px solid "
+                        "<div style='background:rgba(200,151,31,0.06);border:1px solid "
                         "#fed7aa;border-radius:10px;padding:14px;"
                         "margin-bottom:10px;'>"
                         "<div style='display:flex;justify-content:"
                         "space-between;'>"
                         "<span style='font-weight:600;color:#9a3412;'>"
                         "vs. {name}</span>"
-                        "<span style='font-size:0.82em;color:#6b7280;'>"
+                        "<span style='font-size:13px;color:#717171;'>"
                         "{date}</span></div>"
-                        "<div style='margin-top:6px;font-size:0.95em;'>"
+                        "<div style='margin-top:6px;font-size:14px;'>"
                         "{scenario}</div>"
                         "</div>".format(
                             name=challenger_name, date=b_created,
@@ -2164,8 +2164,8 @@ with tabs[5]:
                 win_rate = wins / total_battles * 100
                 st.markdown(
                     "<div style='text-align:center;margin:12px 0;'>"
-                    "<div style='font-size:1.5em;font-weight:700;"
-                    "color:#059669;'>{:.0f}% Win Rate</div>"
+                    "<div style='font-size:24px;font-weight:700;"
+                    "color:#2D6A2D;'>{:.0f}% Win Rate</div>"
                     "</div>".format(win_rate),
                     unsafe_allow_html=True,
                 )
@@ -2233,7 +2233,7 @@ with tabs[6]:
                 podium_order = [1, 0, 2]  # Silver, Gold, Bronze positions
                 podium_labels = ["🥇", "🥈", "🥉"]
                 podium_sizes = ["2em", "2.4em", "1.8em"]
-                podium_bgs = ["#fef3c7", "#fefce8", "#fff7ed"]
+                podium_bgs = ["rgba(200,151,31,0.08)", "rgba(200,151,31,0.04)", "rgba(200,151,31,0.06)"]
 
                 for col_idx, pod_idx in enumerate(podium_order):
                     if pod_idx < len(leaders):
@@ -2250,13 +2250,13 @@ with tabs[6]:
                                 "{bg};border-radius:12px;padding:16px;'>"
                                 "<div style='font-size:{sz};'>"
                                 "{medal}</div>"
-                                "<div style='font-size:1.4em;'>{icon}</div>"
+                                "<div style='font-size:22px;'>{icon}</div>"
                                 "<div style='font-weight:700;margin-top:4px;'>"
                                 "{name}</div>"
-                                "<div style='font-size:0.85em;color:#6b7280;'>"
+                                "<div style='font-size:12px;color:#717171;'>"
                                 "{level}</div>"
-                                "<div style='font-weight:700;color:#059669;"
-                                "font-size:1.1em;margin-top:6px;'>"
+                                "<div style='font-weight:700;color:#2D6A2D;"
+                                "font-size:16px;margin-top:6px;'>"
                                 "{xp:,} XP</div>"
                                 "</div>".format(
                                     bg=podium_bgs[pod_idx],
@@ -2272,7 +2272,7 @@ with tabs[6]:
             # Full list
             for entry in leaders:
                 is_me = entry.get("user_id") == uid
-                bg = "#f0fdf4" if is_me else "#ffffff"
+                bg = "rgba(45,106,45,0.04)" if is_me else "#ffffff"
                 border = "2px solid #2D6A2D" if is_me else "1px solid #f1f5f9"
                 me_tag = " (You)" if is_me else ""
                 raw_name = entry.get("user_id", "")
@@ -2287,17 +2287,17 @@ with tabs[6]:
                     "<div style='display:flex;align-items:center;"
                     "padding:10px 14px;border-radius:8px;margin-bottom:6px;"
                     "background:{bg};border:{bd};'>"
-                    "<div style='width:40px;font-weight:700;font-size:1.2em;"
-                    "color:#6b7280;'>#{rank}</div>"
-                    "<div style='width:36px;font-size:1.4em;text-align:center;'>"
+                    "<div style='width:40px;font-weight:700;font-size:18px;"
+                    "color:#717171;'>#{rank}</div>"
+                    "<div style='width:36px;font-size:22px;text-align:center;'>"
                     "{icon}</div>"
                     "<div style='flex:1;'>"
                     "<div style='font-weight:600;'>{name}{me}</div>"
-                    "<div style='font-size:0.8em;color:#6b7280;'>"
+                    "<div style='font-size:12px;color:#717171;'>"
                     "{level} | {streak} day streak</div>"
                     "</div>"
-                    "<div style='font-weight:700;color:#059669;"
-                    "font-size:1.1em;'>{xp:,} XP</div>"
+                    "<div style='font-weight:700;color:#2D6A2D;"
+                    "font-size:16px;'>{xp:,} XP</div>"
                     "</div>".format(
                         bg=bg, bd=border, rank=e_rank, icon=e_icon,
                         name=display_name, me=me_tag, level=e_level,
@@ -2327,9 +2327,9 @@ with tabs[6]:
                 p_tier = p.get("tier_name", "")
                 top_5_html += (
                     "<div style='text-align:center;min-width:100px;'>"
-                    "<div style='font-size:2.2em;'>{icon}</div>"
-                    "<div style='font-weight:700;font-size:1em;'>{name}</div>"
-                    "<div style='font-size:0.8em;opacity:0.8;'>{tier}</div>"
+                    "<div style='font-size:35px;'>{icon}</div>"
+                    "<div style='font-weight:700;font-size:16px;'>{name}</div>"
+                    "<div style='font-size:12px;opacity:0.8;'>{tier}</div>"
                     "</div>".format(icon=p_icon, name=p_name, tier=p_tier)
                 )
 
@@ -2337,7 +2337,7 @@ with tabs[6]:
                 "<div style='background:linear-gradient(135deg, #1e1b4b, "
                 "#312e81);color:white;border-radius:14px;padding:24px;"
                 "margin-bottom:20px;text-align:center;'>"
-                "<div style='font-size:1.4em;font-weight:800;"
+                "<div style='font-size:22px;font-weight:800;"
                 "margin-bottom:16px;'>Jedi Council</div>"
                 "<div style='display:flex;justify-content:center;gap:24px;"
                 "flex-wrap:wrap;'>"
@@ -2350,7 +2350,7 @@ with tabs[6]:
             st.markdown("**Full Rankings:**")
             for idx, entry in enumerate(paddock_leaders):
                 is_me = entry.get("user_id") == uid
-                bg = "#f0fdf4" if is_me else "#ffffff"
+                bg = "rgba(45,106,45,0.04)" if is_me else "#ffffff"
                 border = (
                     "2px solid #2D6A2D" if is_me else "1px solid #f1f5f9"
                 )
@@ -2366,13 +2366,13 @@ with tabs[6]:
                     "<div style='display:flex;align-items:center;"
                     "padding:10px 14px;border-radius:8px;margin-bottom:6px;"
                     "background:{bg};border:{bd};'>"
-                    "<div style='width:40px;font-weight:700;font-size:1.2em;"
-                    "color:#6b7280;'>#{rank}</div>"
-                    "<div style='width:36px;font-size:1.4em;text-align:center;'>"
+                    "<div style='width:40px;font-weight:700;font-size:18px;"
+                    "color:#717171;'>#{rank}</div>"
+                    "<div style='width:36px;font-size:22px;text-align:center;'>"
                     "{ticon}</div>"
                     "<div style='flex:1;'>"
                     "<div style='font-weight:600;'>{name}{me}</div>"
-                    "<div style='font-size:0.8em;color:#6b7280;'>"
+                    "<div style='font-size:12px;color:#717171;'>"
                     "{tname} | Level: {lvl} | {att} attempts</div>"
                     "</div>"
                     "</div>".format(
@@ -2419,7 +2419,7 @@ with tabs[6]:
                     "label": "AI Leaders",
                     "icon": "🌟",
                     "desc": "High skill + High engagement",
-                    "bg": "#f0fdf4",
+                    "bg": "rgba(45,106,45,0.04)",
                     "border": "#2D6A2D",
                 },
                 {
@@ -2427,16 +2427,16 @@ with tabs[6]:
                     "label": "Hidden Gems",
                     "icon": "💎",
                     "desc": "High skill + Low engagement",
-                    "bg": "#eff6ff",
-                    "border": "#3b82f6",
+                    "bg": "rgba(21,101,192,0.04)",
+                    "border": "#1565C0",
                 },
                 {
                     "key": "solid_practitioners",
                     "label": "Solid Practitioners",
                     "icon": "🔧",
                     "desc": "Growing skill + High engagement",
-                    "bg": "#fefce8",
-                    "border": "#eab308",
+                    "bg": "rgba(200,151,31,0.04)",
+                    "border": "#C8971F",
                 },
                 {
                     "key": "early_stage",
@@ -2444,7 +2444,7 @@ with tabs[6]:
                     "icon": "🌱",
                     "desc": "Low skill + Low engagement",
                     "bg": "#f8fafc",
-                    "border": "#94a3b8",
+                    "border": "#717171",
                 },
             ]
 
@@ -2464,14 +2464,14 @@ with tabs[6]:
                         )
                         qu_score = qu.get("composite_score", 0)
                         users_html += (
-                            "<div style='font-size:0.85em;padding:2px 0;'>"
+                            "<div style='font-size:12px;padding:2px 0;'>"
                             "{name} "
-                            "<span style='color:#6b7280;'>({score:.0f})</span>"
+                            "<span style='color:#717171;'>({score:.0f})</span>"
                             "</div>".format(name=qu_name, score=qu_score)
                         )
                     if user_count > 8:
                         users_html += (
-                            "<div style='font-size:0.8em;color:#94a3b8;'>"
+                            "<div style='font-size:12px;color:#717171;'>"
                             "+{} more</div>".format(user_count - 8)
                         )
 
@@ -2479,11 +2479,11 @@ with tabs[6]:
                         "<div style='background:{bg};border:2px solid "
                         "{bd};border-radius:10px;padding:14px;"
                         "min-height:160px;'>"
-                        "<div style='font-size:1.1em;font-weight:700;'>"
+                        "<div style='font-size:16px;font-weight:700;'>"
                         "{icon} {label}</div>"
-                        "<div style='font-size:0.8em;color:#6b7280;"
+                        "<div style='font-size:12px;color:#717171;"
                         "margin:4px 0 8px;'>{desc}</div>"
-                        "<div style='font-weight:600;color:#4A5568;"
+                        "<div style='font-weight:600;color:#4A4A4A;"
                         "margin-bottom:4px;'>{count} users</div>"
                         "{users}"
                         "</div>".format(
@@ -2515,17 +2515,17 @@ with tabs[6]:
                     st.markdown(
                         "<div style='background:#f8fafc;border:1px solid "
                         "#e2e8f0;border-radius:10px;padding:16px;'>"
-                        "<div style='font-weight:700;font-size:1.05em;'>"
+                        "<div style='font-weight:700;font-size:15px;'>"
                         "{email}</div>"
                         "<div style='display:flex;gap:20px;margin-top:10px;"
                         "flex-wrap:wrap;'>"
-                        "<div><span style='color:#6b7280;font-size:0.82em;'>"
+                        "<div><span style='color:#717171;font-size:13px;'>"
                         "Composite</span><br/>"
-                        "<span style='font-weight:700;font-size:1.2em;'>"
+                        "<span style='font-weight:700;font-size:18px;'>"
                         "{comp:.1f}</span></div>"
-                        "<div><span style='color:#6b7280;font-size:0.82em;'>"
+                        "<div><span style='color:#717171;font-size:13px;'>"
                         "Quadrant</span><br/>"
-                        "<span style='font-weight:700;font-size:1.2em;'>"
+                        "<span style='font-weight:700;font-size:18px;'>"
                         "{quad}</span></div>"
                         "</div></div>".format(
                             email=hipo_email, comp=composite,
@@ -2544,15 +2544,15 @@ with tabs[6]:
                             sig_col = (
                                 "#2D6A2D" if sig_val >= 7
                                 else (
-                                    "#eab308" if sig_val >= 4
-                                    else "#ef4444"
+                                    "#C8971F" if sig_val >= 4
+                                    else "#C0392B"
                                 )
                             )
                             st.markdown(
                                 "<div style='margin:4px 0;'>"
                                 "<div style='display:flex;"
                                 "justify-content:space-between;"
-                                "font-size:0.88em;'>"
+                                "font-size:14px;'>"
                                 "<span>{label}</span>"
                                 "<span style='font-weight:600;"
                                 "color:{col};'>{val:.1f}</span>"
@@ -2596,11 +2596,11 @@ with tabs[6]:
 
 st.markdown("---")
 st.markdown(
-    "<div style='background:linear-gradient(135deg, #f0fdf4, #dcfce7);"
+    "<div style='background:linear-gradient(135deg, rgba(45,106,45,0.04), rgba(45,106,45,0.08));"
     "border-radius:12px;padding:20px;text-align:center;margin:16px 0;'>"
-    "<div style='font-size:1.3em;font-weight:700;color:#166534;'>"
+    "<div style='font-size:20px;font-weight:700;color:#1B4D1B;'>"
     "\"Master the prompt, master the outcome.\"</div>"
-    "<div style='font-size:0.95em;color:#059669;margin-top:8px;'>"
+    "<div style='font-size:14px;color:#2D6A2D;margin-top:8px;'>"
     "10 modules + Enterprise capstone. Adaptive difficulty. Daily challenges. "
     "Peer battles. One standard. Start with the Placement Challenge and "
     "work your way to AI certification.</div>"

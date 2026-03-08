@@ -29,12 +29,12 @@ from shared.demographic_intel import (
 
 # ── Layout helpers ───────────────────────────────────────────────────────────
 
-_DARK_LAYOUT = dict(
+_LAYOUT = dict(
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(color="#FFFFFF", family="Trebuchet MS, sans-serif"),
+    font=dict(color="#1A1A1A", family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif"),
 )
-_GRID = dict(showgrid=True, gridcolor="rgba(0,0,0,0.08)")
+_GRID = dict(showgrid=True, gridcolor="#E0E8E0")
 
 _METRIC_LABELS = {
     "pct_professional_catchment": "Professional/Managerial %",
@@ -175,7 +175,7 @@ with tab_exec:
                     y="gpm_roc_primary_4k",
                     text="store",
                     color="format_segment" if "format_segment" in scorecard.columns else None,
-                    color_discrete_map={"Express": "#2D6A2D", "Standard": "#3B82F6", "Large": "#d97706"},
+                    color_discrete_map={"Express": "#2D6A2D", "Standard": "#1565C0", "Large": "#C8971F"},
                     labels={
                         "pct_professional_catchment": "Professional/Managerial % (Catchment)",
                         "gpm_roc_primary_4k": "GPM ROC (est. @ $4K/sqm)",
@@ -183,7 +183,7 @@ with tab_exec:
                     title="Professional Workforce % vs GPM Return on Capital",
                 )
                 fig.update_traces(textposition="top center", textfont_size=10)
-                fig.update_layout(**_DARK_LAYOUT, height=500)
+                fig.update_layout(**_LAYOUT, height=500)
                 fig.update_xaxes(**_GRID)
                 fig.update_yaxes(**_GRID)
                 fig.add_hline(y=1.0, line_dash="dash", line_color="rgba(0,0,0,0.20)",
@@ -269,11 +269,11 @@ with tab_profiles:
                 theta=labels + [labels[0]],
                 fill="toself",
                 name="Network Average",
-                line_color="#6B7280",
+                line_color="#717171",
                 fillcolor="rgba(107,114,128,0.1)",
             ))
             fig.update_layout(
-                **_DARK_LAYOUT,
+                **_LAYOUT,
                 polar=dict(
                     bgcolor="rgba(0,0,0,0)",
                     radialaxis=dict(visible=True, range=[0, 100], gridcolor="rgba(0,0,0,0.08)"),
@@ -362,11 +362,11 @@ with tab_blueprint:
                     y="metric_label",
                     orientation="h",
                     color="difference_pct",
-                    color_continuous_scale=["#dc2626", "#6B7280", "#2D6A2D"],
+                    color_continuous_scale=["#C0392B", "#717171", "#2D6A2D"],
                     labels={"difference_pct": "Difference %", "metric_label": ""},
                     title="How Top Quartile Stores Differ Demographically",
                 )
-                fig.update_layout(**_DARK_LAYOUT, height=400, coloraxis_showscale=False)
+                fig.update_layout(**_LAYOUT, height=400, coloraxis_showscale=False)
                 fig.update_xaxes(**_GRID)
                 st.plotly_chart(fig, use_container_width=True)
 
@@ -425,7 +425,7 @@ with tab_corr:
                 textfont={"size": 10},
             ))
             fig.update_layout(
-                **_DARK_LAYOUT,
+                **_LAYOUT,
                 height=350,
                 xaxis=dict(tickangle=-45),
                 title="Correlation Matrix: Demographics vs Performance",
@@ -489,7 +489,7 @@ with tab_scores:
             labels={"demographic_score": "Demographic Score"},
             title="Score Distribution",
         )
-        fig.update_layout(**_DARK_LAYOUT, height=300)
+        fig.update_layout(**_LAYOUT, height=300)
         fig.update_xaxes(**_GRID)
         fig.update_yaxes(**_GRID)
         st.plotly_chart(fig, use_container_width=True)

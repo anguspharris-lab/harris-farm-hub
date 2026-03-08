@@ -264,18 +264,18 @@ def _render_component(
         }}
         #vdb-mic-btn:hover {{ background: #e8f5e9; border-color: #2D6A2D; }}
         #vdb-mic-btn.listening {{
-            background: #ef4444;
-            border-color: #dc2626;
+            background: #C0392B;
+            border-color: #C0392B;
             animation: vdb-pulse 1.5s infinite;
         }}
         #vdb-mic-btn.thinking {{
-            background: #f59e0b;
-            border-color: #d97706;
+            background: #C8971F;
+            border-color: #C8971F;
             animation: vdb-spin 1s infinite linear;
         }}
         #vdb-mic-btn.speaking {{
             background: #2D6A2D;
-            border-color: #3d8a1b;
+            border-color: #235522;
             animation: vdb-pulse 1s infinite;
         }}
         @keyframes vdb-pulse {{
@@ -287,7 +287,7 @@ def _render_component(
             to {{ transform: rotate(360deg); }}
         }}
         #vdb-status {{
-            color: #666;
+            color: #717171;
             font-size: 13px;
             flex: 1;
         }}
@@ -298,7 +298,7 @@ def _render_component(
             background: #f8f9fa;
             border-radius: 8px;
             font-size: 13px;
-            color: #333;
+            color: #4A4A4A;
             display: none;
             max-height: 120px;
             overflow-y: auto;
@@ -311,8 +311,8 @@ def _render_component(
             font-size: 11px;
             font-weight: 600;
         }}
-        .vdb-badge.realtime {{ background: #dcfce7; color: #166534; }}
-        .vdb-badge.fallback {{ background: #fef3c7; color: #92400e; }}
+        .vdb-badge.realtime {{ background: rgba(45,106,45,0.08); color: #1B4D1B; }}
+        .vdb-badge.fallback {{ background: rgba(200,151,31,0.08); color: #C8971F; }}
     </style>
 
     <div id="vdb-container">

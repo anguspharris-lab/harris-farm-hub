@@ -103,15 +103,15 @@ def _format_time(seconds):
 def _tier_colour(tier_name):
     # type: (str) -> str
     colours = {
-        "Unranked": "#94a3b8",
-        "Seed": "#84cc16",
+        "Unranked": "#717171",
+        "Seed": "#7CB342",
         "Sprout": "#2D6A2D",
-        "Grower": "#f59e0b",
-        "Harvester": "#f97316",
-        "Cultivator": "#8b5cf6",
-        "Legend": "#eab308",
+        "Grower": "#C8971F",
+        "Harvester": "#C8971F",
+        "Cultivator": "#7C3AED",
+        "Legend": "#C8971F",
     }
-    return colours.get(tier_name, "#94a3b8")
+    return colours.get(tier_name, "#717171")
 
 
 def _reset_playing_state():
@@ -167,9 +167,9 @@ def render_welcome():
         with cols[i]:
             st.markdown(
                 "<div style='text-align:center;'>"
-                "<div style='font-size:1.8em;'>{}</div>"
-                "<div style='font-weight:700;font-size:0.9em;'>{}</div>"
-                "<div style='color:#888;font-size:0.75em;'>Lv {}</div>"
+                "<div style='font-size:28px;'>{}</div>"
+                "<div style='font-weight:700;font-size:14px;'>{}</div>"
+                "<div style='color:#717171;font-size:12px;'>Lv {}</div>"
                 "</div>".format(icon, name, levels),
                 unsafe_allow_html=True,
             )
@@ -184,10 +184,10 @@ def render_welcome():
             tier_icon = _icon_for_tier(tier_name)
             best_level = best.get("max_level_reached", 0)
             st.markdown(
-                "<div style='text-align:center;padding:16px;background:#f0f7ed;"
+                "<div style='text-align:center;padding:16px;background:#EEF2EE;"
                 "border-radius:10px;border:2px solid {};margin-bottom:20px;'>"
-                "<div style='font-size:0.85em;color:#666;'>Your Personal Best</div>"
-                "<div style='font-size:1.6em;font-weight:800;margin:4px 0;'>"
+                "<div style='font-size:14px;color:#717171;'>Your Personal Best</div>"
+                "<div style='font-size:26px;font-weight:800;margin:4px 0;'>"
                 "{} {} &mdash; Level {}</div>"
                 "</div>".format(BRAND_GREEN, tier_icon, tier_name, best_level),
                 unsafe_allow_html=True,
@@ -259,7 +259,7 @@ def render_playing():
     tier_icon = _icon_for_tier(tier_name)
     st.markdown(
         "<div style='text-align:center;margin-bottom:4px;'>"
-        "<span style='font-size:1.3em;font-weight:700;'>"
+        "<span style='font-size:21px;font-weight:700;'>"
         "Level {} &mdash; {} Zone {}</span>"
         "</div>".format(current_level, tier_name, tier_icon),
         unsafe_allow_html=True,
@@ -289,8 +289,8 @@ def _render_question_card(question, attempt_id, current_level):
     badge_colour = _tier_colour(tier_for_q)
     st.markdown(
         "<div style='margin-bottom:12px;'>"
-        "<span style='background:{};color:white;padding:4px 12px;"
-        "border-radius:12px;font-size:0.8em;font-weight:600;'>"
+        "<span style='background:{};color:#1B4D1B;padding:4px 12px;"
+        "border-radius:12px;font-size:13px;font-weight:600;'>"
         "Level {} &bull; {}</span>"
         "</div>".format(badge_colour, diff_level, topic.replace("_", " ").title() if topic else "General"),
         unsafe_allow_html=True,
@@ -298,7 +298,7 @@ def _render_question_card(question, attempt_id, current_level):
 
     # Question text
     st.markdown(
-        "<div style='font-size:1.25em;font-weight:600;line-height:1.5;"
+        "<div style='font-size:20px;font-weight:600;line-height:1.5;"
         "margin-bottom:16px;'>{}</div>".format(q_text),
         unsafe_allow_html=True,
     )
@@ -396,10 +396,10 @@ def _render_answer_feedback(data):
         # Answered level 10 — Legend!
         st.markdown(
             "<div style='text-align:center;padding:24px;background:"
-            "linear-gradient(135deg, #eab308 0%, #f59e0b 100%);"
+            "linear-gradient(135deg, #C8971F 0%, #C8971F 100%);"
             "border-radius:14px;color:white;margin-bottom:16px;'>"
-            "<div style='font-size:3em;'>\U0001f3c6</div>"
-            "<div style='font-size:1.6em;font-weight:800;margin:8px 0;'>"
+            "<div style='font-size:48px;'>\U0001f3c6</div>"
+            "<div style='font-size:26px;font-weight:800;margin:8px 0;'>"
             "LEGENDARY!</div>"
             "<div>You answered every level correctly. Absolute legend.</div>"
             "</div>",
@@ -484,10 +484,10 @@ def render_result():
         "<div style='text-align:center;padding:40px 24px;"
         "background:linear-gradient(135deg, {} 0%, {} 80%);"
         "color:white;border-radius:14px;margin-bottom:24px;'>"
-        "<div style='font-size:4em;'>{}</div>"
-        "<div style='font-size:2em;font-weight:800;margin:8px 0;'>"
+        "<div style='font-size:64px;'>{}</div>"
+        "<div style='font-size:32px;font-weight:800;margin:8px 0;'>"
         "You reached Level {} &mdash; {}!</div>"
-        "<div style='font-size:1.05em;opacity:0.9;'>Well played.</div>"
+        "<div style='font-size:17px;opacity:0.9;'>Well played.</div>"
         "</div>".format(BRAND_GREEN, tier_bg, tier_icon, max_level, tier_name),
         unsafe_allow_html=True,
     )
@@ -709,7 +709,7 @@ def _render_leaderboard():
     if top5:
         st.markdown(
             "<div style='text-align:center;margin-bottom:8px;'>"
-            "<span style='font-size:1.1em;font-weight:700;color:{};"
+            "<span style='font-size:18px;font-weight:700;color:{};"
             "'>The Jedi Council</span></div>".format(BRAND_GREEN),
             unsafe_allow_html=True,
         )
@@ -723,15 +723,15 @@ def _render_leaderboard():
                 level = entry.get("best_level", 0)
                 medal = {1: "\U0001f947", 2: "\U0001f948", 3: "\U0001f949"}.get(rank, "")
 
-                border_col = BRAND_GREEN if rank <= 3 else "#ddd"
+                border_col = BRAND_GREEN if rank <= 3 else "#E0E8E0"
                 st.markdown(
                     "<div style='text-align:center;padding:16px 8px;"
                     "border:2px solid {};border-radius:12px;"
-                    "background:#fafafa;'>"
-                    "<div style='font-size:0.8em;color:#888;'>#{}{}</div>"
-                    "<div style='font-size:2.2em;margin:4px 0;'>{}</div>"
-                    "<div style='font-weight:700;font-size:0.95em;'>{}</div>"
-                    "<div style='color:#666;font-size:0.8em;'>{} &bull; Lv {}</div>"
+                    "background:#F5F7F5;'>"
+                    "<div style='font-size:13px;color:#717171;'>#{}{}</div>"
+                    "<div style='font-size:35px;margin:4px 0;'>{}</div>"
+                    "<div style='font-weight:700;font-size:15px;'>{}</div>"
+                    "<div style='color:#717171;font-size:13px;'>{} &bull; Lv {}</div>"
                     "</div>".format(
                         border_col, rank,
                         " " + medal if medal else "",

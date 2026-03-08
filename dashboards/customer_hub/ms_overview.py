@@ -158,7 +158,7 @@ def render():
                         x="market_share_pct", y="region_name", orientation="h",
                         labels={"market_share_pct": "Share %",
                                 "region_name": ""},
-                        color_discrete_sequence=["#dc2626"],
+                        color_discrete_sequence=["#C0392B"],
                         hover_data={"nearest_store": True, "distance_km": True},
                     )
                     fig_bot.update_layout(height=450)

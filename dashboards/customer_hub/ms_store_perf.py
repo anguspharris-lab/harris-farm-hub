@@ -202,7 +202,7 @@ def render():
                         "{:.1f}%".format(worst["avg_share"]))
 
             colours = [
-                "#2D6A2D" if (r["share_change"] or 0) >= 0 else "#dc2626"
+                "#2D6A2D" if (r["share_change"] or 0) >= 0 else "#C0392B"
                 for _, r in macro_df.iterrows()
             ]
             fig_macro = go.Figure()

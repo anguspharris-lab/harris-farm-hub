@@ -254,7 +254,7 @@ def render():
                     pcdf, x="period_date", y="spend_per_customer",
                     labels={"period_date": "",
                             "spend_per_customer": "Spend ($)"},
-                    color_discrete_sequence=["#d97706"],
+                    color_discrete_sequence=["#C8971F"],
                     title="Spend per Customer Trend",
                 )
                 fig_sp.update_layout(height=300)

@@ -39,7 +39,7 @@ _LOGIN_CSS = """
     .main, [data-testid="stAppViewContainer"],
     [data-testid="stHeader"],
     [data-testid="stAppViewContainer"] > section > div {
-        background-color: #FAFAF7 !important;
+        background-color: #F5F7F5 !important;
     }
 
     /* Center content and constrain width */
@@ -51,7 +51,7 @@ _LOGIN_CSS = """
 
     /* Text colors for dark bg */
     .main p, .main li, .main span, .main div,
-    .main label, .stCaption, small { color: #4A5568 !important; }
+    .main label, .stCaption, small { color: #4A4A4A !important; }
     .main strong, .main b, .main h1, .main h2, .main h3 { color: #1A1A1A !important; }
 
     /* Input fields on dark */
@@ -60,7 +60,7 @@ _LOGIN_CSS = """
         border-color: rgba(0,0,0,0.10) !important;
     }
     .stTextInput input { color: #1A1A1A !important; }
-    .stTextInput label { color: #4A5568 !important; }
+    .stTextInput label { color: #4A4A4A !important; }
 
     /* Green submit button */
     .stFormSubmitButton > button,
@@ -76,20 +76,20 @@ _LOGIN_CSS = """
 
     .stFormSubmitButton > button:hover,
     [data-testid="stFormSubmitButton"] > button:hover {
-        background-color: #245624 !important;
+        background-color: #2D6A2D !important;
     }
 
     /* Toggle button (Create Account / Sign In) */
     .stButton > button {
         border-radius: 8px !important;
-        color: #4A5568 !important;
+        color: #4A4A4A !important;
     }
 
     /* Dividers */
     hr { border-color: rgba(0,0,0,0.08) !important; }
 
     /* Checkbox */
-    [data-testid="stCheckbox"] label { color: #718096 !important; }
+    [data-testid="stCheckbox"] label { color: #717171 !important; }
 </style>
 """
 
@@ -173,13 +173,13 @@ def _render_auth_page(api_url):
     # Logo and title
     st.markdown(
         '<div style="text-align:center;margin-bottom:2rem;">'
-        '<div style="font-size:3rem;margin-bottom:0.5rem;">&#127822;</div>'
-        '<div style="font-size:1.75rem;font-weight:700;color:#1A1A1A;'
-        'font-family:Georgia,serif;letter-spacing:-0.5px;margin-bottom:0.25rem;">'
+        '<div style="font-size:48px;margin-bottom:0.5rem;">&#127822;</div>'
+        '<div style="font-size:28px;font-weight:700;color:#1A1A1A;'
+        'font-family:-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, sans-serif;letter-spacing:-0.5px;margin-bottom:0.25rem;">'
         'Harris Farm Hub</div>'
-        '<div style="font-size:0.8rem;color:#718096;'
+        '<div style="font-size:13px;color:#717171;'
         'letter-spacing:2px;text-transform:uppercase;font-weight:400;'
-        'font-family:Trebuchet MS,sans-serif;">'
+        'font-family:-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, sans-serif;">'
         'AI Centre of Excellence</div>'
         '</div>',
         unsafe_allow_html=True,
@@ -201,8 +201,8 @@ def _render_auth_page(api_url):
 
     # Footer
     st.markdown(
-        '<div style="text-align:center;margin-top:2rem;color:#718096;'
-        'font-size:0.75rem;font-family:Trebuchet MS,sans-serif;">'
+        '<div style="text-align:center;margin-top:2rem;color:#717171;'
+        'font-size:12px;font-family:-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, sans-serif;">'
         'Harris Farm Markets &middot; Powered by AI</div>',
         unsafe_allow_html=True,
     )

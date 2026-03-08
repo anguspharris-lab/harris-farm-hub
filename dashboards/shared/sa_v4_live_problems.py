@@ -2007,7 +2007,7 @@ DAILY_CHALLENGE_TOPICS = {
         "name": "Role-Specific",
         "description": "Buyer, store manager, marketing, and finance scenarios",
         "icon": "briefcase",
-        "color": "#2563eb",
+        "color": "#1565C0",
     },
     "data_ai": {
         "name": "Data + AI",
@@ -2019,13 +2019,13 @@ DAILY_CHALLENGE_TOPICS = {
         "name": "Rubric Knowledge",
         "description": "Scoring criteria, quality thresholds, the 8+ rule",
         "icon": "clipboard-check",
-        "color": "#ea580c",
+        "color": "#C8971F",
     },
     "ethics": {
         "name": "Ethics & Governance",
         "description": "Data privacy, bias, when NOT to use AI, B-Corp values",
         "icon": "shield",
-        "color": "#dc2626",
+        "color": "#C0392B",
     },
 }
 

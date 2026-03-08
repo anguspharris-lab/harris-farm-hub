@@ -232,7 +232,7 @@ def render():
             orientation="h",
             labels={"store_short": "", "Variance %": "Variance vs Budget (%)"},
             color="Variance %",
-            color_continuous_scale=["#dc2626", "#fbbf24", "#059669"],
+            color_continuous_scale=["#C0392B", "#C8971F", "#2D6A2D"],
             color_continuous_midpoint=0,
         )
         fig_var.update_layout(height=max(400, len(variance_df) * 25))

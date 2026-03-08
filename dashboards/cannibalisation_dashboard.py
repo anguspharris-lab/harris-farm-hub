@@ -52,10 +52,10 @@ from shared.styles import (  # noqa: E402
 _DARK_LAYOUT = dict(
     paper_bgcolor=NAVY_CARD,
     plot_bgcolor="#FFFFFF",
-    font=dict(color=TEXT_SECONDARY, family="Trebuchet MS, sans-serif"),
-    title_font=dict(family="Georgia, serif", color=TEXT_PRIMARY),
+    font=dict(color=TEXT_SECONDARY, family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif"),
+    title_font=dict(family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif", color=TEXT_PRIMARY),
     margin=dict(t=40, r=20, b=40, l=60),
-    hoverlabel=dict(bgcolor="#EEEDE8", font_color=TEXT_PRIMARY, bordercolor=BORDER),
+    hoverlabel=dict(bgcolor="#EEF2EE", font_color=TEXT_PRIMARY, bordercolor=BORDER),
 )
 
 _MAPBOX_TOKEN = ""  # carto-darkmatter needs no token
@@ -484,7 +484,7 @@ with tab2:
                 [0.0, RED],
                 [0.3, ORANGE],
                 [0.5, GOLD],
-                [1.0, "#EEEDE8"],
+                [1.0, "#EEF2EE"],
             ]
 
             fig_heat = go.Figure(data=go.Heatmap(
@@ -1017,7 +1017,7 @@ with tab5:
                 glass_card(
                     f"<h3 style='color:{verdict_colour};margin:0;'>{verdict}</h3>"
                     f"<p style='color:{TEXT_SECONDARY};margin:4px 0 0;'>{verdict_msg}</p>"
-                    f"<p style='color:{TEXT_MUTED};font-size:0.85em;margin:4px 0 0;'>"
+                    f"<p style='color:{TEXT_MUTED};font-size:12px;margin:4px 0 0;'>"
                     f"Revenue retention: {retention_pct:.0f}% | "
                     f"Affected stores: {len(aff_df)} | "
                     f"Avg distance: {aff_df['distance_km'].mean():.1f}km</p>",

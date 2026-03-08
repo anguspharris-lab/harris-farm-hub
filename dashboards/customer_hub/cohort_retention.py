@@ -122,8 +122,8 @@ def render():
             x=pivot.columns.tolist(),
             y=pivot.index.tolist(),
             colorscale=[
-                [0, "#ef4444"], [0.3, "#fbbf24"],
-                [0.6, "#86efac"], [1, "#059669"],
+                [0, "#C0392B"], [0.3, "#C8971F"],
+                [0.6, "#7CB342"], [1, "#2D6A2D"],
             ],
             text=[["{:.0f}%".format(v) if pd.notna(v) else ""
                    for v in row] for row in pivot.values],

@@ -53,32 +53,30 @@ def render_growth_engine(user_level: str = "Seed", user_xp: int = 5, xp_to_next:
 
     html = f'''
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
-
     :root {{
-        --ge-green-deep: #FAFAF7;
-        --ge-green-rich: #F5F5F0;
+        --ge-green-deep: #F5F7F5;
+        --ge-green-rich: #F0F4F0;
         --ge-green-mid: #2D6A2D;
         --ge-green-bright: #2D6A2D;
         --ge-green-light: #2D6A2D;
         --ge-green-pale: rgba(45,106,45,0.12);
-        --ge-gold: #E8B84B;
-        --ge-gold-light: #E8B84B;
-        --ge-cream: #FAFAF7;
-        --ge-cream-warm: #F5F5F0;
+        --ge-gold: #C8971F;
+        --ge-gold-light: #C8971F;
+        --ge-cream: #F5F7F5;
+        --ge-cream-warm: #F0F4F0;
         --ge-charcoal: #1A1A1A;
-        --ge-slate: #4A5568;
-        --ge-mist: #718096;
+        --ge-slate: #4A4A4A;
+        --ge-mist: #717171;
         --ge-white: #FFFFFF;
-        --ge-purple: #8B5CF6;
-        --ge-font-display: Georgia, 'Times New Roman', serif;
-        --ge-font-body: 'Trebuchet MS', 'Segoe UI', sans-serif;
+        --ge-purple: #7C3AED;
+        --ge-font-display: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+        --ge-font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
         --ge-ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
         --ge-ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
     }}
 
     .ge-container {{
-        background: linear-gradient(178deg, #FFFFFF 0%, #FAFAF7 40%, #FFFFFF 100%);
+        background: linear-gradient(178deg, #FFFFFF 0%, #F5F7F5 40%, #FFFFFF 100%);
         border: 1px solid rgba(0,0,0,0.08);
         position: relative;
         overflow: hidden;
@@ -143,7 +141,7 @@ def render_growth_engine(user_level: str = "Seed", user_xp: int = 5, xp_to_next:
         font-size: clamp(26px, 3.5vw, 40px);
         font-weight: 900;
         line-height: 1.1;
-        color: var(--ge-white);
+        color: var(--ge-charcoal);
         margin-bottom: 10px;
         opacity: 0;
         transform: translateY(12px);
@@ -254,7 +252,7 @@ def render_growth_engine(user_level: str = "Seed", user_xp: int = 5, xp_to_next:
         box-shadow: 0 14px 40px rgba(0,0,0,0.3);
     }}
 
-    .ge-vis-simple {{ background: linear-gradient(135deg, #132240, #E8E8E4); position: relative; }}
+    .ge-vis-simple {{ background: linear-gradient(135deg, #F0F4F0, #E0E8E0); position: relative; }}
     .ge-vis-simple .ge-rays {{
         position: absolute; inset: -20px;
         background: radial-gradient(circle, rgba(255,235,59,0.25) 0%, transparent 65%);
@@ -267,7 +265,7 @@ def render_growth_engine(user_level: str = "Seed", user_xp: int = 5, xp_to_next:
         50% {{ opacity: 1; transform: scale(1.08); }}
     }}
 
-    .ge-vis-bigger {{ background: linear-gradient(135deg, #132240, #E8E8E4); position: relative; }}
+    .ge-vis-bigger {{ background: linear-gradient(135deg, #F0F4F0, #E0E8E0); position: relative; }}
     .ge-ring-set {{ position: relative; width: 100px; height: 100px; }}
     .ge-ring {{ position: absolute; border-radius: 50%; border: 2px solid var(--ge-green-mid); animation: ge-breathe 3.5s ease-in-out infinite; }}
     .ge-ring:nth-child(1) {{ inset: 34px; border-color: var(--ge-green-deep); background: rgba(45,90,63,0.1); }}
@@ -281,7 +279,7 @@ def render_growth_engine(user_level: str = "Seed", user_xp: int = 5, xp_to_next:
         50% {{ transform: scale(1.06); }}
     }}
 
-    .ge-vis-work {{ background: linear-gradient(135deg, #E8E8E4, #132240); }}
+    .ge-vis-work {{ background: linear-gradient(135deg, #E0E8E0, #F0F4F0); }}
     .ge-gear-cluster {{ position: relative; width: 90px; height: 72px; }}
     .ge-g {{ position: absolute; animation: ge-spin 5s linear infinite; }}
     .ge-g:nth-child(1) {{ top: 6px; left: 2px; font-size: 40px; }}
@@ -321,7 +319,7 @@ def render_growth_engine(user_level: str = "Seed", user_xp: int = 5, xp_to_next:
 
     .ge-lesson-title {{
         font-family: var(--ge-font-display);
-        font-size: 16px; font-weight: 700; color: var(--ge-white);
+        font-size: 16px; font-weight: 700; color: var(--ge-charcoal);
         margin-bottom: 4px; line-height: 1.25;
     }}
 
@@ -382,7 +380,7 @@ def render_growth_engine(user_level: str = "Seed", user_xp: int = 5, xp_to_next:
     }}
 
     .ge-pillar:nth-child(1)::before {{ background: linear-gradient(90deg, var(--ge-green-mid), var(--ge-green-light)); }}
-    .ge-pillar:nth-child(2)::before {{ background: linear-gradient(90deg, var(--ge-purple), #A78BFA); }}
+    .ge-pillar:nth-child(2)::before {{ background: linear-gradient(90deg, var(--ge-purple), #7C3AED); }}
     .ge-pillar:nth-child(3)::before {{ background: linear-gradient(90deg, var(--ge-green-mid), var(--ge-green-light)); }}
 
     .ge-pillar-icon {{
@@ -391,7 +389,7 @@ def render_growth_engine(user_level: str = "Seed", user_xp: int = 5, xp_to_next:
         font-size: 20px; margin-bottom: 14px;
     }}
     .ge-pillar:nth-child(1) .ge-pillar-icon {{ background: rgba(45,106,45,0.15); }}
-    .ge-pillar:nth-child(2) .ge-pillar-icon {{ background: rgba(139,92,246,0.15); }}
+    .ge-pillar:nth-child(2) .ge-pillar-icon {{ background: rgba(124,58,237,0.15); }}
     .ge-pillar:nth-child(3) .ge-pillar-icon {{ background: rgba(45,106,45,0.15); }}
 
     .ge-pillar-label {{
@@ -405,7 +403,7 @@ def render_growth_engine(user_level: str = "Seed", user_xp: int = 5, xp_to_next:
     .ge-pillar h3 {{
         font-family: var(--ge-font-display);
         font-size: 17px; font-weight: 700;
-        color: var(--ge-white); margin-bottom: 8px; line-height: 1.25;
+        color: var(--ge-charcoal); margin-bottom: 8px; line-height: 1.25;
     }}
 
     .ge-pillar-desc {{
@@ -449,7 +447,7 @@ def render_growth_engine(user_level: str = "Seed", user_xp: int = 5, xp_to_next:
         background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05);
         transition: background 0.2s;
     }}
-    .ge-pipe-step:hover {{ background: rgba(139,92,246,0.08); }}
+    .ge-pipe-step:hover {{ background: rgba(124,58,237,0.08); }}
     .ge-pipe-num {{
         width: 22px; height: 22px; border-radius: 5px;
         display: flex; align-items: center; justify-content: center;
@@ -463,9 +461,9 @@ def render_growth_engine(user_level: str = "Seed", user_xp: int = 5, xp_to_next:
         border-radius: 3px;
         letter-spacing: 0.04em; text-transform: uppercase; flex-shrink: 0; margin-left: auto;
     }}
-    .ge-pipe-badge.rubric {{ background: rgba(139,92,246,0.15); color: #A78BFA; }}
+    .ge-pipe-badge.rubric {{ background: rgba(124,58,237,0.15); color: #7C3AED; }}
     .ge-pipe-badge.auto {{ background: rgba(45,106,45,0.15); color: #2D6A2D; }}
-    .ge-pipe-badge.human {{ background: rgba(249,115,22,0.15); color: #F97316; }}
+    .ge-pipe-badge.human {{ background: rgba(200,151,31,0.15); color: #C8971F; }}
 
     /* New Ways */
     .ge-ways {{ display: flex; flex-direction: column; gap: 8px; }}
@@ -481,7 +479,7 @@ def render_growth_engine(user_level: str = "Seed", user_xp: int = 5, xp_to_next:
         display: flex; align-items: center; justify-content: center;
         font-size: 14px; background: rgba(45,106,45,0.12); flex-shrink: 0; margin-top: 1px;
     }}
-    .ge-way h4 {{ font-size: 12px; font-weight: 600; color: var(--ge-white); margin-bottom: 1px; }}
+    .ge-way h4 {{ font-size: 12px; font-weight: 600; color: var(--ge-charcoal); margin-bottom: 1px; }}
     .ge-way p {{ font-size: 10.5px; line-height: 1.5; color: var(--ge-mist); }}
 
     /* Method quote strip */
@@ -507,7 +505,7 @@ def render_growth_engine(user_level: str = "Seed", user_xp: int = 5, xp_to_next:
         font-family: var(--ge-font-display);
         font-size: clamp(16px, 2.2vw, 22px);
         font-weight: 300; font-style: italic;
-        color: var(--ge-white);
+        color: var(--ge-charcoal);
         max-width: 580px;
         margin: 0 auto 10px;
         line-height: 1.45;

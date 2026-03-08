@@ -10,29 +10,29 @@ import streamlit as st
 HFM_GREEN = "#2D6A2D"
 
 PALETTE = {
-    "green": "#2d8659",
-    "dark_blue": "#1e3a8a",
+    "green": "#2D6A2D",
+    "dark_blue": "#1565C0",
     "purple": "#7c3aed",
-    "teal": "#0d9488",
-    "amber": "#d97706",
-    "red": "#dc2626",
-    "grey": "#6b7280",
+    "teal": "#0891B2",
+    "amber": "#C8971F",
+    "red": "#C0392B",
+    "grey": "#717171",
 }
 
 SEGMENT_COLORS = {
-    "Champion": "#059669",
-    "High-Value": "#0d9488",
-    "Regular": "#3b82f6",
-    "Occasional": "#f59e0b",
-    "Lapsed": "#ef4444",
+    "Champion": "#2D6A2D",
+    "High-Value": "#0891B2",
+    "Regular": "#1565C0",
+    "Occasional": "#C8971F",
+    "Lapsed": "#C0392B",
 }
 
 HEALTH_COLOURS = {
     "Accelerating": "#2D6A2D",
     "Growing": "#65a30d",
-    "Stable": "#d97706",
-    "Softening": "#ea580c",
-    "Declining": "#dc2626",
+    "Stable": "#C8971F",
+    "Softening": "#C8971F",
+    "Declining": "#C0392B",
     "New": "#9ca3af",
 }
 
@@ -41,20 +41,20 @@ HEALTH_ORDER = ["Accelerating", "Growing", "Stable", "Softening", "Declining", "
 GRADE_COLOURS = {
     "A": "#2D6A2D",
     "B": "#65a30d",
-    "C": "#d97706",
-    "D": "#ea580c",
-    "F": "#dc2626",
+    "C": "#C8971F",
+    "D": "#C8971F",
+    "F": "#C0392B",
 }
 
 OPP_COLOURS = {
     "Stronghold": "#2D6A2D",
-    "Growth Opportunity": "#2563eb",
-    "Basket Opportunity": "#d97706",
-    "Retention Risk": "#dc2626",
+    "Growth Opportunity": "#1565C0",
+    "Basket Opportunity": "#C8971F",
+    "Retention Risk": "#C0392B",
     "Monitor": "#9ca3af",
 }
 
-STATE_COLOURS = {"NSW": "#2D6A2D", "QLD": "#7c3aed", "ACT": "#d97706"}
+STATE_COLOURS = {"NSW": "#2D6A2D", "QLD": "#7c3aed", "ACT": "#C8971F"}
 
 
 # ── Reusable UI components ───────────────────────────────────────────────────
@@ -74,15 +74,15 @@ def section_header(title, subtitle="", icon=""):
 def insight_callout(text, style="info"):
     """Render a storytelling insight box. style: info | success | warning."""
     colour_map = {
-        "info": ("#eff6ff", "#1e40af", "#dbeafe"),
-        "success": ("#f0fdf4", "#166534", "#dcfce7"),
-        "warning": ("#fffbeb", "#92400e", "#fef3c7"),
+        "info": ("rgba(21,101,192,0.04)", "#1565C0", "rgba(21,101,192,0.08)"),
+        "success": ("rgba(45,106,45,0.04)", "#1B4D1B", "rgba(45,106,45,0.08)"),
+        "warning": ("rgba(200,151,31,0.04)", "#C8971F", "rgba(200,151,31,0.08)"),
     }
     bg, fg, border = colour_map.get(style, colour_map["info"])
     st.markdown(
         "<div style='background:{bg};color:{fg};border-left:4px solid {fg};"
         "padding:12px 16px;border-radius:6px;margin:8px 0 16px 0;"
-        "font-size:0.95rem;'>{text}</div>".format(
+        "font-size:15px;'>{text}</div>".format(
             bg=bg, fg=fg, text=text
         ),
         unsafe_allow_html=True,
@@ -92,12 +92,12 @@ def insight_callout(text, style="info"):
 def one_thing_box(text):
     """Render a 'One Thing to Remember' callout."""
     st.markdown(
-        "<div style='background:linear-gradient(135deg,#f0fdf4,#dcfce7);"
+        "<div style='background:linear-gradient(135deg,rgba(45,106,45,0.04),rgba(45,106,45,0.08));"
         "border-left:4px solid #2D6A2D;padding:14px 18px;border-radius:8px;"
         "margin:12px 0;'>"
-        "<div style='font-weight:700;color:#166534;margin-bottom:4px;'>"
+        "<div style='font-weight:700;color:#1B4D1B;margin-bottom:4px;'>"
         "One Thing to Remember</div>"
-        "<div style='color:#15803d;font-size:0.95rem;'>{}</div>"
+        "<div style='color:#235522;font-size:15px;'>{}</div>"
         "</div>".format(text),
         unsafe_allow_html=True,
     )

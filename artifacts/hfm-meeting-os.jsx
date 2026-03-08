@@ -107,7 +107,7 @@ function QuoteBar({ accent }) {
       <div style={{ fontFamily: "Georgia, serif", fontSize: 15, fontStyle: "italic", color: "#4A5568", lineHeight: 1.6 }}>
         "{q.text}"
       </div>
-      <div style={{ fontSize: 11, color: "#718096", marginTop: 4, letterSpacing: "0.05em", textTransform: "uppercase" }}>
+      <div style={{ fontSize: 11, color: "#4A4A4A", marginTop: 4, letterSpacing: "0.05em", textTransform: "uppercase" }}>
         — {q.attr}
       </div>
     </div>
@@ -130,14 +130,14 @@ function Slider({ label, help, value, onChange, color }) {
           <ScoreBadge score={value} />
         </div>
       </div>
-      {help && <div style={{ fontSize: 12, color: "#718096", marginBottom: 8, lineHeight: 1.4 }}>{help}</div>}
+      {help && <div style={{ fontSize: 12, color: "#4A4A4A", marginBottom: 8, lineHeight: 1.4 }}>{help}</div>}
       <input
         type="range" min="1" max="10" value={value}
         onChange={e => onChange(parseInt(e.target.value))}
         className="hfm-slider"
         style={{ width: "100%", background: trackBg, accentColor: color, cursor: "pointer" }}
       />
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#A0AEC0", marginTop: 4 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#666666", marginTop: 4 }}>
         <span>1 — Critical</span><span>10 — Strong</span>
       </div>
     </div>
@@ -148,7 +148,7 @@ function TextArea({ label, help, value, onChange, rows = 3, placeholder }) {
   return (
     <div style={{ marginBottom: 20 }}>
       <label style={{ fontWeight: 600, fontSize: 14, color: "#1A1A1A", display: "block", marginBottom: 4 }}>{label}</label>
-      {help && <div style={{ fontSize: 12, color: "#718096", marginBottom: 6, lineHeight: 1.4 }}>{help}</div>}
+      {help && <div style={{ fontSize: 12, color: "#4A4A4A", marginBottom: 6, lineHeight: 1.4 }}>{help}</div>}
       <textarea
         value={value} onChange={e => onChange(e.target.value)} rows={rows}
         placeholder={placeholder || "Share your thoughts..."}
@@ -170,7 +170,7 @@ function TextField({ label, help, value, onChange, placeholder = "", type = "tex
       <label style={{ fontWeight: 600, fontSize: 14, color: "#1A1A1A", display: "block", marginBottom: 4 }}>
         {label}{required && <span style={{ color: "#DC2626", marginLeft: 3 }}>*</span>}
       </label>
-      {help && <div style={{ fontSize: 12, color: "#718096", marginBottom: 6, lineHeight: 1.4 }}>{help}</div>}
+      {help && <div style={{ fontSize: 12, color: "#4A4A4A", marginBottom: 6, lineHeight: 1.4 }}>{help}</div>}
       <input
         type={type} value={value} onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
@@ -182,6 +182,31 @@ function TextField({ label, help, value, onChange, placeholder = "", type = "tex
           transition: "border-color 0.2s, box-shadow 0.2s",
         }}
       />
+    </div>
+  );
+}
+
+function SelectField({ label, help, value, onChange, options = [], placeholder = "", required }) {
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <label style={{ fontWeight: 600, fontSize: 14, color: "#1A1A1A", display: "block", marginBottom: 4 }}>
+        {label}{required && <span style={{ color: "#DC2626", marginLeft: 3 }}>*</span>}
+      </label>
+      {help && <div style={{ fontSize: 12, color: "#4A4A4A", marginBottom: 6, lineHeight: 1.4 }}>{help}</div>}
+      <select
+        value={value} onChange={e => onChange(e.target.value)}
+        className="hfm-input"
+        style={{
+          width: "100%", background: "#FFFFFF", border: "1.5px solid rgba(0,0,0,0.08)",
+          borderRadius: 10, padding: "12px 16px", color: value ? "#1A1A1A" : "#A0AEC0", fontSize: 14,
+          fontFamily: "'Trebuchet MS', sans-serif",
+          transition: "border-color 0.2s, box-shadow 0.2s",
+          cursor: "pointer",
+        }}
+      >
+        <option value="">{placeholder || "Select..."}</option>
+        {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+      </select>
     </div>
   );
 }
@@ -218,7 +243,7 @@ function Card({ title, children, color, icon, delay = 0 }) {
 function ScoreBadge({ score }) {
   let bg, color, text;
   if (score >= 8) { bg = "rgba(45,106,45,0.10)"; color = "#2D6A2D"; text = "Strong"; }
-  else if (score >= 6) { bg = "rgba(232,184,75,0.12)"; color = "#B8860B"; text = "Adequate"; }
+  else if (score >= 6) { bg = "rgba(146,113,10,0.10)"; color = "#7A6209"; text = "Adequate"; }
   else if (score >= 4) { bg = "rgba(249,115,22,0.10)"; color = "#F97316"; text = "Gap"; }
   else { bg = "rgba(220,38,38,0.08)"; color = "#DC2626"; text = "Critical"; }
   return (
@@ -259,7 +284,7 @@ function ConfettiExplosion() {
 
 function buildDefault() {
   const d = {};
-  (C.welcomeFields || []).forEach(f => { d[f.key] = f.type === "slider" ? (f.default || 5) : ""; });
+  (C.welcomeFields || []).forEach(f => { d[f.key] = f.type === "slider" ? (f.default || 5) : (f.default || ""); });
   (C.sections || []).forEach(sec => {
     const allQ = [];
     if (sec.questions) allQ.push(...sec.questions);
@@ -291,7 +316,7 @@ function App() {
 
   const showSummary = C.showSummary !== false;
   const stepLabels = [
-    { key: "welcome", label: "Welcome", icon: "\uD83D\uDC4B" },
+    { key: "welcome", label: "Welcome", icon: "\u{1F44B}" },
     ...sections.map(s => ({ key: s.key, label: s.label, icon: s.icon || "" })),
     ...(showSummary ? [{ key: "summary", label: "Review & Submit", icon: "\u2705" }] : []),
   ];
@@ -325,7 +350,11 @@ function App() {
   };
 
   const welcomeValid = useMemo(() => {
-    return welcomeFields.filter(f => f.required).every(f => {
+    return welcomeFields.filter(f => f.required).filter(f => {
+      // Skip validation for conditionally hidden fields
+      if (f.showIf && data[f.showIf.key] !== f.showIf.value) return false;
+      return true;
+    }).every(f => {
       const v = data[f.key] || "";
       if (f.key === "email") return v.endsWith("@harrisfarm.com.au");
       return v.trim().length > 0;
@@ -381,6 +410,14 @@ function App() {
     // Default: JSON blob for meeting-os CF
     const responses = {};
     const scores = {};
+    // Include welcome fields beyond the standard top-level ones
+    const standardKeys = new Set(["name", "email", "role", "department"]);
+    (C.welcomeFields || []).forEach(f => {
+      if (!standardKeys.has(f.key) && data[f.key]) {
+        if (f.type === "slider") scores[f.key] = data[f.key];
+        else responses[f.key] = data[f.key];
+      }
+    });
     sections.forEach(sec => {
       const allQ = [];
       if (sec.questions) allQ.push(...sec.questions);
@@ -392,9 +429,10 @@ function App() {
     });
     return {
       meeting_type: C.meetingType,
+      transformation_type: data.transformation_type || "",
       email: data.email || "",
       name: data.name || "",
-      role: data.role || "",
+      role: data.role || data.role_level || "",
       department: data.department || "",
       responses_json: JSON.stringify(responses),
       scores_json: JSON.stringify(scores),
@@ -474,24 +512,91 @@ function App() {
 
   /* ── Thank-you screen ── */
   if (submitted) {
+    const firstName = data.name ? data.name.split(" ")[0] : "";
+
+    // Build ADKAR summary — one line per dimension from the user's own answers
+    const adkarSummary = [];
+    sections.forEach(sec => {
+      const allQ = [];
+      if (sec.questions) allQ.push(...sec.questions);
+      if (sec.cards) sec.cards.forEach(c => { if (c.questions) allQ.push(...c.questions); });
+      // Find a representative answer for this section
+      const slider = allQ.find(q => q.type === "slider");
+      const text = allQ.find(q => q.type === "text" && (data[q.key] || "").trim());
+      let summary = "";
+      if (slider && data[slider.key]) {
+        const score = data[slider.key];
+        const label = score >= 8 ? "Strong" : score >= 6 ? "Adequate" : score >= 4 ? "Gap" : "Critical";
+        summary += `${score}/10 (${label})`;
+      }
+      if (text && data[text.key]) {
+        const snippet = data[text.key].trim();
+        const short = snippet.length > 80 ? snippet.substring(0, 80) + "\u2026" : snippet;
+        summary += (summary ? " \u2014 " : "") + `"${short}"`;
+      }
+      if (summary) {
+        adkarSummary.push({ label: sec.label, icon: sec.icon || "", summary });
+      }
+    });
+
     return (
       <div style={{
         minHeight: "100vh", background: "#FAFAF7",
         display: "flex", alignItems: "center", justifyContent: "center", padding: 40,
       }}>
         {showConfetti && <ConfettiExplosion />}
-        <div className="hfm-scale-enter" style={{ textAlign: "center", maxWidth: 560 }}>
+        <div className="hfm-scale-enter" style={{ textAlign: "center", maxWidth: 620 }}>
           <div className="hfm-float" style={{ fontSize: 72, marginBottom: 16 }}>&#127822;</div>
           <h2 style={{
-            color: accent, fontFamily: "Georgia, serif", fontSize: 32,
-            marginBottom: 8, lineHeight: 1.3,
+            color: accent, fontFamily: "Georgia, serif", fontSize: 30,
+            marginBottom: 12, lineHeight: 1.3,
           }}>
-            Thank you{data.name ? `, ${data.name.split(" ")[0]}` : ""}!
+            Thank you{firstName ? `, ${firstName}` : ""}.
           </h2>
-          <p style={{ color: "#4A5568", fontSize: 17, lineHeight: 1.7, marginBottom: 8 }}>
-            Your voice matters. Every response helps us build something better — together.
+          <p style={{ color: "#4A5568", fontSize: 17, lineHeight: 1.7, marginBottom: 4 }}>
+            Your voice is shaping our future.
+          </p>
+          <p style={{ color: "#4A4A4A", fontSize: 15, lineHeight: 1.7, marginBottom: 8 }}>
+            The Harris Farm AI First transformation starts with honest conversations like this one.
             {submitStatus === "error" && <><br /><span style={{ color: "#F97316" }}>Database save failed — your JSON backup has been downloaded.</span></>}
           </p>
+
+          {/* ADKAR answer summary */}
+          {adkarSummary.length > 0 && (
+            <div style={{
+              textAlign: "left", marginTop: 24,
+              background: "#FFFFFF",
+              border: "1px solid rgba(0,0,0,0.06)",
+              borderRadius: 14, padding: "20px 24px",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
+            }}>
+              <div style={{
+                fontSize: 12, color: "#4A4A4A", fontWeight: 700,
+                textTransform: "uppercase", letterSpacing: "0.06em",
+                marginBottom: 14, textAlign: "center",
+              }}>
+                Your Response Summary
+              </div>
+              {adkarSummary.map((item, i) => (
+                <div key={i} style={{
+                  display: "flex", alignItems: "flex-start", gap: 10,
+                  padding: "8px 0",
+                  borderTop: i > 0 ? "1px solid rgba(0,0,0,0.04)" : "none",
+                }}>
+                  <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>{item.icon}</span>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: accent, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                      {item.label}
+                    </div>
+                    <div style={{ fontSize: 14, color: "#4A5568", lineHeight: 1.5, marginTop: 2 }}>
+                      {item.summary}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div style={{
             background: `linear-gradient(135deg, ${accent}0A, ${accent}18)`,
             borderRadius: 12, padding: "16px 24px", marginTop: 24,
@@ -500,7 +605,7 @@ function App() {
             <div style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontSize: 15, color: "#4A5568", lineHeight: 1.6 }}>
               "We grow more than food. We grow ideas, capability, and each other."
             </div>
-            <div style={{ fontSize: 11, color: "#718096", marginTop: 8, letterSpacing: "0.05em", textTransform: "uppercase" }}>
+            <div style={{ fontSize: 11, color: "#4A4A4A", marginTop: 8, letterSpacing: "0.05em", textTransform: "uppercase" }}>
               Harris Farm Markets — For the Greater Goodness
             </div>
           </div>
@@ -527,7 +632,7 @@ function App() {
                 background: isActive
                   ? `linear-gradient(135deg, ${accent}, ${accent}DD)`
                   : isDone ? `${accent}15` : "rgba(0,0,0,0.03)",
-                color: isActive ? "#FFFFFF" : isDone ? accent : "#A0AEC0",
+                color: isActive ? "#FFFFFF" : isDone ? accent : "#666666",
                 border: isActive ? "none" : isDone ? `1px solid ${accent}30` : "1px solid rgba(0,0,0,0.05)",
                 borderRadius: 24, padding: isActive ? "8px 18px" : "7px 14px",
                 fontSize: 12, fontWeight: isActive ? 700 : isDone ? 600 : 400,
@@ -555,7 +660,7 @@ function App() {
           boxShadow: `0 0 10px ${accent}40`,
         }} />
       </div>
-      <div style={{ textAlign: "right", fontSize: 11, color: "#A0AEC0", marginTop: 4 }}>
+      <div style={{ textAlign: "right", fontSize: 11, color: "#666666", marginTop: 4 }}>
         {progress}% complete
       </div>
     </div>
@@ -565,7 +670,7 @@ function App() {
   const renderWelcome = () => (
     <div key={stepKey}>
       <QuoteBar accent={accent} />
-      <Card title={C.welcomeTitle || "About You"} color={accent} icon="\uD83C\uDF3F" delay={0}>
+      <Card title={C.welcomeTitle || "About You"} color={accent} icon={"\u{1F33F}"} delay={0}>
         {C.welcomeDescription && (
           <div style={{
             background: `linear-gradient(135deg, ${accent}08, ${accent}12)`,
@@ -577,6 +682,7 @@ function App() {
           </div>
         )}
         {welcomeFields.map(f => {
+          if (f.showIf && data[f.showIf.key] !== f.showIf.value) return null;
           if (f.type === "textarea") {
             return <TextArea key={f.key} label={f.label} help={f.help} value={data[f.key] || ""}
               onChange={v => set(f.key, v)} rows={f.rows || 3} placeholder={f.placeholder} />;
@@ -584,6 +690,10 @@ function App() {
           if (f.type === "slider") {
             return <Slider key={f.key} label={f.label} help={f.help} value={data[f.key] || 5}
               onChange={v => set(f.key, v)} color={f.color || accent} />;
+          }
+          if (f.type === "select") {
+            return <SelectField key={f.key} label={f.label} help={f.help} value={data[f.key] || ""}
+              onChange={v => set(f.key, v)} options={f.options || []} placeholder={f.placeholder} required={f.required} />;
           }
           return (
             <React.Fragment key={f.key}>
@@ -613,7 +723,7 @@ function App() {
           textAlign: "center", marginBottom: 20, padding: "0 20px",
         }}>
           <div style={{
-            fontSize: 13, color: "#718096", lineHeight: 1.6,
+            fontSize: 14, color: "#2D2D2D", lineHeight: 1.6,
             fontStyle: "italic",
           }}>
             {sec.description}
@@ -676,7 +786,7 @@ function App() {
             <div style={{ fontSize: 48, fontWeight: 800, fontFamily: "Georgia, serif", color: accent }}>
               {avgScore}
             </div>
-            <div style={{ fontSize: 13, color: "#718096", letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 4 }}>
+            <div style={{ fontSize: 13, color: "#4A4A4A", letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 4 }}>
               Overall Average Score
             </div>
             <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 12 }}>
@@ -688,7 +798,7 @@ function App() {
               </span>
               <span style={{
                 fontSize: 11, padding: "4px 12px", borderRadius: 12,
-                background: "rgba(232,184,75,0.10)", color: "#B8860B", fontWeight: 600,
+                background: "rgba(146,113,10,0.08)", color: "#7A6209", fontWeight: 600,
               }}>
                 {allSliders.filter(s => s.value >= 4 && s.value < 8).length} Building
               </span>
@@ -704,7 +814,7 @@ function App() {
 
         {/* Detailed scores by section */}
         {sectionNames.length > 0 && (
-          <Card title="Score Breakdown" color={accent} icon="\uD83D\uDCCA" delay={0}>
+          <Card title="Score Breakdown" color={accent} icon={"\u{1F4CA}"} delay={0}>
             <div style={{
               display: "grid",
               gridTemplateColumns: sectionNames.length > 1 ? "1fr 1fr" : "1fr",
@@ -713,7 +823,7 @@ function App() {
               {sectionNames.map(secName => (
                 <div key={secName}>
                   <div style={{
-                    fontSize: 11, color: "#718096", marginBottom: 8, fontWeight: 700,
+                    fontSize: 11, color: "#4A4A4A", marginBottom: 8, fontWeight: 700,
                     textTransform: "uppercase", letterSpacing: "0.08em",
                     paddingBottom: 6, borderBottom: `2px solid ${accent}20`,
                   }}>{secName}</div>
@@ -730,7 +840,7 @@ function App() {
                         }}>
                           <div style={{
                             width: `${s.value * 10}%`, height: "100%",
-                            background: s.value >= 8 ? "#2D6A2D" : s.value >= 6 ? "#E8B84B" : s.value >= 4 ? "#F97316" : "#DC2626",
+                            background: s.value >= 8 ? "#2D6A2D" : s.value >= 6 ? "#92710A" : s.value >= 4 ? "#C2410C" : "#DC2626",
                             borderRadius: 3,
                           }} />
                         </div>
@@ -746,7 +856,7 @@ function App() {
             {/* Attention areas */}
             {gaps.length > 0 && (
               <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(0,0,0,0.05)" }}>
-                <div style={{ fontSize: 11, color: "#718096", marginBottom: 8, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                <div style={{ fontSize: 11, color: "#4A4A4A", marginBottom: 8, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                   Areas Needing Attention
                 </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -775,13 +885,13 @@ function App() {
         )}
 
         {/* Submit card */}
-        <Card title="Ready to Submit" color={accent} icon="\uD83D\uDE80" delay={1}>
+        <Card title="Ready to Submit" color={accent} icon={"\u{1F680}"} delay={1}>
           <div style={{
             fontSize: 14, color: "#4A5568", marginBottom: 20, lineHeight: 1.7,
           }}>
             Submitting saves your response to the database and downloads a backup JSON file.
             <br />
-            <span style={{ fontStyle: "italic", color: "#718096" }}>
+            <span style={{ fontStyle: "italic", color: "#4A4A4A" }}>
               Your voice shapes what comes next.
             </span>
           </div>
@@ -800,11 +910,11 @@ function App() {
                 transition: "all 0.3s ease",
                 transform: (!submitting && welcomeValid) ? "translateY(0)" : "none",
               }}>
-              {submitting ? "Submitting..." : "\uD83C\uDF3F Submit Response"}
+              {submitting ? "Submitting..." : "\u{1F33F} Submit Response"}
             </button>
             <button onClick={handleReset}
               style={{
-                background: "transparent", color: "#A0AEC0",
+                background: "transparent", color: "#666666",
                 border: "1px solid rgba(0,0,0,0.08)", borderRadius: 12,
                 padding: "16px 18px", fontSize: 13, cursor: "pointer",
                 transition: "all 0.2s",
@@ -894,7 +1004,7 @@ function App() {
     }}>
       {/* Hero header */}
       <div className="hfm-fade-enter" style={{ textAlign: "center", marginBottom: 28, position: "relative" }}>
-        <div style={{ fontSize: 36, marginBottom: 8 }}>{C.headerEmoji || "\uD83C\uDF3F"}</div>
+        <div style={{ fontSize: 36, marginBottom: 8 }}>{C.headerEmoji || "\u{1F33F}"}</div>
         <h1 style={{
           fontFamily: "Georgia, serif", fontSize: 30, fontWeight: 700,
           marginBottom: 6, lineHeight: 1.3,
@@ -905,7 +1015,7 @@ function App() {
           {C.title || "Meeting Form"}
         </h1>
         {C.subtitle && (
-          <p style={{ color: "#718096", fontSize: 14, maxWidth: 500, margin: "0 auto", lineHeight: 1.5 }}>
+          <p style={{ color: "#2D2D2D", fontSize: 15, maxWidth: 500, margin: "0 auto", lineHeight: 1.5 }}>
             {C.subtitle}
           </p>
         )}
@@ -914,7 +1024,7 @@ function App() {
           display: "inline-flex", alignItems: "center", gap: 6,
           background: "rgba(0,0,0,0.03)", borderRadius: 20,
           padding: "4px 14px", marginTop: 10,
-          fontSize: 11, color: "#A0AEC0", letterSpacing: "0.04em",
+          fontSize: 11, color: "#666666", letterSpacing: "0.04em",
         }}>
           <span style={{ fontSize: 13 }}>&#x1F916;</span>
           AI-First Meeting OS &middot; The Harris Farm Way
@@ -935,7 +1045,7 @@ function App() {
         textAlign: "center", marginTop: 32, padding: "16px 0",
         borderTop: "1px solid rgba(0,0,0,0.04)",
       }}>
-        <div style={{ fontSize: 12, color: "#A0AEC0", lineHeight: 1.8 }}>
+        <div style={{ fontSize: 12, color: "#666666", lineHeight: 1.8 }}>
           <span style={{ fontSize: 14 }}>&#127822;</span> Harris Farm Markets &middot; The Harris Farm Way
           <br />
           <span style={{ fontStyle: "italic" }}>Built by our people, powered by AI, grown with purpose.</span>

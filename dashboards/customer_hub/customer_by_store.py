@@ -140,9 +140,9 @@ def render():
 
     def _color_var(val):
         if val > 5:
-            return "background-color: #dcfce7"
+            return "background-color: rgba(45,106,45,0.08)"
         elif val < -5:
-            return "background-color: #fee2e2"
+            return "background-color: rgba(192,57,43,0.08)"
         return ""
 
     styled = display.style.format({

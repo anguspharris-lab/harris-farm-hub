@@ -277,7 +277,7 @@ with tab2:
                     fig_pt = px.line(
                         df_pt, x="period", y="revenue",
                         labels={"period": "Month", "revenue": "Revenue ($)"},
-                        color_discrete_sequence=["#0d9488"],
+                        color_discrete_sequence=["#0891B2"],
                     )
                     fig_pt.update_layout(height=350)
                     st.plotly_chart(fig_pt, key="prodintel_plu_trend")
@@ -300,7 +300,7 @@ with tab2:
                         df_ps.sort_values("revenue", ascending=True).tail(15),
                         x="revenue", y="store_name", orientation="h",
                         labels={"revenue": "Revenue ($)", "store_name": "Store"},
-                        color_discrete_sequence=["#0d9488"],
+                        color_discrete_sequence=["#0891B2"],
                     )
                     fig_ps.update_layout(height=400)
                     st.plotly_chart(fig_ps, key="prodintel_plu_stores")
@@ -351,7 +351,7 @@ with tab2:
                         fig_w = px.bar(
                             tdf, x="label", y="wastage_abs",
                             labels={"label": "Week", "wastage_abs": "Wastage ($)"},
-                            color_discrete_sequence=["#ef4444"],
+                            color_discrete_sequence=["#C0392B"],
                         )
                         fig_w.update_layout(height=300, xaxis_tickangle=-45, showlegend=False)
                         st.plotly_chart(fig_w, key="prodintel_plu_wastage_trend")
@@ -360,7 +360,7 @@ with tab2:
                         fig_m = px.bar(
                             tdf, x="label", y="gm",
                             labels={"label": "Week", "gm": "Gross Margin ($)"},
-                            color_discrete_sequence=["#10b981"],
+                            color_discrete_sequence=["#7CB342"],
                         )
                         fig_m.update_layout(height=300, xaxis_tickangle=-45, showlegend=False)
                         st.plotly_chart(fig_m, key="prodintel_plu_gm_trend")
@@ -405,7 +405,7 @@ with tab3:
                     df_basket, x="basket_size", y="frequency",
                     labels={"basket_size": "Items per Basket",
                             "frequency": "Basket Count"},
-                    color_discrete_sequence=["#0d9488"],
+                    color_discrete_sequence=["#0891B2"],
                 )
                 fig_basket.update_layout(height=400)
                 st.plotly_chart(fig_basket, key="prodintel_basket_dist")

@@ -409,7 +409,7 @@ with tab_by_store:
     with col_l1:
         st.markdown(
             glass_card(
-                f"<span style='color:{GREEN};font-weight:700;font-size:1.1em;'>"
+                f"<span style='color:{GREEN};font-weight:700;font-size:16px;'>"
                 f"Green: >= {ROCE_TARGET:.0f}%</span>"
                 f"<br><span style='color:{TEXT_MUTED};'>Above board target</span>"
             ),
@@ -418,7 +418,7 @@ with tab_by_store:
     with col_l2:
         st.markdown(
             glass_card(
-                f"<span style='color:{ORANGE};font-weight:700;font-size:1.1em;'>"
+                f"<span style='color:{ORANGE};font-weight:700;font-size:16px;'>"
                 f"Amber: 10-{ROCE_TARGET:.0f}%</span>"
                 f"<br><span style='color:{TEXT_MUTED};'>Needs improvement</span>"
             ),
@@ -427,7 +427,7 @@ with tab_by_store:
     with col_l3:
         st.markdown(
             glass_card(
-                f"<span style='color:{RED};font-weight:700;font-size:1.1em;'>"
+                f"<span style='color:{RED};font-weight:700;font-size:16px;'>"
                 f"Red: < 10%</span>"
                 f"<br><span style='color:{TEXT_MUTED};'>Critical -- review investment</span>"
             ),
@@ -436,7 +436,7 @@ with tab_by_store:
     with col_l4:
         st.markdown(
             glass_card(
-                f"<span style='color:{GOLD};font-weight:700;font-size:1.1em;'>"
+                f"<span style='color:{GOLD};font-weight:700;font-size:16px;'>"
                 f"Dashed Line: {ROCE_TARGET:.0f}%</span>"
                 f"<br><span style='color:{TEXT_MUTED};'>Board Year 2 target</span>"
             ),
@@ -543,7 +543,7 @@ with tab_trend:
         # Add traces for each store
         colour_map = {}
         top_colours = [GREEN, CYAN, BLUE, PURPLE, "#A3E635"]
-        bot_colours = [RED, ORANGE, GOLD, "#EC4899", "#818CF8"]
+        bot_colours = [RED, ORANGE, GOLD, "#DB2777", "#7C3AED"]
 
         for i, name in enumerate(top5_names):
             colour_map[name] = top_colours[i % len(top_colours)]
@@ -805,7 +805,7 @@ with tab_dupont:
 
         st.markdown(
             glass_card(
-                f"<div style='font-size:1.05em;color:{TEXT_SECONDARY};'>"
+                f"<div style='font-size:15px;color:{TEXT_SECONDARY};'>"
                 f"{insight}</div>",
                 border_color=roce_colour(store_roce),
             ),
@@ -998,14 +998,14 @@ with tab_simulator:
             st.markdown(
                 glass_card(
                     f"<div style='text-align:center;'>"
-                    f"<div style='color:{TEXT_MUTED};font-size:0.9em;'>{year}</div>"
-                    f"<div style='color:{colour};font-size:2.2em;font-weight:700;"
-                    f"font-family:Georgia,serif;'>{roce_val:.1f}%</div>"
-                    f"<div style='color:{TEXT_SECONDARY};font-size:0.9em;'>"
+                    f"<div style='color:{TEXT_MUTED};font-size:13px;'>{year}</div>"
+                    f"<div style='color:{colour};font-size:35px;font-weight:700;"
+                    f"font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;'>{roce_val:.1f}%</div>"
+                    f"<div style='color:{TEXT_SECONDARY};font-size:13px;'>"
                     f"Rev: {fmt_dollar(rev)} | EBIT: {fmt_dollar(ebit)}</div>"
                     f"<div style='margin-top:8px;padding:4px 12px;border-radius:6px;"
                     f"background:{colour};color:white;display:inline-block;"
-                    f"font-weight:600;font-size:0.85em;'>"
+                    f"font-weight:600;font-size:12px;'>"
                     f"{'MEETS TARGET' if meets_target else 'BELOW TARGET'}</div>"
                     f"</div>",
                     border_color=colour,

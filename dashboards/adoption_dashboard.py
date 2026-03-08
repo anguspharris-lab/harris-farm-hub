@@ -147,8 +147,8 @@ with col_right:
         df_roles = pd.DataFrame(roles)
         fig3 = px.pie(
             df_roles, values="views", names="role",
-            color_discrete_sequence=["#2D6A2D", "#059669", "#d97706", "#7c3aed",
-                                      "#ef4444", "#0ea5e9", "#f59e0b", "#6b7280"],
+            color_discrete_sequence=["#2D6A2D", "#2D6A2D", "#C8971F", "#7c3aed",
+                                      "#C0392B", "#0891B2", "#C8971F", "#717171"],
         )
         fig3.update_layout(height=300, margin=dict(l=10, r=10, t=10, b=10))
         st.plotly_chart(fig3, use_container_width=True)

@@ -14,8 +14,8 @@ MATURITY_LEVELS = [
         "name": "Seed",
         "icon": "\U0001f331",
         "tagline": "Just planted",
-        "color": "#dcfce7",
-        "text_color": "#166534",
+        "color": "rgba(45,106,45,0.08)",
+        "text_color": "#1B4D1B",
         "description": (
             "You know AI exists and you're curious. You haven't used it at work yet, "
             "but you're ready to learn."
@@ -39,7 +39,7 @@ MATURITY_LEVELS = [
         "icon": "\U0001f33f",
         "tagline": "First shoots",
         "color": "#bbf7d0",
-        "text_color": "#166534",
+        "text_color": "#1B4D1B",
         "description": (
             "You use AI for simple tasks — drafting emails, looking up info, "
             "basic questions. You know it's not always right."
@@ -63,7 +63,7 @@ MATURITY_LEVELS = [
         "name": "Grower",
         "icon": "\U0001f33b",
         "tagline": "Growing strong",
-        "color": "#86efac",
+        "color": "#7CB342",
         "text_color": "#14532d",
         "description": (
             "You use AI daily with structure. You apply the Role-Context-Task "
@@ -116,7 +116,7 @@ MATURITY_LEVELS = [
         "icon": "\U0001f333",
         "tagline": "Shaping the farm",
         "color": "#2D6A2D",
-        "text_color": "#f0fdf4",
+        "text_color": "rgba(45,106,45,0.04)",
         "description": (
             "You design AI solutions for the business. Multi-step workflows, "
             "API integration, evaluation rubrics — you build tools that others use."
@@ -142,8 +142,8 @@ MATURITY_LEVELS = [
         "name": "Legend",
         "icon": "\U0001f3c6",
         "tagline": "A growing legend",
-        "color": "#166534",
-        "text_color": "#f0fdf4",
+        "color": "#1B4D1B",
+        "text_color": "rgba(45,106,45,0.04)",
         "description": (
             "You drive AI strategy across the business. You mentor others, "
             "design rubrics, evaluate AI initiatives at a strategic level, "
@@ -537,8 +537,8 @@ LEARNING_PATHS = [
         "levels": "Seed \u2192 Sprout",
         "hours": "~2 hrs",
         "tagline": "Your first steps with AI",
-        "color": "#dcfce7",
-        "text_color": "#166534",
+        "color": "rgba(45,106,45,0.08)",
+        "text_color": "#1B4D1B",
         "goal_tags": ["G3"],
         "description": (
             "Start here if you've never used AI at work. Learn what AI can do, "
@@ -557,7 +557,7 @@ LEARNING_PATHS = [
         "hours": "~3 hrs",
         "tagline": "Write prompts that actually work",
         "color": "#bbf7d0",
-        "text_color": "#166534",
+        "text_color": "#1B4D1B",
         "goal_tags": ["G3"],
         "description": (
             "Master the 5 building blocks of a great prompt. Learn Role, Context, "
@@ -576,7 +576,7 @@ LEARNING_PATHS = [
         "levels": "Grower \u2192 Harvester",
         "hours": "~3 hrs",
         "tagline": "Turn data into decisions",
-        "color": "#86efac",
+        "color": "#7CB342",
         "text_color": "#14532d",
         "goal_tags": ["G2", "G3"],
         "description": (
@@ -616,7 +616,7 @@ LEARNING_PATHS = [
         "hours": "~5 hrs",
         "tagline": "Build AI-powered tools",
         "color": "#2D6A2D",
-        "text_color": "#f0fdf4",
+        "text_color": "rgba(45,106,45,0.04)",
         "goal_tags": ["G3", "G5"],
         "description": (
             "Build real tools using Claude Code. API integration, multi-step "
@@ -635,8 +635,8 @@ LEARNING_PATHS = [
         "levels": "Cultivator \u2192 Legend",
         "hours": "~3 hrs",
         "tagline": "Lead AI transformation",
-        "color": "#166534",
-        "text_color": "#f0fdf4",
+        "color": "#1B4D1B",
+        "text_color": "rgba(45,106,45,0.04)",
         "goal_tags": ["G1", "G3"],
         "description": (
             "Evaluate AI initiatives using the 5-tier strategic rubric. "

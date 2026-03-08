@@ -336,7 +336,7 @@ with tab3:
 
             fig_radar = go.Figure(data=go.Scatterpolar(
                 r=values, theta=labels, fill="toself",
-                line_color="#0d9488",
+                line_color="#0891B2",
             ))
             fig_radar.update_layout(
                 polar=dict(radialaxis=dict(visible=True, range=[0, 10])),
@@ -434,7 +434,7 @@ with tab4:
                     color = "red" if score < 7 else "orange" if score < 8 else "green"
                     st.markdown(
                         "<div style='text-align:center'>"
-                        "<span style='font-size:2em;color:{}'>{}</span><br>"
+                        "<span style='font-size:32px;color:{}'>{}</span><br>"
                         "<b>{}</b></div>".format(color, score, labels[c]),
                         unsafe_allow_html=True,
                     )
@@ -617,18 +617,18 @@ with tab5:
             if d in ("COMPLETED", "APPROVED"):
                 return "#2D6A2D"
             if d in ("PENDING",):
-                return "#f59e0b"
+                return "#C8971F"
             if d in ("FAILED", "REJECTED"):
-                return "#ef4444"
+                return "#C0392B"
             if "GRADE:" in d:
-                return "#3b82f6"
+                return "#1565C0"
             if "RISK: HIGH" in d or "RISK: CRITICAL" in d:
-                return "#ef4444"
+                return "#C0392B"
             if "RISK:" in d:
-                return "#f59e0b"
+                return "#C8971F"
             if item_type == "improvement":
                 return "#a855f7"
-            return "#718096"
+            return "#717171"
 
         feed_html = "<div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;'>"
         for item in activity:
@@ -643,15 +643,15 @@ with tab5:
                 "<div style='background:rgba(0,0,0,0.04);border-radius:8px;padding:12px 14px;"
                 "border:1px solid rgba(0,0,0,0.08);'>"
                 "<div style='display:flex;align-items:center;gap:8px;'>"
-                "<span style='font-size:1.2em;'>{icon}</span>"
-                "<span style='font-size:0.85em;font-weight:600;color:{dark};"
+                "<span style='font-size:18px;'>{icon}</span>"
+                "<span style='font-size:12px;font-weight:600;color:{dark};"
                 "flex:1;'>{title}</span>"
                 "</div>"
                 "<div style='display:flex;justify-content:space-between;"
                 "align-items:center;margin-top:6px;'>"
-                "<span style='font-size:0.75em;color:{dc};font-weight:500;'>"
+                "<span style='font-size:12px;color:{dc};font-weight:500;'>"
                 "{det}</span>"
-                "<span style='font-size:0.7em;color:#718096;'>{ts}</span>"
+                "<span style='font-size:11px;color:#717171;'>{ts}</span>"
                 "</div>"
                 "<div style='margin-top:4px;'>{badges}</div>"
                 "</div>"

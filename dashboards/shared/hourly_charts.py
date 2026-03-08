@@ -65,7 +65,7 @@ def render_hourly_analysis(query_fn, store_id, start, end,
                     color="day_type",
                     category_orders={"dayofweekname": DAY_ORDER},
                     color_discrete_map={
-                        "Business Day": "#0d9488",
+                        "Business Day": "#0891B2",
                         "Weekend": "#7c3aed",
                     },
                     labels={
@@ -117,7 +117,7 @@ def render_hourly_analysis(query_fn, store_id, start, end,
                     color="day_type", barmode="group",
                     category_orders={"day_type": ["Business Day", "Weekend"]},
                     color_discrete_map={
-                        "Business Day": "#0d9488",
+                        "Business Day": "#0891B2",
                         "Weekend": "#7c3aed",
                     },
                     labels={

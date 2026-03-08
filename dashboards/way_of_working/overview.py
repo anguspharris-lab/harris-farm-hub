@@ -58,21 +58,21 @@ def render():
                 "<div style='border-left:3px solid {color};background:rgba(0,0,0,0.04);"
                 "border-radius:0 8px 8px 0;padding:14px;"
                 "min-height:180px;'>"
-                "<div style='font-size:1.2em;'>{icon}</div>"
-                "<div style='font-weight:700;color:{dark};font-size:0.9em;"
+                "<div style='font-size:18px;'>{icon}</div>"
+                "<div style='font-weight:700;color:{dark};font-size:13px;"
                 "margin:4px 0;'>{name}</div>"
-                "<div style='font-size:0.8em;color:#718096;margin-bottom:8px;'>"
+                "<div style='font-size:12px;color:#717171;margin-bottom:8px;'>"
                 "{done}/{total} done</div>"
-                "<div style='display:flex;gap:4px;font-size:0.75em;'>"
+                "<div style='display:flex;gap:4px;font-size:12px;'>"
                 "<span style='color:#2D6A2D;'>\u2713 {done}</span>"
-                "<span style='color:#2563eb;'>\u25b6 {ip}</span>"
-                "<span style='color:#dc2626;'>\u25cf {stuck}</span>"
+                "<span style='color:#1565C0;'>\u25b6 {ip}</span>"
+                "<span style='color:#C0392B;'>\u25cf {stuck}</span>"
                 "</div>"
                 "<div style='background:rgba(0,0,0,0.08);border-radius:4px;height:6px;"
                 "margin-top:8px;'>"
                 "<div style='background:{color};height:6px;border-radius:4px;"
                 "width:{pct}%;'></div></div>"
-                "<div style='font-size:0.7em;color:#718096;text-align:right;"
+                "<div style='font-size:12px;color:#717171;text-align:right;"
                 "margin-top:2px;'>{pct}%</div>"
                 "</div>".format(
                     color=color, icon=pillar["icon"], dark=HFM_DARK,
@@ -91,7 +91,7 @@ def render():
             fig = go.Figure(data=[go.Pie(
                 labels=["Done", "In Progress", "Stuck", "Not Started"],
                 values=[done, in_prog, stuck, not_started],
-                marker=dict(colors=["#2D6A2D", "#2563eb", "#dc2626", "#d1d5db"]),
+                marker=dict(colors=["#2D6A2D", "#1565C0", "#C0392B", "#E0E8E0"]),
                 hole=0.4,
                 textinfo="label+value",
             )])

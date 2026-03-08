@@ -67,7 +67,7 @@ PILLAR_REGISTRY = {
         "name": "Today's Business, Done Better",
         "short_name": "Operations",
         "icon": "\U0001f4ca",
-        "color": "#d97706",
+        "color": "#C8971F",
         "tagline": "We will tidy up the supply chain, from pay to purchase",
         "strategic_question": (
             "Are we running tighter, smarter, and faster \u2014 "

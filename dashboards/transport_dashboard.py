@@ -346,15 +346,15 @@ daily_costs = df.groupby('date').agg(
 fig_trend = go.Figure()
 fig_trend.add_trace(go.Scatter(
     x=daily_costs['date'], y=daily_costs['total_cost'],
-    name='Total Cost', line=dict(color='#1e3a8a', width=3), fill='tonexty'
+    name='Total Cost', line=dict(color='#1565C0', width=3), fill='tonexty'
 ))
 fig_trend.add_trace(go.Scatter(
     x=daily_costs['date'], y=daily_costs['driver_cost'],
-    name='Driver Cost', line=dict(color='#10b981', width=2)
+    name='Driver Cost', line=dict(color='#7CB342', width=2)
 ))
 fig_trend.add_trace(go.Scatter(
     x=daily_costs['date'], y=daily_costs['fuel_cost'],
-    name='Fuel Cost', line=dict(color='#f59e0b', width=2)
+    name='Fuel Cost', line=dict(color='#C8971F', width=2)
 ))
 fig_trend.update_layout(
     height=400, hovermode='x unified',

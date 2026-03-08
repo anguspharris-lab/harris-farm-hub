@@ -202,6 +202,6 @@ def format_comparison(store_name):
     }
 
 
-TIER_COLOURS = {1: "#2D6A2D", 2: "#65a30d", 3: "#d97706", 4: "#ea580c", 5: "#dc2626"}
-PHASE_COLOURS = {1: "#2D6A2D", 2: "#3B82F6", 3: "#8B5CF6"}
-CONFIDENCE_COLOURS = {"High": "#2D6A2D", "Medium": "#d97706", "Low": "#dc2626"}
+TIER_COLOURS = {1: "#2D6A2D", 2: "#65a30d", 3: "#C8971F", 4: "#C8971F", 5: "#C0392B"}
+PHASE_COLOURS = {1: "#2D6A2D", 2: "#1565C0", 3: "#7C3AED"}
+CONFIDENCE_COLOURS = {"High": "#2D6A2D", "Medium": "#C8971F", "Low": "#C0392B"}

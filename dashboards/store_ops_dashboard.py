@@ -370,12 +370,12 @@ with tab1:
         fig = go.Figure()
         fig.add_trace(go.Scatter(
             x=df_trend["period"], y=df_trend["revenue"],
-            name="Revenue ($)", yaxis="y", line=dict(color="#0d9488", width=2),
+            name="Revenue ($)", yaxis="y", line=dict(color="#0891B2", width=2),
         ))
         fig.add_trace(go.Bar(
             x=df_trend["period"], y=df_trend["transactions"],
             name="Transactions", yaxis="y2", opacity=0.3,
-            marker_color="#94a3b8",
+            marker_color="#717171",
         ))
 
         # Comparison overlay
@@ -397,7 +397,7 @@ with tab1:
                         x=df_comp["period"], y=df_comp["revenue"],
                         name=f"Revenue — {comparison.get('label', 'Prior')}",
                         yaxis="y",
-                        line=dict(color="#94a3b8", width=2, dash="dash"),
+                        line=dict(color="#717171", width=2, dash="dash"),
                     ))
             except Exception:
                 pass  # Silently skip comparison overlay on error
@@ -492,7 +492,7 @@ with tab3:
                 x="revenue", y=cat_name_col,
                 orientation="h",
                 color="revenue",
-                color_continuous_scale=["#ccfbf1", "#0d9488"],
+                color_continuous_scale=["rgba(8,145,178,0.08)", "#0891B2"],
                 labels={"revenue": "Revenue ($)", cat_name_col: ""},
             )
             fig_cbar.update_layout(height=350, coloraxis_showscale=False)
@@ -515,7 +515,7 @@ with tab3:
                 df_gst = pd.DataFrame(gst_data)
                 fig_pie = px.pie(
                     df_gst, values="revenue", names="category",
-                    color_discrete_sequence=["#059669", "#7c3aed"],
+                    color_discrete_sequence=["#2D6A2D", "#7c3aed"],
                     hole=0.4,
                 )
                 fig_pie.update_layout(height=300)
@@ -536,7 +536,7 @@ with tab3:
                 fig_gst_trend = px.bar(
                     df_gst_trend, x="period", y="revenue", color="category",
                     barmode="stack",
-                    color_discrete_map={"Fresh": "#059669", "Packaged": "#7c3aed"},
+                    color_discrete_map={"Fresh": "#2D6A2D", "Packaged": "#7c3aed"},
                     labels={"period": "Month", "revenue": "Revenue ($)"},
                 )
                 fig_gst_trend.update_layout(height=300)
@@ -746,9 +746,9 @@ with tab5:
                 x=pivot.columns.tolist(),
                 y=pivot.index.tolist(),
                 colorscale=[
-                    [0, "#f0fdf4"],
-                    [0.3, "#fbbf24"],
-                    [0.7, "#ef4444"],
+                    [0, "rgba(45,106,45,0.04)"],
+                    [0.3, "#C8971F"],
+                    [0.7, "#C0392B"],
                     [1, "#991b1b"],
                 ],
                 text=[[_fmt_val(v) for v in row]

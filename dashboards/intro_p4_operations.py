@@ -74,8 +74,8 @@ else:
     st.markdown(
         "<div style='background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.08);"
         "border-radius:8px;padding:12px 16px;"
-        "color:#718096;font-size:0.9em;'>"
-        "\U0001f4cb <strong style='color:#4A5568;'>Initiative Tracking:</strong> Connect Monday.com "
+        "color:#717171;font-size:13px;'>"
+        "\U0001f4cb <strong style='color:#4A4A4A;'>Initiative Tracking:</strong> Connect Monday.com "
         "to see P4 strategic initiatives here. "
         "Add <code>MONDAY_API_KEY</code> to your <code>.env</code> file."
         "</div>",
@@ -87,15 +87,15 @@ st.markdown("---")
 st.markdown(
     "<div style='background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);"
     "border-radius:10px;padding:20px;'>"
-    "<h3 style='color:white;margin-top:0;font-family:Georgia,serif;'>Tidy Up the Supply Chain</h3>"
-    "<p style='color:#4A5568;'>"
+    "<h3 style='color:white;margin-top:0;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;'>Tidy Up the Supply Chain</h3>"
+    "<p style='color:#4A4A4A;'>"
     "Grant Enders is transforming our supply chain from pay to purchase. "
     "The Hub tracks this transformation with 383.6 million transaction rows, "
     "store-level P&Ls, PLU wastage analysis, and demand forecasting.</p>"
-    "<p style='color:#718096;font-size:0.9em;'>"
-    "<strong style='color:#4A5568;'>Key targets:</strong> OOS reduction 20% by Jun 2026 | "
+    "<p style='color:#717171;font-size:13px;'>"
+    "<strong style='color:#4A4A4A;'>Key targets:</strong> OOS reduction 20% by Jun 2026 | "
     "Category buying optimisation | Weather-adjusted demand planning</p>"
-    "<p style='color:#4A5568;font-style:italic;font-size:0.9em;'>"
+    "<p style='color:#4A4A4A;font-style:italic;font-size:13px;'>"
     "AI doesn't replace operational expertise \u2014 it compounds it. "
     "Prompt the whole process, not just one report.</p>"
     "</div>",

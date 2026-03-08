@@ -261,10 +261,10 @@ def _render_health_overview():
             colour = score_color(overall)
             label = score_label(overall)
             st.markdown(
-                f"<h1 style='text-align:center;color:{colour};font-size:4rem;"
+                f"<h1 style='text-align:center;color:{colour};font-size:64px;"
                 f"margin-bottom:0;'>{overall:.1f}</h1>"
                 f"<p style='text-align:center;color:{TEXT_SECONDARY};"
-                f"font-size:1.2rem;margin-top:0;'>"
+                f"font-size:19px;margin-top:0;'>"
                 f"Overall Health Score  |  {label}</p>",
                 unsafe_allow_html=True,
             )
@@ -284,12 +284,12 @@ def _render_health_overview():
 
             with st.container(border=True):
                 st.markdown(
-                    f"<p style='color:{TEXT_MUTED};font-size:0.9rem;"
+                    f"<p style='color:{TEXT_MUTED};font-size:14px;"
                     f"margin-bottom:4px;text-align:center;'>{domain}</p>"
                     f"<h2 style='text-align:center;color:{colour};"
-                    f"margin:0;font-size:2.4rem;'>{display_score}</h2>"
+                    f"margin:0;font-size:38px;'>{display_score}</h2>"
                     f"<p style='text-align:center;color:{TEXT_MUTED};"
-                    f"font-size:0.8rem;margin-top:4px;'>"
+                    f"font-size:13px;margin-top:4px;'>"
                     f"{display_records} records</p>",
                     unsafe_allow_html=True,
                 )
